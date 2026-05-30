@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard — Discover</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --bg:#000000;
+  --bg2:#000000;
+  --bg3:#111111;
+  --card:#0a0a0a;
+  --card2:#2d2d30;
+  --surface:#111111;
+  --surface2:#1a1a1a;
+
+  --red:#990033;
+  --red2:#c41e5c;
+  --red-grad:linear-gradient(135deg,#990033,#c41e5c);
+  --red-glow:rgba(153,0,51,.28);
+  --red-dim:rgba(153,0,51,.12);
+  --red-border:rgba(153,0,51,.35);
+
+  --tx:#ffffff;
+  --tx2:#a1a1aa;
+  --muted:#71717a;
+  --star:#fbbf24;
+
+  --bd:rgba(255,255,255,.08);
+  --bd2:rgba(255,255,255,.04);
+
+  --safe-b:env(safe-area-inset-bottom,14px);
+  --r:12px;
+  --r-sm:8px;
+  --px:14px;
+
+  --font-d:'Syne',sans-serif;
+  --font-b:'Instrument Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow:hidden}
+img{display:block;user-select:none}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-b);cursor:pointer;border:none}
+
+/* SHELL */
+.shell{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+
+/* TOPBAR */
+.topbar{
+  flex-shrink:0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;
+  padding:10px var(--px) 9px;background:var(--bg2);border-bottom:1px solid var(--bd);z-index:60;
+}
+.logo{
+  font-family:var(--font-d);font-size:22px;font-weight:800;letter-spacing:-1px;
+  background:var(--red-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.search{
+  display:flex;align-items:center;gap:7px;background:var(--bg3);
+  border:1.5px solid var(--bd);border-radius:24px;padding:7px 13px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search:focus-within{border-color:var(--red);box-shadow:0 0 0 3px rgba(153,0,51,.15)}
+.search i{color:var(--muted);font-size:12px;flex-shrink:0}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--tx);font-family:var(--font-b);font-size:13px;font-weight:500}
+.search input::placeholder{color:var(--muted)}
+.notif{
+  width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--muted);position:relative;cursor:pointer;flex-shrink:0;
+}
+.ndot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--red);border:2px solid var(--bg2)}
+
+/* GENRE PILLS */
+.genre-bar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--bd)}
+.gps{display:flex;gap:6px;padding:7px var(--px);overflow-x:auto;scrollbar-width:none}
+.gps::-webkit-scrollbar{display:none}
+.gp{
+  flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;
+  border:1.5px solid var(--bd);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap;
+}
+.gp.on{background:var(--red-grad);border-color:transparent;color:#fff;box-shadow:0 2px 12px var(--red-glow)}
+.gp:active{transform:scale(.95)}
+
+/* SCROLL BODY */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:calc(64px + var(--safe-b) + 16px)}
+.body::-webkit-scrollbar{display:none}
+
+/* SECTION HEADERS */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:20px var(--px) 10px}
+.sh-title{font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:8px}
+.sh-title.line{border-left:3px solid var(--red);padding-left:9px;border-radius:0}
+.sh-icon{width:26px;height:26px;border-radius:8px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;font-size:13px;border:1px solid var(--red-border)}
+.sh-more{
+  font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;display:flex;align-items:center;gap:3px;
+  padding:4px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--bd);transition:background .18s;
+}
+.sh-more:active{background:var(--surface)}
+.div{height:1px;background:var(--bd2);margin:4px var(--px) 0}
+
+/* ── BANNER ── */
+.banner-wrap{margin:14px var(--px) 0;border-radius:var(--r);overflow:hidden;position:relative;box-shadow:0 6px 28px rgba(0,0,0,.5)}
+.btk{display:flex;will-change:transform;transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.bslide{flex:0 0 100%;height:215px;position:relative;background-size:cover;background-position:center 25%;cursor:pointer}
+.bscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.4) 45%,rgba(0,0,0,.97) 100%)}
+.bcta{
+  position:absolute;top:11px;right:11px;
+  background:var(--red-grad);color:#fff;
+  padding:5px 13px;border-radius:20px;font-size:9px;font-weight:800;cursor:pointer;
+  box-shadow:0 2px 12px var(--red-glow);letter-spacing:.04em;
+}
+.bcontent{position:absolute;bottom:0;left:0;right:0;padding:10px 13px 14px}
+.btags{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.btag{font-size:8px;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:.03em}
+.btag-r{background:rgba(153,0,51,.3);color:#ff6688;border:1px solid rgba(153,0,51,.45)}
+.btag-m{background:rgba(255,255,255,.12);backdrop-filter:blur(4px);color:rgba(255,255,255,.85)}
+.btitle{font-family:var(--font-d);font-size:14px;font-weight:800;line-height:1.28;color:#fff;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.bmeta{display:flex;align-items:center;gap:7px}
+.bav{width:19px;height:19px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.3)}
+.bauthor{font-size:10px;color:rgba(255,255,255,.78);font-weight:700;flex:1}
+.bstats{display:flex;gap:8px}
+.bstat{font-size:9px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:3px;font-weight:600}
+.bdots{display:flex;gap:4px;justify-content:center;padding:8px 0 2px}
+.bdot{width:5px;height:5px;border-radius:50%;background:var(--bg3);cursor:pointer;transition:.25s}
+.bdot.on{width:18px;border-radius:3px;background:var(--red)}
+
+/* ── 3-COL GRID ── */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 var(--px)}
+.sc{cursor:pointer;transition:.18s}
+.sc:active{transform:scale(.97)}
+.sc-cover{position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--bg3);aspect-ratio:3/4;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.sc-cover img{width:100%;height:100%;object-fit:cover}
+.sc-scrim{position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,rgba(0,0,0,.92),transparent)}
+.sc-badge{position:absolute;top:5px;left:0;font-size:7px;font-weight:800;padding:2px 6px 2px 4px;border-radius:0 6px 6px 0;letter-spacing:.03em;text-transform:uppercase}
+.badge-hot{background:var(--red);color:#fff}
+.badge-free{background:#14532d;color:#86efac}
+.badge-new{background:#3b0764;color:#d8b4fe}
+.sc-views{position:absolute;bottom:5px;left:5px;font-size:8px;font-weight:700;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:2px}
+.sc-title{font-size:10.5px;font-weight:700;line-height:1.3;margin-top:6px;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-sub{font-size:9px;color:var(--muted);margin-top:2px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── 4-COL GRID ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 var(--px)}
+.g4 .sc-title{font-size:9.5px}
+.g4 .sc-sub{font-size:8px}
+
+/* ── RANKINGS ── */
+.rank-tabs{display:flex;gap:0;background:var(--bg3);border-radius:10px;padding:3px;border:1.5px solid var(--bd);margin:0 var(--px) 10px}
+.rtab{flex:1;text-align:center;padding:6px 0;font-size:10.5px;font-weight:700;color:var(--muted);border-radius:8px;cursor:pointer;transition:.18s}
+.rtab.on{background:var(--red-grad);color:#fff;box-shadow:0 2px 10px var(--red-glow)}
+.rg{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:0 var(--px)}
+.rc{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:.18s;box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.rc:active{transform:scale(.97)}
+.rc-img-w{position:relative}
+.rc-img{width:100%;height:72px;object-fit:cover;display:block}
+.rc-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.88),transparent 55%)}
+.rc-num{position:absolute;top:4px;left:0;font-family:var(--font-d);font-size:12px;font-weight:800;padding:2px 7px 2px 5px;border-radius:0 7px 7px 0;line-height:1}
+.rn-g{background:rgba(234,170,0,.2);color:#d4a017}
+.rn-s{background:rgba(140,140,160,.16);color:#8888a8}
+.rn-b{background:rgba(175,110,60,.16);color:#a07040}
+.rn-d{background:rgba(255,255,255,.07);color:var(--muted)}
+.rc-tag{position:absolute;top:4px;right:4px;font-size:7px;font-weight:800;padding:2px 5px;border-radius:5px}
+.rt-hot{background:rgba(153,0,51,.18);color:#cc2255;border:1px solid rgba(153,0,51,.3)}
+.rt-new{background:rgba(22,163,74,.1);color:#4ade80;border:1px solid rgba(22,163,74,.2)}
+.rt-top{background:rgba(217,119,6,.1);color:#fbbf24;border:1px solid rgba(217,119,6,.2)}
+.rt-rise{background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.18)}
+.rc-body{padding:6px 7px 8px}
+.rc-cat{font-size:7px;font-weight:800;color:var(--red2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.rc-title{font-size:9.5px;font-weight:700;line-height:1.3;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px}
+.rc-meta{font-size:8px;color:var(--muted);font-weight:600}
+
+/* ── EDITOR PICKS — horizontal card scroll ── */
+.feat-scroll{display:flex;gap:10px;padding:0 var(--px) 4px;overflow-x:auto;scrollbar-width:none}
+.feat-scroll::-webkit-scrollbar{display:none}
+.feat-card{
+  flex-shrink:0;width:calc(100% - 28px);background:var(--card);border:1.5px solid var(--bd);
+  border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.18s;
+  display:flex;align-items:stretch;min-height:90px;box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.feat-card:active{transform:scale(.98)}
+.feat-thumb{position:relative;width:72px;flex-shrink:0}
+.feat-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.feat-thumb-scrim{position:absolute;inset:0;background:linear-gradient(90deg,transparent 55%,var(--card))}
+.feat-cat{position:absolute;top:6px;left:6px;background:var(--red-grad);color:#fff;font-size:7px;font-weight:800;padding:2px 7px;border-radius:5px}
+.feat-body{flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.feat-title{font-family:var(--font-d);font-size:11.5px;font-weight:700;line-height:1.35;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.feat-meta{display:flex;align-items:center;gap:5px}
+.feat-av{width:14px;height:14px;border-radius:50%;object-fit:cover;border:1.5px solid var(--bd)}
+.feat-author{font-size:9px;color:var(--muted);font-weight:700;flex:1}
+.feat-stat{font-size:8.5px;color:var(--tx2);font-weight:600}
+
+/* ── DEBATES ── */
+.debate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 var(--px)}
+.dc{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.dc:active{transform:scale(.99)}
+.dc.live{border-color:var(--red-border)}
+.dc-thumb{position:relative;width:100%;height:70px}
+.dc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.dc-thumb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.88),rgba(0,0,0,.1) 55%)}
+.dc-badges{position:absolute;top:5px;left:5px;display:flex;gap:4px;flex-wrap:wrap}
+.db{font-size:7px;font-weight:800;padding:2px 6px;border-radius:5px}
+.db-live{background:rgba(153,0,51,.25);color:#ff6688;border:1px solid rgba(153,0,51,.4);display:flex;align-items:center;gap:3px}
+.db-pulse{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.db-cat{background:rgba(255,255,255,.1);color:var(--tx2);border:1px solid rgba(255,255,255,.1)}
+.dc-body{padding:8px 9px;flex:1;display:flex;flex-direction:column;gap:6px}
+.dc-motion{font-size:9.5px;font-weight:600;color:var(--tx);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dc-sides{display:flex;flex-direction:column;gap:4px}
+.dside{border-radius:6px;padding:5px 8px;position:relative;overflow:hidden}
+.dside.for{background:rgba(22,163,74,.08);border:1.5px solid rgba(22,163,74,.2)}
+.dside.against{background:rgba(153,0,51,.07);border:1.5px solid rgba(153,0,51,.2)}
+.dside-bar{position:absolute;left:0;top:0;bottom:0;z-index:0;border-radius:6px}
+.dside.for .dside-bar{background:rgba(22,163,74,.14)}
+.dside.against .dside-bar{background:rgba(153,0,51,.1)}
+.dside-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+.dside-lbl{font-size:8px;font-weight:800}
+.dside.for .dside-lbl{color:#4ade80}
+.dside.against .dside-lbl{color:#cc2255}
+.dside-pct{font-size:10px;font-weight:900}
+.dside.for .dside-pct{color:#4ade80}
+.dside.against .dside-pct{color:#cc2255}
+.dc-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 9px 8px;border-top:1px solid var(--bd2);margin-top:auto}
+.dc-total{font-size:8.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:3px}
+.dc-join{background:var(--red-grad);color:#fff;padding:4px 11px;border-radius:14px;font-size:8.5px;font-weight:800;box-shadow:0 2px 8px var(--red-glow)}
+
+/* ── EMO PILLS ── */
+.emo-pills{display:flex;gap:6px;padding:0 var(--px);overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.emo-pills::-webkit-scrollbar{display:none}
+.ep{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:10.5px;font-weight:700;border:1.5px solid var(--bd);background:var(--card);color:var(--muted);cursor:pointer;transition:.18s}
+.ep.on{background:var(--red-dim);border-color:var(--red-border);color:#e8a0b0}
+.ep:active{transform:scale(.95)}
+
+/* ── TOP WRITERS ── */
+.writers-scroll{display:flex;gap:12px;padding:0 var(--px) 2px;overflow-x:auto;scrollbar-width:none}
+.writers-scroll::-webkit-scrollbar{display:none}
+.wc{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;cursor:pointer}
+.wc-ring-w{position:relative;width:54px;height:54px;flex-shrink:0}
+.wc-ring{width:54px;height:54px;border-radius:50%;padding:2.5px}
+.wc-ring.active{background:conic-gradient(var(--red),var(--red2),#ff4488,var(--red));animation:spinr 3s linear infinite}
+.wc-ring.viewed{background:var(--surface)}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.wc-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg3);border:2px solid var(--bg2)}
+.wc-inner img{width:100%;height:100%;object-fit:cover}
+.wc-badge{position:absolute;bottom:0;right:0;font-size:6px;font-weight:900;padding:2px 4px;border-radius:4px;border:1.5px solid var(--bg2);line-height:1.2}
+.wb-new{background:#1a3a6e;color:#93c5fd}
+.wb-live{background:var(--red);color:#fff}
+.wc-name{font-size:9.5px;font-weight:800;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;color:var(--tx)}
+.wc-genre{font-size:8px;color:var(--muted);font-weight:600;text-align:center}
+
+/* ── COLLECTIONS ── */
+.coll-scroll{display:flex;gap:9px;padding:0 var(--px) 4px;overflow-x:auto;scrollbar-width:none}
+.coll-scroll::-webkit-scrollbar{display:none}
+.coll-card{flex-shrink:0;width:148px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.18s;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.coll-card:active{transform:scale(.98)}
+.coll-covers{display:grid;grid-template-columns:1fr 1fr;height:68px;gap:1px}
+.coll-cover{background-size:cover;background-position:center}
+.coll-info{padding:8px 10px 10px}
+.coll-name{font-size:10.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;color:var(--tx)}
+.coll-meta{font-size:8.5px;color:var(--muted);font-weight:600}
+.coll-pub{display:inline-flex;align-items:center;gap:3px;margin-top:5px;font-size:8px;font-weight:800;padding:2px 7px;border-radius:5px;background:rgba(22,163,74,.08);color:#4ade80;border:1px solid rgba(22,163,74,.15)}
+
+/* ── COUNTRY ── */
+.flag-pills{display:flex;gap:6px;padding:0 var(--px);overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.flag-pills::-webkit-scrollbar{display:none}
+.fpill{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:var(--card);border:1.5px solid var(--bd);font-size:10.5px;font-weight:700;cursor:pointer;transition:.18s;color:var(--muted)}
+.fpill.on{background:var(--red-dim);border-color:var(--red-border);color:#e8a0b0}
+.fpill:active{transform:scale(.95)}
+
+/* ── SEARCH ── */
+.sr-wrap{display:none;flex-direction:column;gap:8px;padding:12px var(--px)}
+.sr-wrap.show{display:flex}
+.sr-card{display:flex;gap:10px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;cursor:pointer;transition:.18s}
+.sr-card:active{transform:scale(.99)}
+.sr-img{width:48px;height:60px;border-radius:var(--r-sm);object-fit:cover;flex-shrink:0}
+.sr-info{flex:1;min-width:0}
+.sr-cat{font-size:9px;font-weight:800;color:var(--red2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.sr-title{font-family:var(--font-d);font-size:12px;font-weight:700;line-height:1.3;margin-bottom:3px;color:var(--tx)}
+.sr-meta{font-size:10px;color:var(--muted);font-weight:600}
+.sr-empty{display:none;padding:48px 20px;text-align:center}
+.sr-empty.show{display:block}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-t{font-family:var(--font-d);font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)}
+.empty-s{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--bd);
+  display:flex;justify-content:space-around;
+  padding:8px 0 var(--safe-b);z-index:100;
+  box-shadow:0 -2px 16px rgba(0,0,0,.4);
+}
+.bn{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px;position:relative}
+.bn i{font-size:20px;display:block;margin-bottom:2px}
+.bn.on{color:var(--red)}
+.bn-badge{position:absolute;top:0;right:2px;width:16px;height:16px;border-radius:50%;background:var(--red);font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:90px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--bg3);color:var(--tx);
+  padding:9px 18px;border-radius:28px;font-size:12px;font-weight:700;
+  z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;
+  max-width:88vw;text-align:center;border:1px solid var(--bd);
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── ANIMATIONS ── */
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .32s ease both}
+.d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}
+.d4{animation-delay:.15s}.d5{animation-delay:.19s}.d6{animation-delay:.23s}
+.d7{animation-delay:.27s}.d8{animation-delay:.31s}.d9{animation-delay:.35s}
+.d10{animation-delay:.39s}.d11{animation-delay:.43s}.d12{animation-delay:.47s}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">Dro</div>
+    <div class="search">
+      <i class="fas fa-search"></i>
+      <input id="sinput" placeholder="Search stories, writers…" autocomplete="off"/>
+      <i class="fas fa-times" id="sclear" style="color:var(--muted);font-size:12px;cursor:pointer;display:none"></i>
+    </div>
+    <div class="notif" onclick="toast('🔔 Notifications')">
+      <i class="fas fa-bell"></i>
+      <div class="ndot"></div>
+    </div>
+  </div>
+
+  <!-- GENRE PILLS -->
+  <div class="genre-bar">
+    <div class="gps" id="gps"></div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body" id="body">
+
+    <!-- 1. BANNER -->
+    <div class="fu d1" id="bannerSec">
+      <div class="banner-wrap">
+        <div class="btk" id="btk"></div>
+      </div>
+      <div class="bdots" id="bdots"></div>
+    </div>
+
+    <!-- 2. POPULAR -->
+    <div class="sh fu d2">
+      <div class="sh-title line">Popular Stories</div>
+      <div class="sh-more" onclick="toast('📚 Browse all popular')">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="g3 fu d2" id="popularGrid"></div>
+    <div class="div fu d2" style="margin-top:16px"></div>
+
+    <!-- 3. RANKINGS -->
+    <div class="sh fu d3">
+      <div class="sh-title line">Story Rankings</div>
+      <div class="sh-more" onclick="toast('📊 Full rankings')">Full list <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="rank-tabs fu d3" id="rankTabs"></div>
+    <div class="rg fu d3" id="rankGrid"></div>
+    <div class="div fu d3" style="margin-top:16px"></div>
+
+    <!-- 4. EDITOR PICKS -->
+    <div class="sh fu d4">
+      <div class="sh-title"><div class="sh-icon">⭐</div>Editor's Picks</div>
+      <div class="sh-more" onclick="toast('⭐ More picks')">More <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="feat-scroll fu d4" id="featScroll"></div>
+    <div class="div fu d4" style="margin-top:16px"></div>
+
+    <!-- 5. DEBATES -->
+    <div class="sh fu d5">
+      <div class="sh-title line">Live Debates</div>
+      <div class="sh-more" onclick="toast('💬 All debates')">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="debate-grid fu d5" id="debateList"></div>
+    <div class="div fu d5" style="margin-top:16px"></div>
+
+    <!-- 6. BY FEELING -->
+    <div class="sh fu d6">
+      <div class="sh-title"><div class="sh-icon">😭</div>Browse by Feeling</div>
+      <div class="sh-more" onclick="toast('😭 All feelings')">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="emo-pills fu d6" id="emoPills"></div>
+    <div class="g3 fu d6" id="emoGrid"></div>
+    <div class="div fu d6" style="margin-top:16px"></div>
+
+    <!-- 7. ROMANCE -->
+    <div class="sh fu d7">
+      <div class="sh-title line">Romance</div>
+      <div class="sh-more" onclick="toast('💕 Browse romance')">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="g4 fu d7" id="romanceGrid"></div>
+    <div class="div fu d7" style="margin-top:16px"></div>
+
+    <!-- 8. NEW RELEASES -->
+    <div class="sh fu d8">
+      <div class="sh-title line">New Releases</div>
+      <div class="sh-more" onclick="toast('🆕 Browse new')">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="g3 fu d8" id="newGrid"></div>
+    <div class="div fu d8" style="margin-top:16px"></div>
+
+    <!-- 9. TOP WRITERS -->
+    <div class="sh fu d9">
+      <div class="sh-title line">Top Writers</div>
+      <div class="sh-more" onclick="toast('✍️ All writers')">All writers <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="writers-scroll fu d9" id="writersRow"></div>
+    <div class="div fu d9" style="margin-top:16px"></div>
+
+    <!-- 10. COLLECTIONS -->
+    <div class="sh fu d10">
+      <div class="sh-title line">Collections</div>
+      <div class="sh-more" onclick="toast('📂 All collections')">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+    </div>
+    <div class="coll-scroll fu d10" id="collScroll"></div>
+    <div class="div fu d10" style="margin-top:16px"></div>
+
+    <!-- 11. BY COUNTRY -->
+    <div class="sh fu d11">
+      <div class="sh-title line">Popular By Country</div>
+    </div>
+    <div class="flag-pills fu d11" id="flagPills"></div>
+    <div class="g4 fu d11" id="countryGrid"></div>
+
+    <!-- SEARCH -->
+    <div class="sr-wrap" id="srResults"></div>
+    <div class="sr-empty" id="srEmpty">
+      <div class="empty-ico">🔍</div>
+      <div class="empty-t">No results found</div>
+      <div class="empty-s">Try a different keyword, writer name or genre.</div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <div class="bn" onclick="toast('🏠 Home')"><i class="fas fa-home"></i>Home</div>
+    <div class="bn on"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn" onclick="toast('✏️ Create coming soon')"><i class="fas fa-plus-circle"></i>Create</div>
+    <div class="bn" onclick="toast('👥 People')"><i class="fas fa-users"></i>People</div>
+    <div class="bn" onclick="toast('👤 Profile')"><i class="fas fa-user-circle"></i>Profile</div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+const GENRES=['All','Romance','Betrayal','Family','Campus','Revenge','Elegy','Twist','Comedy','Dark','Spiritual','Werewolf'];
+const BANNERS=[
+  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ TWIST',tag:'#1 THIS WEEK',title:'"I left the altar in my socked feet — and found my real life"',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',reads:'312k',likes:'45k'},
+  {cover:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'💔 BETRAYAL',tag:'TRENDING',title:'"She found his second phone at their anniversary dinner"',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',reads:'171k',likes:'24.3k'},
+  {cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',cat:'👑 FAMILY',tag:'EDITOR PICK',title:'"My uncle claimed the inheritance using my late mother\'s stolen will"',author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',reads:'204k',likes:'31k'},
+  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 REVENGE',tag:'HOT',title:'"I became his boss before I told him who I was"',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'192k',likes:'28k'},
+];
+const POPULAR=[
+  {img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',views:'312k',badge:'hot'},
+  {img:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',title:'Caught my husband kissing her photograph',author:'Ada_Writes',views:'171k',badge:''},
+  {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',title:"My grandmother's will revealed I wasn't blood",author:'Chiamaka_N',views:'204k',badge:'free'},
+  {img:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',title:'The letter he never sent',author:'Efe_O',views:'218k',badge:''},
+  {img:'https://i.postimg.cc/cgLZJNmC/8.jpg',title:'The richest boy started sitting beside me',author:'CampusQueen',views:'134k',badge:'new'},
+  {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',title:"He proposed with my best friend's ring",author:'Kemi_A',views:'96k',badge:''},
+];
+const RANK_TABS=['🔥 Hot','⭐ Top','🆕 New'];
+const RDATA={
+  0:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+  1:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+  2:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+};
+const RNC=['rn-g','rn-s','rn-b','rn-d','rn-d','rn-d','rn-d','rn-d'];
+const FEAT=[
+  {cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&q=80',cat:'💔 BETRAYAL',title:'I came home early and caught my husband kissing her photograph',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',reads:'171k',stat:'😭 12k Crying'},
+  {cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300&q=80',cat:'🌙 ELEGY',title:'The letter folded inside the pocket of his old jacket',author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',reads:'218k',stat:'💔 6k Heartbroken'},
+  {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&q=80',cat:'👑 FAMILY',title:"My grandmother's will revealed I wasn't her blood — she left me everything",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',reads:'204k',stat:'🔥 Top Rated'},
+  {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=300&q=80',cat:'✨ TWIST',title:'She left the altar in socked feet and opened a bakery called Bare',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',reads:'312k',stat:'😱 89k Shocked'},
+  {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300&q=80',cat:'🔥 REVENGE',title:'My stepmother stole my university fund — so I exposed her secret life',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'192k',stat:'😡 22k Enraged'},
+  {cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&q=80',cat:'🎓 CAMPUS',title:'The richest boy started sitting beside me every single morning',author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',reads:'134k',stat:'🥹 18k Emotional'},
+];
+const DEBATES=[
+  {cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',motion:'Ada should stay and fight for her marriage, not leave.',forV:2341,agV:3819,live:true},
+  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'TWIST',motion:'Walking out publicly was brave, not dramatic.',forV:9800,agV:2100,live:true},
+  {cover:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'REVENGE',motion:'Legal action was the only appropriate response to her stepmother.',forV:5800,agV:900,live:false},
+  {cover:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'ELEGY',motion:'He was right to end things quietly to protect her.',forV:3400,agV:5600,live:true},
+];
+const EMO_F=[
+  {e:'😭',lbl:'All Feels',val:'all'},{e:'💔',lbl:'Heartbreak',val:'heartbreak'},
+  {e:'😡',lbl:'Rage',val:'rage'},{e:'😱',lbl:'Shocked',val:'shocked'},
+  {e:'🥹',lbl:'Emotional',val:'emotional'},{e:'🔥',lbl:'Savage',val:'savage'},
+];
+const EMO_D={
+  all:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+  heartbreak:[
+    {img:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=75',title:'He deleted our photos on our 5th anniversary',author:'Kemi_A',views:'96k',badge:'new'},
+    {img:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=75',title:'I caught him kissing her photograph',author:'Ada_Writes',views:'171k',badge:'hot'},
+    {img:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=75',title:'The letter he kept folded in his jacket',author:'Efe_O',views:'218k',badge:''},
+  ],
+  rage:[
+    {img:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',title:'My stepmother stole my fund',author:'Zara_M',views:'192k',badge:'hot'},
+    {img:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=75',title:'Caught my husband kissing her photograph',author:'Ada_Writes',views:'171k',badge:''},
+    {img:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',title:'The will that revealed everything',author:'Chiamaka_N',views:'204k',badge:'new'},
+  ],
+  shocked:[
+    {img:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',title:'She walked out in socked feet',author:'Ifeanyi_Story',views:'312k',badge:''},
+    {img:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=75',title:'The richest boy chose the scholarship girl',author:'CampusQueen',views:'134k',badge:'new'},
+    {img:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400&q=75',title:'Three rejections and then forever',author:'Dami_Cole',views:'22k',badge:''},
+  ],
+  emotional:[
+    {img:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=75',title:'The letter he never sent',author:'Efe_O',views:'218k',badge:''},
+    {img:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',title:'Left everything to me despite not being blood',author:'Chiamaka_N',views:'204k',badge:''},
+    {img:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=75',title:'He deleted our photos on the 5th anniversary',author:'Kemi_A',views:'96k',badge:'new'},
+  ],
+  savage:[
+    {img:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',title:'I left the altar in socked feet',author:'Ifeanyi_Story',views:'312k',badge:'hot'},
+    {img:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',title:'I became his boss before revealing who I was',author:'Zara_M',views:'192k',badge:''},
+    {img:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=75',title:'The scholarship girl who outlasted them all',author:'CampusQueen',views:'134k',badge:'new'},
+  ],
+};
+const ROMANCE=[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ];
+const NEW_REL=[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ];
+const WRITERS=[
+  {name:'CLAIRE FONTAINE',genre:'✨ Twist',av:'https://i.pravatar.cc/100?img=53',ring:'active',badge:'new'},
+  {name:'J.H. STERLING',genre:'🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',ring:'viewed',badge:''},
+  {name:'ARIA VANCE',genre:'💔 Betrayal',av:'https://i.pravatar.cc/100?img=32',ring:'active',badge:'live'},
+  {name:'CHIAMAKA N.',genre:'👑 Family',av:'https://i.pravatar.cc/100?img=47',ring:'active',badge:'new'},
+  {name:'ZARA M.',genre:'🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',ring:'viewed',badge:''},
+  {name:'DAMI COLE',genre:'🏙️ Love',av:'https://i.pravatar.cc/100?img=64',ring:'active',badge:''},
+];
+const COLLS=[
+  {name:'Stories That Wrecked Me',count:14,curator:'Chioma_R',covers:['https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200','https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200','https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200','https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200']},
+  {name:'Best Plot Twists 2025',count:8,curator:'Ada_Writes',covers:['https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200','https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200','https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200','https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=200']},
+  {name:'2am Crying Material',count:11,curator:'Kemi_A',covers:['https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200','https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200','https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=200','https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200']},
+  {name:'Campus Life Classics',count:6,curator:'CampusQueen',covers:['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200','https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=200','https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200','https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=200']},
+  {name:'Revenge Arc Masterclass',count:9,curator:'Zara_M',covers:['https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200','https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200','https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200','https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200']},
+];
+const COUNTRIES=[{flag:'🇳🇬',name:'Nigeria',code:'ng'},{flag:'🇬🇭',name:'Ghana',code:'gh'},{flag:'🇰🇪',name:'Kenya',code:'ke'},{flag:'🇿🇦',name:'S.Africa',code:'za'},{flag:'🇺🇬',name:'Uganda',code:'ug'}];
+const C_DATA={
+  ng:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+  gh:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ],
+  ke:[
+  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ TWIST',tag:'#1 THIS WEEK',title:'"I left the altar in my socked feet — and found my real life"',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',reads:'312k',likes:'45k'},
+  {cover:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'💔 BETRAYAL',tag:'TRENDING',title:'"She found his second phone at their anniversary dinner"',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',reads:'171k',likes:'24.3k'},
+  {cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',cat:'👑 FAMILY',tag:'EDITOR PICK',title:'"My uncle claimed the inheritance using my late mother\'s stolen will"',author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',reads:'204k',likes:'31k'},
+  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 REVENGE',tag:'HOT',title:'"I became his boss before I told him who I was"',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'192k',likes:'28k'},
+],
+  za:[
+  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ TWIST',tag:'#1 THIS WEEK',title:'"I left the altar in my socked feet — and found my real life"',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',reads:'312k',likes:'45k'},
+  {cover:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'💔 BETRAYAL',tag:'TRENDING',title:'"She found his second phone at their anniversary dinner"',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',reads:'171k',likes:'24.3k'},
+  {cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',cat:'👑 FAMILY',tag:'EDITOR PICK',title:'"My uncle claimed the inheritance using my late mother\'s stolen will"',author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',reads:'204k',likes:'31k'},
+  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 REVENGE',tag:'HOT',title:'"I became his boss before I told him who I was"',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'192k',likes:'28k'},
+],
+  ug:[
+    {img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'TWIST',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',reads:'312k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'ELEGY',title:'The letter he never sent',author:'Efe_O',reads:'218k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'FAMILY',title:"Grandmother's will revealed everything",author:'Chiamaka_N',reads:'204k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'REVENGE',title:'Stepmother stole my university fund',author:'Zara_M',reads:'192k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',title:'Caught my husband kissing her photo',author:'Ada_Writes',reads:'171k',tag:'hot',tc:'rt-hot'},
+    {img:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'CAMPUS',title:'The richest boy sat beside me daily',author:'CampusQueen',reads:'134k',tag:'new',tc:'rt-new'},
+    {img:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'HEARTBREAK',title:'He deleted our photos on anniversary',author:'Kemi_A',reads:'96k',tag:'rise',tc:'rt-rise'},
+    {img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'LOVE',title:"She rejected me 3 times. Dog: 'Finally'",author:'Dami_Cole',reads:'22k',tag:'new',tc:'rt-new'},
+  ]
+};
+const SPOOL=[
+  {cat:'✨ TWIST',img:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200',title:'The runaway bride in her socked feet',writer:'Ifeanyi_Story',likes:'45k'},
+  {cat:'🌙 ELEGY',img:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200',title:'The letter he never sent',writer:'Efe_O',likes:'36.5k'},
+  {cat:'💔 BETRAYAL',img:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:"I caught my husband kissing my late sister's photo",writer:'Ada_Writes',likes:'24.3k'},
+  {cat:'👑 FAMILY',img:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200',title:"My grandmother's will revealed I wasn't her blood",writer:'Chiamaka_N',likes:'31k'},
+  {cat:'🔥 REVENGE',img:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200',title:'My stepmother stole my university fund',writer:'Zara_M',likes:'28k'},
+  {cat:'🎓 CAMPUS',img:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',title:'The richest boy started sitting beside me every morning',writer:'CampusQueen',likes:'18.1k'},
+];
+
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400)}
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+
+function sc(s){
+  const bc=s.badge==='hot'?'badge-hot':s.badge==='free'?'badge-free':s.badge==='new'?'badge-new':'badge-hot';
+  return`<div class="sc" onclick="toast('📖 Opening…')">
+    <div class="sc-cover">
+      <img src="${s.img}" loading="lazy"/>
+      <div class="sc-scrim"></div>
+      ${s.badge?`<div class="sc-badge ${bc}">${s.badge.toUpperCase()}</div>`:''}
+      <div class="sc-views"><i class="fas fa-eye" style="font-size:7px"></i>${s.views}</div>
+    </div>
+    <div class="sc-title">${s.title}</div>
+    <div class="sc-sub">@${s.author}</div>
+  </div>`;
+}
+
+/* Genre pills */
+document.getElementById('gps').innerHTML=GENRES.map((g,i)=>
+  `<div class="gp${i===0?' on':''}" onclick="setGenre(this,'${g}')">${g}</div>`).join('');
+function setGenre(el,g){document.querySelectorAll('.gp').forEach(p=>p.classList.remove('on'));el.classList.add('on');toast(g==='All'?'📚 Showing all genres':`📚 ${g}`)}
+
+/* Banner */
+let bIdx=0,bTimer=null;
+(function renderBanner(){
+  const tk=document.getElementById('btk'),dots=document.getElementById('bdots');
+  tk.innerHTML=BANNERS.map(b=>`
+    <div class="bslide" style="background-image:url('${b.cover}')">
+      <div class="bscrim"></div>
+      <button class="bcta" onclick="toast('📖 Reading now')">Read Now</button>
+      <div class="bcontent">
+        <div class="btags"><span class="btag btag-r">${b.cat}</span><span class="btag btag-m">${b.tag}</span></div>
+        <div class="btitle">${b.title}</div>
+        <div class="bmeta">
+          <img class="bav" src="${b.av}" loading="lazy"/>
+          <span class="bauthor">@${b.author}</span>
+          <div class="bstats">
+            <span class="bstat"><i class="fas fa-eye" style="font-size:7px"></i>${b.reads}</span>
+            <span class="bstat"><i class="fas fa-heart" style="font-size:7px"></i>${b.likes}</span>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  dots.innerHTML=BANNERS.map((_,i)=>`<div class="bdot${i===0?' on':''}" data-i="${i}"></div>`).join('');
+  dots.querySelectorAll('.bdot').forEach(d=>d.addEventListener('click',()=>goBanner(+d.dataset.i)));
+  startBanner();
+  let sx=0;
+  document.getElementById('bannerSec').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;clearTimeout(bTimer)},{passive:true});
+  document.getElementById('bannerSec').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)goBanner(dx<0?(bIdx+1)%BANNERS.length:(bIdx-1+BANNERS.length)%BANNERS.length);else startBanner()},{passive:true});
+})();
+function goBanner(i){bIdx=i;document.getElementById('btk').style.transform=`translateX(-${i*100}%)`;document.querySelectorAll('.bdot').forEach((d,j)=>d.classList.toggle('on',j===i));clearTimeout(bTimer);startBanner()}
+function startBanner(){bTimer=setTimeout(()=>goBanner((bIdx+1)%BANNERS.length),4200)}
+
+/* Popular */
+document.getElementById('popularGrid').innerHTML=POPULAR.map(sc).join('');
+
+/* Rankings */
+let aRT=0;
+document.getElementById('rankTabs').innerHTML=RANK_TABS.map((t,i)=>
+  `<div class="rtab${i===0?' on':''}" onclick="setRT(${i})">${t}</div>`).join('');
+function setRT(i){aRT=i;document.querySelectorAll('.rtab').forEach((t,j)=>t.classList.toggle('on',j===i));renderRG()}
+function renderRG(){
+  document.getElementById('rankGrid').innerHTML=(RDATA[aRT]||[]).slice(0,8).map((s,i)=>`
+    <div class="rc" onclick="toast('📖 Opening…')">
+      <div class="rc-img-w">
+        <img class="rc-img" src="${s.img}" loading="lazy"/>
+        <div class="rc-scrim"></div>
+        <div class="rc-num ${RNC[i]||'rn-d'}">${i+1}</div>
+        <div class="rc-tag ${s.tc}">${s.tag==='hot'?'🔥':s.tag==='new'?'🆕':s.tag==='top'?'⭐':'📈'}</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-cat">${s.cat}</div>
+        <div class="rc-title">${s.title}</div>
+        <div class="rc-meta">@${s.author} · ${s.reads}</div>
+      </div>
+    </div>`).join('');
+}
+renderRG();
+
+/* Editor Picks */
+document.getElementById('featScroll').innerHTML=FEAT.map(s=>`
+  <div class="feat-card" onclick="toast('📖 Opening…')">
+    <div class="feat-thumb">
+      <img src="${s.cover}" loading="lazy"/>
+      <div class="feat-thumb-scrim"></div>
+      <div class="feat-cat">${s.cat}</div>
+    </div>
+    <div class="feat-body">
+      <div class="feat-title">${s.title}</div>
+      <div class="feat-meta">
+        <img class="feat-av" src="${s.av}" loading="lazy"/>
+        <span class="feat-author">@${s.author}</span>
+        <span class="feat-stat">${s.stat}</span>
+      </div>
+    </div>
+  </div>`).join('');
+
+/* Debates */
+document.getElementById('debateList').innerHTML=DEBATES.map(d=>{
+  const tot=(d.forV+d.agV)||1,fp=Math.round(d.forV/tot*100),ap=100-fp;
+  return`<div class="dc${d.live?' live':''}" onclick="toast('💬 Debate')">
+    <div class="dc-thumb">
+      <img src="${d.cover}" loading="lazy"/>
+      <div class="dc-thumb-scrim"></div>
+      <div class="dc-badges">
+        ${d.live?`<span class="db db-live"><span class="db-pulse"></span>LIVE</span>`:''}
+        <span class="db db-cat">${d.cat}</span>
+      </div>
+    </div>
+    <div class="dc-body">
+      <div class="dc-motion">"${d.motion}"</div>
+      <div class="dc-sides">
+        <div class="dside for"><div class="dside-bar" style="width:${fp}%"></div><div class="dside-inner"><span class="dside-lbl">✅ FOR</span><span class="dside-pct">${fp}%</span></div></div>
+        <div class="dside against"><div class="dside-bar" style="width:${ap}%"></div><div class="dside-inner"><span class="dside-lbl">❌ AGAINST</span><span class="dside-pct">${ap}%</span></div></div>
+      </div>
+    </div>
+    <div class="dc-footer">
+      <span class="dc-total"><i class="fas fa-fire" style="color:var(--red);font-size:8px"></i>${fmt(d.forV+d.agV)}</span>
+      <button class="dc-join" onclick="event.stopPropagation();toast('💬 Joining debate')">Join →</button>
+    </div>
+  </div>`;
+}).join('');
+
+/* Emo Feeling */
+document.getElementById('emoPills').innerHTML=EMO_F.map(f=>
+  `<div class="ep${f.val==='all'?' on':''}" onclick="setEmo(this,'${f.val}')">${f.e} ${f.lbl}</div>`).join('');
+function setEmo(el,val){
+  document.querySelectorAll('.ep').forEach(p=>p.classList.remove('on'));el.classList.add('on');
+  document.getElementById('emoGrid').innerHTML=(EMO_D[val]||EMO_D.all).map(sc).join('');
+}
+document.getElementById('emoGrid').innerHTML=EMO_D.all.map(sc).join('');
+
+/* Romance & New */
+document.getElementById('romanceGrid').innerHTML=ROMANCE.map(sc).join('');
+document.getElementById('newGrid').innerHTML=NEW_REL.map(sc).join('');
+
+/* Writers */
+document.getElementById('writersRow').innerHTML=WRITERS.map(w=>`
+  <div class="wc" onclick="toast('✍️ ${w.name}')">
+    <div class="wc-ring-w">
+      <div class="wc-ring ${w.ring}">
+        <div class="wc-inner"><img src="${w.av}" loading="lazy"/></div>
+      </div>
+      ${w.badge==='new'?'<div class="wc-badge wb-new">NEW</div>':w.badge==='live'?'<div class="wc-badge wb-live">LIVE</div>':''}
+    </div>
+    <div class="wc-name">${w.name}</div>
+    <div class="wc-genre">${w.genre}</div>
+  </div>`).join('');
+
+/* Collections */
+document.getElementById('collScroll').innerHTML=COLLS.map(c=>`
+  <div class="coll-card" onclick="toast('📂 ${c.name}')">
+    <div class="coll-covers">${c.covers.slice(0,4).map(img=>`<div class="coll-cover" style="background-image:url('${img}')"></div>`).join('')}</div>
+    <div class="coll-info">
+      <div class="coll-name">${c.name}</div>
+      <div class="coll-meta">${c.count} stories · @${c.curator}</div>
+      <div class="coll-pub">🌍 Public</div>
+    </div>
+  </div>`).join('');
+
+/* Country */
+let aC='ng';
+document.getElementById('flagPills').innerHTML=COUNTRIES.map(c=>
+  `<div class="fpill${c.code==='ng'?' on':''}" onclick="setCountry(this,'${c.code}')">${c.flag} ${c.name}</div>`).join('');
+function setCountry(el,code){
+  aC=code;document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('on',p===el));
+  document.getElementById('countryGrid').innerHTML=(C_DATA[code]||[]).map(sc).join('');
+}
+document.getElementById('countryGrid').innerHTML=(C_DATA.ng||[]).map(sc).join('');
+
+/* Search */
+const sinput=document.getElementById('sinput'),sclear=document.getElementById('sclear');
+const srR=document.getElementById('srResults'),srE=document.getElementById('srEmpty');
+let mainNodes=[];
+setTimeout(()=>{const b=document.getElementById('body');mainNodes=[...b.children].filter(n=>n.id!=='srResults'&&n.id!=='srEmpty')},200);
+function showMain(){mainNodes.forEach(n=>n.style.display='');srR.classList.remove('show');srE.classList.remove('show');sclear.style.display='none'}
+function runSearch(q){
+  q=q.trim().toLowerCase();if(!q){showMain();return}
+  sclear.style.display='block';mainNodes.forEach(n=>n.style.display='none');
+  srR.classList.remove('show');srE.classList.remove('show');
+  const hits=SPOOL.filter(s=>(s.title||'').toLowerCase().includes(q)||(s.writer||'').toLowerCase().includes(q)||(s.cat||'').toLowerCase().includes(q));
+  if(!hits.length){srE.classList.add('show');return}
+  srR.classList.add('show');
+  srR.innerHTML=hits.map(s=>`
+    <div class="sr-card" onclick="toast('📖 Opening…')">
+      <img class="sr-img" src="${s.img}" loading="lazy"/>
+      <div class="sr-info">
+        <div class="sr-cat">${s.cat}</div>
+        <div class="sr-title">${s.title}</div>
+        <div class="sr-meta">@${s.writer} · ❤️ ${s.likes}</div>
+      </div>
+    </div>`).join('');
+}
+sinput.addEventListener('input',e=>runSearch(e.target.value));
+sclear.addEventListener('click',()=>{sinput.value='';showMain();sinput.focus()});
+</script>
+</body>
+</html>

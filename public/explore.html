@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#07070b">
+<title>Droboard — Genre Stories</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --acc: #ff0050;
+    --acc2: #ff6b8a;
+    --glow: rgba(255, 0, 80, .28);
+    --dark: #07070b;
+    --card: #111118;
+    --surface: #0e0e1c;
+    --tx: #f5f5f7;
+    --muted: #888;
+    --bd: rgba(255, 255, 255, .09);
+  }
+
+  body {
+    background: var(--dark);
+    color: var(--tx);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--dark);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Header */
+  .genre-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7, 7, 11, 0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--bd);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--bd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .genre-title {
+    flex: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--acc);
+  }
+  .genre-stats {
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* FEATURED BANNER (same as discover page) */
+  .featured-banner {
+    margin: 16px;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+  }
+  .banner-track {
+    display: flex;
+    transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .banner-slide {
+    flex: 0 0 100%;
+    height: 240px;
+    position: relative;
+    background-size: cover;
+    background-position: center 20%;
+  }
+  .banner-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(175deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.6) 48%, rgba(0, 0, 0, 0.97) 100%);
+  }
+  .banner-cta {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--acc);
+    color: #fff;
+    border: none;
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 0 12px var(--glow);
+    z-index: 2;
+  }
+  .banner-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 14px 14px;
+    z-index: 2;
+  }
+  .banner-tags {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .btag {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: 8px;
+  }
+  .btag.acc {
+    background: var(--acc);
+    color: #fff;
+  }
+  .btag.muted {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(6px);
+    color: #fff;
+  }
+  .banner-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1.3;
+    color: #fff;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .banner-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bav {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+  }
+  .bauthor {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 700;
+    flex: 1;
+  }
+  .bstats {
+    display: flex;
+    gap: 10px;
+  }
+  .bstat {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.55);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 600;
+  }
+  .banner-dots {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    padding: 8px 0 2px;
+  }
+  .bdot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: 0.25s;
+  }
+  .bdot.on {
+    width: 18px;
+    border-radius: 3px;
+    background: var(--acc);
+  }
+
+  /* WRITERS ROW (same as homepage) */
+  .writers-row-wrap {
+    padding: 8px 0 12px;
+    border-bottom: 1px solid var(--bd);
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 16px 10px;
+  }
+  .section-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .writers-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 0 16px;
+    scrollbar-width: none;
+  }
+  .writers-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .writer-card {
+    flex-shrink: 0;
+    width: 70px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .writer-ring {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--acc), var(--acc2));
+  }
+  .writer-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--dark);
+  }
+  .writer-name {
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .writer-fol {
+    font-size: 8px;
+    color: var(--muted);
+  }
+
+  /* SORT BAR */
+  .sort-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--bd);
+    background: var(--surface);
+  }
+  .story-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .sort-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--bd);
+    border-radius: 20px;
+    padding: 6px 12px;
+    color: var(--tx);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+
+  /* GRID (same as discover page) */
+  .stories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 16px;
+  }
+  .sc {
+    cursor: pointer;
+    transition: 0.18s;
+  }
+  .sc:active {
+    transform: scale(0.97);
+  }
+  .sc-cover {
+    position: relative;
+    border-radius: 11px;
+    overflow: hidden;
+    background: var(--card);
+    aspect-ratio: 2/3;
+  }
+  .sc-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sc-scrim {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.92), transparent);
+  }
+  .sc-badge {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    font-size: 7px;
+    font-weight: 800;
+    padding: 2px 7px 2px 5px;
+    border-radius: 0 7px 7px 0;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .sc-badge.hot {
+    background: var(--acc);
+    color: #fff;
+  }
+  .sc-badge.new {
+    background: #3ecf8e;
+    color: #fff;
+  }
+  .sc-views {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
+    border-radius: 10px;
+  }
+  .sc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 6px;
+    color: var(--tx);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sc-sub {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sc-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .sc-star {
+    font-size: 8px;
+    color: #f0b429;
+  }
+
+  .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 720px;
+    margin: 0 auto;
+    background: rgba(7, 7, 11, 0.97);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--bd);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 env(safe-area-inset-bottom, 14px);
+    z-index: 100;
+  }
+  .bn-item {
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 3px 8px;
+  }
+  .bn-item i {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .bn-item.active {
+    color: var(--acc);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #1e1e28;
+    border: 1px solid var(--bd);
+    color: #fff;
+    padding: 8px 17px;
+    border-radius: 28px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 900;
+    opacity: 0;
+    transition: 0.28s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <div class="genre-header">
+    <div class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></div>
+    <div class="genre-title" id="genreTitle">Popular Stories</div>
+    <div class="genre-stats" id="genreStats">loading...</div>
+  </div>
+
+  <div id="bannerSection"></div>
+
+  <div class="writers-row-wrap" id="writersSection" style="display: none;">
+    <div class="section-header">
+      <h3><i class="fas fa-pen-fancy" style="color: var(--acc);"></i> Top Writers in this Genre</h3>
+      <span style="font-size: 11px; color: var(--acc2); cursor: pointer;" onclick="toast('All writers coming soon')">See all →</span>
+    </div>
+    <div class="writers-scroll" id="writersRow"></div>
+  </div>
+
+  <div class="sort-bar">
+    <span class="story-count" id="storyCount">0 stories</span>
+    <select class="sort-select" id="sortSelect">
+      <option value="trending">🔥 Trending</option>
+      <option value="newest">🆕 Newest</option>
+      <option value="rating">⭐ Top Rated</option>
+    </select>
+  </div>
+
+  <div class="stories-grid" id="storiesGrid"></div>
+  <div class="loading-indicator" id="loadingIndicator" style="display: none;">Loading more stories...</div>
+
+  <div class="bottom-nav">
+    <div class="bn-item" data-nav="home"><i class="fas fa-home"></i>Home</div>
+    <div class="bn-item active" data-nav="discover"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn-item" data-nav="create"><i class="fas fa-plus-circle"></i>Create</div>
+    <div class="bn-item" data-nav="profile"><i class="fas fa-user-circle"></i>Profile</div>
+  </div>
+</div>
+<div class="toast" id="toastMsg"></div>
+
+<script>
+  function toast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  function fmtN(n) {
+    return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+  }
+
+  function stars(r) {
+    return '★'.repeat(Math.floor(r)) + '☆'.repeat(5 - Math.floor(r));
+  }
+
+  // ========== GENRE DATA ==========
+  const genreLibrary = {
+    popular: {
+      name: '🔥 Popular Stories',
+      icon: '🔥',
+      bannerStories: [
+        { cover: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900', cat: '✨ TWIST', tag: '#1 THIS WEEK', title: 'The runaway bride — I left at the altar in my socked feet', author: 'Ifeanyi_Story', av: 'https://i.pravatar.cc/100?img=53', reads: '312k', likes: '45k' },
+        { cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900', cat: '💔 BETRAYAL', tag: 'TRENDING', title: 'She found his second phone at their anniversary dinner', author: 'Ada_Writes', av: 'https://i.pravatar.cc/100?img=32', reads: '171k', likes: '24.3k' },
+        { cover: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900', cat: '👑 FAMILY', tag: 'EDITOR PICK', title: 'My uncle claimed the inheritance using my late mother\'s stolen will', author: 'Chiamaka_N', av: 'https://i.pravatar.cc/100?img=47', reads: '204k', likes: '31k' }
+      ],
+      writers: [
+        { name: 'Ifeanyi_Story', avatar: 'https://i.pravatar.cc/100?img=53', followers: '31.7k' },
+        { name: 'Ada_Writes', avatar: 'https://i.pravatar.cc/100?img=32', followers: '12.4k' },
+        { name: 'Chiamaka_N', avatar: 'https://i.pravatar.cc/100?img=47', followers: '19.2k' },
+        { name: 'Dami_Cole', avatar: 'https://i.pravatar.cc/100?img=64', followers: '9.4k' }
+      ],
+      stories: [
+        { img: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400', title: 'The runaway bride in her socked feet', author: 'Ifeanyi_Story', rating: 4.9, views: '312k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400', title: 'Caught my husband kissing her photograph', author: 'Ada_Writes', rating: 4.7, views: '171k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400', title: "My grandmother's will revealed I wasn't blood", author: 'Chiamaka_N', rating: 4.6, views: '204k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400', title: 'The letter he never sent', author: 'Efe_O', rating: 4.7, views: '218k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', title: 'The richest boy started sitting beside me', author: 'CampusQueen', rating: 4.5, views: '134k', badge: 'new' },
+        { img: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400', title: 'He proposed with my best friend\'s ring', author: 'Kemi_A', rating: 4.4, views: '96k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400', title: 'My stepmother stole my university fund', author: 'Zara_M', rating: 4.5, views: '192k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400', title: 'She rejected me 3 times. Dog named "Finally"', author: 'Dami_Cole', rating: 4.8, views: '22.4k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400', title: 'My twin and I switched lives for one month', author: 'Ngozi_J', rating: 4.3, views: '89k', badge: 'new' },
+        { img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400', title: 'We argued about puff puff and fell in love', author: 'Dami_Cole', rating: 4.6, views: '61k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400', title: 'The intern who became my partner', author: 'Kola_B', rating: 4.2, views: '44k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400', title: 'Love, Unscripted', author: 'Lola_S', rating: 4.9, views: '132k', badge: '' }
+      ]
+    },
+    romance: {
+      name: '💕 Romance Stories',
+      icon: '💕',
+      bannerStories: [
+        { cover: 'https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=900', cat: '💕 ROMANCE', tag: 'STEAMY', title: 'A Kiss from Lagos — the night that changed everything', author: 'Olaide Brown', av: 'https://i.pravatar.cc/100?img=36', reads: '89k', likes: '12k' },
+        { cover: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900', cat: '🌅 SLOW BURN', tag: 'EDITOR\'S PICK', title: 'Before Sunrise in Accra', author: 'Nana Serwaa', av: 'https://i.pravatar.cc/100?img=42', reads: '104k', likes: '18k' },
+        { cover: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=900', cat: '🎬 ROM-COM', tag: 'FUNNY', title: 'Love, Unscripted — they hated each other on set', author: 'Lola Shoneyin', av: 'https://i.pravatar.cc/100?img=55', reads: '132k', likes: '22k' }
+      ],
+      writers: [
+        { name: 'Olaide Brown', avatar: 'https://i.pravatar.cc/100?img=36', followers: '15.2k' },
+        { name: 'Nana Serwaa', avatar: 'https://i.pravatar.cc/100?img=42', followers: '12.8k' },
+        { name: 'Dami Cole', avatar: 'https://i.pravatar.cc/100?img=64', followers: '9.4k' },
+        { name: 'Lola Shoneyin', avatar: 'https://i.pravatar.cc/100?img=55', followers: '22.1k' }
+      ],
+      stories: [
+        { img: 'https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=400', title: 'A Kiss from Lagos', author: 'Olaide Brown', rating: 4.9, views: '89k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1536590158209-e9d615d525e4?w=400', title: 'The Vow on the Bridge', author: 'Efe Johnson', rating: 4.8, views: '72k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', title: 'Before Sunrise in Accra', author: 'Nana Serwaa', rating: 4.9, views: '104k', badge: 'new' },
+        { img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400', title: 'The Last Love Letter', author: 'Dami Cole', rating: 4.6, views: '61k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400', title: 'Sweet Nothings', author: 'Temilade A.', rating: 4.5, views: '48k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400', title: 'Love, Unscripted', author: 'Lola Shoneyin', rating: 4.9, views: '132k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400', title: 'Finally', author: 'Dami Cole', rating: 4.8, views: '22.4k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400', title: 'Puff Puff & Love', author: 'Kemi_A', rating: 4.6, views: '61k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400', title: 'The Intern', author: 'Kola_B', rating: 4.4, views: '44k', badge: 'new' },
+        { img: 'https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=400', title: 'Midnight in Lagos', author: 'Olaide Brown', rating: 4.7, views: '56k', badge: '' }
+      ]
+    },
+    ranking: {
+      name: '🏆 Top Rankings',
+      icon: '🏆',
+      bannerStories: [
+        { cover: 'https://images.unsplash.com/photo-1519791883288-dc8bd696e667?w=900', cat: '⭐ #1 RATED', tag: 'BEST OF 2025', title: 'Letters I Never Sent — the letter that broke a million hearts', author: 'Chiamaka Eze', av: 'https://i.pravatar.cc/100?img=47', reads: '98k', likes: '31k' },
+        { cover: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900', cat: '🌅 #2 RATED', tag: 'READER\'S CHOICE', title: 'Before Sunrise in Accra', author: 'Nana Serwaa', av: 'https://i.pravatar.cc/100?img=42', reads: '104k', likes: '18k' }
+      ],
+      writers: [
+        { name: 'Chiamaka Eze', avatar: 'https://i.pravatar.cc/100?img=47', followers: '19.2k' },
+        { name: 'Ada Obi', avatar: 'https://i.pravatar.cc/100?img=32', followers: '12.4k' },
+        { name: 'Ifeanyi Story', avatar: 'https://i.pravatar.cc/100?img=53', followers: '31.7k' }
+      ],
+      stories: [
+        { img: 'https://images.unsplash.com/photo-1519791883288-dc8bd696e667?w=400', title: 'Letters I Never Sent', author: 'Chiamaka Eze', rating: 4.9, views: '98k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', title: 'Before Sunrise in Accra', author: 'Nana Serwaa', rating: 4.9, views: '104k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=400', title: 'A Kiss from Lagos', author: 'Olaide Brown', rating: 4.9, views: '89k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=400', title: 'The Scent of Rain', author: 'Ada Obi', rating: 4.8, views: '134k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400', title: 'Love, Unscripted', author: 'Lola Shoneyin', rating: 4.9, views: '132k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400', title: 'The Runaway Bride', author: 'Ifeanyi Story', rating: 4.9, views: '312k', badge: 'hot' },
+        { img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400', title: 'His Hidden Heir', author: 'Kemi Lawal', rating: 4.7, views: '210k', badge: '' },
+        { img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400', title: 'My Stepmother Stole My Fund', author: 'Zara_M', rating: 4.5, views: '192k', badge: '' }
+      ]
+    }
+  };
+
+  // Get genre from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  let currentGenre = urlParams.get('type') || 'popular';
+  if (!genreLibrary[currentGenre]) currentGenre = 'popular';
+
+  const genre = genreLibrary[currentGenre];
+  let allStories = [...genre.stories];
+  let displayedCount = 9;
+  let isLoading = false;
+  let currentSort = 'trending';
+  let bIdx = 0;
+  let bTimer = null;
+
+  // ========== BANNER CAROUSEL ==========
+  function renderBanner() {
+    const container = document.getElementById('bannerSection');
+    container.innerHTML = `
+      <div class="featured-banner">
+        <div class="banner-track" id="bannerTrack"></div>
+      </div>
+      <div class="banner-dots" id="bannerDots"></div>
+    `;
+
+    const track = document.getElementById('bannerTrack');
+    track.innerHTML = genre.bannerStories.map(b => `
+      <div class="banner-slide" style="background-image: url('${b.cover}')">
+        <div class="banner-scrim"></div>
+        <button class="banner-cta" onclick="toast('📖 Reading now')">Read Now</button>
+        <div class="banner-content">
+          <div class="banner-tags"><span class="btag acc">${b.cat}</span><span class="btag muted">${b.tag}</span></div>
+          <div class="banner-title">${b.title}</div>
+          <div class="banner-meta">
+            <img class="bav" src="${b.av}" loading="lazy"/>
+            <span class="bauthor">@${b.author}</span>
+            <div class="bstats">
+              <span class="bstat"><i class="fas fa-eye"></i>${b.reads}</span>
+              <span class="bstat"><i class="fas fa-heart"></i>${b.likes}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const dots = document.getElementById('bannerDots');
+    dots.innerHTML = genre.bannerStories.map((_, i) => `<div class="bdot ${i === 0 ? 'on' : ''}" data-i="${i}"></div>`).join('');
+
+    dots.querySelectorAll('.bdot').forEach(dot => {
+      dot.addEventListener('click', () => goToBanner(+dot.dataset.i));
+    });
+
+    startBannerTimer();
+  }
+
+  function goToBanner(i) {
+    bIdx = i;
+    document.getElementById('bannerTrack').style.transform = `translateX(-${i * 100}%)`;
+    document.querySelectorAll('.bdot').forEach((d, j) => d.classList.toggle('on', j === i));
+    clearTimeout(bTimer);
+    startBannerTimer();
+  }
+
+  function startBannerTimer() {
+    bTimer = setTimeout(() => goToBanner((bIdx + 1) % genre.bannerStories.length), 4500);
+  }
+
+  // ========== WRITERS ROW ==========
+  function renderWriters() {
+    if (!genre.writers || genre.writers.length === 0) {
+      document.getElementById('writersSection').style.display = 'none';
+      return;
+    }
+    document.getElementById('writersSection').style.display = 'block';
+    const container = document.getElementById('writersRow');
+    container.innerHTML = genre.writers.map(w => `
+      <div class="writer-card" onclick="toast('@${w.name} profile coming soon')">
+        <div class="writer-ring"><img src="${w.avatar}" loading="lazy"/></div>
+        <div class="writer-name">@${w.name.split('_')[0]}</div>
+        <div class="writer-fol">${w.followers}</div>
+      </div>
+    `).join('');
+  }
+
+  // ========== STORIES GRID ==========
+  function renderStories() {
+    const container = document.getElementById('storiesGrid');
+    const displayStories = allStories.slice(0, displayedCount);
+    document.getElementById('storyCount').textContent = `${allStories.length} stories`;
+    document.getElementById('genreStats').textContent = `${allStories.length} stories`;
+
+    container.innerHTML = displayStories.map(s => `
+      <div class="sc" onclick="toast('📖 Opening ${s.title}')">
+        <div class="sc-cover">
+          <img src="${s.img}" loading="lazy"/>
+          <div class="sc-scrim"></div>
+          ${s.badge ? `<div class="sc-badge ${s.badge === 'hot' ? 'hot' : s.badge === 'new' ? 'new' : 'hot'}">${s.badge === 'hot' ? '🔥 HOT' : s.badge === 'new' ? '🆕 NEW' : s.badge.toUpperCase()}</div>` : ''}
+          <div class="sc-views"><i class="fas fa-eye"></i> ${s.views}</div>
+        </div>
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-sub">@${s.author}</div>
+        <div class="sc-stars"><span class="sc-star">${stars(s.rating)}</span></div>
+      </div>
+    `).join('');
+  }
+
+  function sortStories() {
+    if (currentSort === 'trending') {
+      allStories.sort((a, b) => {
+        const viewsA = parseInt(a.views.replace('k', '')) || 0;
+        const viewsB = parseInt(b.views.replace('k', '')) || 0;
+        return viewsB - viewsA;
+      });
+    } else if (currentSort === 'rating') {
+      allStories.sort((a, b) => b.rating - a.rating);
+    } else if (currentSort === 'newest') {
+      allStories = [...genre.stories].reverse();
+    }
+    displayedCount = 9;
+    renderStories();
+  }
+
+  // ========== INFINITE SCROLL ==========
+  function handleScroll() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    if (scrollTop + windowHeight >= documentHeight - 400 && !isLoading && displayedCount < allStories.length) {
+      isLoading = true;
+      document.getElementById('loadingIndicator').style.display = 'block';
+      setTimeout(() => {
+        displayedCount = Math.min(displayedCount + 6, allStories.length);
+        renderStories();
+        isLoading = false;
+        document.getElementById('loadingIndicator').style.display = 'none';
+      }, 500);
+    }
+  }
+
+  // ========== INIT ==========
+  function init() {
+    document.title = `${genre.name} — Droboard`;
+    document.getElementById('genreTitle').innerHTML = genre.icon + ' ' + genre.name.split(' ').slice(1).join(' ');
+    
+    renderBanner();
+    renderWriters();
+    sortStories();
+
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      sortStories();
+      toast(`Sorted by ${e.target.options[e.target.selectedIndex].text}`);
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => window.history.back());
+
+    document.querySelectorAll('.bn-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const nav = item.dataset.nav;
+        if (nav === 'home') window.location.href = 'index.html';
+        else if (nav === 'discover') window.location.href = 'explore.html';
+        else toast('🚧 Coming soon');
+      });
+    });
+
+    window.addEventListener('scroll', handleScroll);
+  }
+
+  init();
+</script>
+</body>
+</html>

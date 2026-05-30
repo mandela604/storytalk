@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · Live Write</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.28);--glow2:rgba(255,0,80,.12);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;
+  --tx:#f5f5f7;--muted:#666;--muted2:#999;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.05);
+  --gold:#f59e0b;--emerald:#10b981;--ruby:#ff4444;--blue:#00aaff;
+  --nav-h:60px;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--nav-h) + 16px)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.3);border-radius:3px}
+
+/* ── TOP BAR ── */
+.top-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(7,7,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.back-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#ccc;flex-shrink:0}
+.back-btn:active{transform:scale(.9)}
+.top-bar-center{flex:1;min-width:0}
+.top-bar-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-bar-sub{font-size:10px;color:var(--muted2);margin-top:1px;display:flex;align-items:center;gap:5px}
+.live-pulse{display:flex;align-items:center;gap:4px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:lp 1.3s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+.live-badge{background:var(--acc);color:#fff;font-size:8px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:.06em}
+.top-actions{display:flex;gap:6px}
+.top-icon-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#ccc;flex-shrink:0}
+
+/* ── AVATAR RING ── */
+.av-ring-wrap{position:relative;cursor:pointer;flex-shrink:0}
+.av-ring{border-radius:50%;display:flex;align-items:center;justify-content:center;padding:2px}
+.av-ring.ring-new{background:conic-gradient(#00aaff,#0066ff,#00eeff,#0088ff,#00aaff);animation:spinRing 2.5s linear infinite}
+.av-ring.ring-viewed{background:#3a3a55}
+.av-ring.ring-none{background:var(--acc)}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--dark)}
+.av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+
+/* ── WRITER HERO ── */
+.writer-hero{position:relative;overflow:hidden}
+.hero-cover-el{width:100%;height:200px;background:linear-gradient(135deg,#0d0a16 0%,#1a0e28 40%,#0d1a26 100%);position:relative;overflow:hidden}
+.hero-cover-el::before{content:'✦';position:absolute;font-size:120px;color:rgba(255,0,80,.06);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hero-grad{position:absolute;bottom:0;left:0;right:0;height:130px;background:linear-gradient(0deg,rgba(7,7,11,1) 0%,rgba(7,7,11,.7) 60%,transparent 100%)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:14px 16px 16px;z-index:2}
+.writer-row{display:flex;align-items:center;gap:10px}
+.writer-info{flex:1;min-width:0}
+.writer-name{font-size:14px;font-weight:700}
+.writer-meta{font-size:10px;color:var(--muted2);margin-top:1px}
+.follow-btn{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);color:#fff;padding:5px 14px;border-radius:30px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;transition:.2s}
+.follow-btn.ing{background:var(--acc);border-color:var(--acc)}
+.follow-btn:active{transform:scale(.95)}
+
+/* ── STORY META ── */
+.story-meta-bar{padding:12px 16px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.story-cat-badge{background:var(--acc);padding:3px 10px;border-radius:16px;font-size:9px;font-weight:800;letter-spacing:.04em}
+.story-title-text{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;line-height:1.3;flex:1;min-width:0}
+.viewer-count{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted2);flex-shrink:0}
+.viewer-count i{color:var(--acc);font-size:10px}
+
+/* ── WRITER DASHBOARD ── */
+.writer-dash{background:linear-gradient(135deg,rgba(255,0,80,.06),rgba(255,107,138,.03));border-top:1px solid rgba(255,0,80,.15);padding:14px 16px;display:none}
+.writer-dash.open{display:block}
+.dash-title{font-size:10px;font-weight:800;color:var(--acc2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.dash-stat{background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:10px;padding:8px;text-align:center}
+.dash-stat-num{font-size:15px;font-weight:900;color:var(--acc2)}
+.dash-stat-label{font-size:8px;color:var(--muted2);margin-top:2px}
+.publish-area{background:rgba(0,0,0,.3);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+.pub-label{font-size:10px;font-weight:700;color:var(--muted2);margin-bottom:8px}
+.pub-textarea{width:100%;background:transparent;border:none;color:#fff;font-family:'DM Serif Display',serif;font-size:15px;line-height:1.75;outline:none;resize:none;min-height:100px}
+.pub-textarea::placeholder{color:#3a3a55;font-family:'DM Serif Display',serif}
+.pub-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd2)}
+.pub-chars{font-size:10px;color:var(--muted)}
+.pub-actions{display:flex;gap:7px}
+.pub-btn{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.pub-btn:active{transform:scale(.95)}
+.pub-btn.draft{background:rgba(255,255,255,.08);border:1px solid var(--bd);color:#ccc}
+.pub-btn.publish{background:var(--acc);color:#fff;box-shadow:0 0 12px var(--glow2)}
+.pub-btn.publish:disabled{background:#2a2a35;color:#555;box-shadow:none;cursor:default}
+
+/* Writer insert tools */
+.insert-tools{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.insert-btn{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:rgba(255,255,255,.04);color:#bbb;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:.15s}
+.insert-btn:hover{background:rgba(255,0,80,.08);border-color:rgba(255,0,80,.25);color:var(--acc2)}
+.insert-btn:active{transform:scale(.95)}
+
+/* ── CHAPTER HEADER ── */
+.chapter-header{padding:16px 16px 0;display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.chapter-badge{background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.06em}
+.chapter-title-small{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;flex:1;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── STORY STREAM ── */
+.story-stream{padding:0 16px 12px;position:relative}
+.stream-para{margin-bottom:0;overflow:hidden}
+.stream-para-inner{font-family:'DM Serif Display',serif;font-size:17px;line-height:1.78;color:#e8e7f5;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);opacity:0;transform:translateY(12px);animation:paraIn .55s ease forwards}
+@keyframes paraIn{to{opacity:1;transform:translateY(0)}}
+.stream-para-inner.para-1::first-letter{font-family:'Playfair Display',serif;font-size:4em;font-weight:900;float:left;line-height:.75;padding-right:10px;margin-top:10px;color:var(--acc)}
+.stream-para-inner:last-child{border-bottom:none}
+
+/* Typing indicator */
+.typing-block{padding:14px 16px;display:flex;align-items:center;gap:10px}
+.typing-av{width:28px;height:28px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--acc)}
+.typing-av img{width:100%;height:100%;object-fit:cover;display:block}
+.typing-label{font-size:11px;color:var(--muted2)}
+.typing-dots{display:flex;gap:3px;align-items:center;margin-left:4px}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--acc2);animation:tdAnim 1.2s ease-in-out infinite}
+.tdot:nth-child(2){animation-delay:.18s}
+.tdot:nth-child(3){animation-delay:.36s}
+@keyframes tdAnim{0%,80%,100%{transform:scale(.7);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+/* New para flash */
+.new-para-flash{display:inline-flex;align-items:center;gap:5px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;margin:4px 0 10px 16px;animation:npFlash .6s ease;letter-spacing:.06em}
+@keyframes npFlash{0%{opacity:0;transform:scale(.85)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+
+/* ── INLINE CARDS (poll / question) — DON'T distort story flow ── */
+.inline-card{margin:12px 16px;border-radius:14px;overflow:hidden;border:1px solid var(--bd)}
+.inline-card-header{padding:10px 12px 8px;background:rgba(255,255,255,.03);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd2)}
+.inline-card-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.inline-card-icon.poll{background:rgba(0,170,255,.15)}
+.inline-card-icon.question{background:rgba(255,0,80,.12)}
+.inline-card-icon.debate{background:rgba(16,185,129,.12)}
+.inline-card-label{font-size:10px;font-weight:800;color:#ccc;flex:1}
+.inline-card-label span{color:var(--muted2);font-weight:400}
+.inline-card-body{padding:10px 12px 12px}
+.inline-card-q{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#f0eeff;line-height:1.35;margin-bottom:10px}
+
+/* Poll options */
+.poll-opts{display:flex;flex-direction:column;gap:6px}
+.poll-opt{position:relative;border-radius:9px;padding:9px 12px;cursor:pointer;overflow:hidden;border:1.5px solid rgba(255,255,255,.08);transition:border-color .2s;user-select:none}
+.poll-opt:hover{border-color:rgba(255,0,80,.35)}
+.poll-opt.voted{border-color:var(--acc)}
+.poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.1);transition:width .6s cubic-bezier(.4,0,.2,1);z-index:0}
+.poll-opt-inner{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center}
+.poll-opt-text{font-size:12px;font-weight:600;color:#f0f0f5}
+.poll-opt-pct{font-size:11px;font-weight:800;color:var(--acc)}
+.poll-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:9px;color:var(--muted2)}
+
+/* Question / comment prompt */
+.question-prompt-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:8px 11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;margin-bottom:8px}
+.question-prompt-input::placeholder{color:#444}
+.question-comments-list{display:flex;flex-direction:column;gap:6px}
+
+/* ── VIEWER TICKER ── */
+.viewer-ticker{display:flex;align-items:center;gap:6px;padding:8px 16px;border-top:1px solid var(--bd2);overflow:hidden}
+.ticker-aves{display:flex}
+.ticker-av{width:20px;height:20px;border-radius:50%;overflow:hidden;border:1.5px solid var(--dark);flex-shrink:0;margin-left:-5px}
+.ticker-av:first-child{margin-left:0}
+.ticker-av img{width:100%;height:100%;object-fit:cover}
+.ticker-text{font-size:10px;color:var(--muted2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── AD CARD ── */
+.ad-card{margin:12px 16px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;display:flex;gap:11px;align-items:center;position:relative}
+.ad-card::after{content:'AD';position:absolute;top:8px;right:10px;font-size:7px;font-weight:800;letter-spacing:.08em;color:#555}
+.ad-logo{width:38px;height:38px;border-radius:10px;object-fit:cover;flex-shrink:0;background:rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-size:16px}
+.ad-body{flex:1;min-width:0}
+.ad-brand{font-size:9px;font-weight:800;color:var(--acc);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.ad-headline{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:2px}
+.ad-sub{font-size:9px;color:#888;line-height:1.35}
+.ad-cta{background:var(--acc);color:#fff;border:none;padding:6px 12px;border-radius:14px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'DM Sans',sans-serif;box-shadow:0 0 10px var(--glow2)}
+
+/* ── PINNED QUOTE ── */
+.pinned-quote-block{margin:0 16px 12px;background:linear-gradient(135deg,rgba(255,0,80,.07),rgba(255,107,138,.04));border:1px solid rgba(255,0,80,.18);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.pinned-quote-block::before{content:'"';position:absolute;right:10px;top:0;font-family:'Playfair Display',serif;font-size:60px;color:var(--acc);opacity:.07;line-height:1}
+.pinned-quote-label{font-size:8px;font-weight:800;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.pinned-quote-text{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;line-height:1.45;color:#f0eeff}
+.pinned-quote-save{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--acc2);cursor:pointer;margin-top:8px}
+
+/* ── LIVE DEBATE SECTION ── */
+.live-debate-section{margin:0 16px 12px;background:linear-gradient(135deg,rgba(16,185,129,.06),rgba(255,0,80,.03));border:1px solid rgba(16,185,129,.2);border-radius:14px;overflow:hidden}
+.ldb-header{padding:12px 14px;border-bottom:1px solid rgba(16,185,129,.12);display:flex;align-items:center;gap:8px}
+.ldb-icon{width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center;font-size:13px}
+.ldb-title{font-size:11px;font-weight:800;color:#fff;flex:1}
+.ldb-live-badge{background:var(--emerald);color:#fff;font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px}
+.ldb-motion{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#f0eeff;line-height:1.35;padding:10px 14px;border-bottom:1px solid rgba(16,185,129,.1)}
+.ldb-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px;border-bottom:1px solid rgba(16,185,129,.1)}
+.ldb-side{border-radius:10px;padding:10px;cursor:pointer;border:1.5px solid rgba(255,255,255,.08);text-align:center;transition:all .2s;user-select:none}
+.ldb-side.for{border-color:var(--emerald);background:rgba(16,185,129,.06)}
+.ldb-side.against{border-color:var(--ruby);background:rgba(255,68,68,.06)}
+.ldb-side-label{font-size:11px;font-weight:800}
+.ldb-side.for .ldb-side-label{color:var(--emerald)}
+.ldb-side.against .ldb-side-label{color:var(--ruby)}
+.ldb-bar{height:3px;border-radius:3px;margin:5px 0 3px}
+.ldb-side.for .ldb-bar{background:var(--emerald)}
+.ldb-side.against .ldb-bar{background:var(--ruby)}
+.ldb-pct{font-size:13px;font-weight:900}
+.ldb-side.for .ldb-pct{color:var(--emerald)}
+.ldb-side.against .ldb-pct{color:var(--ruby)}
+
+/* ── 8-REACTION SYSTEM ── */
+.rx-popup{position:absolute;background:rgba(10,10,20,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:40px;padding:7px 9px;display:none;flex-direction:row;align-items:center;gap:2px;z-index:500;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.8);animation:rxPopIn .2s cubic-bezier(.34,1.56,.64,1)}
+.rx-popup.show{display:flex}
+@keyframes rxPopIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.rx-popup-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 6px;border-radius:12px;transition:.15s;user-select:none}
+.rx-popup-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.2)}
+.rx-popup-btn:active{transform:scale(.9)}
+.rx-popup-emoji{font-size:22px;line-height:1}
+.rx-popup-count{font-size:7px;font-weight:700;color:#aaa;min-width:16px;text-align:center}
+.rx-popup-btn.reacted .rx-popup-count{color:var(--acc2)}
+
+/* ── REACTIONS STRIP (sticky above bottom nav) ── */
+.reactions-strip{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + var(--nav-h));z-index:80;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd)}
+.reaction-bar{display:flex;align-items:center;border-bottom:1px solid var(--bd2);overflow-x:auto;scrollbar-width:none}
+.reaction-bar::-webkit-scrollbar{display:none}
+.rx-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;cursor:pointer;transition:background .15s;user-select:none;border:none;background:transparent;position:relative}
+.rx-btn:active{background:rgba(255,255,255,.04)}
+.rx-emoji{font-size:19px;line-height:1;transition:transform .2s}
+.rx-count{font-size:8px;font-weight:700;color:var(--muted2);margin-top:2px;transition:color .2s}
+.rx-btn.reacted .rx-emoji{animation:rxPop .3s ease}
+.rx-btn.reacted .rx-count{color:var(--acc2)}
+@keyframes rxPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
+.rx-float{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:16px;pointer-events:none;animation:rxFloat .9s ease forwards;z-index:10}
+@keyframes rxFloat{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}
+
+/* Comment input row */
+.comment-input-row{display:flex;align-items:center;gap:8px;padding:8px 12px 10px}
+.cm-my-av{width:28px;height:28px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.cm-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:22px;padding:7px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.cm-inp::placeholder{color:#555}
+.cm-send-btn{width:30px;height:30px;border-radius:50%;background:var(--acc);border:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;cursor:pointer;flex-shrink:0;transition:.15s}
+.cm-send-btn:disabled{background:#2a2a35;cursor:default}
+
+/* ── COMMENTS SECTION ── */
+.comments-section{padding:0 0 8px}
+.comments-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+.comments-hdr-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px}
+.cm-count-badge{background:rgba(255,0,80,.15);border:1px solid rgba(255,0,80,.2);color:var(--acc2);font-size:9px;font-weight:800;padding:2px 8px;border-radius:10px}
+
+/* ── COMMENT ITEM ── */
+.cm-item{display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);animation:cmIn .35s ease forwards;opacity:0;transform:translateY(8px);position:relative}
+@keyframes cmIn{to{opacity:1;transform:translateY(0)}}
+.cm-item:last-child{border-bottom:none}
+.cm-av{width:27px;height:27px;border-radius:50%;flex-shrink:0;overflow:hidden;background:rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;cursor:pointer}
+.cm-av img{width:100%;height:100%;object-fit:cover}
+.cm-body{flex:1;min-width:0}
+.cm-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap}
+.cm-name{font-size:11px;font-weight:700}
+.cm-time{font-size:9px;color:var(--muted)}
+.cm-text{font-size:13px;color:#ccc;line-height:1.45;word-break:break-word}
+.cm-mention{color:var(--acc2);font-weight:700}
+
+/* Comment actions (like, reply, react) */
+.cm-actions{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.cm-act{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none;padding:2px 6px;border-radius:7px;transition:.15s;position:relative}
+.cm-act:active{background:rgba(255,255,255,.05)}
+.cm-act.liked{color:var(--acc)}
+.cm-act i{font-size:11px}
+.cm-act-sep{width:1px;height:12px;background:var(--bd2)}
+.cm-reply-btn{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;padding:2px 6px;border-radius:7px}
+/* Comment reaction summary */
+.cm-rx-summary{display:flex;align-items:center;gap:2px;font-size:9px;color:var(--muted2);cursor:pointer}
+.cm-rx-summary .rx-emojis{font-size:11px}
+/* Debate side badge on comment */
+.cm-debate-badge{font-size:8px;font-weight:800;padding:1px 6px;border-radius:6px}
+.cm-debate-badge.for{background:rgba(16,185,129,.15);color:var(--emerald)}
+.cm-debate-badge.against{background:rgba(255,68,68,.15);color:var(--ruby)}
+/* Upvote/downvote only for debate comments */
+.cm-upvote.active{color:var(--emerald)}
+.cm-downvote.active{color:var(--ruby)}
+
+/* Replies */
+.cm-replies-block{margin-left:35px;border-left:2px solid rgba(255,0,80,.15);padding-left:8px;display:none;margin-top:4px;margin-bottom:4px}
+.cm-replies-block.open{display:block}
+.cm-reply-item{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.cm-reply-item:last-child{border-bottom:none}
+.cm-reply-input-wrap{margin:5px 0 5px 35px;display:none}
+.cm-reply-input-wrap.open{display:flex;gap:7px;align-items:center}
+.cm-reply-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:16px;padding:6px 11px;color:#fff;font-family:inherit;font-size:11px;outline:none}
+.cm-reply-inp::placeholder{color:#555}
+.cm-reply-send{background:var(--acc);border:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#fff;flex-shrink:0}
+.cm-reply-send:disabled{background:#333;cursor:default}
+
+/* ── SESSION END PANEL ── */
+.session-end-panel{padding:20px 16px;text-align:center;border-top:1px solid var(--bd);display:none}
+.session-end-panel.show{display:block}
+.sep-emoji{font-size:36px;margin-bottom:10px}
+.sep-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;margin-bottom:5px}
+.sep-sub{font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:16px}
+.sep-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.sep-btn{padding:9px 18px;border-radius:24px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.sep-btn.pri{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow2)}
+.sep-btn.sec{background:rgba(255,255,255,.08);color:#ccc;border:1px solid var(--bd)}
+
+/* ── MILESTONE ── */
+.milestone-pop{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-16px);background:linear-gradient(135deg,#1a0d24,#0d1a26);border:1px solid rgba(255,0,80,.35);border-radius:18px;padding:12px 18px;z-index:800;opacity:0;transition:.35s;pointer-events:none;text-align:center;min-width:220px;max-width:90vw}
+.milestone-pop.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.milestone-emoji{font-size:28px;margin-bottom:4px}
+.milestone-msg{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff}
+.milestone-sub{font-size:10px;color:var(--acc2);margin-top:2px}
+
+/* ── STATUS VIEWER ── */
+.status-ov{position:fixed;inset:0;z-index:600;background:#000;display:none;flex-direction:column}
+.status-ov.open{display:flex}
+.status-top-bar{position:absolute;top:0;left:0;right:0;z-index:20;padding:12px 14px 8px;background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent)}
+.status-prog-bars{display:flex;gap:4px;margin-bottom:10px}
+.spb{flex:1;height:3px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}
+.spb-fill{height:100%;background:#fff;border-radius:3px;width:0%}
+.status-writer-info{display:flex;align-items:center;gap:10px}
+.status-w-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #00aaff}
+.status-w-name{font-size:13px;font-weight:700;color:#fff;flex:1}
+.status-w-time{font-size:10px;color:rgba(255,255,255,.55)}
+.status-view-btn{display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.5);border:none;color:rgba(255,255,255,.7);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;backdrop-filter:blur(6px);font-family:'DM Sans',sans-serif}
+.status-close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:6px}
+.status-content{flex:1;position:relative;overflow:hidden}
+.status-slide{position:absolute;inset:0;background-size:cover;background-position:center}
+.status-slide-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.5) 100%)}
+.status-slide-text{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:80px 24px 100px;text-align:center;pointer-events:none;user-select:none}
+.status-slide-quote{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.42;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.status-slide-caption{font-size:12px;color:rgba(255,255,255,.65);margin-top:10px}
+.status-nav-left{position:absolute;left:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.status-nav-right{position:absolute;right:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.status-bottom{position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);display:flex;align-items:center;gap:10px;z-index:15}
+.status-reply-inp{flex:1;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);border-radius:30px;padding:9px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.status-reply-inp::placeholder{color:rgba(255,255,255,.5)}
+.status-react-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Viewers modal */
+.viewers-modal{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.viewers-modal.open{display:flex}
+.viewers-sheet{width:100%;max-height:75vh;background:#13131a;border-radius:20px 20px 0 0;overflow:hidden;animation:slideUp .25s ease;display:flex;flex-direction:column}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.viewers-handle{width:34px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:10px auto 0}
+.viewers-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 10px;border-bottom:1px solid var(--bd)}
+.viewers-hdr h3{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+.viewers-list-scroll{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:none}
+.viewer-item{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.viewer-av{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bd)}
+.viewer-av-init{width:36px;height:36px;border-radius:50%;background:rgba(255,0,80,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.viewer-info{flex:1}
+.viewer-name{font-size:13px;font-weight:700;color:#fff}
+.viewer-role{font-size:10px;margin-top:1px}
+.viewer-role.writer{color:var(--acc)}
+.viewer-role.reader{color:var(--muted2)}
+.viewer-time{font-size:10px;color:var(--muted)}
+.viewers-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#ccc;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ── SHARE MODAL (platform style) ── */
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.share-sheet{width:100%;background:#13131a;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.share-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:34px;height:4px;background:rgba(255,255,255,.18);border-radius:4px;margin:10px auto 0}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 10px}
+.modal-hdr h3{font-size:15px;font-weight:800}
+.modal-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#ccc}
+.share-preview-row{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border-radius:12px;padding:10px;margin:0 16px 12px}
+.share-preview-img{width:44px;height:44px;border-radius:8px;background:rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.share-preview-title{font-size:11px;font-weight:700;color:#fff;margin-bottom:2px}
+.share-preview-sub{font-size:9px;color:var(--muted2)}
+.share-special-row{display:flex;gap:10px;padding:0 16px 12px}
+.sh-special{flex:1;padding:10px 8px;border-radius:14px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;transition:.15s}
+.sh-special:active{transform:scale(.95)}
+.sh-special i{font-size:17px}
+.sh-special.status-opt{background:linear-gradient(135deg,#0044ff,#00aaff)}
+.sh-special.profile-opt{background:rgba(255,0,80,.25);border:1px solid rgba(255,0,80,.35)}
+.share-link-row{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:11px;padding:8px 11px;margin:0 16px 12px}
+.share-link-row input{flex:1;background:transparent;border:none;color:#bbb;font-size:11px;outline:none}
+.copy-link-btn{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}
+.share-icons-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:0 16px 8px}
+.sh-icon{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s}
+.sh-icon:active{transform:scale(.9)}
+.sh-icon-bg{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.sh-icon span{font-size:9px;font-weight:600;color:#aaa}
+.sh-copy-msg{text-align:center;font-size:11px;color:var(--acc2);font-weight:600;height:16px;padding-bottom:14px}
+
+/* Tip modal */
+.tip-sheet{width:100%;background:#13131a;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.tip-sheet::-webkit-scrollbar{display:none}
+.tip-body{padding:0 16px 14px}
+.tip-writer-row{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--bd);margin-bottom:14px}
+.tip-writer-av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.tip-writer-av img{width:100%;height:100%;object-fit:cover}
+.tip-presets{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.tip-preset{flex:1;min-width:60px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:rgba(255,255,255,.04);color:#ccc;font-family:'DM Sans',sans-serif;text-align:center;transition:.2s}
+.tip-preset.active{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--gold)}
+.tip-custom{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:12px}
+.tip-custom::placeholder{color:#444}
+.tip-send-btn{width:100%;background:var(--gold);color:#07070b;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 16px rgba(245,158,11,.3)}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,7,11,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,14px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px}
+.bn-item i{font-size:20px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);left:50%;transform:translateX(-50%) translateY(16px);background:#1e1e28;border:1px solid var(--bd);color:#fff;padding:8px 17px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></div>
+  <div class="top-bar-center">
+    <div class="top-bar-title" id="topBarTitle">The Runaway Bride</div>
+    <div class="top-bar-sub">
+      <div class="live-pulse"><div class="live-dot"></div><span class="live-badge">LIVE</span></div>
+      <span id="viewerCountTop">1,247 watching</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="top-icon-btn" onclick="openSave()"><i class="far fa-bookmark" id="topSaveIcon"></i></div>
+    <div class="top-icon-btn" onclick="openShareModal()"><i class="fas fa-share-alt"></i></div>
+  </div>
+</div>
+
+<!-- WRITER HERO -->
+<div class="writer-hero">
+  <div class="hero-cover-el"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-content">
+    <div class="writer-row">
+      <div class="av-ring-wrap" id="heroAvWrap" onclick="openStatus('w1')">
+        <div class="av-ring ring-new" style="width:46px;height:46px">
+          <div class="av-inner"><img src="https://i.pravatar.cc/100?img=53" alt="Ifeanyi_Story"/></div>
+        </div>
+      </div>
+      <div class="writer-info">
+        <div class="writer-name">@Ifeanyi_Story ✍️</div>
+        <div class="writer-meta">Writing live right now · Season 2 · Chapter 10</div>
+      </div>
+      <button class="follow-btn ing" id="followBtn" onclick="toggleFollow()">✓ Following</button>
+    </div>
+  </div>
+</div>
+
+<!-- STORY META -->
+<div class="story-meta-bar">
+  <span class="story-cat-badge">✨ Twist of Fate</span>
+  <span class="story-title-text">The Runaway Bride — Bare Kitchen</span>
+  <span class="viewer-count"><i class="fas fa-eye"></i><span id="viewerCount">1,247</span></span>
+</div>
+
+<!-- WRITER DASHBOARD -->
+<div class="writer-dash" id="writerDash">
+  <div class="dash-title">✍️ Your Live Session</div>
+  <div class="dash-stats">
+    <div class="dash-stat"><div class="dash-stat-num" id="dReaders">1.2k</div><div class="dash-stat-label">Readers</div></div>
+    <div class="dash-stat"><div class="dash-stat-num" id="dReactions">0</div><div class="dash-stat-label">Reactions</div></div>
+    <div class="dash-stat"><div class="dash-stat-num" id="dComments">0</div><div class="dash-stat-label">Comments</div></div>
+    <div class="dash-stat"><div class="dash-stat-num" id="dParas">0</div><div class="dash-stat-label">Published</div></div>
+  </div>
+  <div class="insert-tools">
+    <div class="insert-btn" onclick="insertPoll()"><i class="fas fa-chart-bar" style="color:var(--blue)"></i> Poll</div>
+    <div class="insert-btn" onclick="insertQuestion()"><i class="fas fa-question-circle" style="color:var(--acc2)"></i> Question</div>
+    <div class="insert-btn" onclick="insertDebate()"><i class="fas fa-gavel" style="color:var(--emerald)"></i> Debate</div>
+  </div>
+  <div class="publish-area">
+    <div class="pub-label"><i class="fas fa-feather-alt" style="color:var(--acc2);margin-right:4px"></i> Write your next paragraph</div>
+    <textarea class="pub-textarea" id="writeArea" placeholder="She opened the oven door and the warmth hit her face like the gentlest apology…" maxlength="800"></textarea>
+    <div class="pub-bottom">
+      <span class="pub-chars" id="pubChars">0 / 800</span>
+      <div class="pub-actions">
+        <button class="pub-btn draft" onclick="saveDraft()">Save draft</button>
+        <button class="pub-btn publish" id="pubBtn" onclick="publishParagraph()" disabled>Publish ↗</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER HEADER -->
+<div class="chapter-header">
+  <span class="chapter-badge">📖 Chapter 10 · Live</span>
+  <span class="chapter-title-small">Bare Kitchen</span>
+  <span style="font-size:9px;color:var(--muted2);flex-shrink:0" id="sessionTimer">0:00</span>
+</div>
+
+<!-- STORY STREAM -->
+<div class="story-stream" id="storyStream"></div>
+
+<!-- TYPING INDICATOR -->
+<div class="typing-block" id="typingBlock" style="display:none">
+  <div class="typing-av"><img src="https://i.pravatar.cc/100?img=53" alt=""/></div>
+  <div class="typing-label">Ifeanyi_Story is writing</div>
+  <div class="typing-dots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>
+</div>
+
+<!-- NEW PARA FLASH -->
+<div class="new-para-flash" id="newParaFlash" style="display:none">✦ New paragraph just dropped</div>
+
+<!-- VIEWER TICKER -->
+<div class="viewer-ticker" id="viewerTicker">
+  <div class="ticker-aves" id="tickerAves"></div>
+  <div class="ticker-text" id="tickerText">Waiting for the first paragraph…</div>
+</div>
+
+<!-- COMMENTS SECTION -->
+<div class="comments-section">
+  <div class="comments-hdr">
+    <div class="comments-hdr-title"><i class="fas fa-comment-dots" style="color:var(--acc2);font-size:13px"></i> Live Comments <span class="cm-count-badge" id="cmCountBadge">0</span></div>
+    <span style="font-size:10px;color:var(--muted2);cursor:pointer" onclick="toast('📋 Full comments view')">See all</span>
+  </div>
+  <div id="commentsFeed"></div>
+</div>
+
+<!-- AD CARD -->
+<div class="ad-card" id="adCard1" style="display:none">
+  <div class="ad-logo">💸</div>
+  <div class="ad-body">
+    <div class="ad-brand">PiggyVest</div>
+    <div class="ad-headline">Save while you read. Build while you dream.</div>
+    <div class="ad-sub">Join 4M+ Nigerians saving smarter every day.</div>
+  </div>
+  <button class="ad-cta" onclick="toast('🔗 Opening PiggyVest…')">Start Saving</button>
+</div>
+
+<!-- PINNED QUOTE -->
+<div class="pinned-quote-block" id="pinnedQuote" style="display:none">
+  <div class="pinned-quote-label"><i class="fas fa-thumbtack" style="font-size:8px"></i> Pinned Quote · Most Saved</div>
+  <div class="pinned-quote-text" id="pinnedQuoteText"></div>
+  <div class="pinned-quote-save" onclick="toast('📌 Quote saved to your library!')"><i class="fas fa-bookmark" style="font-size:10px"></i> Save this quote</div>
+</div>
+
+<!-- SESSION END -->
+<div class="session-end-panel" id="sessionEndPanel">
+  <div class="sep-emoji">📖</div>
+  <div class="sep-title">Chapter 10 Complete!</div>
+  <div class="sep-sub">Ifeanyi_Story just wrapped the live writing session. The full chapter is now available to read.</div>
+  <div class="sep-actions">
+    <button class="sep-btn pri" onclick="toast('📖 Opening full chapter…')"><i class="fas fa-book-open"></i> Read Full</button>
+    <button class="sep-btn sec" onclick="openShareModal()"><i class="fas fa-share-alt"></i> Share</button>
+    <button class="sep-btn sec" onclick="openTip()"><i class="fas fa-coins" style="color:var(--gold)"></i> Tip Writer</button>
+    <button class="sep-btn sec" onclick="toast('💬 Opening debate…')"><i class="fas fa-gavel" style="color:var(--emerald)"></i> Debate</button>
+  </div>
+</div>
+
+<!-- REACTIONS STRIP -->
+<div class="reactions-strip" id="reactionsStrip">
+  <div class="reaction-bar" id="reactionBar"></div>
+  <div class="comment-input-row">
+    <div class="cm-my-av">Y</div>
+    <input class="cm-inp" id="cmInp" placeholder="React to what was just written…" autocomplete="off"/>
+    <button class="cm-send-btn" id="cmSendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="window.location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item" onclick="toast('✏️ Create')"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn-item" onclick="window.location.href='people.html'"><i class="fas fa-users"></i>People</div>
+  <div class="bn-item active"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<!-- MILESTONE -->
+<div class="milestone-pop" id="milestonePop">
+  <div class="milestone-emoji" id="milestoneEmoji">🔥</div>
+  <div class="milestone-msg" id="milestoneMsg">First paragraph!</div>
+  <div class="milestone-sub" id="milestoneSub">Readers are arriving…</div>
+</div>
+
+<!-- STATUS VIEWER -->
+<div class="status-ov" id="statusOv">
+  <div class="status-top-bar">
+    <div class="status-prog-bars" id="statusProgBars"></div>
+    <div class="status-writer-info">
+      <img class="status-w-av" id="statusWAv" src="" alt=""/>
+      <div style="flex:1"><div class="status-w-name" id="statusWName"></div><div class="status-w-time" id="statusWTime"></div></div>
+      <button class="status-view-btn" onclick="openViewers()"><i class="fas fa-eye"></i><span id="statusViewCount">0</span></button>
+      <button class="status-close-btn" onclick="closeStatus()">✕</button>
+    </div>
+  </div>
+  <div class="status-content" id="statusContent"></div>
+  <div class="status-bottom">
+    <input class="status-reply-inp" placeholder="Reply to story…"/>
+    <button class="status-react-btn" onclick="toast('❤️ Reacted!')">❤️</button>
+    <button class="status-react-btn" onclick="toast('🔥 Reacted!')">🔥</button>
+  </div>
+</div>
+
+<!-- VIEWERS MODAL -->
+<div class="viewers-modal" id="viewersModal">
+  <div class="viewers-sheet">
+    <div class="viewers-handle"></div>
+    <div class="viewers-hdr">
+      <h3><i class="fas fa-eye" style="color:var(--acc);font-size:14px"></i> <span id="viewersTitle">Views</span></h3>
+      <button class="viewers-close" onclick="closeViewers()">✕</button>
+    </div>
+    <div class="viewers-list-scroll" id="viewersList"></div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-bg" id="shareModal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><h3>Share Live Session 📤</h3><div class="modal-close" onclick="closeShareModal()">✕</div></div>
+    <div class="share-preview-row">
+      <div class="share-preview-img">📖</div>
+      <div><div class="share-preview-title">The Runaway Bride · Live Chapter 10</div><div class="share-preview-sub">@Ifeanyi_Story · 1,247 watching</div></div>
+    </div>
+    <div class="share-special-row">
+      <div class="sh-special status-opt" onclick="doSpecialShare('status')"><i class="fas fa-circle-notch"></i>Post to Status</div>
+      <div class="sh-special profile-opt" onclick="doSpecialShare('profile')"><i class="fas fa-user-circle"></i>Repost to Profile</div>
+    </div>
+    <div class="share-link-row"><input type="text" value="https://droboard.app/live/ifeanyi-story" readonly/><button class="copy-link-btn" onclick="copyShareLink()">Copy</button></div>
+    <div class="share-icons-row">
+      <div class="sh-icon" onclick="shareVia('whatsapp')"><div class="sh-icon-bg" style="background:#1ebe57"><i class="fab fa-whatsapp" style="color:#fff"></i></div><span>WhatsApp</span></div>
+      <div class="sh-icon" onclick="shareVia('twitter')"><div class="sh-icon-bg" style="background:#000;border:1px solid #333"><i class="fab fa-x-twitter" style="color:#fff"></i></div><span>X</span></div>
+      <div class="sh-icon" onclick="shareVia('instagram')"><div class="sh-icon-bg" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"><i class="fab fa-instagram" style="color:#fff"></i></div><span>Instagram</span></div>
+      <div class="sh-icon" onclick="shareVia('telegram')"><div class="sh-icon-bg" style="background:#0088cc"><i class="fab fa-telegram" style="color:#fff"></i></div><span>Telegram</span></div>
+      <div class="sh-icon" onclick="shareVia('facebook')"><div class="sh-icon-bg" style="background:#1877f2"><i class="fab fa-facebook" style="color:#fff"></i></div><span>Facebook</span></div>
+      <div class="sh-icon" onclick="copyShareLink()"><div class="sh-icon-bg" style="background:rgba(255,255,255,.1)"><i class="fas fa-link" style="color:#fff"></i></div><span>Copy Link</span></div>
+    </div>
+    <div class="sh-copy-msg" id="shCopyMsg"></div>
+  </div>
+</div>
+
+<!-- TIP MODAL -->
+<div class="modal-bg" id="tipModal" onclick="if(event.target===this)closeTip()">
+  <div class="tip-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><h3><i class="fas fa-coins" style="color:var(--gold)"></i> Tip the Writer</h3><div class="modal-close" onclick="closeTip()">✕</div></div>
+    <div class="tip-body">
+      <div class="tip-writer-row">
+        <div class="tip-writer-av"><img src="https://i.pravatar.cc/100?img=53" alt=""/></div>
+        <div>
+          <div style="font-size:13px;font-weight:700">@Ifeanyi_Story</div>
+          <div style="font-size:10px;color:var(--muted2)">Show your love for this live chapter</div>
+        </div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted2);margin-bottom:8px">Choose Amount</div>
+      <div class="tip-presets">
+        <div class="tip-preset active" onclick="selectTip(this,'100')">₦100</div>
+        <div class="tip-preset" onclick="selectTip(this,'200')">₦200</div>
+        <div class="tip-preset" onclick="selectTip(this,'500')">₦500</div>
+        <div class="tip-preset" onclick="selectTip(this,'1000')">₦1,000</div>
+      </div>
+      <input class="tip-custom" id="tipCustom" placeholder="Or enter custom amount (₦)" type="number" min="50"/>
+      <button class="tip-send-btn" onclick="sendTip()">💰 Send Tip</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// 8 REACTIONS CONFIG
+// ══════════════════════════════════════════════
+const REACTIONS_CONFIG = [
+  {id:'crying',   emoji:'😭', label:'Crying'},
+  {id:'emotional',emoji:'🥹', label:'Felt'},
+  {id:'fire',     emoji:'🔥', label:'Fire'},
+  {id:'love',     emoji:'💔', label:'Heart'},
+  {id:'shocked',  emoji:'😱', label:'Whoa'},
+  {id:'broken',   emoji:'🤯', label:'Mind'},
+  {id:'clap',     emoji:'👏', label:'Bravo'},
+  {id:'save',     emoji:'🔖', label:'Save'},
+];
+
+// Per-story global reactions
+let storyReactions = {};
+REACTIONS_CONFIG.forEach(r => { storyReactions[r.id] = {count: Math.floor(Math.random()*3000)+200, reacted:false}; });
+
+// ══════════════════════════════════════════════
+// WRITER STATUSES
+// ══════════════════════════════════════════════
+const WRITER_STATUSES = {
+  w1:{ hasStatus:true, viewed:false, name:'Ifeanyi_Story', avatar:'https://i.pravatar.cc/100?img=53', viewCount:874,
+    viewers:[{name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',role:'reader',time:'2m ago'},{name:'CampusQueen',avatar:'https://i.pravatar.cc/100?img=12',role:'writer',time:'5m ago'}],
+    statuses:[
+      {bg:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900',quote:'I walked out in socked feet and found my actual life.',caption:'Bare Kitchen is real btw 🥐',time:'30m ago'},
+      {bg:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900',quote:'Chapter 10 drops in 5 minutes. Grab your tissues.',caption:'Writing live tonight ✍️',time:'10m ago'}
+    ]
+  }
+};
+
+// ══════════════════════════════════════════════
+// DEMO DATA
+// ══════════════════════════════════════════════
+const DEMO_PARAGRAPHS = [
+  "Six months after I walked out of my own wedding in my socked feet, I opened Bare Kitchen. The name came to me the same morning I kneaded my first batch of dough — I was standing at the counter in the pre-dawn dark, my hands white with flour, and I thought: bare. Not stripped. Not broken. Bare as in nothing hidden.",
+  "The kitchen was a disaster in those early weeks. I burned three batches of chin-chin before I understood that the oil had to be patient. I piped frosting onto cakes that slid off because I hadn't let them cool. I dropped an entire tray of puff-puff onto the floor and sat beside it for a moment, and then I got up and made another batch.",
+  "Tunde came in on a Tuesday. He had the look of someone who had read about the place on Twitter and was trying not to make it obvious. He ordered the dark chocolate groundnut cake, which I had named Clarity — because it's bitter before it's sweet. He ate it in four bites and then looked up at me and said: 'You make something that tastes like a decision.'",
+  "I didn't know what to do with that. I thanked him and turned back to the counter. But when I looked up again, he was still there, not leaving, not ordering more, just sitting as though he had somewhere to be and had decided it could wait.",
+  "That was the beginning of something neither of us planned for. Which is, I have since learned, exactly the kind of beginning that holds.",
+  "Two years later, Bare Kitchen has a second location in Abuja. The flour still finds its way into my hair. I still think, sometimes, about four hundred faces turning to watch me go. But mostly I think about what it feels like to choose yourself so completely that the whole room witnesses it."
+];
+
+const DEMO_COMMENTS_SEED = [
+  {name:'Chioma_R', av:'https://i.pravatar.cc/100?img=47', text:"I've been waiting for this chapter for three weeks. Sitting here with tears on my cheeks already.", time:'just now', likes:24},
+  {name:'Ada_Writes', av:'https://i.pravatar.cc/100?img=32', text:'@Ifeanyi_Story writes like she\'s reaching inside you. The flour-in-the-hair line? I felt that.', time:'just now', likes:18},
+  {name:'EmekaTells', av:'https://i.pravatar.cc/100?img=15', text:"'Something that tastes like a decision' — this is a LINE. This man Tunde is something else.", time:'just now', likes:41},
+  {name:'Zara_M', av:'https://i.pravatar.cc/100?img=16', text:'I am refusing to let this session end. Do not stop writing. I will cry.', time:'just now', likes:12},
+  {name:'CampusQueen', av:'https://i.pravatar.cc/100?img=12', text:'Bare as in nothing hidden. I need this on a mug, a wall, a tattoo. All three.', time:'just now', likes:67},
+  {name:'Kemi_A', av:'https://i.pravatar.cc/100?img=28', text:"The flour in the hair. The oil needing patience. She's not just writing a story she's writing a LIFE.", time:'just now', likes:33},
+  {name:'Dami_Cole', av:'https://i.pravatar.cc/100?img=64', text:'Tunde walked in on a Tuesday and ordered Clarity. Ifeanyi knew exactly what she was doing with that name.', time:'just now', likes:88},
+  {name:'Chiamaka_N', av:'https://i.pravatar.cc/100?img=47', text:"Second Abuja location?? We love to see it. The socked feet woman built an empire. 👏", time:'just now', likes:102},
+  {name:'Anonymous', av:null, text:"I walked away from a relationship last month and I've been questioning myself every day. I needed to read this today. Thank you.", time:'just now', likes:214},
+  {name:'Bello_Reads', av:'https://i.pravatar.cc/100?img=68', text:'The patience of the oil is a whole philosophy. She snuck a life lesson in there and I almost missed it.', time:'just now', likes:55},
+];
+
+const TICKER_AVS = ['https://i.pravatar.cc/100?img=47','https://i.pravatar.cc/100?img=32','https://i.pravatar.cc/100?img=15','https://i.pravatar.cc/100?img=16','https://i.pravatar.cc/100?img=12'];
+const LIVE_TICKER_EVENTS = [
+  "Chioma_R and 24 others just joined the session",
+  "EmekaTells is reading for the 3rd time today",
+  "This chapter is now trending in ✨ Twist of Fate",
+  "1,000 readers watching right now",
+  "Dami_Cole reacted 💔 to the last paragraph",
+  "CampusQueen shared this to their WhatsApp",
+  "1,247 simultaneous readers — highest this week!",
+];
+const MILESTONES = [
+  {threshold:1, emoji:'✍️', msg:'First paragraph published!', sub:'Readers are arriving…'},
+  {threshold:2, emoji:'🔥', msg:'The energy is building', sub:'Comments are flooding in'},
+  {threshold:3, emoji:'💔', msg:'Readers are feeling this', sub:'500+ reactions already'},
+  {threshold:4, emoji:'😭', msg:'Most emotional chapter yet', sub:'Readers are crying'},
+  {threshold:5, emoji:'👑', msg:'Top trending right now', sub:'Bare Kitchen just hit #1'},
+  {threshold:6, emoji:'🎉', msg:'Chapter 10 complete!', sub:'1,247 readers witnessed this live'},
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let comments = [];
+let publishedCount = 0;
+let totalUserReactions = 0;
+let isFollowing = true;
+let isWriterMode = false;
+let sessionStartTime = Date.now();
+let demoIdx = 0;
+let demoRunning = false;
+let isSaved = false;
+let statusWriterId = null, statusIdx = 0, statusTimer = null, statusPaused = false, statusElapsed = 0;
+const STATUS_DUR = 5000;
+
+// Per-comment reaction storage
+let commentReactions = {}; // cid -> {emoji->count, userReaction}
+
+// Poll state
+let pollData = null;
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function fmtN(n) { return n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n); }
+function fmtText(t) { return (t||'').replace(/(@[\w_]+)/g,'<span class="cm-mention">$1</span>'); }
+function updateDashStat(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = typeof val === 'number' && val >= 1000 ? fmtN(val) : val;
+}
+
+// ══════════════════════════════════════════════
+// REACTION BAR (story-level)
+// ══════════════════════════════════════════════
+function renderReactionBar() {
+  const bar = document.getElementById('reactionBar');
+  bar.innerHTML = REACTIONS_CONFIG.map(r => `
+    <div class="rx-btn${storyReactions[r.id].reacted?' reacted':''}" data-rid="${r.id}" onclick="reactStory('${r.id}',this)">
+      <span class="rx-emoji">${r.emoji}</span>
+      <span class="rx-count">${fmtN(storyReactions[r.id].count)}</span>
+    </div>`).join('');
+}
+
+function reactStory(rid, el) {
+  const rx = storyReactions[rid];
+  if (rx.reacted) { rx.reacted = false; rx.count--; totalUserReactions--; }
+  else { rx.reacted = true; rx.count++; totalUserReactions++; updateDashStat('dReactions', totalUserReactions); }
+  renderReactionBar();
+  // Float emoji
+  const float = document.createElement('div');
+  float.className = 'rx-float';
+  float.textContent = REACTIONS_CONFIG.find(r => r.id === rid).emoji;
+  el.style.position = 'relative';
+  el.appendChild(float);
+  setTimeout(() => float.remove(), 1000);
+  // Bump viewer count slightly
+  if (rx.reacted) {
+    const vc = document.getElementById('viewerCount');
+    const n = (parseInt(vc.textContent.replace(/,/g,''))||1247) + Math.floor(Math.random()*6)+1;
+    vc.textContent = n.toLocaleString();
+    document.getElementById('viewerCountTop').textContent = n.toLocaleString()+' watching';
+  }
+}
+
+// ══════════════════════════════════════════════
+// PER-COMMENT REACTION POPUP (8 reactions)
+// ══════════════════════════════════════════════
+function getCommentRx(cid) {
+  if (!commentReactions[cid]) {
+    const rx = {};
+    REACTIONS_CONFIG.forEach(r => { rx[r.id] = Math.floor(Math.random()*30); });
+    rx.userReaction = null;
+    commentReactions[cid] = rx;
+  }
+  return commentReactions[cid];
+}
+
+function buildCommentRxPopup(cid) {
+  const rx = getCommentRx(cid);
+  return `<div class="rx-popup" id="rxpop-${cid}">
+    ${REACTIONS_CONFIG.map(r => `
+      <div class="rx-popup-btn${rx.userReaction===r.id?' reacted':''}" data-cid="${cid}" data-rid="${r.id}" onclick="reactComment('${cid}','${r.id}',event)">
+        <span class="rx-popup-emoji">${r.emoji}</span>
+        <span class="rx-popup-count">${fmtN(rx[r.id])}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+function reactComment(cid, rid, e) {
+  e.stopPropagation();
+  const rx = getCommentRx(cid);
+  if (rx.userReaction === rid) { rx[rid]--; rx.userReaction = null; }
+  else { if (rx.userReaction) rx[rx.userReaction]--; rx[rid]++; rx.userReaction = rid; }
+  hideAllRxPopups();
+  renderLatestComments();
+  toast(REACTIONS_CONFIG.find(r=>r.id===rid).emoji + ' ' + REACTIONS_CONFIG.find(r=>r.id===rid).label);
+}
+
+let rxPopupHoldTimer = null;
+function showRxPopup(cid) {
+  hideAllRxPopups();
+  const popup = document.getElementById('rxpop-'+cid);
+  if (popup) popup.classList.add('show');
+}
+function hideAllRxPopups() {
+  document.querySelectorAll('.rx-popup').forEach(p => p.classList.remove('show'));
+}
+
+// Build comment reaction summary line
+function buildRxSummary(cid) {
+  const rx = getCommentRx(cid);
+  const topped = REACTIONS_CONFIG
+    .filter(r => rx[r.id] > 0)
+    .sort((a,b) => rx[b.id]-rx[a.id])
+    .slice(0,3);
+  const total = REACTIONS_CONFIG.reduce((s,r) => s+rx[r.id], 0);
+  if (!total && !rx.userReaction) return '';
+  const emojis = rx.userReaction
+    ? [REACTIONS_CONFIG.find(r=>r.id===rx.userReaction).emoji, ...topped.filter(r=>r.id!==rx.userReaction).slice(0,2).map(r=>r.emoji)]
+    : topped.map(r=>r.emoji);
+  return `<span class="cm-rx-summary" onclick="showRxPopup('${cid}')"><span class="rx-emojis">${[...new Set(emojis)].slice(0,3).join('')}</span> ${total>0?fmtN(total):''}</span>`;
+}
+
+// ══════════════════════════════════════════════
+// COMMENT SYSTEM (with replies of replies, 1 indent)
+// ══════════════════════════════════════════════
+function flattenReplies(replies) {
+  const flat = [];
+  function walk(arr) { arr.forEach(r => { flat.push(r); if (r.replies && r.replies.length) walk(r.replies); }); }
+  walk(replies || []);
+  return flat;
+}
+
+function renderComment(c, isRoot=true) {
+  const avHtml = c.av
+    ? `<div class="cm-av av-ring-wrap" data-wid="${c.wid||''}" onclick="maybeOpenStatus('${c.wid||''}')"><img src="${c.av}" alt=""/></div>`
+    : `<div class="cm-av">${(c.name||'?')[0]}</div>`;
+  const rxSummary = buildRxSummary(c.id);
+  const flatReplies = flattenReplies(c.replies);
+  const rxPopup = buildCommentRxPopup(c.id);
+
+  let replyItems = '';
+  if (flatReplies.length > 0) {
+    replyItems = flatReplies.map(r => {
+      const rav = r.av ? `<div class="cm-av" onclick="maybeOpenStatus('${r.wid||''}')"><img src="${r.av}" alt=""/></div>` : `<div class="cm-av">${(r.name||'?')[0]}</div>`;
+      const rrxSummary = buildRxSummary(r.id);
+      const rrxPopup = buildCommentRxPopup(r.id);
+      return `<div class="cm-reply-item" id="cm-${r.id}">
+        <div style="display:flex;gap:8px">
+          ${rav}
+          <div class="cm-body">
+            <div class="cm-name-row"><span class="cm-name">${r.name}</span><span class="cm-time">${r.time}</span></div>
+            <div class="cm-text">${fmtText(r.text)}</div>
+            <div class="cm-actions">
+              <div class="cm-act${r.liked?' liked':''}" onclick="likeComment('${r.id}',this)"><i class="${r.liked?'fas':'far'} fa-heart"></i> ${r.likes}</div>
+              <div class="cm-act-sep"></div>
+              <div class="cm-act" style="position:relative" onpointerdown="startRxHold('${r.id}',this)" onpointerup="endRxHold()" onpointercancel="endRxHold()">
+                <i class="far fa-smile"></i>
+                ${rrxPopup}
+              </div>
+              <div class="cm-act-sep"></div>
+              <div class="cm-reply-btn" onclick="openReplyInput('${c.id}','${r.name}')">Reply</div>
+              ${rrxSummary}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  return `<div class="cm-item" id="cm-${c.id}">
+    ${avHtml}
+    <div class="cm-body">
+      <div class="cm-name-row"><span class="cm-name">${c.name}</span><span class="cm-time">${c.time}</span></div>
+      <div class="cm-text">${fmtText(c.text)}</div>
+      <div class="cm-actions">
+        <div class="cm-act${c.liked?' liked':''}" onclick="likeComment('${c.id}',this)"><i class="${c.liked?'fas':'far'} fa-heart"></i> ${fmtN(c.likes)}</div>
+        <div class="cm-act-sep"></div>
+        <div class="cm-act" style="position:relative" onpointerdown="startRxHold('${c.id}',this)" onpointerup="endRxHold()" onpointercancel="endRxHold()">
+          <i class="far fa-smile"></i>
+          ${rxPopup}
+        </div>
+        <div class="cm-act-sep"></div>
+        <div class="cm-reply-btn" onclick="openReplyInput('${c.id}','${c.name}')">Reply</div>
+        ${rxSummary}
+        ${flatReplies.length>0 ? `<div class="cm-act" onclick="toggleReplies('${c.id}')"><i class="far fa-comment-dots"></i> ${flatReplies.length}</div>` : ''}
+      </div>
+    </div>
+  </div>
+  ${flatReplies.length>0 ? `<div class="cm-replies-block" id="cmrep-${c.id}">${replyItems}</div>` : `<div class="cm-replies-block" id="cmrep-${c.id}"></div>`}
+  <div class="cm-reply-input-wrap" id="cmria-${c.id}">
+    <div class="cm-my-av" style="width:24px;height:24px;font-size:9px">Y</div>
+    <input class="cm-reply-inp" id="cmri-${c.id}" placeholder="Reply…"/>
+    <button class="cm-reply-send" id="cmrs-${c.id}" disabled><i class="fas fa-paper-plane"></i></button>
+  </div>`;
+}
+
+function renderLatestComments() {
+  const feed = document.getElementById('commentsFeed');
+  const toShow = comments.slice(-15);
+  feed.innerHTML = toShow.map(c => renderComment(c)).join('');
+  document.getElementById('cmCountBadge').textContent = comments.length;
+  updateDashStat('dComments', comments.length);
+  // Attach reply send handlers
+  toShow.forEach(c => {
+    const sendBtn = document.getElementById('cmrs-'+c.id);
+    const inp = document.getElementById('cmri-'+c.id);
+    if (sendBtn && inp) {
+      sendBtn.onclick = () => submitReply(c.id, inp.value);
+    }
+  });
+}
+
+function toggleReplies(cid) {
+  const block = document.getElementById('cmrep-'+cid);
+  if (block) block.classList.toggle('open');
+}
+
+function openReplyInput(cid, name) {
+  document.querySelectorAll('.cm-reply-input-wrap').forEach(w => {
+    if (w.id !== 'cmria-'+cid) w.classList.remove('open');
+  });
+  const wrap = document.getElementById('cmria-'+cid);
+  if (!wrap) return;
+  const wasOpen = wrap.classList.contains('open');
+  if (wasOpen) { wrap.classList.remove('open'); return; }
+  wrap.classList.add('open');
+  const block = document.getElementById('cmrep-'+cid);
+  if (block) block.classList.add('open');
+  const inp = document.getElementById('cmri-'+cid);
+  if (inp) {
+    inp.value = '@'+name+' ';
+    inp.focus();
+    inp.oninput = () => {
+      const sb = document.getElementById('cmrs-'+cid);
+      if (sb) sb.disabled = inp.value.trim().length < 2;
+    };
+    document.getElementById('cmrs-'+cid).disabled = false;
+  }
+}
+
+function submitReply(parentCid, text) {
+  if (!text || text.trim().length < 2) return;
+  const parent = comments.find(c => c.id === parentCid);
+  if (!parent) return;
+  if (!parent.replies) parent.replies = [];
+  parent.replies.push({id:'r_'+Date.now(), name:'You', av:null, wid:null, text:text.trim(), time:'just now', likes:0, liked:false, replies:[]});
+  renderLatestComments();
+  setTimeout(() => { const b = document.getElementById('cmrep-'+parentCid); if (b) b.classList.add('open'); }, 60);
+  toast('💬 Reply posted!');
+}
+
+function likeComment(cid, el) {
+  const allC = getAllComments();
+  const c = allC.find(x => x.id === cid);
+  if (!c) return;
+  c.liked = !c.liked;
+  c.likes += c.liked ? 1 : -1;
+  el.classList.toggle('liked', c.liked);
+  const icon = el.querySelector('i');
+  if (icon) icon.className = c.liked ? 'fas fa-heart' : 'far fa-heart';
+  el.innerHTML = `<i class="${c.liked?'fas':'far'} fa-heart"></i> ${fmtN(c.likes)}`;
+  el.classList.toggle('liked', c.liked);
+}
+
+function getAllComments() {
+  const all = [];
+  function walk(arr) { arr.forEach(c => { all.push(c); if (c.replies) walk(c.replies); }); }
+  walk(comments);
+  return all;
+}
+
+function addComment(name, av, text, likes, wid) {
+  const c = {id:'c_'+Date.now(), name, av:av||null, wid:wid||null, text, time:'just now', likes:likes||0, liked:false, replies:[]};
+  comments.push(c);
+  renderLatestComments();
+}
+
+// Reaction hold on comment react button
+let rxHoldTimer = null;
+function startRxHold(cid, btnEl) {
+  rxHoldTimer = setTimeout(() => showRxPopup(cid), 350);
+  // Quick tap = show popup too
+  btnEl.addEventListener('click', () => showRxPopup(cid), {once:true});
+}
+function endRxHold() { clearTimeout(rxHoldTimer); }
+function maybeOpenStatus(wid) { if (wid && WRITER_STATUSES[wid]) openStatus(wid); }
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.rx-popup') && !e.target.closest('.cm-act')) hideAllRxPopups();
+});
+
+// ══════════════════════════════════════════════
+// INLINE WRITER INSERTS (poll, question, debate)
+// These appear in the stream but don't break story flow
+// ══════════════════════════════════════════════
+function insertPoll() {
+  const q = "What do you think Ada would do next?";
+  const opts = [
+    {text:"💔 Leave him for good", v:1240},
+    {text:"🕊️ Go to therapy and rebuild", v:890},
+    {text:"📸 The sister was actually alive", v:320},
+  ];
+  let voted = -1;
+  const pid = 'poll_'+Date.now();
+  const el = document.createElement('div');
+  el.className = 'inline-card';
+  el.id = pid;
+  const total = opts.reduce((s,o)=>s+o.v,0)||1;
+  el.innerHTML = `<div class="inline-card-header">
+    <div class="inline-card-icon poll"><i class="fas fa-chart-bar" style="color:var(--blue);font-size:11px"></i></div>
+    <div class="inline-card-label">📊 Reader Poll <span>· by @Ifeanyi_Story</span></div>
+  </div>
+  <div class="inline-card-body">
+    <div class="inline-card-q">${q}</div>
+    <div class="poll-opts">
+      ${opts.map((o,i)=>{const pct=Math.round(o.v/total*100);return `<div class="poll-opt${voted===i?' voted':''}" id="${pid}-opt-${i}">
+        <div class="poll-bar" style="width:${pct}%"></div>
+        <div class="poll-opt-inner"><span class="poll-opt-text">${o.t||o.text}</span><span class="poll-opt-pct">${pct}%</span></div>
+      </div>`;}).join('')}
+    </div>
+    <div class="poll-foot"><span id="${pid}-total">${fmtN(total)} votes</span><span onclick="openShareModal()" style="cursor:pointer;color:var(--acc2);font-weight:700;font-size:9px"><i class="fas fa-share-alt"></i> Share</span></div>
+  </div>`;
+  document.getElementById('storyStream').appendChild(el);
+
+  // Attach vote handlers
+  opts.forEach((o,i) => {
+    const optEl = document.getElementById(`${pid}-opt-${i}`);
+    if (optEl) optEl.addEventListener('click', () => {
+      if (voted >= 0) return;
+      voted = i;
+      opts[i].v++;
+      const newTotal = opts.reduce((s,x)=>s+x.v,0)||1;
+      opts.forEach((op,j) => {
+        const oe = document.getElementById(`${pid}-opt-${j}`);
+        if (!oe) return;
+        const pct = Math.round(op.v/newTotal*100);
+        oe.querySelector('.poll-bar').style.width=pct+'%';
+        oe.querySelector('.poll-opt-pct').textContent=pct+'%';
+        if (j===i) oe.classList.add('voted');
+      });
+      document.getElementById(`${pid}-total`).textContent = fmtN(newTotal)+' votes';
+      toast('✅ Vote recorded!');
+    });
+  });
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('writerDash').classList.remove('open');
+  toast('📊 Poll inserted into stream!');
+}
+
+function insertQuestion() {
+  const qid = 'q_'+Date.now();
+  const el = document.createElement('div');
+  el.className = 'inline-card';
+  el.id = qid;
+  el.innerHTML = `<div class="inline-card-header">
+    <div class="inline-card-icon question"><i class="fas fa-question-circle" style="color:var(--acc2);font-size:11px"></i></div>
+    <div class="inline-card-label">💬 Writer's Question <span>· by @Ifeanyi_Story</span></div>
+  </div>
+  <div class="inline-card-body">
+    <div class="inline-card-q">If you were Nadia, would you have opened Bare Kitchen — or gone back to him?</div>
+    <div class="question-comments-list" id="${qid}-cmts"></div>
+    <input class="question-prompt-input" id="${qid}-inp" placeholder="Drop your answer…"/>
+  </div>`;
+  document.getElementById('storyStream').appendChild(el);
+  const inp = el.querySelector(`#${qid}-inp`);
+  if (inp) inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && inp.value.trim()) {
+      const cmtEl = el.querySelector(`#${qid}-cmts`);
+      const div = document.createElement('div');
+      div.style.cssText = 'padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;color:#ccc';
+      div.innerHTML = `<strong style="color:#fff">You:</strong> ${inp.value.trim()}`;
+      cmtEl.appendChild(div);
+      inp.value = '';
+      toast('💬 Answer posted!');
+    }
+  });
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('writerDash').classList.remove('open');
+  toast('💬 Question inserted into stream!');
+}
+
+function insertDebate() {
+  const did = 'dbt_'+Date.now();
+  const el = document.createElement('div');
+  el.className = 'live-debate-section';
+  el.id = did;
+  let forV = 2341, agV = 3819, userVote = null;
+  const total = () => forV + agV;
+  const fp = () => Math.round(forV/total()*100);
+  el.innerHTML = `<div class="ldb-header">
+    <div class="ldb-icon"><i class="fas fa-gavel" style="color:var(--emerald);font-size:12px"></i></div>
+    <div class="ldb-title">⚔️ Live Debate</div>
+    <div class="ldb-live-badge">LIVE</div>
+  </div>
+  <div class="ldb-motion">"She should open a second Bare Kitchen — or close the first and start fresh with Tunde?"</div>
+  <div class="ldb-sides">
+    <div class="ldb-side for" id="${did}-for">
+      <div class="ldb-side-label">✅ OPEN SECOND</div>
+      <div class="ldb-bar" id="${did}-fbar" style="width:${fp()}%"></div>
+      <div class="ldb-pct" id="${did}-fpct">${fp()}%</div>
+      <div style="font-size:9px;color:var(--muted2)" id="${did}-fcnt">${fmtN(forV)} readers</div>
+    </div>
+    <div class="ldb-side against" id="${did}-ag">
+      <div class="ldb-side-label">❌ START FRESH</div>
+      <div class="ldb-bar" id="${did}-abar" style="width:${100-fp()}%"></div>
+      <div class="ldb-pct" id="${did}-apct">${100-fp()}%</div>
+      <div style="font-size:9px;color:var(--muted2)" id="${did}-acnt">${fmtN(agV)} readers</div>
+    </div>
+  </div>`;
+
+  document.getElementById('storyStream').appendChild(el);
+  el.querySelector(`#${did}-for`).addEventListener('click', () => {
+    if (userVote) return;
+    userVote = 'for'; forV++;
+    el.querySelector(`#${did}-fbar`).style.width = fp()+'%';
+    el.querySelector(`#${did}-abar`).style.width = (100-fp())+'%';
+    el.querySelector(`#${did}-fpct`).textContent = fp()+'%';
+    el.querySelector(`#${did}-apct`).textContent = (100-fp())+'%';
+    el.querySelector(`#${did}-fcnt`).textContent = fmtN(forV)+' readers';
+    toast('✅ Voted — Open Second Location!');
+  });
+  el.querySelector(`#${did}-ag`).addEventListener('click', () => {
+    if (userVote) return;
+    userVote = 'against'; agV++;
+    el.querySelector(`#${did}-fbar`).style.width = fp()+'%';
+    el.querySelector(`#${did}-abar`).style.width = (100-fp())+'%';
+    el.querySelector(`#${did}-fpct`).textContent = fp()+'%';
+    el.querySelector(`#${did}-apct`).textContent = (100-fp())+'%';
+    el.querySelector(`#${did}-acnt`).textContent = fmtN(agV)+' readers';
+    toast('❌ Voted — Start Fresh!');
+  });
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('writerDash').classList.remove('open');
+  toast('⚔️ Debate inserted into stream!');
+}
+
+// ══════════════════════════════════════════════
+// PUBLISH PARAGRAPH
+// ══════════════════════════════════════════════
+function publishParagraphText(text, isDemo) {
+  const stream = document.getElementById('storyStream');
+  publishedCount++;
+
+  const flash = document.getElementById('newParaFlash');
+  flash.style.display = 'flex';
+  clearTimeout(flash._t);
+  flash._t = setTimeout(() => flash.style.display = 'none', 2800);
+
+  const div = document.createElement('div');
+  div.className = 'stream-para';
+  const inner = document.createElement('div');
+  inner.className = 'stream-para-inner' + (publishedCount===1?' para-1':'');
+  inner.style.animationDelay = '0.05s';
+  inner.textContent = text;
+  div.appendChild(inner);
+  stream.appendChild(div);
+  div.scrollIntoView({behavior:'smooth', block:'end'});
+
+  document.getElementById('typingBlock').style.display = 'none';
+  updateDashStat('dParas', publishedCount);
+
+  if (publishedCount === 2) {
+    setTimeout(() => {
+      document.getElementById('adCard1').style.display = 'flex';
+    }, 1500);
+    setTimeout(() => {
+      const pq = document.getElementById('pinnedQuote');
+      pq.style.display = 'block';
+      document.getElementById('pinnedQuoteText').textContent = '"' + text.split('.')[0] + '."';
+    }, 2500);
+  }
+
+  const m = MILESTONES.find(ml => ml.threshold === publishedCount);
+  if (m) showMilestone(m.emoji, m.msg, m.sub);
+
+  updateTicker('Ifeanyi_Story just published a new paragraph — '+(Math.floor(Math.random()*50)+80)+' readers reacted instantly');
+
+  if (isDemo) {
+    const commentPool = DEMO_COMMENTS_SEED.filter(c => !c._used);
+    if (commentPool.length > 0) {
+      setTimeout(() => {
+        const pick = commentPool[Math.floor(Math.random()*commentPool.length)];
+        pick._used = true;
+        addComment(pick.name, pick.av, pick.text, pick.likes, pick.wid);
+      }, 1400 + Math.random()*1600);
+    }
+    // Occasionally insert a poll in demo after para 2
+    if (publishedCount === 3 && isDemo) {
+      setTimeout(() => insertDemoPoll(), 4000);
+    }
+  }
+
+  if (isDemo && publishedCount >= DEMO_PARAGRAPHS.length) {
+    setTimeout(() => {
+      document.getElementById('typingBlock').style.display = 'none';
+      document.getElementById('sessionEndPanel').classList.add('show');
+      document.querySelector('.av-ring.ring-new').style.animation = 'none';
+      document.querySelector('.av-ring.ring-new').style.background = '#3a3a55';
+      document.getElementById('viewerCountTop').textContent = 'Session ended';
+      showMilestone('🎉', 'Live session complete!', 'Chapter 10 is now available');
+    }, 3000);
+  }
+}
+
+function insertDemoPoll() {
+  // Auto-insert a poll from the writer mid-story (non-destructive)
+  const pid = 'demopoll_'+Date.now();
+  const el = document.createElement('div');
+  el.className = 'inline-card';
+  const opts = [{text:'🥐 Open Bare Kitchen', v:2840},{text:'💕 Stay home with Tunde', v:1920},{text:'✈️ Move cities entirely', v:640}];
+  let voted = -1;
+  const total = opts.reduce((s,o)=>s+o.v,0)||1;
+  el.innerHTML = `<div class="inline-card-header">
+    <div class="inline-card-icon poll"><i class="fas fa-chart-bar" style="color:var(--blue);font-size:11px"></i></div>
+    <div class="inline-card-label">📊 What would you do after? <span>· @Ifeanyi_Story asks</span></div>
+  </div>
+  <div class="inline-card-body">
+    <div class="inline-card-q">If you were Nadia on that morning — flour in your hair, heart finally free — what would you do?</div>
+    <div class="poll-opts">
+      ${opts.map((o,i)=>{const pct=Math.round(o.v/total*100);return `<div class="poll-opt" id="${pid}-opt-${i}">
+        <div class="poll-bar" style="width:${pct}%"></div>
+        <div class="poll-opt-inner"><span class="poll-opt-text">${o.text}</span><span class="poll-opt-pct">${pct}%</span></div>
+      </div>`;}).join('')}
+    </div>
+    <div class="poll-foot"><span>${fmtN(total)} votes</span></div>
+  </div>`;
+  document.getElementById('storyStream').appendChild(el);
+  opts.forEach((o,i) => {
+    const optEl = document.getElementById(`${pid}-opt-${i}`);
+    if (optEl) optEl.addEventListener('click', () => {
+      if (voted >= 0) return;
+      voted = i;
+      opts[i].v++;
+      const newTotal = opts.reduce((s,x)=>s+x.v,0)||1;
+      opts.forEach((op,j) => {
+        const oe = document.getElementById(`${pid}-opt-${j}`);
+        if (!oe) return;
+        const pct = Math.round(op.v/newTotal*100);
+        oe.querySelector('.poll-bar').style.width=pct+'%';
+        oe.querySelector('.poll-opt-pct').textContent=pct+'%';
+        if (j===i) oe.classList.add('voted');
+      });
+      toast('✅ Vote recorded!');
+    });
+  });
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function publishParagraph() {
+  const ta = document.getElementById('writeArea');
+  const text = ta.value.trim();
+  if (text.length < 10) return;
+  ta.value = '';
+  document.getElementById('pubBtn').disabled = true;
+  document.getElementById('pubChars').textContent = '0 / 800';
+  publishParagraphText(text, false);
+  toast('✅ Published! Readers are seeing this now.');
+}
+
+function saveDraft() { toast('💾 Draft saved — continue whenever you\'re ready'); }
+
+// ══════════════════════════════════════════════
+// DEMO AUTO-PUBLISH
+// ══════════════════════════════════════════════
+function startDemo() {
+  demoRunning = true;
+  scheduleNextPara();
+}
+function scheduleNextPara() {
+  if (!demoRunning || demoIdx >= DEMO_PARAGRAPHS.length) return;
+  const delay = demoIdx === 0 ? 2000 : 7000 + Math.random()*5000;
+  setTimeout(() => {
+    if (!demoRunning) return;
+    showTypingIndicator();
+    const typeTime = 2200 + DEMO_PARAGRAPHS[demoIdx].length * 18 + Math.random()*2000;
+    setTimeout(() => {
+      if (!demoRunning) return;
+      publishParagraphText(DEMO_PARAGRAPHS[demoIdx], true);
+      demoIdx++;
+      scheduleNextPara();
+    }, typeTime);
+  }, delay);
+}
+function showTypingIndicator() {
+  const tb = document.getElementById('typingBlock');
+  tb.style.display = 'flex';
+  tb.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ══════════════════════════════════════════════
+// TICKER
+// ══════════════════════════════════════════════
+function renderTickerAves() {
+  document.getElementById('tickerAves').innerHTML = TICKER_AVS.map(a =>
+    `<div class="ticker-av"><img src="${a}" loading="lazy"/></div>`).join('');
+}
+renderTickerAves();
+
+function updateTicker(msg) {
+  document.getElementById('tickerText').textContent = msg;
+  const vc = document.getElementById('viewerCount');
+  const n = (parseInt(vc.textContent.replace(/,/g,''))||1247) + Math.floor(Math.random()*12)+2;
+  vc.textContent = n.toLocaleString();
+  document.getElementById('viewerCountTop').textContent = n.toLocaleString()+' watching';
+}
+let tickerIdx = 0;
+setInterval(() => {
+  if (publishedCount > 0) { updateTicker(LIVE_TICKER_EVENTS[tickerIdx++ % LIVE_TICKER_EVENTS.length]); }
+}, 8000);
+
+// ══════════════════════════════════════════════
+// MILESTONE
+// ══════════════════════════════════════════════
+function showMilestone(emoji, msg, sub) {
+  const pop = document.getElementById('milestonePop');
+  document.getElementById('milestoneEmoji').textContent = emoji;
+  document.getElementById('milestoneMsg').textContent = msg;
+  document.getElementById('milestoneSub').textContent = sub;
+  pop.classList.add('show');
+  clearTimeout(pop._t);
+  pop._t = setTimeout(() => pop.classList.remove('show'), 3400);
+}
+
+// ══════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════
+function updateTimer() {
+  const elapsed = Math.floor((Date.now()-sessionStartTime)/1000);
+  const m = Math.floor(elapsed/60), s = elapsed%60;
+  document.getElementById('sessionTimer').textContent = m+':'+(s<10?'0':'')+s;
+}
+setInterval(updateTimer, 1000);
+
+// ══════════════════════════════════════════════
+// FOLLOW
+// ══════════════════════════════════════════════
+function toggleFollow() {
+  isFollowing = !isFollowing;
+  const btn = document.getElementById('followBtn');
+  btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', isFollowing);
+  toast(isFollowing ? '✅ Following @Ifeanyi_Story!' : 'Unfollowed @Ifeanyi_Story');
+}
+
+// ══════════════════════════════════════════════
+// SAVE
+// ══════════════════════════════════════════════
+function openSave() {
+  isSaved = !isSaved;
+  const icon = document.getElementById('topSaveIcon');
+  if (icon) { icon.className = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark'; icon.style.color = isSaved ? 'var(--blue)' : ''; }
+  toast(isSaved ? '📌 Saved to your library!' : '🗑️ Removed from library');
+}
+
+// ══════════════════════════════════════════════
+// COMMENT INPUT
+// ══════════════════════════════════════════════
+const cmInp = document.getElementById('cmInp');
+cmInp.addEventListener('input', () => {
+  document.getElementById('cmSendBtn').disabled = cmInp.value.trim().length === 0;
+});
+document.getElementById('cmSendBtn').addEventListener('click', () => {
+  const text = cmInp.value.trim();
+  if (!text) return;
+  addComment('You', null, text, 0, null);
+  cmInp.value = '';
+  document.getElementById('cmSendBtn').disabled = true;
+  toast('💬 Comment posted!');
+  setTimeout(() => {
+    const last = comments[comments.length-1];
+    if (last && last.name==='You') { last.likes = Math.floor(Math.random()*8)+2; renderLatestComments(); }
+  }, 2200);
+});
+
+// ══════════════════════════════════════════════
+// WRITER MODE (triple-tap title)
+// ══════════════════════════════════════════════
+let titleTaps = 0;
+document.getElementById('topBarTitle').addEventListener('click', () => {
+  titleTaps++;
+  if (titleTaps >= 3) { titleTaps = 0; toggleWriterMode(); }
+  clearTimeout(window._ttTimer);
+  window._ttTimer = setTimeout(() => titleTaps = 0, 700);
+});
+function toggleWriterMode() {
+  isWriterMode = !isWriterMode;
+  const dash = document.getElementById('writerDash');
+  dash.classList.toggle('open', isWriterMode);
+  demoRunning = !isWriterMode;
+  if (isWriterMode) {
+    toast('✍️ Writer mode — write and publish paragraphs');
+    document.getElementById('typingBlock').style.display = 'none';
+  } else {
+    toast('👀 Switched to reader mode');
+    if (demoIdx < DEMO_PARAGRAPHS.length) startDemo();
+  }
+}
+const writeArea = document.getElementById('writeArea');
+writeArea.addEventListener('input', () => {
+  const len = writeArea.value.length;
+  document.getElementById('pubChars').textContent = len+' / 800';
+  document.getElementById('pubBtn').disabled = len < 10;
+});
+
+// Double-tap hero avatar for writer mode
+document.getElementById('heroAvWrap').addEventListener('dblclick', () => toggleWriterMode());
+
+// ══════════════════════════════════════════════
+// STATUS VIEWER (platform style with hold-to-pause)
+// ══════════════════════════════════════════════
+function openStatus(wid) {
+  const ws = WRITER_STATUSES[wid];
+  if (!ws || !ws.statuses.length) { toast('No status available'); return; }
+  statusWriterId = wid; statusIdx = 0; statusPaused = false; statusElapsed = 0;
+  document.getElementById('statusWAv').src = ws.avatar;
+  document.getElementById('statusWName').textContent = '@'+ws.name;
+  document.getElementById('statusViewCount').textContent = fmtN(ws.viewCount||0);
+  document.getElementById('statusOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderStatusSlide();
+}
+function renderStatusSlide() {
+  const ws = WRITER_STATUSES[statusWriterId];
+  if (!ws) return;
+  const slide = ws.statuses[statusIdx];
+  statusElapsed = 0; statusPaused = false;
+  document.getElementById('statusProgBars').innerHTML = ws.statuses.map((_,i) =>
+    `<div class="spb"><div class="spb-fill" id="spb${i}" style="width:${i<statusIdx?100:0}%"></div></div>`).join('');
+  document.getElementById('statusWTime').textContent = slide.time;
+  const content = document.getElementById('statusContent');
+  content.innerHTML = `<div class="status-slide" style="background-image:url('${slide.bg}');background-size:cover;position:absolute;inset:0">
+    <div class="status-slide-grad"></div>
+    <div class="status-slide-text"><div class="status-slide-quote">${slide.quote}</div><div class="status-slide-caption">${slide.caption}</div></div>
+  </div>
+  <div class="status-nav-left" id="sNavL"></div>
+  <div class="status-nav-right" id="sNavR"></div>`;
+  document.getElementById('sNavL').addEventListener('click', () => statusNav(-1));
+  document.getElementById('sNavR').addEventListener('click', () => statusNav(1));
+  const ov = document.getElementById('statusOv');
+  if (ov._phStart) ov.removeEventListener('pointerdown', ov._phStart);
+  if (ov._phEnd) ov.removeEventListener('pointerup', ov._phEnd);
+  if (ov._phCancel) ov.removeEventListener('pointercancel', ov._phCancel);
+  ov._phStart = e => {
+    if (e.target.closest('.status-close-btn')||e.target.closest('.status-view-btn')||e.target.closest('.status-reply-inp')||e.target.closest('.status-react-btn')) return;
+    pauseStatus();
+  };
+  ov._phEnd = () => resumeStatus();
+  ov._phCancel = () => resumeStatus();
+  ov.addEventListener('pointerdown', ov._phStart);
+  ov.addEventListener('pointerup', ov._phEnd);
+  ov.addEventListener('pointercancel', ov._phCancel);
+  clearTimeout(statusTimer);
+  requestAnimationFrame(() => {
+    const fill = document.getElementById('spb'+statusIdx);
+    if (fill) { fill.style.transition=`width ${STATUS_DUR}ms linear`; fill.style.width='100%'; }
+    statusTimer = setTimeout(() => statusNav(1), STATUS_DUR);
+  });
+  ws.viewed = true;
+  // Update hero ring
+  document.getElementById('heroAvWrap').innerHTML = `<div class="av-ring ring-viewed" style="width:46px;height:46px"><div class="av-inner"><img src="https://i.pravatar.cc/100?img=53" alt="Ifeanyi_Story"/></div></div>`;
+}
+function pauseStatus() {
+  if (!statusWriterId||statusPaused) return;
+  statusPaused = true; clearTimeout(statusTimer);
+  const fill = document.getElementById('spb'+statusIdx);
+  if (fill) {
+    const curW = parseFloat(window.getComputedStyle(fill).width);
+    const trackW = fill.parentElement ? fill.parentElement.getBoundingClientRect().width : 1;
+    const pct = trackW > 0 ? (curW/trackW*100) : 0;
+    statusElapsed = (pct/100)*STATUS_DUR;
+    fill.style.transition='none'; fill.style.width=pct+'%';
+  }
+}
+function resumeStatus() {
+  if (!statusWriterId||!statusPaused) return;
+  statusPaused = false;
+  const remaining = Math.max(0, STATUS_DUR-statusElapsed);
+  const fill = document.getElementById('spb'+statusIdx);
+  if (fill) { fill.style.transition=`width ${remaining}ms linear`; fill.style.width='100%'; }
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => statusNav(1), remaining);
+}
+function statusNav(dir) {
+  const ws = WRITER_STATUSES[statusWriterId];
+  if (!ws) return;
+  clearTimeout(statusTimer); statusPaused = false; statusElapsed = 0;
+  statusIdx += dir;
+  if (statusIdx < 0 || statusIdx >= ws.statuses.length) { closeStatus(); return; }
+  renderStatusSlide();
+}
+function closeStatus() {
+  clearTimeout(statusTimer); statusPaused = false;
+  const ov = document.getElementById('statusOv');
+  if (ov._phStart) ov.removeEventListener('pointerdown', ov._phStart);
+  if (ov._phEnd) ov.removeEventListener('pointerup', ov._phEnd);
+  if (ov._phCancel) ov.removeEventListener('pointercancel', ov._phCancel);
+  ov.classList.remove('open'); document.body.style.overflow = '';
+  statusWriterId = null;
+}
+
+// ══════════════════════════════════════════════
+// VIEWERS MODAL
+// ══════════════════════════════════════════════
+function openViewers() {
+  const ws = statusWriterId ? WRITER_STATUSES[statusWriterId] : null;
+  if (!ws) return;
+  const viewers = [{name:'You',avatar:null,role:'reader',time:'just now'},...(ws.viewers||[])];
+  document.getElementById('viewersTitle').textContent = fmtN((ws.viewCount||0)+1)+' Views';
+  document.getElementById('viewersList').innerHTML = viewers.map(v =>
+    `<div class="viewer-item">
+      ${v.avatar?`<img class="viewer-av" src="${v.avatar}" loading="lazy"/>`:`<div class="viewer-av-init">${v.name[0]||'?'}</div>`}
+      <div class="viewer-info"><div class="viewer-name">@${v.name}</div><div class="viewer-role ${v.role}">${v.role==='writer'?'✍️ Writer':'📖 Reader'}</div></div>
+      <div class="viewer-time">${v.time}</div>
+    </div>`).join('');
+  document.getElementById('viewersModal').classList.add('open');
+}
+function closeViewers() { document.getElementById('viewersModal').classList.remove('open'); }
+document.getElementById('viewersModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeViewers(); });
+
+// ══════════════════════════════════════════════
+// SHARE MODAL (platform style)
+// ══════════════════════════════════════════════
+function openShareModal() { document.getElementById('shareModal').classList.add('open'); }
+function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
+function doSpecialShare(type) {
+  closeShareModal();
+  toast(type==='status'?'📢 Posted to your status!':'✅ Reposted to your profile!');
+}
+function copyShareLink() {
+  navigator.clipboard?.writeText('https://droboard.app/live/ifeanyi-story').catch(()=>{});
+  document.getElementById('shCopyMsg').textContent = '✅ Link copied!';
+  toast('🔗 Link copied!');
+}
+function shareVia(platform) {
+  const url = encodeURIComponent('https://droboard.app/live/ifeanyi-story');
+  const text = encodeURIComponent('📖 Ifeanyi_Story is writing LIVE on Droboard — Chapter 10 🔥');
+  const links = {
+    whatsapp:`https://wa.me/?text=${text}%20${url}`,
+    twitter:`https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+    instagram:'#',
+    telegram:`https://t.me/share/url?url=${url}&text=${text}`,
+    facebook:`https://www.facebook.com/sharer/sharer.php?u=${url}`
+  };
+  if (platform==='instagram') { copyShareLink(); toast('📋 Copied! Paste in your Instagram story.'); return; }
+  if (links[platform]) { window.open(links[platform],'_blank'); closeShareModal(); }
+}
+
+// ══════════════════════════════════════════════
+// TIP MODAL
+// ══════════════════════════════════════════════
+function openTip() { document.getElementById('tipModal').classList.add('open'); }
+function closeTip() { document.getElementById('tipModal').classList.remove('open'); }
+function selectTip(el, amount) {
+  document.querySelectorAll('.tip-preset').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tipCustom').value = '';
+}
+function sendTip() {
+  const preset = document.querySelector('.tip-preset.active');
+  const custom = document.getElementById('tipCustom').value;
+  const amount = custom || (preset ? preset.textContent : null);
+  if (!amount) { toast('💰 Choose an amount!'); return; }
+  closeTip();
+  toast(`🙏 ${amount} tip sent to @Ifeanyi_Story!`);
+}
+
+// Viewer count live pulse
+setInterval(() => {
+  const vc = document.getElementById('viewerCount');
+  const n = (parseInt(vc.textContent.replace(/,/g,''))||1247) + (Math.random()>.5?1:-1)*(Math.floor(Math.random()*5)+1);
+  vc.textContent = Math.max(1100,n).toLocaleString();
+  updateDashStat('dReaders', fmtN(Math.max(1100,n)));
+}, 5000);
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+renderReactionBar();
+
+// Seed early comments
+setTimeout(() => addComment('Chioma_R','https://i.pravatar.cc/100?img=47',"I've been waiting for this chapter for THREE WEEKS. Refreshing non-stop.",24,'w2'), 800);
+setTimeout(() => addComment('CampusQueen','https://i.pravatar.cc/100?img=12','The live ring is spinning and I am READY. Let\'s go @Ifeanyi_Story 🔥',18,'w2'), 2400);
+
+setTimeout(() => startDemo(), 1500);
+</script>
+</body>
+</html>

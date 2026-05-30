@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Reader</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;
+  --acc-dim:rgba(255,0,80,.12);--acc-border:rgba(255,0,80,.3);--glow:rgba(255,0,80,.22);
+  --bg:#000000;--bg2:#0a0a0a;--bg3:#111111;--card:#0d0d0d;--surface:#161616;
+  --tx:#f0f0f0;--tx2:#a8a8a8;--muted:#606060;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);
+  --font-story:'Lora',serif;--font-ui:'DM Sans',sans-serif;
+  --fs:14px;--lh:1.85;
+  --theme-bg:#000000;--theme-tx:#f0f0f0;--theme-tx2:#a8a8a8;
+  --safe-b:env(safe-area-inset-bottom,14px);
+  --topbar-h:50px;--bottombar-h:62px;
+}
+body.theme-sepia{
+  --theme-bg:#1a1510;--theme-tx:#e8d5b0;--theme-tx2:#a89070;
+  --bg:#1a1510;--bg2:#201a12;--bg3:#26201a;--card:#201a12;--surface:#26201a;
+  --bd:rgba(232,213,176,.07);--muted:#806050;--tx2:#a89070;
+}
+body.theme-dark{--theme-bg:#000000;--theme-tx:#f0f0f0;--theme-tx2:#a8a8a8;}
+body.theme-grey{
+  --theme-bg:#0f1117;--theme-tx:#d8dce8;--theme-tx2:#888da0;
+  --bg:#0f1117;--bg2:#151820;--bg3:#1c2028;--card:#151820;--surface:#1c2028;
+  --bd:rgba(216,220,232,.07);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-ui);overflow:hidden;transition:background .3s,color .3s}
+img{display:block;user-select:none}
+button{font-family:var(--font-ui);cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+
+/* SHELL */
+.shell{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+
+/* TOP BAR */
+.topbar{
+  flex-shrink:0;height:var(--topbar-h);
+  display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);z-index:100;
+  transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;
+}
+.topbar.hidden{transform:translateY(-100%);opacity:0;pointer-events:none}
+.tb-back{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx2);cursor:pointer;flex-shrink:0;}
+.tb-back:active{transform:scale(.9)}
+.tb-center{flex:1;min-width:0;text-align:center}
+.tb-story-title{font-family:var(--font-story);font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;margin:0 auto;}
+.tb-ch-info{font-size:9.5px;color:var(--muted);margin-top:1px;font-weight:600}
+.tb-right{display:flex;gap:7px;align-items:center}
+.tb-btn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx2);cursor:pointer;flex-shrink:0;transition:.15s;}
+.tb-btn:active{transform:scale(.9)}
+.tb-btn.active{background:var(--acc-dim);border-color:var(--acc-border);color:var(--acc)}
+
+/* PROGRESS BAR */
+.read-progress{position:absolute;top:var(--topbar-h);left:0;right:0;height:2px;background:var(--bd);z-index:99;}
+.read-progress-fill{height:100%;background:var(--acc);width:0%;transition:width .3s}
+
+/* SCROLL BODY */
+.scroll-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--bottombar-h) + var(--safe-b) + 20px);
+}
+.scroll-body::-webkit-scrollbar{display:none}
+
+/* CHAPTER HERO */
+.ch-hero{position:relative;height:220px;overflow:hidden;flex-shrink:0;}
+.ch-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:blur(1px) brightness(.55);transform:scale(1.04);}
+.ch-hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 55%,var(--bg) 100%);}
+.ch-hero-content{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:16px 18px 22px;}
+.ch-cat-badge{display:inline-flex;align-items:center;gap:4px;background:var(--acc);color:#fff;font-size:8px;font-weight:800;padding:3px 9px;border-radius:999px;margin-bottom:8px;letter-spacing:.04em;align-self:flex-start;}
+.ch-title{font-family:var(--font-story);font-size:18px;font-weight:700;line-height:1.25;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);margin-bottom:10px;}
+.ch-meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ch-meta-pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;gap:4px;}
+
+/* STORY TEXT */
+.story-wrap{padding:28px 22px 0;max-width:680px;margin:0 auto}
+.story-text{font-family:var(--font-story);font-size:var(--fs);line-height:var(--lh);color:var(--theme-tx);letter-spacing:.01em;word-spacing:.05em;transition:font-size .2s,color .3s;}
+.story-text p{margin-bottom:1.5em}
+.story-text p:last-child{margin-bottom:0}
+.story-divider{display:flex;align-items:center;gap:12px;margin:36px 0;opacity:.35;}
+.story-divider::before,.story-divider::after{content:'';flex:1;height:1px;background:var(--theme-tx2)}
+.story-divider span{font-size:12px;color:var(--theme-tx2)}
+.story-text p:first-child::first-letter{font-family:var(--font-story);font-size:3.2em;font-weight:700;float:left;line-height:.82;margin-right:.08em;margin-top:.04em;color:var(--acc);}
+
+/* CHAPTER NAV — clean icon row, no box */
+.ch-nav{display:flex;align-items:center;justify-content:space-between;padding:28px 22px 20px;gap:12px;}
+.ch-nav-side{display:flex;align-items:center;gap:8px;cursor:pointer;transition:.18s;user-select:none;}
+.ch-nav-side:active{opacity:.6}
+.ch-nav-side.disabled{opacity:.22;pointer-events:none}
+.ch-nav-icon{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx2);flex-shrink:0;}
+.ch-nav-side.next-ch .ch-nav-icon{background:var(--acc-dim);border-color:var(--acc-border);color:var(--acc)}
+.ch-nav-label{font-size:11px;font-weight:700;color:var(--tx2)}
+.ch-nav-side.next-ch .ch-nav-label{color:var(--acc)}
+.ch-nav-center{font-size:10px;color:var(--muted);font-weight:600;white-space:nowrap;}
+
+/* CHAPTER END — no card box, pure #000 background, icons on one line */
+.ch-end-section{padding:0 22px 28px;text-align:center;background:var(--bg);}
+.ch-end-title{font-family:var(--font-story);font-size:14px;font-weight:700;color:var(--tx2);margin-bottom:4px;}
+.ch-end-sub{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+.ch-end-actions{display:flex;align-items:center;justify-content:center;gap:32px;}
+.ch-end-act{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:.15s;user-select:none;}
+.ch-end-act:active{transform:scale(.9)}
+.ch-end-act-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.ch-end-act.notify .ch-end-act-icon{background:var(--acc-dim);border-color:var(--acc-border);color:var(--acc)}
+.ch-end-act-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.03em;text-transform:uppercase;}
+
+/* YOU MAY ALSO LIKE — image crops to top, pure #000 body */
+.yml-section{padding:20px 0 0}
+.yml-title{font-family:var(--font-story);font-size:13px;font-weight:700;color:var(--tx);padding:0 22px 12px;display:flex;align-items:center;gap:7px;}
+.yml-scroll{display:flex;gap:10px;padding:0 22px;overflow-x:auto;scrollbar-width:none;}
+.yml-scroll::-webkit-scrollbar{display:none}
+.yml-card{flex-shrink:0;width:130px;background:#000;border:1px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.18s;}
+.yml-card:active{transform:scale(.97)}
+.yml-thumb{width:100%;height:88px;background-size:cover;background-position:top center;display:block;}
+.yml-body{padding:8px 9px 10px;background:#000;}
+.yml-cat{font-size:7.5px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.yml-t{font-size:10px;font-weight:600;color:var(--tx);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;}
+.yml-a{font-size:8.5px;color:var(--muted);margin-bottom:7px}
+.yml-read-btn{display:block;width:100%;background:var(--acc);color:#fff;border:none;padding:5px 0;border-radius:6px;font-size:9px;font-weight:800;font-family:var(--font-ui);cursor:pointer;text-align:center;}
+
+/* BOTTOM BAR — always fixed, never hides */
+.bottombar{
+  flex-shrink:0;
+  height:calc(var(--bottombar-h) + var(--safe-b));
+  background:rgba(0,0,0,.92);backdrop-filter:blur(24px);
+  border-top:1px solid var(--bd);
+  display:flex;align-items:center;
+  padding:0 12px var(--safe-b);gap:6px;z-index:100;
+}
+.bb-act{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;flex-shrink:0;padding:5px 6px;border-radius:10px;transition:.15s;user-select:none;}
+.bb-act:active{background:var(--surface)}
+.bb-icon{font-size:20px;color:var(--tx2);transition:.18s}
+.bb-label{font-size:8px;font-weight:600;color:var(--muted)}
+.bb-act.liked .bb-icon{color:var(--acc)}
+.bb-act.saved .bb-icon{color:#60a5fa}
+.bb-read-btn{flex:1;height:42px;border-radius:12px;background:var(--acc);color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 2px 14px var(--glow);transition:.15s;font-family:var(--font-ui);}
+.bb-read-btn:active{transform:scale(.97)}
+
+/* CHAPTERS PANEL */
+.ch-panel{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:var(--bg);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.ch-panel.open{transform:translateX(0)}
+.ch-panel-hdr{flex-shrink:0;height:52px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--bd);background:rgba(0,0,0,.85);backdrop-filter:blur(16px);}
+.ch-panel-title{font-family:var(--font-story);font-size:15px;font-weight:700;color:var(--tx);flex:1}
+.ch-panel-close{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx2);cursor:pointer;}
+.ch-panel-body{flex:1;overflow-y:auto;scrollbar-width:none;padding:12px 14px}
+.ch-panel-body::-webkit-scrollbar{display:none}
+.season-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px}
+.season-tabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;padding:5px 14px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);color:var(--muted);background:var(--surface);transition:.18s;}
+.stab.active{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 2px 8px var(--glow)}
+.ch-list{display:flex;flex-direction:column;gap:6px}
+.ch-row{display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--bd);border-radius:10px;padding:11px 13px;cursor:pointer;transition:.18s;}
+.ch-row.current{border-color:var(--acc-border);background:var(--acc-dim)}
+.ch-row:active{transform:scale(.99)}
+.ch-num{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;background:var(--bg3);border:1.5px solid var(--bd);color:var(--muted);}
+.ch-num.done{background:rgba(22,163,74,.1);color:#4ade80;border-color:rgba(22,163,74,.2)}
+.ch-num.current{background:var(--acc-dim);color:var(--acc);border-color:var(--acc-border)}
+.ch-row-body{flex:1;min-width:0}
+.ch-row-title{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px}
+.ch-row-meta{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.ch-row-badge{font-size:7px;font-weight:800;padding:1.5px 5px;border-radius:999px}
+.crb-new{background:var(--acc-dim);color:var(--acc);border:1px solid var(--acc-border)}
+.crb-free{background:rgba(22,163,74,.1);color:#4ade80;border:1px solid rgba(22,163,74,.2)}
+.ch-row-right{flex-shrink:0;text-align:right}
+.ch-current-badge{font-size:8px;font-weight:800;color:var(--acc);background:var(--acc-dim);padding:2px 7px;border-radius:999px;border:1px solid var(--acc-border)}
+.ch-done-check{color:#4ade80;font-size:13px}
+
+/* SETTINGS PANEL */
+.settings-panel{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--bg2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 calc(20px + var(--safe-b));}
+.settings-panel.open{transform:translateY(0)}
+.sp-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:12px auto 16px}
+.sp-title{font-size:12px;font-weight:800;color:var(--tx2);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.sp-section{padding:0 20px 16px}
+.sp-label{font-size:9.5px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.font-ctrl{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:8px 14px}
+.font-ctrl-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--tx2);cursor:pointer;flex-shrink:0;font-weight:700;}
+.font-ctrl-btn:active{transform:scale(.9)}
+.font-size-display{flex:1;text-align:center;font-size:14px;font-weight:800;color:var(--tx)}
+.font-preview{font-family:var(--font-story);font-size:11px;color:var(--muted);margin-top:2px;text-align:center}
+.theme-opts{display:flex;gap:8px}
+.theme-opt{flex:1;height:52px;border-radius:10px;cursor:pointer;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;transition:.18s;}
+.theme-opt:active{transform:scale(.95)}
+.theme-opt.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-dim)}
+.theme-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.theme-name{font-size:8.5px;font-weight:700;color:var(--muted)}
+.lh-opts{display:flex;gap:6px}
+.lh-opt{flex:1;padding:8px 4px;border-radius:9px;cursor:pointer;border:1.5px solid var(--bd);background:var(--surface);text-align:center;transition:.18s;}
+.lh-opt:active{transform:scale(.95)}
+.lh-opt.on{border-color:var(--acc);background:var(--acc-dim)}
+.lh-opt-icon{font-size:14px;line-height:1;margin-bottom:2px}
+.lh-opt-label{font-size:8px;font-weight:700;color:var(--muted)}
+.lh-opt.on .lh-opt-label{color:var(--acc)}
+.ff-opts{display:flex;gap:6px}
+.ff-opt{flex:1;padding:10px 6px;border-radius:9px;cursor:pointer;border:1.5px solid var(--bd);background:var(--surface);text-align:center;transition:.18s;}
+.ff-opt:active{transform:scale(.95)}
+.ff-opt.on{border-color:var(--acc);background:var(--acc-dim)}
+.ff-opt-label{font-size:11px;font-weight:700;color:var(--tx2)}
+.ff-opt-sub{font-size:8px;color:var(--muted);margin-top:2px}
+.ff-opt.on .ff-opt-label,.ff-opt.on .ff-opt-sub{color:var(--acc)}
+
+/* OVERLAY */
+.overlay-bg{position:fixed;inset:0;z-index:190;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .28s;}
+.overlay-bg.show{opacity:1;pointer-events:auto}
+
+/* REACTION POPUP */
+.rx-popup{position:fixed;z-index:300;bottom:calc(var(--bottombar-h) + var(--safe-b) + 8px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--bd);border-radius:24px;padding:10px 12px;display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:300px;width:calc(100vw - 32px);box-shadow:0 8px 32px rgba(0,0,0,.8);opacity:0;pointer-events:none;transition:.22s cubic-bezier(.34,1.56,.64,1);}
+.rx-popup.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.rx-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:12px;cursor:pointer;transition:.15s;user-select:none;}
+.rx-btn:active{transform:scale(.88)}
+.rx-btn.picked{background:var(--acc-dim)}
+.rx-emoji{font-size:22px;line-height:1}
+.rx-count{font-size:8px;font-weight:700;color:var(--muted)}
+.rx-btn.picked .rx-count{color:var(--acc2)}
+
+/* SHARE SHEET */
+.share-sheet{position:fixed;bottom:0;left:0;right:0;z-index:250;background:var(--bg2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 calc(16px + var(--safe-b));}
+.share-sheet.open{transform:translateY(0)}
+.ss-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:12px auto 0}
+.ss-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.ss-hdr h3{font-size:14px;font-weight:800;color:var(--tx)}
+.ss-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx2);cursor:pointer}
+.ss-preview{display:flex;gap:10px;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:10px;margin:0 16px 12px;align-items:center}
+.ss-prev-thumb{width:44px;height:44px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0}
+.ss-prev-title{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3}
+.ss-prev-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.ss-specials{display:flex;gap:9px;padding:0 16px 12px}
+.ss-spec{flex:1;padding:10px 8px;border-radius:12px;cursor:pointer;font-size:10.5px;font-weight:700;color:#fff;display:flex;flex-direction:column;align-items:center;gap:5px;transition:.15s;}
+.ss-spec:active{transform:scale(.95)}
+.ss-spec i{font-size:18px}
+.ss-spec.status{background:linear-gradient(135deg,#0044ff,#00aaff)}
+.ss-spec.profile{background:var(--acc-dim);border:1px solid var(--acc-border);color:var(--acc)}
+.ss-link-row{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--bd);border-radius:10px;padding:8px 11px;margin:0 16px 12px}
+.ss-link-row input{flex:1;background:transparent;border:none;color:var(--tx2);font-size:11px;outline:none;font-family:var(--font-ui)}
+.ss-copy-btn{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui)}
+.ss-icons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:0 16px 4px}
+.ss-icon{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;}
+.ss-icon:active{transform:scale(.9)}
+.ss-icon-bg{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ss-icon span{font-size:9px;font-weight:600;color:var(--muted)}
+.ss-copy-msg{text-align:center;font-size:11px;color:var(--acc2);font-weight:600;height:18px;padding-top:6px}
+
+/* SAVE SHEET — with collections list */
+.save-sheet{position:fixed;bottom:0;left:0;right:0;z-index:250;background:var(--bg2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 calc(16px + var(--safe-b));max-height:85vh;overflow-y:auto;}
+.save-sheet::-webkit-scrollbar{display:none}
+.save-sheet.open{transform:translateY(0)}
+.svs-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:12px auto 0}
+.svs-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.svs-hdr h3{font-size:14px;font-weight:800;color:var(--tx)}
+.svs-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx2);cursor:pointer}
+.svs-section-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:0 16px 8px}
+.svs-opts{padding:0 16px}
+.svs-opt{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--surface);border:1.5px solid var(--bd);border-radius:11px;cursor:pointer;transition:.18s;margin-bottom:8px;}
+.svs-opt:active{transform:scale(.99);border-color:var(--acc-border)}
+.svs-opt-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.svs-opt-body{flex:1}
+.svs-opt-title{font-size:13px;font-weight:700;color:var(--tx)}
+.svs-opt-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.svs-opt-check{font-size:16px;color:var(--muted)}
+.svs-opt.saved .svs-opt-check{color:#4ade80}
+/* Collections */
+.svs-collections-wrap{padding:0 16px}
+.svs-coll-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--surface);border:1.5px solid var(--bd);border-radius:11px;cursor:pointer;transition:.18s;margin-bottom:7px;}
+.svs-coll-item:active{transform:scale(.99)}
+.svs-coll-item.saved{border-color:var(--acc-border);background:var(--acc-dim)}
+.svs-coll-thumb{width:38px;height:38px;border-radius:8px;background:var(--bg3);background-size:cover;background-position:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.svs-coll-info{flex:1}
+.svs-coll-name{font-size:12px;font-weight:700;color:var(--tx)}
+.svs-coll-count{font-size:10px;color:var(--muted);margin-top:1px}
+.svs-coll-check{font-size:15px;color:var(--muted)}
+.svs-coll-item.saved .svs-coll-check{color:#4ade80}
+.svs-new-coll{display:flex;align-items:center;gap:8px;padding:11px 14px;border:1.5px dashed var(--bd);border-radius:11px;cursor:pointer;margin:4px 16px 0;font-size:12px;font-weight:700;color:var(--muted);}
+.svs-new-coll i{font-size:14px}
+
+/* TIP SHEET — exactly matches homepage style */
+.tip-sheet{position:fixed;bottom:0;left:0;right:0;z-index:250;background:var(--bg2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 calc(20px + var(--safe-b));}
+.tip-sheet.open{transform:translateY(0)}
+.ts-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:12px auto 0}
+.ts-hdr{padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.ts-hdr h3{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:7px}
+.ts-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx2);cursor:pointer}
+.ts-writer{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:0 16px 14px;}
+.ts-w-av{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--acc-border);flex-shrink:0;}
+.ts-w-info{flex:1}
+.ts-w-name{font-size:13px;font-weight:800;color:var(--tx)}
+.ts-w-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.ts-amounts{display:flex;gap:8px;padding:0 16px 14px;overflow-x:auto;scrollbar-width:none;}
+.ts-amounts::-webkit-scrollbar{display:none}
+.ts-amt{flex-shrink:0;padding:9px 18px;border-radius:999px;cursor:pointer;border:1.5px solid var(--bd);background:var(--surface);font-size:12px;font-weight:800;color:var(--tx);transition:.18s;}
+.ts-amt:active{transform:scale(.95)}
+.ts-amt.on{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 2px 10px var(--glow)}
+.ts-msg-row{padding:0 16px 12px}
+.ts-msg{width:100%;background:var(--surface);border:1px solid var(--bd);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:var(--font-ui);font-size:12px;outline:none;resize:none;line-height:1.5;}
+.ts-msg::placeholder{color:var(--muted)}
+.ts-send{display:block;width:calc(100% - 32px);margin:0 16px;background:var(--acc);color:#fff;border:none;padding:13px;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-ui);box-shadow:0 2px 14px var(--glow);}
+.ts-send:active{transform:scale(.98)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--bottombar-h) + var(--safe-b) + 12px);left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg3);color:var(--tx);padding:8px 17px;border-radius:999px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.26s;pointer-events:none;white-space:nowrap;border:1px solid var(--bd);box-shadow:0 4px 20px rgba(0,0,0,.6);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .3s ease both}
+</style>
+</head>
+<body class="theme-dark">
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <div class="tb-back" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+    <div class="tb-center">
+      <div class="tb-story-title" id="tbStoryTitle">The Runaway Bride</div>
+      <div class="tb-ch-info" id="tbChInfo">Season 2 · Chapter 4</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-btn" onclick="openSettings()"><i class="fas fa-text-height"></i></div>
+      <div class="tb-btn" onclick="openChPanel()"><i class="fas fa-list-ul"></i></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="read-progress"><div class="read-progress-fill" id="readProgressFill"></div></div>
+
+  <!-- SCROLL BODY -->
+  <div class="scroll-body" id="scrollBody">
+
+    <!-- HERO -->
+    <div class="ch-hero fu">
+      <div class="ch-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=85')"></div>
+      <div class="ch-hero-scrim"></div>
+      <div class="ch-hero-content">
+        <div class="ch-cat-badge">✨ TWIST</div>
+        <div class="ch-title">I left the altar in my socked feet and found my actual life</div>
+        <div class="ch-meta-row">
+          <div class="ch-meta-pill"><i class="fas fa-book-open" style="font-size:8px"></i> S2 · Ch 4</div>
+          <div class="ch-meta-pill"><i class="far fa-clock" style="font-size:8px"></i> ~4 min read</div>
+          <div class="ch-meta-pill">✍️ Ifeanyi_Story</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORY -->
+    <div class="story-wrap fu">
+      <div class="story-text" id="storyText">
+        <p>The morning of my wedding I woke up at four a.m. and lay in the dark listening to the hotel air conditioning hum. My mother was asleep two rooms down. The dress was hanging near the window like a white ghost.</p>
+        <p>I did not feel afraid. That was the strange thing. I felt something closer to clarity — the kind that arrives only when a long argument finally ends, not in victory, but in exhaustion.</p>
+        <div class="story-divider"><span>✦</span></div>
+        <p>Four hundred guests. The ceremony was in the hotel ballroom — high ceilings, imported flowers, a string quartet that my mother-in-law had insisted upon. My dress had cost four hundred and twenty thousand naira. I had worn it to one fitting and cried, which everyone assumed was joy.</p>
+        <p>I removed my heels during the vows. Not dramatically. I simply bent and set them neatly beside my feet while the pastor was still reading. My maid of honour, Sade, noticed and looked at me with a question I did not answer.</p>
+        <p>The pastor reached the part everyone knows.</p>
+        <p>"Speak now, or forever hold your peace."</p>
+        <p>My mother was smiling so hard her eyes had nearly closed. My father was watching me with the look he used to give me as a child when he was trying to tell me something without words. I looked at Emeka — my soon-to-be husband, my six-year relationship, my plan — and I thought:</p>
+        <p><em>I know about the other woman. I have known for eleven months. I have been waiting for it to stop mattering. It never stopped mattering.</em></p>
+        <div class="story-divider"><span>✦</span></div>
+        <p>Four hundred people heard what I said next. The exact words do not matter now. What matters is that I said them clearly, without crying, and without looking away from his face.</p>
+        <p>His expression did something I had not expected. It did not collapse into guilt. It collapsed into relief. As if he had also been waiting for eleven months for someone to say it out loud.</p>
+        <p>In my socked feet, I walked down the aisle.</p>
+        <p>My father stood up as I passed him. I shook my head, just slightly. He sat back down. I loved him enormously in that moment.</p>
+        <p>Outside the ballroom there was a corridor with blue carpet and a fire exit. I pushed through the fire exit into the service stairwell and sat on the third step and called my cousin Adaeze, who lived nearby.</p>
+        <p>"Come now," I said. "Don't ask anything. Just come."</p>
+        <div class="story-divider"><span>✦</span></div>
+        <p>The video was viewed four million times in eleven days. A stranger filmed it — one of the string quartet, I later learned, who had placed a phone on a music stand. I do not blame him. I would have filmed it too.</p>
+        <p>I did not watch it for three weeks. When I finally did, what struck me most was how quiet I was. How deliberate. You could see the heels placed neatly on the floor. You could see my father standing. You could see the exact moment I stopped being afraid of the wrong things.</p>
+        <p>In the second week I started baking. I had no reason to — I had never baked seriously before. But my hands needed something to do and flour was what was in the kitchen.</p>
+        <p>By the third week, three strangers had contacted me through the video asking if I could make what I had posted on my phone. I had posted a photograph of a cardamom loaf. I had not thought of it as a product.</p>
+        <p>Six months later I opened Bare Kitchen.</p>
+        <p>Bare — because I had stood in front of four hundred people with nothing hidden. Because the name felt honest in a way I was trying to become.</p>
+        <p>The morning we opened, a woman came in who I did not recognise. She ordered the cardamom loaf and sat at the small table near the window for two hours. When she was leaving she stopped at the counter.</p>
+        <p>"I walked out of a job I had hated for seven years after I watched your video," she said. "I wanted you to know that."</p>
+        <p>I thanked her. After she left I went to the back and stood quietly for a moment before the next order came in.</p>
+        <p>I have thought about that woman often. About the small, unintended permission that one person's honesty can give another. About how the things we do in our most frightened, most certain moments ripple outward in ways we will never fully know.</p>
+        <p>I still do not wear heels inside the bakery.</p>
+      </div>
+
+      <!-- CHAPTER NAV — icon row, no boxes -->
+      <div class="ch-nav">
+        <div class="ch-nav-side disabled" id="prevChBtn" onclick="goChapter(-1)">
+          <div class="ch-nav-icon"><i class="fas fa-chevron-left"></i></div>
+          <span class="ch-nav-label">Previous</span>
+        </div>
+        <span class="ch-nav-center" id="chNavCenter">Ch 4 of 5</span>
+        <div class="ch-nav-side next-ch" id="nextChBtn" onclick="goChapter(1)">
+          <span class="ch-nav-label">Next</span>
+          <div class="ch-nav-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+      </div>
+
+      <!-- CHAPTER END — no card, icon row on #000 -->
+      <div class="ch-end-section">
+        <div class="ch-end-title">Chapter 4 complete</div>
+        <div class="ch-end-sub">Chapter 5 drops Friday midnight.<br/>Don't miss what she discovers next.</div>
+        <div class="ch-end-actions">
+          <div class="ch-end-act notify" onclick="toast('🔔 You\'ll be notified!')">
+            <div class="ch-end-act-icon"><i class="far fa-bell"></i></div>
+            <div class="ch-end-act-label">Notify</div>
+          </div>
+          <div class="ch-end-act" onclick="openShare()">
+            <div class="ch-end-act-icon"><i class="fas fa-share-alt"></i></div>
+            <div class="ch-end-act-label">Share</div>
+          </div>
+          <div class="ch-end-act" onclick="openTip()">
+            <div class="ch-end-act-icon"><i class="fas fa-coins"></i></div>
+            <div class="ch-end-act-label">Tip</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- YOU MAY ALSO LIKE — image crops to top, #000 body -->
+      <div class="yml-section">
+        <div class="yml-title"><span>✨</span> You May Also Like</div>
+        <div class="yml-scroll" id="ymlScroll"></div>
+      </div>
+
+    </div><!-- /story-wrap -->
+  </div><!-- /scroll-body -->
+
+  <!-- BOTTOM BAR — always fixed -->
+  <div class="bottombar" id="bottombar">
+    <div class="bb-act" id="bbLike" onclick="handleLikeTap()" onpointerdown="startLikeHold()" onpointerup="endLikeHold()" onpointercancel="endLikeHold()">
+      <div class="bb-icon"><i class="far fa-heart"></i></div>
+      <div class="bb-label">Like</div>
+    </div>
+    <div class="bb-read-btn">
+      <i class="fas fa-book-open" style="font-size:13px"></i> Reading
+    </div>
+    <div class="bb-act" id="bbSave" onclick="openSave()">
+      <div class="bb-icon"><i class="far fa-bookmark"></i></div>
+      <div class="bb-label">Save</div>
+    </div>
+    <div class="bb-act" onclick="openShare()">
+      <div class="bb-icon"><i class="fas fa-share-alt"></i></div>
+      <div class="bb-label">Share</div>
+    </div>
+    <div class="bb-act" onclick="openTip()">
+      <div class="bb-icon"><i class="fas fa-coins"></i></div>
+      <div class="bb-label">Tip</div>
+    </div>
+  </div>
+</div>
+
+<!-- REACTION POPUP -->
+<div class="rx-popup" id="rxPopup"></div>
+
+<!-- OVERLAY -->
+<div class="overlay-bg" id="overlayBg" onclick="closeAllSheets()"></div>
+
+<!-- CHAPTERS PANEL -->
+<div class="ch-panel" id="chPanel">
+  <div class="ch-panel-hdr">
+    <div class="ch-panel-title">Chapters</div>
+    <div class="ch-panel-close" onclick="closeChPanel()">✕</div>
+  </div>
+  <div class="ch-panel-body">
+    <div class="season-tabs" id="seasonTabs"></div>
+    <div class="ch-list" id="chListPanel"></div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="sp-handle"></div>
+  <div class="sp-title">Reading Settings</div>
+  <div class="sp-section">
+    <div class="sp-label">Font Size</div>
+    <div class="font-ctrl">
+      <div class="font-ctrl-btn" onclick="changeFontSize(-1)">A−</div>
+      <div style="flex:1;text-align:center">
+        <div class="font-size-display" id="fontSizeDisplay">14px</div>
+        <div class="font-preview" id="fontPreview" style="font-family:var(--font-story)">The quick brown fox…</div>
+      </div>
+      <div class="font-ctrl-btn" onclick="changeFontSize(1)">A+</div>
+    </div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Line Spacing</div>
+    <div class="lh-opts">
+      <div class="lh-opt" data-lh="1.55" onclick="setLH(this,'1.55')"><div class="lh-opt-icon">≡</div><div class="lh-opt-label">Compact</div></div>
+      <div class="lh-opt on" data-lh="1.85" onclick="setLH(this,'1.85')"><div class="lh-opt-icon" style="letter-spacing:1px">≡</div><div class="lh-opt-label">Normal</div></div>
+      <div class="lh-opt" data-lh="2.2" onclick="setLH(this,'2.2')"><div class="lh-opt-icon" style="letter-spacing:3px">≡</div><div class="lh-opt-label">Relaxed</div></div>
+    </div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Font Style</div>
+  <div class="ff-opts">
+  <div class="ff-opt on" onclick="setFF(this, '\'Lora\', serif')">
+    <div class="ff-opt-label" style="font-family:'Lora', serif;">Lora</div>
+    <div class="ff-opt-sub">Serif</div>
+  </div>
+
+  <div class="ff-opt" onclick="setFF(this, '\'DM Sans\', sans-serif')">
+    <div class="ff-opt-label" style="font-family:'DM Sans', sans-serif;">DM Sans</div>
+    <div class="ff-opt-sub">Sans</div>
+  </div>
+
+  <div class="ff-opt" onclick="setFF(this, 'Georgia, serif')">
+    <div class="ff-opt-label" style="font-family:Georgia, serif;">Georgia</div>
+    <div class="ff-opt-sub">Classic</div>
+  </div>
+</div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Background</div>
+    <div class="theme-opts">
+      <div class="theme-opt on" onclick="setTheme(this,'theme-dark')"><div class="theme-dot" style="background:#000;border-color:rgba(255,255,255,.3)"></div><div class="theme-name">Dark</div></div>
+      <div class="theme-opt" onclick="setTheme(this,'theme-sepia')"><div class="theme-dot" style="background:#1a1510;border-color:rgba(232,213,176,.3)"></div><div class="theme-name">Sepia</div></div>
+      <div class="theme-opt" onclick="setTheme(this,'theme-grey')"><div class="theme-dot" style="background:#0f1117;border-color:rgba(216,220,232,.3)"></div><div class="theme-name">Slate</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE SHEET -->
+<div class="share-sheet" id="shareSheet">
+  <div class="ss-handle"></div>
+  <div class="ss-hdr"><h3>Share Story</h3><div class="ss-close" onclick="closeAllSheets()">✕</div></div>
+  <div class="ss-preview">
+    <div class="ss-prev-thumb" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=80')"></div>
+    <div><div class="ss-prev-title">The Runaway Bride — I left in my socked feet</div><div class="ss-prev-sub">by @Ifeanyi_Story · 45k likes</div></div>
+  </div>
+  <div class="ss-specials">
+    <div class="ss-spec status" onclick="toast('📢 Posted to status!');closeAllSheets()"><i class="fas fa-circle-notch"></i>Status</div>
+    <div class="ss-spec profile" onclick="toast('✅ Posted to profile!');closeAllSheets()"><i class="fas fa-user-circle"></i>Profile</div>
+  </div>
+  <div class="ss-link-row">
+    <input type="text" value="https://droboard.app/story/5" readonly id="shareLinkInput"/>
+    <button class="ss-copy-btn" onclick="copyShareLink()">Copy</button>
+  </div>
+  <div class="ss-icons">
+    <div class="ss-icon" onclick="toast('✅ Opening WhatsApp…')"><div class="ss-icon-bg" style="background:#1ebe57"><i class="fab fa-whatsapp" style="color:#fff"></i></div><span>WhatsApp</span></div>
+    <div class="ss-icon" onclick="toast('✅ Opening X…')"><div class="ss-icon-bg" style="background:#000;border:1px solid #333"><i class="fab fa-x-twitter" style="color:#fff;font-size:18px"></i></div><span>X</span></div>
+    <div class="ss-icon" onclick="toast('📋 Copied for Instagram!')"><div class="ss-icon-bg" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)"><i class="fab fa-instagram" style="color:#fff"></i></div><span>Instagram</span></div>
+    <div class="ss-icon" onclick="toast('✅ Opening Telegram…')"><div class="ss-icon-bg" style="background:#0088cc"><i class="fab fa-telegram" style="color:#fff"></i></div><span>Telegram</span></div>
+    <div class="ss-icon" onclick="toast('✅ Opening Facebook…')"><div class="ss-icon-bg" style="background:#1877f2"><i class="fab fa-facebook" style="color:#fff"></i></div><span>Facebook</span></div>
+    <div class="ss-icon" onclick="copyShareLink()"><div class="ss-icon-bg" style="background:var(--surface)"><i class="fas fa-link" style="color:var(--tx2)"></i></div><span>Copy</span></div>
+  </div>
+  <div class="ss-copy-msg" id="ssCopyMsg"></div>
+</div>
+
+<!-- SAVE SHEET -->
+<div class="save-sheet" id="saveSheet">
+  <div class="svs-handle"></div>
+  <div class="svs-hdr"><h3>Save Story</h3><div class="svs-close" onclick="closeAllSheets()">✕</div></div>
+  <div class="svs-section-label">Quick Save</div>
+  <div class="svs-opts">
+    <div class="svs-opt" id="svLibrary" onclick="toggleSaveOpt('library')">
+      <div class="svs-opt-icon" style="background:var(--acc-dim)">📚</div>
+      <div class="svs-opt-body"><div class="svs-opt-title">Library</div><div class="svs-opt-sub">Your personal reading list</div></div>
+      <div class="svs-opt-check" id="libCheck"><i class="far fa-circle"></i></div>
+    </div>
+    <div class="svs-opt" id="svFavourites" onclick="toggleSaveOpt('fav')">
+      <div class="svs-opt-icon" style="background:rgba(250,204,21,.1)">⭐</div>
+      <div class="svs-opt-body"><div class="svs-opt-title">Favourites</div><div class="svs-opt-sub">Stories you love most</div></div>
+      <div class="svs-opt-check" id="favCheck"><i class="far fa-circle"></i></div>
+    </div>
+    <div class="svs-opt" id="svReadLater" onclick="toggleSaveOpt('later')">
+      <div class="svs-opt-icon" style="background:rgba(96,165,250,.1)">🕐</div>
+      <div class="svs-opt-body"><div class="svs-opt-title">Read Later</div><div class="svs-opt-sub">Finish when you're ready</div></div>
+      <div class="svs-opt-check" id="laterCheck"><i class="far fa-circle"></i></div>
+    </div>
+  </div>
+  <div class="svs-section-label" style="margin-top:16px">My Collections</div>
+  <div class="svs-collections-wrap" id="collectionsWrap"></div>
+  <div class="svs-new-coll" onclick="createNewCollection()"><i class="fas fa-plus"></i> Create new collection</div>
+</div>
+
+<!-- TIP SHEET — same as homepage -->
+<div class="tip-sheet" id="tipSheet">
+  <div class="ts-handle"></div>
+  <div class="ts-hdr">
+    <h3>💰 Tip the Writer</h3>
+    <div class="ts-close" onclick="closeAllSheets()">✕</div>
+  </div>
+  <div class="ts-writer">
+    <img class="ts-w-av" src="https://i.pravatar.cc/100?img=53" loading="lazy" alt=""/>
+    <div class="ts-w-info">
+      <div class="ts-w-name">Ifeanyi_Story</div>
+      <div class="ts-w-sub">@ifeanyi_story · 31.7k followers</div>
+    </div>
+  </div>
+  <div class="ts-amounts" id="tsAmounts"></div>
+  <div class="ts-msg-row">
+    <textarea class="ts-msg" rows="2" placeholder="Leave a message for the writer (optional)…"></textarea>
+  </div>
+  <button class="ts-send" onclick="sendTip()">Send Tip 💰</button>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+/* UTILS */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+/* READING PROGRESS */
+const sb=document.getElementById('scrollBody');
+sb.addEventListener('scroll',()=>{
+  const max=sb.scrollHeight-sb.clientHeight;
+  const pct=max>0?Math.round(sb.scrollTop/max*100):0;
+  document.getElementById('readProgressFill').style.width=pct+'%';
+},{passive:true});
+
+/* TOP BAR — hides on scroll down, shows on scroll up. Bottom bar stays fixed always. */
+let lastY=0;
+const topbar=document.getElementById('topbar');
+sb.addEventListener('scroll',()=>{
+  const y=sb.scrollTop;const d=y-lastY;lastY=y;
+  if(y<60){topbar.classList.remove('hidden');return;}
+  if(d>6)topbar.classList.add('hidden');
+  else if(d<-6)topbar.classList.remove('hidden');
+},{passive:true});
+document.getElementById('storyText').addEventListener('click',()=>topbar.classList.remove('hidden'));
+
+/* FONT SIZE — default 14 */
+let fsVal=14;const FS_MIN=12,FS_MAX=24;
+function changeFontSize(d){
+  fsVal=Math.min(FS_MAX,Math.max(FS_MIN,fsVal+d));
+  document.documentElement.style.setProperty('--fs',fsVal+'px');
+  document.getElementById('fontSizeDisplay').textContent=fsVal+'px';
+  document.getElementById('fontPreview').style.fontSize=Math.max(9,fsVal-5)+'px';
+}
+
+/* LINE HEIGHT */
+function setLH(el,val){
+  document.querySelectorAll('.lh-opt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  document.documentElement.style.setProperty('--lh',val);
+}
+
+/* FONT FAMILY */
+function setFF(el,val){
+  document.querySelectorAll('.ff-opt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  document.documentElement.style.setProperty('--font-story',val);
+}
+
+/* THEME */
+function setTheme(el,theme){
+  document.body.className=theme;
+  document.querySelectorAll('.theme-opt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* SETTINGS */
+function openSettings(){
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('overlayBg').classList.add('show');
+}
+
+/* CHAPTERS PANEL */
+const SEASONS_DATA=[
+  {label:'Season 1',chs:[
+    {n:1,title:'The photograph on the mantel',meta:'3 min',badge:'free',state:'done'},
+    {n:2,title:'Six years of silence',meta:'4 min',badge:null,state:'done'},
+    {n:3,title:'What Sade saw at the rehearsal',meta:'3 min',badge:null,state:'done'},
+    {n:4,title:'The night before',meta:'4 min',badge:null,state:'done'},
+    {n:5,title:'Four hundred witnesses',meta:'4 min',badge:null,state:'done'},
+    {n:6,title:'The service stairwell',meta:'3 min',badge:null,state:'done'},
+    {n:7,title:'Adaeze arrives',meta:'4 min',badge:null,state:'done'},
+    {n:8,title:'Eleven days, four million views',meta:'5 min',badge:null,state:'done'},
+  ]},
+  {label:'Season 2',chs:[
+    {n:1,title:'Bare Kitchen — first flour',meta:'4 min',badge:null,state:'done'},
+    {n:2,title:'Three strangers and a cardamom loaf',meta:'3 min',badge:null,state:'done'},
+    {n:3,title:'What Emeka texted',meta:'4 min',badge:null,state:'done'},
+    {n:4,title:'I left in my socked feet',meta:'4 min',badge:'new',state:'current'},
+    {n:5,title:'The woman who came back',meta:'Coming soon',badge:'new',state:'locked'},
+  ]},
+];
+let activeSeason=1;
+
+function renderSeasonTabs(){
+  document.getElementById('seasonTabs').innerHTML=SEASONS_DATA.map((s,i)=>
+    `<div class="stab${i===activeSeason?' active':''}" onclick="setSeason(${i})">${s.label}</div>`
+  ).join('');
+}
+function setSeason(i){activeSeason=i;renderSeasonTabs();renderChList();}
+function renderChList(){
+  const chs=SEASONS_DATA[activeSeason].chs;
+  document.getElementById('chListPanel').innerHTML=chs.map(c=>{
+    const numEl=c.state==='done'
+      ?`<div class="ch-num done"><i class="fas fa-check" style="font-size:9px"></i></div>`
+      :c.state==='current'
+      ?`<div class="ch-num current">${c.n}</div>`
+      :`<div class="ch-num"><i class="fas fa-lock" style="font-size:9px"></i></div>`;
+    const badge=c.badge==='new'?`<span class="ch-row-badge crb-new">NEW</span>`:c.badge==='free'?`<span class="ch-row-badge crb-free">FREE</span>`:'';
+    const right=c.state==='current'
+      ?`<span class="ch-current-badge">Reading</span>`
+      :c.state==='done'?`<i class="fas fa-check ch-done-check"></i>`:'';
+    return`<div class="ch-row${c.state==='current'?' current':''}" onclick="toast('📖 Chapter ${c.n}…');closeChPanel()">
+      ${numEl}
+      <div class="ch-row-body">
+        <div class="ch-row-title">Ch.${c.n} — ${c.title}</div>
+        <div class="ch-row-meta">${c.meta} ${badge}</div>
+      </div>
+      <div class="ch-row-right">${right}</div>
+    </div>`;
+  }).join('');
+}
+renderSeasonTabs();renderChList();
+
+function openChPanel(){
+  document.getElementById('chPanel').classList.add('open');
+  document.getElementById('overlayBg').classList.add('show');
+}
+function closeChPanel(){
+  document.getElementById('chPanel').classList.remove('open');
+  document.getElementById('overlayBg').classList.remove('show');
+}
+
+/* CHAPTER NAV */
+let currentCh=4;const totalChs=5;
+function goChapter(dir){
+  const next=currentCh+dir;
+  if(next<1){toast('You\'re on the first chapter!');return;}
+  if(next>totalChs){toast('🔔 Next chapter coming soon!');return;}
+  currentCh=next;
+  toast('📖 Loading Chapter '+currentCh+'…');
+  sb.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('tbChInfo').textContent='Season 2 · Chapter '+currentCh;
+  document.getElementById('chNavCenter').textContent='Ch '+currentCh+' of '+totalChs;
+  document.getElementById('prevChBtn').classList.toggle('disabled',currentCh<=1);
+  document.getElementById('nextChBtn').classList.toggle('disabled',currentCh>=totalChs);
+}
+document.getElementById('prevChBtn').classList.toggle('disabled',currentCh<=1);
+document.getElementById('nextChBtn').classList.toggle('disabled',currentCh>=totalChs);
+
+/* REACTIONS */
+const REACTIONS=[
+  {id:'cry',e:'😭',l:'Crying',n:9200},{id:'broken',e:'💔',l:'Heartbroken',n:7800},
+  {id:'shock',e:'😱',l:'Shocked',n:4100},{id:'rage',e:'😡',l:'Rage',n:3300},
+  {id:'emo',e:'🥹',l:'Emotional',n:5600},{id:'sus',e:'👀',l:'Suspicious',n:2100},
+  {id:'savage',e:'🔥',l:'Savage',n:1800},{id:'twist',e:'🫢',l:'Twist',n:2900},
+];
+let pickedRx=null,rxVisible=false;
+
+function buildRxPopup(){
+  document.getElementById('rxPopup').innerHTML=REACTIONS.map(r=>
+    `<div class="rx-btn${pickedRx===r.id?' picked':''}" onclick="pickRx('${r.id}')">
+      <div class="rx-emoji">${r.e}</div><div class="rx-count">${fmtN(r.n)}</div>
+    </div>`
+  ).join('');
+}
+buildRxPopup();
+
+function pickRx(id){
+  if(pickedRx===id){REACTIONS.find(r=>r.id===id).n--;pickedRx=null;}
+  else{
+    if(pickedRx)REACTIONS.find(r=>r.id===pickedRx).n--;
+    const r=REACTIONS.find(r=>r.id===id);r.n++;pickedRx=id;
+    toast(r.e+' '+r.l+'!');
+    const likeEl=document.getElementById('bbLike');
+    likeEl.classList.add('liked');
+    likeEl.querySelector('.bb-icon').innerHTML='<i class="fas fa-heart"></i>';
+    likeEl.querySelector('.bb-label').textContent='Liked';
+  }
+  buildRxPopup();hideRxPopup();
+}
+
+let holdTimer=null;
+function startLikeHold(){holdTimer=setTimeout(()=>showRxPopup(),380);}
+function endLikeHold(){clearTimeout(holdTimer);}
+function handleLikeTap(){
+  const likeEl=document.getElementById('bbLike');
+  if(rxVisible){hideRxPopup();return;}
+  const isLiked=likeEl.classList.contains('liked');
+  if(isLiked&&pickedRx){REACTIONS.find(r=>r.id===pickedRx).n--;pickedRx=null;buildRxPopup();}
+  likeEl.classList.toggle('liked',!isLiked);
+  likeEl.querySelector('.bb-icon').innerHTML='<i class="'+(isLiked?'far':'fas')+' fa-heart"></i>';
+  likeEl.querySelector('.bb-label').textContent=isLiked?'Like':'Liked';
+  toast(isLiked?'Unliked':'❤️ Liked! Hold for reactions');
+}
+function showRxPopup(){rxVisible=true;document.getElementById('rxPopup').classList.add('show');}
+function hideRxPopup(){rxVisible=false;document.getElementById('rxPopup').classList.remove('show');}
+document.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('#rxPopup')&&!e.target.closest('#bbLike'))hideRxPopup();
+},{passive:true});
+
+/* SHARE */
+function openShare(){
+  closeAllSheets();
+  setTimeout(()=>{
+    document.getElementById('shareSheet').classList.add('open');
+    document.getElementById('overlayBg').classList.add('show');
+  },50);
+}
+function copyShareLink(){
+  navigator.clipboard?.writeText(document.getElementById('shareLinkInput').value).catch(()=>{});
+  document.getElementById('ssCopyMsg').textContent='✅ Link copied!';
+  toast('🔗 Link copied!');
+}
+
+/* SAVE + COLLECTIONS */
+const saveState={library:false,fav:false,later:false};
+
+const MY_COLLECTIONS=[
+  {id:'c1',name:'Romance Reads',icon:'💕',count:14,saved:false},
+  {id:'c2',name:'Weekend Binge',icon:'📺',count:8,saved:false},
+  {id:'c3',name:'Tear-jerkers',icon:'😭',count:22,saved:true},
+  {id:'c4',name:'Nigerian Narratives',icon:'🇳🇬',count:31,saved:false},
+];
+
+function renderCollections(){
+  document.getElementById('collectionsWrap').innerHTML=MY_COLLECTIONS.map(c=>`
+    <div class="svs-coll-item${c.saved?' saved':''}" onclick="toggleCollection('${c.id}')">
+      <div class="svs-coll-thumb">${c.icon}</div>
+      <div class="svs-coll-info">
+        <div class="svs-coll-name">${c.name}</div>
+        <div class="svs-coll-count">${c.count} stories</div>
+      </div>
+      <div class="svs-coll-check">${c.saved?'<i class="fas fa-check-circle" style="color:#4ade80"></i>':'<i class="far fa-circle"></i>'}</div>
+    </div>
+  `).join('');
+}
+
+function toggleCollection(id){
+  const c=MY_COLLECTIONS.find(x=>x.id===id);if(!c)return;
+  c.saved=!c.saved;c.count+=c.saved?1:-1;
+  renderCollections();
+  toast(c.saved?'📌 Added to "'+c.name+'"':'Removed from "'+c.name+'"');
+  updateSaveBadge();
+}
+
+function createNewCollection(){
+  const name=prompt('Collection name:');
+  if(!name||!name.trim())return;
+  MY_COLLECTIONS.push({id:'c_'+Date.now(),name:name.trim(),icon:'📂',count:1,saved:true});
+  renderCollections();toast('📂 "'+name.trim()+'" created!');
+  updateSaveBadge();
+}
+
+function updateSaveBadge(){
+  const any=Object.values(saveState).some(Boolean)||MY_COLLECTIONS.some(c=>c.saved);
+  const bbSave=document.getElementById('bbSave');
+  bbSave.classList.toggle('saved',any);
+  bbSave.querySelector('.bb-icon').innerHTML=any?'<i class="fas fa-bookmark"></i>':'<i class="far fa-bookmark"></i>';
+  bbSave.querySelector('.bb-label').textContent=any?'Saved':'Save';
+}
+
+function openSave(){
+  closeAllSheets();
+  setTimeout(()=>{
+    renderCollections();
+    document.getElementById('saveSheet').classList.add('open');
+    document.getElementById('overlayBg').classList.add('show');
+  },50);
+}
+
+function toggleSaveOpt(key){
+  saveState[key]=!saveState[key];
+  const ids={library:'libCheck',fav:'favCheck',later:'laterCheck'};
+  const optIds={library:'svLibrary',fav:'svFavourites',later:'svReadLater'};
+  document.getElementById(ids[key]).innerHTML=saveState[key]
+    ?'<i class="fas fa-check-circle" style="color:#4ade80"></i>'
+    :'<i class="far fa-circle"></i>';
+  document.getElementById(optIds[key]).classList.toggle('saved',saveState[key]);
+  updateSaveBadge();
+  toast(saveState[key]?'📌 Saved!':'Removed');
+}
+
+/* TIP */
+const TIP_AMTS=[100,200,500,1000,2000,5000];
+let selTip=500;
+function buildTipAmounts(){
+  document.getElementById('tsAmounts').innerHTML=TIP_AMTS.map(a=>
+    `<div class="ts-amt${a===selTip?' on':''}" onclick="selTipAmt(${a})">₦${a>=1000?(a/1000)+'k':a}</div>`
+  ).join('');
+}
+buildTipAmounts();
+function selTipAmt(a){selTip=a;buildTipAmounts();}
+function openTip(){
+  closeAllSheets();
+  setTimeout(()=>{
+    document.getElementById('tipSheet').classList.add('open');
+    document.getElementById('overlayBg').classList.add('show');
+  },50);
+}
+function sendTip(){
+  closeAllSheets();
+  toast('💰 ₦'+(selTip>=1000?(selTip/1000)+'k':selTip)+' tipped to @Ifeanyi_Story!');
+}
+
+/* CLOSE ALL */
+function closeAllSheets(){
+  ['settingsPanel','shareSheet','saveSheet','tipSheet'].forEach(id=>
+    document.getElementById(id).classList.remove('open')
+  );
+  document.getElementById('overlayBg').classList.remove('show');
+  document.getElementById('ssCopyMsg').textContent='';
+}
+
+/* YOU MAY ALSO LIKE */
+const YML=[
+  {cover:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",author:'Kemi_A'},
+  {cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'🔥 Revenge',title:'My stepmother stole my university fund',author:'Zara_M'},
+  {cover:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'👑 Family',title:"Grandmother's will revealed everything",author:'Chiamaka_N'},
+  {cover:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'🌙 Elegy',title:'The letter he never sent',author:'Efe_O'},
+  {cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'💔 Betrayal',title:'Caught my husband kissing her photograph',author:'Ada_Writes'},
+];
+
+document.getElementById('ymlScroll').innerHTML=YML.map(s=>
+  `<div class="yml-card" onclick="toast('📖 Opening…')">
+    <div class="yml-thumb" style="background-image:url('${s.cover}')"></div>
+    <div class="yml-body">
+      <div class="yml-cat">${s.cat}</div>
+      <div class="yml-t">${s.title}</div>
+      <div class="yml-a">@${s.author}</div>
+      <button class="yml-read-btn" onclick="event.stopPropagation();toast('📖 Opening…')">Read →</button>
+    </div>
+  </div>`
+).join('');
+</script>
+</body>
+</html>

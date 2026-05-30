@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard — Create Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.22);--glow2:rgba(255,0,80,.1);
+  --dark:#07070b;--card:#111118;--sf:rgba(255,255,255,.06);--sf2:rgba(255,255,255,.04);
+  --tx:#f5f5f7;--mt:#666;--mt2:#aaa;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.14);
+  /* engagement colours */
+  --poll:#7c3aed;--poll-soft:rgba(124,58,237,.12);--poll-border:rgba(124,58,237,.3);
+  --pred:#0ea5e9;--pred-soft:rgba(14,165,233,.12);--pred-border:rgba(14,165,233,.3);
+  --deb-for:#10b981;--deb-ag:#ff4444;
+  --debate:#f59e0b;--debate-soft:rgba(245,158,11,.12);--debate-border:rgba(245,158,11,.3);
+  --next:#ff0050;--next-soft:rgba(255,0,80,.1);--next-border:rgba(255,0,80,.28);
+}
+html,body{height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden}
+.shell{position:fixed;inset:0;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:var(--dark)}
+
+/* ── TOP NAV ── */
+.top-nav{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);z-index:50}
+.nav-back{width:36px;height:36px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--mt2);transition:.2s}
+.nav-back:hover{border-color:var(--acc);color:var(--acc)}
+.nav-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900}
+.nav-pub{background:var(--acc);color:#fff;border:none;padding:8px 20px;border-radius:22px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:.18s;box-shadow:0 0 14px var(--glow)}
+.nav-pub:hover{transform:translateY(-1px)}
+.nav-pub:disabled{background:rgba(255,0,80,.28);box-shadow:none;cursor:not-allowed;transform:none}
+
+/* ── STEP BAR ── */
+.step-bar{flex-shrink:0;display:flex;background:rgba(7,7,11,.9);border-bottom:1px solid var(--bd)}
+.step{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:11px 4px;font-size:11px;font-weight:600;color:var(--mt);cursor:pointer;transition:.2s;position:relative;border-right:1px solid var(--bd)}
+.step:last-child{border-right:none}
+.step.active{color:var(--acc)}
+.step.done{color:var(--mt2)}
+.step.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acc)}
+.sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;border:1.5px solid currentColor;flex-shrink:0}
+.step.active .sn{background:var(--acc);border-color:var(--acc);color:#fff}
+.step.done .sn{background:rgba(255,0,80,.18);border-color:var(--acc);color:var(--acc)}
+
+/* ── SCROLL BODY ── */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.panel{display:none;padding:18px 16px 120px;animation:fadeUp .22s ease both}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── FORM BASICS ── */
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:7px}
+.fi,.fs,.ft{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:12px;padding:11px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus,.fs:focus,.ft:focus{border-color:rgba(255,0,80,.5)}
+.fi::placeholder,.ft::placeholder{color:var(--mt)}
+.fi[readonly]{color:var(--mt2);background:rgba(255,255,255,.03);cursor:default;border-color:rgba(255,0,80,.2)}
+.fs option{background:#111118}
+.ft{resize:none;line-height:1.6}
+.chint{font-size:10px;color:var(--mt);text-align:right;margin-top:4px}
+.chint.warn{color:#ffcc00}
+.chint.over{color:var(--acc)}
+
+/* ── STORY TYPE ── */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.type-card{padding:14px 8px;border-radius:14px;border:1.5px solid var(--bd);background:var(--sf2);text-align:center;cursor:pointer;transition:.2s;user-select:none}
+.type-card:hover{border-color:rgba(255,0,80,.35)}
+.type-card.sel{background:rgba(255,0,80,.12);border-color:var(--acc)}
+.tc-icon{font-size:22px;margin-bottom:5px}
+.tc-name{font-size:12px;font-weight:700;color:var(--mt2)}
+.type-card.sel .tc-name{color:var(--acc)}
+
+/* ── TOGGLE ROW ── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.25s;user-select:none;margin-bottom:0}
+.tog-row:hover{border-color:rgba(255,0,80,.3)}
+.tog-row.on{background:rgba(255,0,80,.07);border-color:rgba(255,0,80,.4)}
+.tog-label{font-size:13px;font-weight:700}
+.tog-sub{font-size:11px;color:var(--mt);margin-top:3px}
+.tog2{position:relative;width:42px;height:24px;flex-shrink:0}
+.tog2 input{display:none}
+.tog2-tr{width:100%;height:100%;background:rgba(255,255,255,.12);border-radius:20px;transition:.25s;display:flex;align-items:center;padding:0 3px}
+.tog2 input:checked + .tog2-tr{background:var(--acc)}
+.tog2-th{width:18px;height:18px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tog2 input:checked + .tog2-tr .tog2-th{transform:translateX(18px)}
+
+/* Continue block */
+.continue-block{display:none;opacity:0;transform:translateY(-6px);transition:opacity .28s ease,transform .28s ease;margin-top:0;pointer-events:none}
+.continue-block.open{display:block;opacity:1;transform:translateY(0);margin-top:12px;pointer-events:auto}
+.sdd-wrap{position:relative;margin-bottom:0}
+.sdd-trigger{width:100%;min-height:58px;background:rgba(255,255,255,.06);border:1.5px solid var(--bd2);border-radius:14px;display:flex;align-items:center;cursor:pointer;transition:border-color .2s,background .2s,border-radius .15s;overflow:hidden}
+.sdd-trigger:hover{border-color:rgba(255,0,80,.45);background:rgba(255,0,80,.04)}
+.sdd-trigger.open{border-color:var(--acc);background:rgba(255,0,80,.06);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.sdd-ph{flex:1;padding:0 16px;font-size:13px;color:var(--mt);text-align:left}
+.sdd-sel-inner{flex:1;display:flex;align-items:center;gap:12px;padding:8px 12px}
+.sdd-sel-img{width:42px;height:42px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,0,80,.25)}
+.sdd-sel-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sdd-sel-meta{font-size:10px;color:var(--acc2);margin-top:2px;font-weight:600}
+.sdd-arrow{padding:0 16px;flex-shrink:0;color:var(--mt2);transition:transform .25s}
+.sdd-trigger.open .sdd-arrow{transform:rotate(180deg);color:var(--acc)}
+.sdd-menu{display:none;width:100%;background:#14141d;border:1.5px solid var(--acc);border-top:none;border-bottom-left-radius:16px;border-bottom-right-radius:16px;overflow-y:auto;max-height:340px;box-shadow:0 20px 50px rgba(0,0,0,.85);margin-bottom:14px;scrollbar-width:none}
+.sdd-menu::-webkit-scrollbar{display:none}
+.sdd-menu.show{display:block;animation:dropIn .18s ease}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.sdd-item{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
+.sdd-item:last-child{border-bottom:none}
+.sdd-item:hover{background:rgba(255,0,80,.09)}
+.sdd-item.chosen{background:rgba(255,0,80,.14)}
+.sdd-item-img{width:52px;height:52px;border-radius:11px;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,.08)}
+.sdd-item-body{flex:1;min-width:0}
+.sdd-item-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.sdd-item-sub{font-size:10px;color:var(--mt2);margin-bottom:4px}
+.sdd-item-desc{font-size:10px;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sdd-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.spill{font-size:8px;font-weight:800;padding:3px 8px;border-radius:20px}
+.sp-ongoing{background:rgba(255,160,0,.15);color:#ffa000;border:1px solid rgba(255,160,0,.3)}
+.sp-completed{background:rgba(0,180,255,.15);color:#00b4ff;border:1px solid rgba(0,180,255,.3)}
+.sp-paused{background:rgba(150,100,255,.15);color:#9664ff;border:1px solid rgba(150,100,255,.3)}
+.sp-new{background:rgba(0,200,100,.15);color:#00c864;border:1px solid rgba(0,200,100,.3)}
+.next-pill{font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;background:rgba(255,0,80,.15);color:var(--acc);border:1px solid rgba(255,0,80,.3)}
+.sel-strip{display:none;background:rgba(255,0,80,.07);border:1.5px solid rgba(255,0,80,.25);border-radius:14px;padding:12px 14px;margin-top:10px;align-items:center;gap:12px;animation:fadeUp .2s ease}
+.sel-strip.show{display:flex}
+.ss-img{width:50px;height:50px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,0,80,.25)}
+.ss-body{flex:1;min-width:0}
+.ss-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-meta{font-size:10px;color:var(--acc2);margin-top:4px;font-weight:600;line-height:1.5}
+.ss-clear{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--mt2);font-size:10px;font-weight:700;padding:6px 13px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;transition:.2s;white-space:nowrap}
+.ss-clear:hover{border-color:var(--acc);color:var(--acc)}
+.series-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.status-grid{display:flex;flex-wrap:wrap;gap:7px}
+.s-chip{padding:7px 14px;border-radius:22px;border:1px solid var(--bd);background:var(--sf2);font-size:12px;font-weight:600;color:var(--mt2);cursor:pointer;transition:.18s;white-space:nowrap;user-select:none}
+.s-chip:hover{border-color:rgba(255,0,80,.35);color:var(--tx)}
+.s-chip[data-s=new].sel{background:rgba(0,200,100,.12);border-color:#00c864;color:#00c864}
+.s-chip[data-s=ongoing].sel{background:rgba(255,160,0,.12);border-color:#ffa000;color:#ffa000}
+.s-chip[data-s=completed].sel{background:rgba(0,180,255,.12);border-color:#00b4ff;color:#00b4ff}
+.s-chip[data-s=paused].sel{background:rgba(150,100,255,.12);border-color:#9664ff;color:#9664ff}
+
+/* ── COVER ── */
+.cover-zone{width:100%;height:180px;border:1.5px dashed var(--bd2);border-radius:16px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.cover-zone:hover{border-color:rgba(255,0,80,.4);background:rgba(255,0,80,.04)}
+.cover-zone.has-img{border-style:solid;border-color:rgba(255,0,80,.35)}
+.cover-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+.cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;display:none;z-index:0}
+.cover-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.35);z-index:1}
+.cover-ic{font-size:32px;opacity:.5}
+.cover-ht{font-size:12px;color:var(--mt2);text-align:center;padding:0 20px}
+.cover-chg{background:rgba(0,0,0,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:10px;font-weight:700;padding:5px 13px;border-radius:20px;font-family:'DM Sans',sans-serif;cursor:pointer;display:none;position:relative;z-index:3}
+.stock-row{display:flex;gap:7px;margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.stock-row::-webkit-scrollbar{display:none}
+.stock-thumb{flex-shrink:0;width:68px;height:46px;border-radius:9px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:.18s}
+.stock-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.stock-thumb.picked{border-color:var(--acc)}
+
+/* ── CATEGORY ── */
+.cat-grid{display:flex;flex-wrap:wrap;gap:7px}
+.cat-chip{padding:7px 14px;border-radius:22px;border:1px solid var(--bd);background:var(--sf2);font-size:12px;font-weight:600;color:var(--mt2);cursor:pointer;transition:.18s;white-space:nowrap;user-select:none}
+.cat-chip:hover{border-color:rgba(255,0,80,.35);color:var(--tx)}
+.cat-chip.sel{background:rgba(255,0,80,.15);border-color:var(--acc);color:var(--acc)}
+
+/* ── INFO BOX ── */
+.ibox{border-radius:10px;padding:11px 13px;display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ibox.acc{background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.2)}
+.ibox.muted{background:rgba(255,255,255,.05);border:1px solid var(--bd)}
+.ibox-txt{font-size:12px;color:var(--mt2);line-height:1.6}
+
+/* ── DROP MODE ── */
+.dm-box{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:16px}
+.dm-title{font-size:10px;font-weight:800;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.dm-opt{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--bd);background:transparent;cursor:pointer;transition:.2s;text-align:left;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:8px}
+.dm-opt:last-child{margin-bottom:0}
+.dm-opt:hover{border-color:rgba(255,0,80,.3)}
+.dm-opt.sel{background:rgba(255,0,80,.09);border-color:var(--acc)}
+.dm-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.dm-name{font-size:13px;font-weight:700;color:var(--tx)}
+.dm-desc{font-size:11px;color:var(--mt);margin-top:3px;line-height:1.5}
+.dm-opt.sel .dm-name{color:var(--acc)}
+
+/* ── AUTO BREAK ── */
+.ab-box{background:rgba(255,0,80,.06);border:1px solid rgba(255,0,80,.15);border-radius:12px;padding:13px 14px;margin-bottom:14px}
+.ab-lbl{font-size:11px;color:var(--mt2);margin-bottom:10px}
+.ab-row{display:flex;align-items:center;gap:10px}
+.ab-row input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:rgba(255,255,255,.15);border-radius:4px;outline:none}
+.ab-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--dark)}
+.ab-val{font-size:12px;font-weight:700;color:var(--acc);width:64px;text-align:right;flex-shrink:0}
+
+/* ── SCENES ── */
+.scenes-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.sc-card{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.sc-hd{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer}
+.sc-num{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:rgba(255,0,80,.15);border:1.5px solid rgba(255,0,80,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--acc)}
+.sc-lbl{flex:1;font-size:12px;font-weight:700;color:var(--mt2)}
+.sc-acts{display:flex;gap:6px}
+.sc-act{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.14s}
+.sc-act:hover{border-color:var(--acc);color:var(--acc)}
+.sc-act.del:hover{border-color:#ff4d4d;color:#ff4d4d}
+.sc-ta{width:100%;background:transparent;border:none;padding:12px 14px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.65;outline:none;resize:none;min-height:110px}
+.sc-ta::placeholder{color:var(--mt)}
+.sc-foot{padding:8px 14px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.sc-wc{font-size:10px;color:var(--mt)}
+
+/* ══════════════════════════════════════
+   ENGAGEMENT TOOLS — per scene card
+══════════════════════════════════════ */
+.eng-section{border-top:1px solid var(--bd);padding:0}
+.eng-section-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px}
+.eng-section-title{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);display:flex;align-items:center;gap:5px}
+.eng-section-title i{font-size:11px}
+
+/* Each engagement toggle row */
+.eng-tool-row{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;transition:background .15s;user-select:none;border-top:1px solid rgba(255,255,255,.04)}
+.eng-tool-row:first-child{border-top:none}
+.eng-tool-row:hover{background:rgba(255,255,255,.03)}
+.eng-tool-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.eng-tool-icon.poll{background:var(--poll-soft);border:1px solid var(--poll-border)}
+.eng-tool-icon.pred{background:var(--pred-soft);border:1px solid var(--pred-border)}
+.eng-tool-icon.debate{background:var(--debate-soft);border:1px solid var(--debate-border)}
+.eng-tool-icon.next{background:var(--next-soft);border:1px solid var(--next-border)}
+.eng-tool-label{flex:1}
+.eng-tool-name{font-size:12px;font-weight:700}
+.eng-tool-name.poll{color:#a78bfa}
+.eng-tool-name.pred{color:#38bdf8}
+.eng-tool-name.debate{color:#fbbf24}
+.eng-tool-name.next{color:var(--acc2)}
+.eng-tool-desc{font-size:10px;color:var(--mt);margin-top:1px}
+/* mini toggle for each tool */
+.mini-tog{width:36px;height:20px;position:relative;flex-shrink:0}
+.mini-tog input{display:none}
+.mini-tog-tr{width:100%;height:100%;border-radius:20px;background:rgba(255,255,255,.1);transition:.22s;display:flex;align-items:center;padding:0 2px}
+.mini-tog input:checked + .mini-tog-tr{background:var(--acc)}
+.mini-tog-th{width:16px;height:16px;border-radius:50%;background:#fff;transition:.22s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.mini-tog input:checked + .mini-tog-tr .mini-tog-th{transform:translateX(16px)}
+
+/* Engagement config panels */
+.eng-config{display:none;padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.06);animation:fadeUp .18s ease both}
+.eng-config.open{display:block}
+
+/* Poll config */
+.poll-opts-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.poll-opt-row{display:flex;align-items:center;gap:8px}
+.poll-opt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.poll-opt-input::placeholder{color:var(--mt)}
+.poll-opt-input:focus{border-color:rgba(124,58,237,.5)}
+.poll-opt-del{width:26px;height:26px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:.14s}
+.poll-opt-del:hover{border-color:#ff4d4d;color:#ff4d4d}
+.add-opt-btn{background:transparent;border:1px dashed rgba(124,58,237,.4);color:#a78bfa;width:100%;padding:8px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.18s}
+.add-opt-btn:hover{background:var(--poll-soft);border-color:var(--poll-border)}
+.eng-config-label{font-size:10px;font-weight:700;color:var(--mt);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* Debate config */
+.debate-motion-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:9px 12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;line-height:1.5}
+.debate-motion-inp::placeholder{color:var(--mt)}
+.debate-preview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.debate-side-preview{border-radius:10px;padding:10px;text-align:center;border:1px solid var(--bd)}
+.debate-side-preview.for{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25)}
+.debate-side-preview.against{background:rgba(255,68,68,.08);border-color:rgba(255,68,68,.25)}
+.debate-side-emoji{font-size:18px;margin-bottom:3px}
+.debate-side-lbl{font-size:10px;font-weight:800}
+.debate-side-preview.for .debate-side-lbl{color:#10b981}
+.debate-side-preview.against .debate-side-lbl{color:#ff4444}
+
+/* Prediction config */
+.pred-opts-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.pred-opt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.pred-opt-input::placeholder{color:var(--mt)}
+.pred-opt-input:focus{border-color:rgba(14,165,233,.5)}
+.add-pred-btn{background:transparent;border:1px dashed rgba(14,165,233,.4);color:#38bdf8;width:100%;padding:8px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.18s}
+.add-pred-btn:hover{background:var(--pred-soft);border-color:var(--pred-border)}
+
+/* What's next config */
+.next-config-inner{background:var(--next-soft);border:1px solid var(--next-border);border-radius:12px;padding:12px 14px}
+.next-config-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.next-config-row:last-child{margin-bottom:0}
+.next-config-icon{font-size:14px;flex-shrink:0;width:20px}
+.next-config-inp{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 11px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.next-config-inp::placeholder{color:var(--mt)}
+.next-config-inp:focus{border-color:rgba(255,0,80,.4)}
+.next-day-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.next-day-btn{padding:7px 4px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:var(--mt2);font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;font-family:'DM Sans',sans-serif}
+.next-day-btn.sel{background:var(--next-soft);border-color:var(--next-border);color:var(--acc2)}
+
+/* Engagement active indicators on scene card */
+.sc-eng-badges{display:flex;gap:4px;flex-wrap:wrap;padding:0 14px 10px}
+.sc-eng-badge{font-size:8px;font-weight:800;padding:2px 8px;border-radius:10px;display:flex;align-items:center;gap:3px}
+.sc-eng-badge.poll{background:var(--poll-soft);color:#a78bfa;border:1px solid var(--poll-border)}
+.sc-eng-badge.pred{background:var(--pred-soft);color:#38bdf8;border:1px solid var(--pred-border)}
+.sc-eng-badge.debate{background:var(--debate-soft);color:#fbbf24;border:1px solid var(--debate-border)}
+.sc-eng-badge.next{background:var(--next-soft);color:var(--acc2);border:1px solid var(--next-border)}
+
+/* Add scene button */
+.add-sc-btn{width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--bd2);background:transparent;color:var(--mt2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.add-sc-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+/* ── PREVIEW ── */
+.pv-card{border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--bd);margin-bottom:16px}
+.pv-cover{height:200px;background-size:cover;background-position:center;position:relative}
+.pv-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 60%,rgba(0,0,0,.28) 100%)}
+.pv-content{position:absolute;bottom:0;left:0;right:0;padding:16px}
+.pv-cat{background:var(--acc);display:inline-block;padding:3px 10px;border-radius:14px;font-size:9px;font-weight:800;margin-bottom:7px}
+.pv-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;line-height:1.25;margin-bottom:4px}
+.pv-chline{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:8px}
+.pv-writer{display:flex;align-items:center;gap:8px}
+.pv-av{width:26px;height:26px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.pv-wname{font-size:11px;color:#ddd}
+.pv-meta{padding:12px 14px;display:flex;gap:14px;align-items:center;border-top:1px solid var(--bd)}
+.pv-mi{font-size:11px;color:var(--mt);display:flex;align-items:center;gap:4px}
+.pv-sc-card{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:10px}
+.pv-sc-num{font-size:10px;color:var(--acc);font-weight:700;margin-bottom:8px}
+.pv-sc-txt{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;line-height:1.7;color:#eeeef5;border-left:3px solid rgba(255,0,80,.4);padding-left:12px}
+
+/* Engagement preview in step 3 */
+.pv-eng-strip{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--bd)}
+.pv-eng-badge{font-size:9px;font-weight:800;padding:3px 10px;border-radius:12px;display:flex;align-items:center;gap:4px}
+.pv-eng-badge.poll{background:var(--poll-soft);color:#a78bfa;border:1px solid var(--poll-border)}
+.pv-eng-badge.pred{background:var(--pred-soft);color:#38bdf8;border:1px solid var(--pred-border)}
+.pv-eng-badge.debate{background:var(--debate-soft);color:#fbbf24;border:1px solid var(--debate-border)}
+.pv-eng-badge.next{background:var(--next-soft);color:var(--acc2);border:1px solid var(--next-border)}
+
+/* Auto split preview */
+.asp-card{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:13px;margin-bottom:8px}
+.asp-num{font-size:10px;color:var(--acc);font-weight:700;margin-bottom:6px}
+.asp-txt{font-size:12px;color:var(--mt2);line-height:1.6}
+
+/* ── SETTINGS ── */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)}
+.set-row:last-child{border-bottom:none}
+.set-lbl{font-size:13px;font-weight:600}
+.set-sub{font-size:11px;color:var(--mt);margin-top:2px}
+
+/* ── BUTTONS ── */
+.btn-pri{width:100%;padding:14px;border-radius:14px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 0 18px var(--glow);transition:.18s}
+.btn-pri:hover{transform:translateY(-1px)}
+.btn-sec{width:100%;padding:12px;border-radius:14px;background:transparent;border:1px solid var(--bd);color:var(--mt2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn-next{padding:12px;border-radius:14px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 0 14px var(--glow)}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:10px 0 24px;z-index:100}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--mt);cursor:pointer;transition:.2s;padding:4px 10px}
+.bn-item i{font-size:21px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e1e28;border:1px solid var(--bd2);color:#fff;padding:10px 22px;border-radius:30px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.7)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SUCCESS SCREEN ── */
+.success-screen{display:none;position:absolute;inset:0;z-index:500;background:var(--dark);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:14px}
+.success-screen.show{display:flex;animation:fadeUp .3s ease}
+.s-emoji{font-size:60px;animation:float 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.s-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1.2}
+.s-sub{font-size:13px;color:var(--mt2);line-height:1.6;max-width:280px}
+.s-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.s-btn{padding:11px 22px;border-radius:30px;font-weight:800;font-size:13px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.s-btn.pri{background:var(--acc);color:#fff;box-shadow:0 0 18px var(--glow)}
+.s-btn.sec{background:rgba(255,255,255,.1);color:#fff;border:1px solid var(--bd2)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-screen" id="successScreen">
+  <div class="s-emoji">🎉</div>
+  <div class="s-title">Story Published!</div>
+  <div class="s-sub">Your story is now live on Droboard. Readers can find it in the For You and Trending feeds.</div>
+  <div class="s-btns">
+    <button class="s-btn pri" onclick="showToast('📤 Link copied!');setTimeout(()=>location.reload(),500)">📤 Share Story</button>
+    <button class="s-btn sec" onclick="location.reload()">Write Another</button>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="nav-back" onclick="showToast('← Going back')"><i class="fas fa-arrow-left"></i></div>
+  <div class="nav-title">Create Story</div>
+  <button class="nav-pub" id="pubBtn" onclick="publish()" disabled>Publish →</button>
+</div>
+
+<!-- STEP BAR -->
+<div class="step-bar">
+  <div class="step active" id="step0" onclick="goStep(0)"><div class="sn">1</div><span>Details</span></div>
+  <div class="step"        id="step1" onclick="goStep(1)"><div class="sn">2</div><span>Write</span></div>
+  <div class="step"        id="step2" onclick="goStep(2)"><div class="sn">3</div><span>Engage</span></div>
+  <div class="step"        id="step3" onclick="goStep(3)"><div class="sn">4</div><span>Preview</span></div>
+  <div class="step"        id="step4" onclick="goStep(4)"><div class="sn">5</div><span>Publish</span></div>
+</div>
+
+<div class="body" id="mainBody">
+
+<!-- ══════════ STEP 1: DETAILS ══════════ -->
+<div class="panel active" id="p0">
+
+  <label class="fl">Story Type</label>
+  <div class="type-grid">
+    <div class="type-card sel" data-type="series"  onclick="pickType('series')"><div class="tc-icon">📚</div><div class="tc-name">Series</div></div>
+    <div class="type-card"     data-type="short"   onclick="pickType('short')"><div class="tc-icon">⚡</div><div class="tc-name">Short Story</div></div>
+    <div class="type-card"     data-type="poem"    onclick="pickType('poem')"><div class="tc-icon">🌸</div><div class="tc-name">Poem</div></div>
+  </div>
+
+  <!-- SERIES BLOCK -->
+  <div id="seriesBlock">
+    <div class="fg" id="newSeriesTitleFg">
+      <label class="fl">Series Title</label>
+      <input class="fi" id="seriesTitleInp" placeholder="e.g. His Secret and Her Shadow" maxlength="120" oninput="onSeriesTitle()"/>
+    </div>
+    <div class="fg">
+      <div class="tog-row" id="contTogRow" onclick="handleToggleClick(event)">
+        <div>
+          <div class="tog-label">📂 Continue an Existing Series?</div>
+          <div class="tog-sub">Pick a series — we auto-fill everything for you</div>
+        </div>
+        <label class="tog2" onclick="event.stopPropagation()">
+          <input type="checkbox" id="contChk" onchange="handleToggleChange()"/>
+          <div class="tog2-tr"><div class="tog2-th"></div></div>
+        </label>
+      </div>
+      <div class="continue-block" id="continueBlock" style="display:none">
+        <label class="fl" style="margin-bottom:8px;margin-top:4px">Select Series to Continue</label>
+        <div class="sdd-wrap" id="sddWrap">
+          <div class="sdd-trigger" id="sddTrigger" onclick="toggleDropdown()">
+            <div id="sddFace"><span class="sdd-ph">Tap to choose a series…</span></div>
+            <i class="fas fa-chevron-down sdd-arrow" id="sddArrow"></i>
+          </div>
+          <div class="sdd-menu" id="sddMenu"></div>
+        </div>
+        <div class="sel-strip" id="selStrip">
+          <img class="ss-img" id="ssImg" src="" alt=""/>
+          <div class="ss-body">
+            <div class="ss-name" id="ssName"></div>
+            <div class="ss-meta" id="ssMeta"></div>
+          </div>
+          <button class="ss-clear" onclick="clearSeriesChoice()">✕ Change</button>
+        </div>
+      </div>
+    </div>
+    <div class="series-meta-grid">
+      <div>
+        <label class="fl">Season</label>
+        <select class="fs" id="seasonSel" onchange="syncPreview()">
+          <option value="1">Season 1</option><option value="2">Season 2</option>
+          <option value="3">Season 3</option><option value="4">Season 4</option>
+          <option value="5">Season 5</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl">Chapter #</label>
+        <input class="fi" id="chapterNum" type="number" value="1" min="1" max="9999" oninput="syncPreview()"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Chapter Title <span style="color:var(--mt);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input class="fi" id="chapterTitleInp" placeholder="e.g. The Night She Found Out…" oninput="syncPreview()"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Story Status</label>
+      <div class="status-grid">
+        <div class="s-chip sel" data-s="new"       onclick="pickStatus('new')">✨ New</div>
+        <div class="s-chip"     data-s="ongoing"   onclick="pickStatus('ongoing')">🔥 Ongoing</div>
+        <div class="s-chip"     data-s="completed" onclick="pickStatus('completed')">✅ Completed</div>
+        <div class="s-chip"     data-s="paused"    onclick="pickStatus('paused')">⏸ On Ice</div>
+      </div>
+      <div id="statusHint" style="font-size:10px;color:var(--mt);margin-top:6px">New stories are automatically tagged as New.</div>
+    </div>
+  </div>
+
+  <!-- SHORT / POEM TITLE -->
+  <div class="fg" id="standaloneTitle" style="display:none">
+    <label class="fl" id="standaloneTitleLabel">Story Title</label>
+    <input class="fi" id="standaloneTitleInp" placeholder="Something unforgettable…" maxlength="120" oninput="onStandaloneTitle()"/>
+    <div class="chint" id="standaloneTitleHint">0 / 120</div>
+  </div>
+
+  <!-- COVER IMAGE -->
+  <div class="fg">
+    <label class="fl">Cover Image</label>
+    <div class="cover-zone" id="coverZone">
+      <div class="cover-bg" id="coverBg"></div>
+      <div class="cover-ov" id="coverOv">
+        <div class="cover-ic" id="coverIc">📷</div>
+        <div class="cover-ht" id="coverHt">Tap to upload a cover image<br/><span style="font-size:10px;opacity:.6">JPG, PNG, WebP · max 8MB</span></div>
+        <button class="cover-chg" id="coverChgBtn" onclick="event.stopPropagation()">Change Photo</button>
+      </div>
+      <input type="file" id="coverFileInp" accept="image/*" onchange="handleCoverUpload(event)"/>
+    </div>
+    <div class="stock-row" id="stockRow"></div>
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="fg">
+    <label class="fl">Category</label>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+
+  <!-- SYNOPSIS -->
+  <div class="fg">
+    <label class="fl">Synopsis <span style="color:var(--mt);font-weight:400;text-transform:none;letter-spacing:0">(shown before reader opens)</span></label>
+    <textarea class="ft" id="synopsisInp" placeholder="A gripping hook that makes readers desperate to open this story…" rows="4" maxlength="400" oninput="onSynopsis()"></textarea>
+    <div class="chint" id="synHint">0 / 400</div>
+  </div>
+
+  <button class="btn-pri" onclick="goStep(1)">Next: Write Scenes →</button>
+</div><!-- /p0 -->
+
+<!-- ══════════ STEP 2: WRITE ══════════ -->
+<div class="panel" id="p1">
+  <div class="dm-box">
+    <div class="dm-title">How do you want to post?</div>
+    <button class="dm-opt sel" data-mode="manual" onclick="pickMode('manual')">
+      <div class="dm-icon">✍️</div>
+      <div><div class="dm-name">Write Scene by Scene</div><div class="dm-desc">Full control over pacing. Each scene is one swipeable reader page.</div></div>
+    </button>
+    <button class="dm-opt" data-mode="auto" onclick="pickMode('auto')">
+      <div class="dm-icon">⚡</div>
+      <div><div class="dm-name">Drop Full Story — Auto-Split</div><div class="dm-desc">Paste your full text and the platform splits it into scenes automatically.</div></div>
+    </button>
+  </div>
+
+  <div class="ab-box" id="abBox" style="display:none">
+    <div class="ab-lbl">Words per scene — drag to adjust</div>
+    <div class="ab-row">
+      <input type="range" id="wpsRange" min="50" max="500" step="25" value="100" oninput="onWps(this.value)"/>
+      <div class="ab-val" id="wpsVal">100 words</div>
+    </div>
+  </div>
+
+  <div id="manualBlock">
+    <div class="ibox acc"><span style="font-size:16px">✍️</span><div class="ibox-txt">Write in scenes — each is one swipeable page. Aim for <strong style="color:var(--tx)">4–8 scenes</strong>. End each on a cliffhanger or emotional beat. Add engagement tools (polls, debates, etc.) per scene using the <strong style="color:var(--acc2)">⚡ Engage</strong> toggle.</div></div>
+    <div class="scenes-list" id="scenesList"></div>
+    <button class="add-sc-btn" onclick="addScene()"><i class="fas fa-plus-circle"></i> Add Scene</button>
+  </div>
+
+  <div id="autoBlock" style="display:none">
+    <div class="ibox acc"><span style="font-size:16px">⚡</span><div class="ibox-txt">Paste your full story below. We split it into scenes of <strong id="wpsHint" style="color:var(--tx)">~100 words</strong> each on publish. Add engagement tools in <strong style="color:var(--acc2)">Step 3</strong>.</div></div>
+    <textarea class="ft" id="fullTextInp" placeholder="Paste or type your full story here…" rows="16" oninput="onFullText()" style="min-height:280px;line-height:1.75;margin-bottom:8px"></textarea>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:10px;color:var(--mt)" id="ftWC">0 words</span>
+      <span style="font-size:10px;color:var(--mt)" id="ftSC">→ 0 scenes</span>
+    </div>
+    <button onclick="previewSplit()" style="width:100%;padding:11px;border-radius:12px;background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.3);color:var(--acc);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:8px">👁 Preview Scene Splits</button>
+    <div id="splitPrev"></div>
+  </div>
+
+  <div class="btn-grid">
+    <button class="btn-sec" onclick="goStep(0)">← Back</button>
+    <button class="btn-next" onclick="goStep(2)">Engage →</button>
+  </div>
+</div><!-- /p1 -->
+
+<!-- ══════════ STEP 3: ENGAGE ══════════ -->
+<div class="panel" id="p2">
+  <div class="ibox acc"><span style="font-size:16px">⚡</span>
+    <div class="ibox-txt">Add engagement tools to any scene. Each tool appears as its own <strong style="color:var(--tx)">swipe slide</strong> after the scene in the reader — polls, predictions, debates, and what's next notices.</div>
+  </div>
+
+  <!-- Global "What's Next" for the whole story -->
+  <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:16px">
+    <div class="fl" style="margin-bottom:10px">📣 Story-Level Engagement</div>
+    <div class="eng-tool-row" style="border-radius:10px;border:1px solid var(--bd);padding:10px 12px;margin-bottom:8px;cursor:default">
+      <div class="eng-tool-icon next" style="flex-shrink:0">🔔</div>
+      <div class="eng-tool-label">
+        <div class="eng-tool-name next">What's Next Notice</div>
+        <div class="eng-tool-desc">Shown after the last scene — notify readers of next chapter drop</div>
+      </div>
+      <label class="mini-tog" onclick="event.stopPropagation()">
+        <input type="checkbox" id="globalNextTog" onchange="onGlobalNextTog()"/>
+        <div class="mini-tog-tr"><div class="mini-tog-th"></div></div>
+      </label>
+    </div>
+    <div id="globalNextConfig" class="eng-config" style="padding:0">
+      <div class="next-config-inner" style="margin-top:8px">
+        <div class="eng-config-label"><i class="fas fa-calendar" style="color:var(--acc)"></i> Drop Schedule</div>
+        <div class="next-day-grid" id="nextDayGrid">
+          <button class="next-day-btn" data-day="Monday" onclick="pickNextDay(this)">Mon</button>
+          <button class="next-day-btn" data-day="Wednesday" onclick="pickNextDay(this)">Wed</button>
+          <button class="next-day-btn" data-day="Friday" onclick="pickNextDay(this)">Fri</button>
+          <button class="next-day-btn" data-day="Sunday" onclick="pickNextDay(this)">Sun</button>
+          <button class="next-day-btn" data-day="Tuesday" onclick="pickNextDay(this)">Tue</button>
+          <button class="next-day-btn" data-day="Thursday" onclick="pickNextDay(this)">Thu</button>
+          <button class="next-day-btn" data-day="Saturday" onclick="pickNextDay(this)">Sat</button>
+          <button class="next-day-btn" data-day="TBD" onclick="pickNextDay(this)">TBD</button>
+        </div>
+        <div class="next-config-row" style="margin-top:10px">
+          <span class="next-config-icon">🕐</span>
+          <select class="fs" id="nextTimeInp" style="font-size:12px;padding:6px 10px">
+            <option value="midnight">Midnight 🌙</option>
+            <option value="morning">Morning 🌅</option>
+            <option value="afternoon">Afternoon ☀️</option>
+            <option value="evening">Evening 🌆</option>
+          </select>
+        </div>
+        <div class="next-config-row">
+          <span class="next-config-icon">💬</span>
+          <input class="next-config-inp" id="nextTeaseInp" placeholder="Tease the next chapter… e.g. 'She opens the letter'" maxlength="100"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-scene engagement list -->
+  <div class="fl" style="margin-bottom:10px">📖 Per-Scene Engagement</div>
+  <div id="engageSceneList"></div>
+
+  <div class="btn-grid">
+    <button class="btn-sec" onclick="goStep(1)">← Edit Scenes</button>
+    <button class="btn-next" onclick="goStep(3)">Preview →</button>
+  </div>
+</div><!-- /p2 -->
+
+<!-- ══════════ STEP 4: PREVIEW ══════════ -->
+<div class="panel" id="p3">
+  <div class="ibox muted"><span style="font-size:16px">👁️</span><div class="ibox-txt">This is how your story appears in the feed and reader — including engagement slides.</div></div>
+  <div class="pv-card">
+    <div class="pv-cover" id="pvCover" style="background-image:url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75')">
+      <div class="pv-grad"></div>
+      <div class="pv-content">
+        <div class="pv-cat" id="pvCat">📖 Story</div>
+        <div class="pv-title" id="pvTitle">Your story title will appear here</div>
+        <div class="pv-chline" id="pvChLine" style="display:none"></div>
+        <div class="pv-writer"><div class="pv-av">AW</div><div class="pv-wname">@ada.writes</div></div>
+      </div>
+    </div>
+    <div class="pv-meta">
+      <div class="pv-mi"><i class="far fa-heart"></i> 0</div>
+      <div class="pv-mi"><i class="far fa-comment"></i> 0</div>
+      <div class="pv-mi" id="pvTime">📖 — min read</div>
+      <div class="pv-mi" id="pvStatus"></div>
+    </div>
+  </div>
+
+  <label class="fl" style="margin-bottom:10px">Scene Preview</label>
+  <div id="pvScenes"></div>
+
+  <!-- Engagement preview -->
+  <div id="pvEngSummary" style="display:none;margin-bottom:16px">
+    <label class="fl" style="margin-bottom:10px">⚡ Engagement Slides</label>
+    <div id="pvEngList"></div>
+  </div>
+
+  <div class="btn-grid">
+    <button class="btn-sec" onclick="goStep(2)">← Engagement</button>
+    <button class="btn-next" onclick="goStep(4)">Settings →</button>
+  </div>
+</div><!-- /p3 -->
+
+<!-- ══════════ STEP 5: PUBLISH SETTINGS ══════════ -->
+<div class="panel" id="p4">
+  <div class="fg">
+    <label class="fl">Audience</label>
+    <select class="fs">
+      <option>🌍 Everyone (Public)</option>
+      <option>👥 Followers only</option>
+      <option>📝 Save as Draft</option>
+    </select>
+  </div>
+  <div class="fg">
+    <label class="fl">Content Warning (optional)</label>
+    <select class="fs">
+      <option value="">No warning needed</option>
+      <option>🔞 Mature themes (18+)</option>
+      <option>⚠️ Mild violence</option>
+      <option>💔 Trauma / emotional distress</option>
+      <option>💬 Strong language</option>
+    </select>
+  </div>
+  <div class="fg">
+    <label class="fl">Language</label>
+    <select class="fs">
+      <option>🇬🇧 English</option>
+      <option>🇳🇬 Nigerian Pidgin</option>
+      <option>🇳🇬 Igbo</option><option>🇳🇬 Yoruba</option><option>🇳🇬 Hausa</option>
+    </select>
+  </div>
+
+  <label class="fl" style="margin-bottom:10px">Story Options</label>
+  <div style="background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:14px;padding:0 14px">
+    <div class="set-row"><div><div class="set-lbl">Allow comments</div><div class="set-sub">Let readers comment on your story</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+    <div class="set-row"><div><div class="set-lbl">Allow tips</div><div class="set-sub">Readers can send you money via Flutterwave</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+    <div class="set-row"><div><div class="set-lbl">Show in Trending</div><div class="set-sub">Eligible for the Trending tab</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+    <div class="set-row"><div><div class="set-lbl">Allow resharing</div><div class="set-sub">Readers can share your story link</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+    <div class="set-row"><div><div class="set-lbl">Notify my followers</div><div class="set-sub">Push notification when published</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+    <div class="set-row"><div><div class="set-lbl">Enable engagement tools</div><div class="set-sub">Show polls, debates, predictions in reader</div></div><label class="tog2"><input type="checkbox" checked/><div class="tog2-tr"><div class="tog2-th"></div></div></label></div>
+  </div>
+
+  <div style="height:16px"></div>
+  <div class="ibox acc" id="readyBox"><span style="font-size:16px">🚀</span><div class="ibox-txt"><strong style="color:var(--tx)">Ready to publish!</strong> Your story has a title, category, and content.</div></div>
+  <div class="ibox muted" id="notReadyBox" style="display:none"><span style="font-size:16px">⚠️</span><div class="ibox-txt" id="notReadyMsg">Complete required fields first.</div></div>
+  <button class="btn-pri" style="margin-bottom:10px" onclick="publish()">🚀 Publish Story</button>
+  <button class="btn-sec" onclick="goStep(3)">← Back to Preview</button>
+</div><!-- /p4 -->
+
+</div><!-- /body -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item active"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn-item" onclick="showToast('🔔 Alerts')"><i class="fas fa-bell"></i>Alerts</div>
+  <div class="bn-item" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+</div><!-- /shell -->
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// API HOOKS
+// ══════════════════════════════════════════════════════
+async function apiGetMySeries(){ return DEMO_SERIES; }
+async function apiPublishStory(payload){ console.log('PUBLISH:', payload); return { id:'demo_'+Date.now(), ok:true }; }
+
+// ══════════════════════════════════════════════════════
+// DEMO DATA
+// ══════════════════════════════════════════════════════
+const DEMO_SERIES = [
+  {id:'s1',title:'His Secret and Her Shadow',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75',category:'betrayal',status:'ongoing',season:1,lastChapter:7,desc:"A billionaire's hidden past collides with the woman hired to destroy him."},
+  {id:'s2',title:'The Lagos Wives',cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=75',category:'marriage',status:'ongoing',season:2,lastChapter:14,desc:'Three women, one neighbourhood, secrets that could burn it all down.'},
+  {id:'s3',title:'Campus Confessions',cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&q=75',category:'campus',status:'paused',season:1,lastChapter:4,desc:'First love, second chances, and an anonymous blog tearing the school apart.'},
+  {id:'s4',title:'Midnight Revenge',cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&q=75',category:'revenge',status:'completed',season:1,lastChapter:12,desc:'She waited five years for this moment. Nothing will stop her now.'},
+  {id:'s5',title:'Born to Betray',cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=75',category:'family',status:'ongoing',season:3,lastChapter:22,desc:'A dynasty built on lies. An heir who knows too much.'},
+];
+
+const CATS = [
+  {id:'betrayal',label:'💔 Betrayal'},{id:'campus',label:'🎓 Campus'},
+  {id:'family',label:'👑 Family Legacy'},{id:'heartbreak',label:'💌 Heartbreak'},
+  {id:'revenge',label:'🔥 Revenge'},{id:'twist',label:'✨ Twist'},
+  {id:'urban',label:'🏙️ Urban Love'},{id:'secrets',label:'🤫 Secrets'},
+  {id:'marriage',label:'💍 Marriage'},{id:'midnight',label:'🌙 Midnight'},
+  {id:'horror',label:'🕯️ Horror'},{id:'comedy',label:'😂 Comedy'},
+];
+
+const STOCKS = [
+  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75',
+  'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=75',
+  'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&q=75',
+  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&q=75',
+  'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=75',
+  'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=75',
+  'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=600&q=75',
+  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=75',
+];
+
+const STATUS_LABEL = {ongoing:'🔥 Ongoing',completed:'✅ Completed',paused:'⏸ On Ice',new:'✨ New'};
+const STATUS_PILL  = {ongoing:'sp-ongoing',completed:'sp-completed',paused:'sp-paused',new:'sp-new'};
+const STATUS_HINTS = {
+  new:'New stories are automatically tagged as New.',
+  ongoing:'Readers will see this is an active, updating series.',
+  completed:'The story has reached its conclusion.',
+  paused:'"On Ice" — updates paused until further notice.',
+};
+
+// ══════════════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════════════
+const ST = {
+  type:'series', isContinuing:false, chosenSeriesId:null,
+  cover:'', category:'', status:'new',
+  mode:'manual', wps:100,
+  globalNext:{ enabled:false, day:'', time:'midnight', tease:'' },
+};
+let sceneIdCounter = 0;
+let dropdownOpen = false;
+let mySeries = [];
+
+// Per-scene engagement state: { poll:{on,q,opts}, prediction:{on,q,opts}, debate:{on,motion}, next:{on} }
+function mkEngState(){ return {
+  poll:{on:false,q:'',opts:['','']},
+  prediction:{on:false,q:'',opts:['','','']},
+  debate:{on:false,motion:''},
+};}
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let toastTimer;
+function showToast(msg){ const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800); }
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+async function init(){
+  mySeries = await apiGetMySeries();
+  buildCatGrid(); buildStockRow(); buildDropdownMenu();
+  addScene('The first line of your story should grab the reader by the throat.\n\nSet the scene. Introduce the world. Make them feel something.');
+  addScene('The stakes rise. Something shifts. A secret surfaces, or a choice has to be made.\n\nThis is where the reader leans in.');
+  updateVisibility(); checkReady();
+}
+
+// ── CATS ──
+function buildCatGrid(){
+  document.getElementById('catGrid').innerHTML = CATS.map(c=>
+    `<div class="cat-chip" data-id="${c.id}" onclick="pickCat('${c.id}')">${c.label}</div>`).join('');
+}
+
+// ── STOCKS ──
+function buildStockRow(){
+  document.getElementById('stockRow').innerHTML = STOCKS.map((url,i)=>
+    `<div class="stock-thumb" id="st${i}" onclick="pickStockCover('${url}',${i})"><img src="${url}" loading="lazy"/></div>`).join('');
+}
+
+// ── DROPDOWN ──
+function buildDropdownMenu(){
+  const menu = document.getElementById('sddMenu');
+  menu.innerHTML = mySeries.map(s=>{
+    const nextCh = s.lastChapter + 1;
+    return `<div class="sdd-item" data-id="${s.id}" onclick="chooseSeries('${s.id}')">
+      <img class="sdd-item-img" src="${s.cover}" loading="lazy"/>
+      <div class="sdd-item-body">
+        <div class="sdd-item-title">${esc(s.title)}</div>
+        <div class="sdd-item-sub">Season ${s.season} · ${s.lastChapter} chapter${s.lastChapter!==1?'s':''} published</div>
+        <div class="sdd-item-desc">${esc(s.desc)}</div>
+      </div>
+      <div class="sdd-item-right">
+        <span class="spill ${STATUS_PILL[s.status]||'sp-new'}">${STATUS_LABEL[s.status]||'New'}</span>
+        <span class="next-pill">→ Ch.${nextCh}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// VISIBILITY
+// ══════════════════════════════════════════════════════
+function updateVisibility(){
+  const isSeries = ST.type==='series';
+  document.getElementById('seriesBlock').style.display    = isSeries?'':'none';
+  document.getElementById('standaloneTitle').style.display = isSeries?'none':'';
+  if(!isSeries) return;
+  const seriesChosen = ST.isContinuing && ST.chosenSeriesId;
+  document.getElementById('newSeriesTitleFg').style.display = seriesChosen?'none':'';
+  document.getElementById('selStrip').classList.toggle('show', !!seriesChosen);
+}
+
+// ══════════════════════════════════════════════════════
+// STORY TYPE
+// ══════════════════════════════════════════════════════
+function pickType(type){
+  ST.type=type;
+  document.querySelectorAll('.type-card').forEach(el=>el.classList.toggle('sel',el.dataset.type===type));
+  if(type!=='series'&&ST.isContinuing) fullReset();
+  if(type==='poem'){document.getElementById('standaloneTitleLabel').textContent='Poem Title';document.getElementById('standaloneTitleInp').placeholder='Give your poem a name…';}
+  else{document.getElementById('standaloneTitleLabel').textContent='Story Title';document.getElementById('standaloneTitleInp').placeholder='A short, punchy title…';}
+  updateVisibility(); checkReady();
+}
+
+// ══════════════════════════════════════════════════════
+// TOGGLE — continue series
+// ══════════════════════════════════════════════════════
+function handleToggleClick(event){
+  if(event.target.closest('.tog2'))return;
+  const chk=document.getElementById('contChk');chk.checked=!chk.checked;applyToggleState(chk.checked);
+}
+function handleToggleChange(){ applyToggleState(document.getElementById('contChk').checked); }
+function applyToggleState(isOn){
+  ST.isContinuing=isOn;
+  document.getElementById('contTogRow').classList.toggle('on',isOn);
+  const block=document.getElementById('continueBlock');
+  if(isOn){
+    block.style.display='block';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{block.classList.add('open');setTimeout(()=>openDropdown(),60);}));
+  }else{
+    closeDropdown();block.classList.remove('open');
+    setTimeout(()=>{if(!ST.isContinuing)block.style.display='none';},300);
+    resetAutoFilledFields();ST.chosenSeriesId=null;
+  }
+  updateVisibility();syncPreview();checkReady();
+}
+
+function openDropdown(){ dropdownOpen=true;document.getElementById('sddMenu').classList.add('show');document.getElementById('sddTrigger').classList.add('open'); }
+function closeDropdown(){ dropdownOpen=false;document.getElementById('sddMenu').classList.remove('show');document.getElementById('sddTrigger').classList.remove('open'); }
+function toggleDropdown(){ if(dropdownOpen)closeDropdown();else openDropdown(); }
+
+document.addEventListener('click',function(e){
+  const trigger=document.getElementById('sddTrigger');const menu=document.getElementById('sddMenu');
+  if(dropdownOpen&&trigger&&menu&&!trigger.contains(e.target)&&!menu.contains(e.target))closeDropdown();
+},true);
+
+function chooseSeries(id){
+  const s=mySeries.find(x=>x.id===id);if(!s)return;
+  ST.chosenSeriesId=id;
+  const nextCh=s.lastChapter+1;
+  document.getElementById('seriesTitleInp').value=s.title;
+  document.getElementById('seasonSel').value=String(s.season);
+  document.getElementById('chapterNum').value=nextCh;
+  document.getElementById('chapterTitleInp').value='';
+  pickCat(s.category);pickStatus('ongoing');setCover(s.cover);
+  STOCKS.forEach((url,i)=>document.getElementById(`st${i}`)?.classList.toggle('picked',url===s.cover));
+  document.getElementById('sddFace').innerHTML=`<div class="sdd-sel-inner"><img class="sdd-sel-img" src="${s.cover}"/><div><div class="sdd-sel-title">${esc(s.title)}</div><div class="sdd-sel-meta">Season ${s.season} · Adding Chapter ${nextCh}</div></div></div>`;
+  document.querySelectorAll('.sdd-item').forEach(el=>el.classList.toggle('chosen',el.dataset.id===id));
+  document.getElementById('ssImg').src=s.cover;
+  document.getElementById('ssName').textContent=s.title;
+  document.getElementById('ssMeta').textContent=`Season ${s.season} · Adding Chapter ${nextCh} (continuing from Ch.${s.lastChapter})`;
+  closeDropdown();updateVisibility();syncPreview();checkReady();
+  showToast(`✅ Linked to "${s.title}" — writing Chapter ${nextCh}`);
+}
+
+function clearSeriesChoice(){
+  ST.chosenSeriesId=null;
+  document.getElementById('sddFace').innerHTML=`<span class="sdd-ph">Tap to choose a series…</span>`;
+  document.querySelectorAll('.sdd-item').forEach(el=>el.classList.remove('chosen'));
+  resetAutoFilledFields();openDropdown();updateVisibility();syncPreview();checkReady();
+}
+
+function resetAutoFilledFields(){
+  document.getElementById('seriesTitleInp').value='';document.getElementById('chapterNum').value=1;
+  document.getElementById('seasonSel').value='1';document.getElementById('chapterTitleInp').value='';
+  clearCover();pickStatus('new');ST.category='';
+  document.querySelectorAll('.cat-chip').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('sddFace').innerHTML=`<span class="sdd-ph">Tap to choose a series…</span>`;
+  document.querySelectorAll('.sdd-item').forEach(el=>el.classList.remove('chosen'));
+}
+
+function fullReset(){
+  ST.isContinuing=false;ST.chosenSeriesId=null;
+  const chk=document.getElementById('contChk');chk.checked=false;
+  document.getElementById('contTogRow').classList.remove('on');
+  const block=document.getElementById('continueBlock');block.classList.remove('open');block.style.display='none';
+  closeDropdown();resetAutoFilledFields();
+}
+
+// ══════════════════════════════════════════════════════
+// STATUS
+// ══════════════════════════════════════════════════════
+function pickStatus(s){
+  ST.status=s;
+  document.querySelectorAll('.s-chip').forEach(el=>el.classList.toggle('sel',el.dataset.s===s));
+  document.getElementById('statusHint').textContent=STATUS_HINTS[s]||'';
+}
+
+// ══════════════════════════════════════════════════════
+// COVER
+// ══════════════════════════════════════════════════════
+function handleCoverUpload(e){ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setCover(ev.target.result);clearStockHighlight();};r.readAsDataURL(f); }
+function pickStockCover(url,idx){ setCover(url);clearStockHighlight();document.getElementById(`st${idx}`)?.classList.add('picked'); }
+function setCover(src){ ST.cover=src;const bg=document.getElementById('coverBg');bg.style.backgroundImage=`url('${src}')`;bg.style.display='block';document.getElementById('coverZone').classList.add('has-img');document.getElementById('coverIc').style.display='none';document.getElementById('coverHt').style.display='none';document.getElementById('coverChgBtn').style.display='block';syncPreview();checkReady(); }
+function clearCover(){ ST.cover='';const bg=document.getElementById('coverBg');bg.style.backgroundImage='';bg.style.display='none';document.getElementById('coverZone').classList.remove('has-img');document.getElementById('coverIc').style.display='';document.getElementById('coverHt').style.display='';document.getElementById('coverChgBtn').style.display='none';clearStockHighlight(); }
+function clearStockHighlight(){ document.querySelectorAll('.stock-thumb').forEach(el=>el.classList.remove('picked')); }
+
+// ══════════════════════════════════════════════════════
+// CATEGORY
+// ══════════════════════════════════════════════════════
+function pickCat(id){ ST.category=id;document.querySelectorAll('.cat-chip').forEach(el=>el.classList.toggle('sel',el.dataset.id===id));syncPreview();checkReady(); }
+
+// ══════════════════════════════════════════════════════
+// TITLE & SYNOPSIS
+// ══════════════════════════════════════════════════════
+function onSeriesTitle(){ syncPreview();checkReady(); }
+function onStandaloneTitle(){ const n=document.getElementById('standaloneTitleInp').value.length;const h=document.getElementById('standaloneTitleHint');h.textContent=`${n} / 120`;h.className='chint'+(n>115?' over':n>100?' warn':'');syncPreview();checkReady(); }
+function onSynopsis(){ const n=document.getElementById('synopsisInp').value.length;const h=document.getElementById('synHint');h.textContent=`${n} / 400`;h.className='chint'+(n>380?' over':n>340?' warn':''); }
+
+// ══════════════════════════════════════════════════════
+// WRITE MODE
+// ══════════════════════════════════════════════════════
+function pickMode(mode){
+  ST.mode=mode;
+  document.querySelectorAll('.dm-opt').forEach(el=>el.classList.toggle('sel',el.dataset.mode===mode));
+  document.getElementById('manualBlock').style.display=mode==='manual'?'':'none';
+  document.getElementById('autoBlock').style.display=mode==='auto'?'':'none';
+  document.getElementById('abBox').style.display=mode==='auto'?'':'none';
+  checkReady();
+}
+function onWps(v){ ST.wps=+v;document.getElementById('wpsVal').textContent=v+' words';document.getElementById('wpsHint').textContent='~'+v+' words';updateFtStats(); }
+function onFullText(){ ST.fullText=document.getElementById('fullTextInp').value;updateFtStats();checkReady(); }
+function updateFtStats(){ const ft=document.getElementById('fullTextInp').value.trim();const words=ft?ft.split(/\s+/).filter(Boolean).length:0;const scenes=words>0?Math.max(1,Math.ceil(words/ST.wps)):0;document.getElementById('ftWC').textContent=words+' words';document.getElementById('ftSC').textContent=`→ ${scenes} scene${scenes!==1?'s':''}`;  }
+function previewSplit(){ const text=(document.getElementById('fullTextInp')?.value||'').trim();if(!text){showToast('⚠️ Paste your story text first');return;}const parts=splitText(text,ST.wps);document.getElementById('splitPrev').innerHTML=`<div style="font-size:10px;color:var(--mt);margin-bottom:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">${parts.length} scenes generated</div>`+parts.slice(0,3).map((p,i)=>`<div class="asp-card"><div class="asp-num">Scene ${i+1}</div><div class="asp-txt">${esc(p.substring(0,180))}${p.length>180?'…':''}</div></div>`).join('')+(parts.length>3?`<div style="text-align:center;font-size:12px;color:var(--mt);padding:8px">+${parts.length-3} more scene${parts.length-3!==1?'s':''}</div>`:''); }
+function splitText(text,wps){ const words=text.split(/\s+/);const out=[];for(let i=0;i<words.length;i+=wps)out.push(words.slice(i,i+wps).join(' '));return out; }
+
+// ══════════════════════════════════════════════════════
+// SCENES — manual mode
+// ══════════════════════════════════════════════════════
+const SCENES = []; // [{id, text, eng:{poll,prediction,debate}}]
+
+function addScene(defaultText){
+  const id=++sceneIdCounter;
+  SCENES.push({id,text:defaultText||'',eng:mkEngState()});
+  renderScenes();
+  if(!defaultText) setTimeout(()=>document.getElementById(`ta${id}`)?.focus(),80);
+}
+
+function removeScene(id){
+  if(SCENES.length<=1){showToast('A story needs at least one scene 📖');return;}
+  const idx=SCENES.findIndex(s=>s.id===id);
+  if(idx>-1)SCENES.splice(idx,1);
+  renderScenes();checkReady();
+}
+
+function moveScene(id,dir){
+  const i=SCENES.findIndex(s=>s.id===id);const n=i+dir;
+  if(n<0||n>=SCENES.length)return;
+  [SCENES[i],SCENES[n]]=[SCENES[n],SCENES[i]];
+  renderScenes();
+}
+
+function onSceneInput(id,el){
+  const sc=SCENES.find(s=>s.id===id);if(sc)sc.text=el.value;
+  el.style.height='auto';el.style.height=Math.max(110,el.scrollHeight)+'px';
+  const wc=el.value.trim().split(/\s+/).filter(Boolean).length;
+  const card=document.getElementById(`sc${id}`);
+  if(card){
+    card.querySelector('.sc-wc').textContent=wc>0?wc+' words':'Empty';
+    const idx=SCENES.findIndex(s=>s.id===id);
+    card.querySelector('.sc-lbl').textContent=`Scene ${idx+1}${wc>0?' · '+wc+' words':' · tap to write'}`;
+  }
+  checkReady();
+}
+
+function renderScenes(){
+  document.getElementById('scenesList').innerHTML=SCENES.map((s,i)=>{
+    const wc=s.text.trim().split(/\s+/).filter(Boolean).length;
+    const eng=s.eng;
+    const badges=[];
+    if(eng.poll.on) badges.push(`<span class="sc-eng-badge poll">📊 Poll</span>`);
+    if(eng.prediction.on) badges.push(`<span class="sc-eng-badge pred">🔮 Prediction</span>`);
+    if(eng.debate.on) badges.push(`<span class="sc-eng-badge debate">⚔️ Debate</span>`);
+    return `<div class="sc-card" id="sc${s.id}">
+      <div class="sc-hd" onclick="document.getElementById('ta${s.id}')?.focus()">
+        <div class="sc-num">${i+1}</div>
+        <div class="sc-lbl">Scene ${i+1}${s.text.trim()?' · '+wc+' words':' · tap to write'}</div>
+        <div class="sc-acts">
+          ${i>0?`<button class="sc-act" onclick="event.stopPropagation();moveScene(${s.id},-1)"><i class="fas fa-chevron-up" style="font-size:9px"></i></button>`:''}
+          ${i<SCENES.length-1?`<button class="sc-act" onclick="event.stopPropagation();moveScene(${s.id},1)"><i class="fas fa-chevron-down" style="font-size:9px"></i></button>`:''}
+          <button class="sc-act del" onclick="event.stopPropagation();removeScene(${s.id})"><i class="fas fa-trash" style="font-size:9px"></i></button>
+        </div>
+      </div>
+      <textarea class="sc-ta" id="ta${s.id}" placeholder="Write scene ${i+1} here…\n\nTip: end on a hook or revelation." oninput="onSceneInput(${s.id},this)">${esc(s.text)}</textarea>
+      <div class="sc-foot">
+        <span class="sc-wc">${wc>0?wc+' words':'Empty'}</span>
+        <span style="font-size:10px;color:var(--acc2);font-weight:600;display:flex;align-items:center;gap:4px"><i class="fas fa-bolt"></i>${badges.length} engagement${badges.length!==1?'s':''}</span>
+      </div>
+      ${badges.length>0?`<div class="sc-eng-badges">${badges.join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  checkReady();
+}
+
+// ══════════════════════════════════════════════════════
+// ENGAGE TAB — per-scene engagement tools
+// ══════════════════════════════════════════════════════
+function renderEngageSceneList(){
+  const container = document.getElementById('engageSceneList');
+  if(!SCENES.length){container.innerHTML=`<div style="text-align:center;padding:24px;color:var(--mt);font-size:12px">Write some scenes in Step 2 first</div>`;return;}
+  container.innerHTML = SCENES.map((sc,i)=>{
+    const eng=sc.eng;
+    const wc=sc.text.trim().split(/\s+/).filter(Boolean).length;
+    const preview=sc.text.trim().substring(0,80)+(sc.text.trim().length>80?'…':'');
+    return `<div style="background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:12px">
+      <!-- Scene header -->
+      <div style="padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">
+        <div style="width:26px;height:26px;border-radius:50%;background:rgba(255,0,80,.15);border:1.5px solid rgba(255,0,80,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--acc);flex-shrink:0">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--mt2)">Scene ${i+1}</div>
+          ${preview?`<div style="font-size:10px;color:var(--mt);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview)}</div>`:'<div style="font-size:10px;color:var(--mt);margin-top:2px;font-style:italic">No content yet</div>'}
+        </div>
+        <div style="font-size:10px;color:var(--mt)">${wc} words</div>
+      </div>
+
+      <!-- POLL toggle + config -->
+      ${renderEngTool(sc.id, 'poll', '📊', 'Poll', 'poll', 'Ask readers to vote — results shown instantly', eng.poll.on)}
+      ${eng.poll.on ? renderPollConfig(sc.id, eng.poll) : ''}
+
+      <!-- PREDICTION toggle + config -->
+      ${renderEngTool(sc.id, 'pred', '🔮', 'Prediction Vote', 'pred', 'Let readers guess what happens next — reveal in next chapter', eng.prediction.on)}
+      ${eng.prediction.on ? renderPredConfig(sc.id, eng.prediction) : ''}
+
+      <!-- DEBATE toggle + config -->
+      ${renderEngTool(sc.id, 'debate', '⚔️', 'Reader Debate', 'debate', 'Put a motion — readers vote FOR or AGAINST and argue', eng.debate.on)}
+      ${eng.debate.on ? renderDebateConfig(sc.id, eng.debate) : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderEngTool(scId, type, icon, name, cls, desc, isOn){
+  return `<div class="eng-tool-row" onclick="toggleEngTool(${scId},'${type}',event)">
+    <div class="eng-tool-icon ${cls}">${icon}</div>
+    <div class="eng-tool-label">
+      <div class="eng-tool-name ${cls}">${name}</div>
+      <div class="eng-tool-desc">${desc}</div>
+    </div>
+    <label class="mini-tog" onclick="event.stopPropagation()">
+      <input type="checkbox" ${isOn?'checked':''} onchange="toggleEngTool(${scId},'${type}',event)"/>
+      <div class="mini-tog-tr"><div class="mini-tog-th"></div></div>
+    </label>
+  </div>`;
+}
+
+function renderPollConfig(scId, state){
+  return `<div class="eng-config open" id="pollConfig-${scId}">
+    <div class="eng-config-label" style="color:#a78bfa"><i class="fas fa-poll" style="color:var(--poll)"></i> Poll Question</div>
+    <input class="fi" style="border-color:rgba(124,58,237,.4);margin-bottom:10px;font-size:12px;padding:9px 12px" 
+      placeholder="e.g. Who was truly wrong here?" value="${esc(state.q)}"
+      oninput="updateEngState(${scId},'poll','q',this.value)"/>
+    <div class="eng-config-label" style="color:#a78bfa;margin-top:0"><i class="fas fa-list" style="color:var(--poll)"></i> Options (2–4)</div>
+    <div class="poll-opts-list" id="pollOptsList-${scId}">
+      ${state.opts.map((opt,i)=>`
+        <div class="poll-opt-row">
+          <input class="poll-opt-input" placeholder="Option ${i+1}" value="${esc(opt)}"
+            oninput="updatePollOpt(${scId},${i},this.value)"/>
+          ${state.opts.length>2?`<button class="poll-opt-del" onclick="removePollOpt(${scId},${i})"><i class="fas fa-times" style="font-size:9px"></i></button>`:'<div style="width:26px"></div>'}
+        </div>`).join('')}
+    </div>
+    ${state.opts.length<4?`<button class="add-opt-btn" onclick="addPollOpt(${scId})"><i class="fas fa-plus"></i> Add Option</button>`:''}
+  </div>`;
+}
+
+function renderPredConfig(scId, state){
+  return `<div class="eng-config open" id="predConfig-${scId}">
+    <div class="eng-config-label" style="color:#38bdf8"><i class="fas fa-crystal-ball" style="color:var(--pred)"></i> Prediction Question</div>
+    <input class="fi" style="border-color:rgba(14,165,233,.4);margin-bottom:10px;font-size:12px;padding:9px 12px"
+      placeholder="e.g. What do you think happens next?" value="${esc(state.q)}"
+      oninput="updateEngState(${scId},'prediction','q',this.value)"/>
+    <div class="eng-config-label" style="color:#38bdf8;margin-top:0"><i class="fas fa-list" style="color:var(--pred)"></i> Prediction Options (2–4)</div>
+    <div class="pred-opts-list" id="predOptsList-${scId}">
+      ${state.opts.map((opt,i)=>`
+        <div class="poll-opt-row">
+          <input class="pred-opt-input" placeholder="Prediction ${i+1}" value="${esc(opt)}"
+            oninput="updatePredOpt(${scId},${i},this.value)"/>
+          ${state.opts.length>2?`<button class="poll-opt-del" onclick="removePredOpt(${scId},${i})"><i class="fas fa-times" style="font-size:9px"></i></button>`:'<div style="width:26px"></div>'}
+        </div>`).join('')}
+    </div>
+    ${state.opts.length<4?`<button class="add-pred-btn" onclick="addPredOpt(${scId})"><i class="fas fa-plus"></i> Add Prediction</button>`:''}
+    <div style="margin-top:10px;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:10px;padding:9px 11px;font-size:10px;color:#7dd3fc;line-height:1.5">
+      💡 You reveal the correct answer when the next chapter drops — readers get notified if they guessed right.
+    </div>
+  </div>`;
+}
+
+function renderDebateConfig(scId, state){
+  return `<div class="eng-config open" id="debateConfig-${scId}">
+    <div class="eng-config-label" style="color:#fbbf24"><i class="fas fa-gavel" style="color:var(--debate)"></i> The Motion</div>
+    <textarea class="debate-motion-inp" placeholder="e.g. Ada should stay and fight for her marriage, not leave." rows="2"
+      oninput="updateEngState(${scId},'debate','motion',this.value)">${esc(state.motion)}</textarea>
+    <div class="debate-preview">
+      <div class="debate-side-preview for"><div class="debate-side-emoji">✅</div><div class="debate-side-lbl">FOR</div></div>
+      <div class="debate-side-preview against"><div class="debate-side-emoji">❌</div><div class="debate-side-lbl">AGAINST</div></div>
+    </div>
+    <div style="margin-top:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:9px 11px;font-size:10px;color:#fde68a;line-height:1.5">
+      ⚔️ Readers vote FOR or AGAINST, then post arguments. A full debate page is auto-generated for each debate.
+    </div>
+  </div>`;
+}
+
+// Toggle engagement tool on/off
+function toggleEngTool(scId, type, e){
+  e.stopPropagation();
+  const sc = SCENES.find(s=>s.id===scId);if(!sc)return;
+  // Map type string to eng key
+  const keyMap = {poll:'poll', pred:'prediction', debate:'debate'};
+  const engKey = keyMap[type];
+  sc.eng[engKey].on = !sc.eng[engKey].on;
+  renderEngageSceneList();
+  renderScenes(); // update badges on scene cards
+  syncPreview();
+  showToast(sc.eng[engKey].on ? `✅ ${type==='poll'?'Poll':type==='pred'?'Prediction':type==='debate'?'Debate':''} added to Scene ${SCENES.findIndex(s=>s.id===scId)+1}` : `Removed`);
+}
+
+// Update engagement state values
+function updateEngState(scId, type, field, value){
+  const sc=SCENES.find(s=>s.id===scId);if(!sc)return;
+  const keyMap={poll:'poll',pred:'prediction',debate:'debate'};
+  sc.eng[keyMap[type]][field]=value;
+}
+function updatePollOpt(scId,i,value){ const sc=SCENES.find(s=>s.id===scId);if(sc)sc.eng.poll.opts[i]=value; }
+function updatePredOpt(scId,i,value){ const sc=SCENES.find(s=>s.id===scId);if(sc)sc.eng.prediction.opts[i]=value; }
+function addPollOpt(scId){ const sc=SCENES.find(s=>s.id===scId);if(!sc||sc.eng.poll.opts.length>=4)return;sc.eng.poll.opts.push('');renderEngageSceneList(); }
+function removePollOpt(scId,i){ const sc=SCENES.find(s=>s.id===scId);if(!sc||sc.eng.poll.opts.length<=2)return;sc.eng.poll.opts.splice(i,1);renderEngageSceneList(); }
+function addPredOpt(scId){ const sc=SCENES.find(s=>s.id===scId);if(!sc||sc.eng.prediction.opts.length>=4)return;sc.eng.prediction.opts.push('');renderEngageSceneList(); }
+function removePredOpt(scId,i){ const sc=SCENES.find(s=>s.id===scId);if(!sc||sc.eng.prediction.opts.length<=2)return;sc.eng.prediction.opts.splice(i,1);renderEngageSceneList(); }
+
+// Global what's next
+function onGlobalNextTog(){
+  ST.globalNext.enabled=document.getElementById('globalNextTog').checked;
+  const cfg=document.getElementById('globalNextConfig');
+  if(ST.globalNext.enabled){cfg.classList.add('open');}else{cfg.classList.remove('open');}
+}
+function pickNextDay(btn){
+  document.querySelectorAll('#nextDayGrid .next-day-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  ST.globalNext.day=btn.dataset.day;
+}
+
+// ══════════════════════════════════════════════════════
+// PREVIEW SYNC
+// ══════════════════════════════════════════════════════
+function getActiveTitle(){
+  if(ST.type==='series') return document.getElementById('seriesTitleInp').value.trim();
+  return document.getElementById('standaloneTitleInp').value.trim();
+}
+function getActiveScenes(){
+  if(ST.mode==='auto'){ const ft=document.getElementById('fullTextInp')?.value.trim()||'';return splitText(ft,ST.wps).map((t,i)=>({id:i,text:t,eng:mkEngState()}));}
+  return SCENES;
+}
+
+function syncPreview(){
+  const cat=CATS.find(c=>c.id===ST.category);
+  const title=getActiveTitle();
+  document.getElementById('pvCover').style.backgroundImage=ST.cover?`url('${ST.cover}')`:"url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75')";
+  document.getElementById('pvCat').textContent=cat?cat.label:'📖 Story';
+  document.getElementById('pvTitle').textContent=title||'Your story title will appear here';
+  const cl=document.getElementById('pvChLine');
+  if(ST.type==='series'){const season=document.getElementById('seasonSel').value;const chNum=document.getElementById('chapterNum').value;const chTit=document.getElementById('chapterTitleInp').value.trim();cl.style.display='';cl.textContent=`Season ${season} · Chapter ${chNum}${chTit?' — '+chTit:''}`;}else{cl.style.display='none';}
+  const sc={new:'#00c864',ongoing:'#ffa000',completed:'#00b4ff',paused:'#9664ff'};
+  const sl={new:'✨ New',ongoing:'🔥 Ongoing',completed:'✅ Completed',paused:'⏸ On Ice'};
+  document.getElementById('pvStatus').innerHTML=ST.type==='series'?`<span style="color:${sc[ST.status]};font-size:11px;font-weight:700">${sl[ST.status]||''}</span>`:'';
+  const scenes=getActiveScenes();
+  const words=scenes.reduce((a,s)=>a+s.text.trim().split(/\s+/).filter(Boolean).length,0);
+  document.getElementById('pvTime').textContent=`📖 ${Math.max(1,Math.ceil(words/200))} min read`;
+  const filled=scenes.filter(s=>s.text.trim());
+  document.getElementById('pvScenes').innerHTML=!filled.length
+    ?'<div style="text-align:center;padding:24px;color:var(--mt);font-size:13px">Write scenes in Step 2 to see them previewed here</div>'
+    :filled.slice(0,2).map((s,i)=>`<div class="pv-sc-card"><div class="pv-sc-num">✨ Scene ${i+1}</div><div class="pv-sc-txt">${s.text.replace(/\n/g,'<br>')}</div></div>`).join('')+(filled.length>2?`<div style="text-align:center;font-size:12px;color:var(--mt);padding:8px">+${filled.length-2} more scene${filled.length-2!==1?'s':''}</div>`:'');
+
+  // Engagement preview
+  const allEng=[];
+  scenes.forEach((s,i)=>{
+    if(s.eng?.poll?.on) allEng.push({type:'poll',sceneIdx:i});
+    if(s.eng?.prediction?.on) allEng.push({type:'pred',sceneIdx:i});
+    if(s.eng?.debate?.on) allEng.push({type:'debate',sceneIdx:i});
+  });
+  if(ST.globalNext.enabled) allEng.push({type:'next',sceneIdx:-1});
+  const engSummary=document.getElementById('pvEngSummary');
+  const engList=document.getElementById('pvEngList');
+  if(allEng.length>0){
+    engSummary.style.display='';
+    engList.innerHTML=allEng.map(e=>{
+      const labels={poll:['📊','Poll','poll'],pred:['🔮','Prediction','pred'],debate:['⚔️','Debate','debate'],next:['🔔','What\'s Next','next']};
+      const [icon,name,cls]=labels[e.type];
+      const where=e.sceneIdx>=0?`after Scene ${e.sceneIdx+1}`:'end of chapter';
+      return `<div class="pv-sc-card" style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+        <span class="pv-eng-badge ${cls}">${icon} ${name}</span>
+        <span style="font-size:11px;color:var(--mt)">appears ${where}</span>
+      </div>`;
+    }).join('');
+  }else{
+    engSummary.style.display='none';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// STEP NAVIGATION
+// ══════════════════════════════════════════════════════
+function goStep(n){
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n));
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i===n)s.classList.add('active');
+    else if(i<n)s.classList.add('done');
+  });
+  if(n===2) renderEngageSceneList();
+  if(n===3){syncPreview();} 
+  if(n===4) syncSettingsPage();
+  document.getElementById('mainBody').scrollTop=0;
+}
+
+function syncSettingsPage(){
+  const ok=isReady();
+  document.getElementById('readyBox').style.display=ok?'':'none';
+  document.getElementById('notReadyBox').style.display=ok?'none':'';
+  if(!ok){
+    const msgs=[];
+    if(!getActiveTitle()) msgs.push('story title');
+    if(!ST.category) msgs.push('a category');
+    const hasContent=ST.mode==='auto'?(document.getElementById('fullTextInp')?.value.trim().length>0):SCENES.some(s=>s.text.trim().length>0);
+    if(!hasContent) msgs.push('at least one scene with content');
+    document.getElementById('notReadyMsg').textContent='Missing: '+msgs.join(', ')+'.';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// VALIDATION & PUBLISH
+// ══════════════════════════════════════════════════════
+function isReady(){
+  const hasContent=ST.mode==='auto'?(document.getElementById('fullTextInp')?.value.trim().length>0):SCENES.some(s=>s.text.trim().length>0);
+  return getActiveTitle().length>0 && ST.category!=='' && hasContent;
+}
+function checkReady(){ document.getElementById('pubBtn').disabled=!isReady(); }
+
+async function publish(){
+  if(!isReady()){goStep(4);syncSettingsPage();showToast('⚠️ Complete all required fields first');return;}
+  const scenes=getActiveScenes();
+  const payload={
+    type:ST.type,title:getActiveTitle(),category:ST.category,status:ST.status,
+    cover:ST.cover,synopsis:document.getElementById('synopsisInp').value.trim(),
+    season:ST.type==='series'?document.getElementById('seasonSel').value:null,
+    chapter:ST.type==='series'?document.getElementById('chapterNum').value:null,
+    chapterTitle:ST.type==='series'?document.getElementById('chapterTitleInp').value.trim():null,
+    continuingSeries:ST.chosenSeriesId||null,mode:ST.mode,
+    scenes:scenes.map(s=>({text:s.text,engagement:{poll:s.eng?.poll,prediction:s.eng?.prediction,debate:s.eng?.debate}})),
+    globalEngagement:{next:ST.globalNext},
+  };
+  await apiPublishStory(payload);
+  document.getElementById('successScreen').classList.add('show');
+}
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>

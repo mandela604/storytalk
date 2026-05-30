@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard — Heartbreak Collective</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--acc3:#ffb3c1;
+  --glow:rgba(255,0,80,.32);--glow2:rgba(255,0,80,.12);
+  --dark:#06060c;--card:#0e0e18;--card2:#12121e;--card3:#16162a;
+  --surface:rgba(255,255,255,.055);--surface2:rgba(255,255,255,.03);
+  --tx:#f0eff8;--muted:#60607a;--soft:#a0a0b8;--bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.05);
+}
+html,body{height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden}
+.shell{position:fixed;inset:0;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── SCROLL BODY ── */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:84px}
+.body::-webkit-scrollbar{display:none}
+
+/* ══════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════ */
+.hero{position:relative;height:260px;overflow:hidden;flex-shrink:0}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%;transform:scale(1.06);transition:transform 8s ease}
+.hero-bg.loaded{transform:scale(1)}
+.hero-noise{position:absolute;inset:0;opacity:.4;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,6,12,1) 0%,rgba(6,6,12,.8) 30%,rgba(6,6,12,.25) 65%,rgba(6,6,12,.5) 100%)}
+.hero-top-bar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.hb-back{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:#fff;transition:.2s}
+.hb-back:hover{border-color:var(--acc);color:var(--acc)}
+.hb-actions{display:flex;gap:8px}
+.hb-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#fff;transition:.2s}
+.hb-btn:hover{border-color:var(--acc);color:var(--acc)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;z-index:5;padding:18px 16px 20px}
+.hero-emoji{font-size:36px;margin-bottom:6px;display:block;filter:drop-shadow(0 4px 16px rgba(255,0,80,.4))}
+.hero-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.4px;text-shadow:0 2px 20px rgba(0,0,0,.9)}
+.hero-tagline{font-size:12px;color:rgba(255,255,255,.7);margin-top:5px;line-height:1.45;max-width:260px}
+.hero-meta{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.hero-stat{font-size:11px;color:#bbb;display:flex;align-items:center;gap:4px}
+.hero-stat i{font-size:12px;color:var(--acc2)}
+.joined-pill{background:rgba(255,0,80,.15);border:1px solid rgba(255,0,80,.3);color:var(--acc2);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px}
+.join-btn-hero{background:var(--acc);color:#fff;border:none;padding:8px 20px;border-radius:24px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 0 20px var(--glow);font-family:'DM Sans',sans-serif;transition:.15s}
+.join-btn-hero.joined{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);box-shadow:none}
+
+/* ── MEMBER AVATAR STACK ── */
+.member-stack{display:flex;align-items:center;gap:0}
+.ms-av{width:22px;height:22px;border-radius:50%;border:2px solid var(--dark);object-fit:cover;margin-left:-6px;flex-shrink:0}
+.ms-av:first-child{margin-left:0}
+.ms-more{width:22px;height:22px;border-radius:50%;background:rgba(255,0,80,.2);border:2px solid var(--dark);font-size:8px;font-weight:800;color:var(--acc2);display:flex;align-items:center;justify-content:center;margin-left:-6px;flex-shrink:0}
+
+/* ══════════════════════════════════════
+   TABS
+══════════════════════════════════════ */
+.tabs{flex-shrink:0;background:rgba(6,6,12,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);display:flex;padding:0 4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:12px 14px 10px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;position:relative;white-space:nowrap;border:none;background:none;font-family:'DM Sans',sans-serif;transition:color .2s}
+.tab.active{color:var(--acc)}
+.tab.active::after{content:'';position:absolute;bottom:0;left:6px;right:6px;height:2px;background:var(--acc);border-radius:2px 2px 0 0}
+.tab .tbadge{background:rgba(255,0,80,.18);color:var(--acc);font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px}
+
+/* ══════════════════════════════════════
+   PAGE PANELS
+══════════════════════════════════════ */
+.panel{display:none}
+.panel.active{display:block;animation:fadeUp .22s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── Section headers ── */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 10px}
+.sh-left .sh-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900}
+.sh-left .sh-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.sh-more{font-size:11px;font-weight:700;color:var(--acc);cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,0,80,.25);background:var(--glow2)}
+
+/* ══════════════════════════════════════
+   FEED POSTS
+══════════════════════════════════════ */
+.feed-list{display:flex;flex-direction:column;gap:0;padding:0}
+.post-card{border-bottom:1px solid var(--bd2);padding:14px 16px;cursor:pointer;transition:background .12s;position:relative}
+.post-card:hover{background:rgba(255,0,80,.025)}
+.post-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.post-av-wrap{position:relative;flex-shrink:0}
+.post-av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,0,80,.25);display:block}
+.post-av-init{width:38px;height:38px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
+.post-online{position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid var(--dark)}
+.post-meta{flex:1;min-width:0}
+.post-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+.post-verified{color:var(--acc);font-size:10px}
+.post-time{font-size:10px;color:var(--muted);margin-top:1px}
+.post-type-badge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.ptb-discussion{background:rgba(100,150,255,.12);color:#7ba7ff;border:1px solid rgba(100,150,255,.2)}
+.ptb-confession{background:rgba(255,0,80,.12);color:var(--acc2);border:1px solid rgba(255,0,80,.2)}
+.ptb-question{background:rgba(255,200,0,.1);color:#ffd000;border:1px solid rgba(255,200,0,.2)}
+.ptb-recommendation{background:rgba(0,200,100,.1);color:#00c864;border:1px solid rgba(0,200,100,.2)}
+.ptb-writeup{background:rgba(150,100,255,.12);color:#b47fff;border:1px solid rgba(150,100,255,.2)}
+
+.post-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px}
+.post-body{font-size:13px;line-height:1.55;color:rgba(240,239,248,.78);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.post-body.expanded{-webkit-line-clamp:unset}
+.read-more{font-size:11px;color:var(--acc2);font-weight:600;cursor:pointer;margin-bottom:10px;display:inline-block}
+
+/* Story mention card */
+.story-mention{background:var(--card2);border:1px solid var(--bd);border-radius:12px;display:flex;gap:10px;padding:10px 12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.story-mention:hover{border-color:rgba(255,0,80,.3)}
+.sm-img{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.sm-body{flex:1;min-width:0}
+.sm-cat{font-size:9px;font-weight:800;color:var(--acc);letter-spacing:.3px;margin-bottom:2px}
+.sm-title{font-size:12px;font-weight:700;line-height:1.3}
+.sm-meta{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Poll */
+.post-poll{margin-bottom:10px}
+.poll-opt{position:relative;background:var(--card2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:6px;cursor:pointer;overflow:hidden;user-select:none;transition:border-color .15s}
+.poll-opt:hover{border-color:rgba(255,0,80,.3)}
+.poll-opt.voted{border-color:var(--acc)}
+.poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.1);transition:width .5s ease}
+.poll-label{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600}
+.poll-pct{font-size:10px;color:var(--acc);font-weight:700}
+.poll-voted-label{font-size:9px;color:var(--acc2);font-weight:700}
+.poll-total{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* Tags */
+.post-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.ptag{background:var(--surface2);border:1px solid var(--bd);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--soft);cursor:pointer}
+.ptag.acc{background:rgba(255,0,80,.08);border-color:rgba(255,0,80,.2);color:var(--acc2)}
+
+/* Post actions */
+.post-actions{display:flex;align-items:center;gap:0}
+.pa-btn{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);transition:.15s;background:none;border:none;font-family:'DM Sans',sans-serif;user-select:none}
+.pa-btn:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.pa-btn.liked{color:var(--acc)}
+.pa-btn.liked i{color:var(--acc)}
+.pa-btn i{font-size:14px}
+.pa-share{margin-left:auto}
+
+/* Pinned indicator */
+.pinned-bar{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--acc2);padding:8px 16px 0;border-top:1px solid rgba(255,0,80,.08)}
+/* Hot badge */
+.hot-badge{background:rgba(255,80,0,.18);border:1px solid rgba(255,120,0,.3);color:#ff7a00;font-size:8px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:.3px}
+
+/* ══════════════════════════════════════
+   WRITE POST BOX (sticky)
+══════════════════════════════════════ */
+.compose-bar{flex-shrink:0;padding:10px 16px;background:rgba(6,6,12,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:center;cursor:pointer}
+.compose-av{width:34px;height:34px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:12px;font-weight:900;color:#fff;flex-shrink:0}
+.compose-placeholder{flex:1;background:var(--surface2);border:1px solid var(--bd);border-radius:24px;padding:9px 16px;font-size:13px;color:var(--muted)}
+.compose-icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);flex-shrink:0;cursor:pointer}
+
+/* ══════════════════════════════════════
+   COMPOSE MODAL
+══════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-sheet{width:100%;background:#13131f;border-radius:22px 22px 0 0;animation:slideUp .28s ease;max-height:90vh;overflow-y:auto;padding-bottom:24px}
+.modal-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:34px;height:4px;background:rgba(255,255,255,.14);border-radius:4px;margin:10px auto 0}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px}
+.modal-hdr h3{font-size:15px;font-weight:800}
+.modal-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+
+/* Post type selector */
+.type-chips{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
+.type-chips::-webkit-scrollbar{display:none}
+.type-chip{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--muted);transition:.15s;user-select:none}
+.type-chip.sel{background:rgba(255,0,80,.15);border-color:var(--acc);color:var(--acc)}
+
+.compose-form{padding:0 16px}
+.cf-input{width:100%;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:11px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:10px}
+.cf-input:focus{border-color:rgba(255,0,80,.4)}
+.cf-input::placeholder{color:var(--muted)}
+.cf-textarea{width:100%;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:11px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.6;transition:border-color .2s;margin-bottom:10px}
+.cf-textarea:focus{border-color:rgba(255,0,80,.4)}
+.cf-textarea::placeholder{color:var(--muted)}
+.cf-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.cf-post-btn{width:100%;padding:13px;border-radius:14px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 0 18px var(--glow)}
+
+/* ══════════════════════════════════════
+   MEMBERS TAB
+══════════════════════════════════════ */
+.members-search{padding:10px 16px 6px}
+.msearch-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--bd);border-radius:12px;padding:9px 14px}
+.msearch-box i{color:var(--muted);font-size:13px}
+.msearch-box input{flex:1;background:transparent;border:none;outline:none;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px}
+.msearch-box input::placeholder{color:var(--muted)}
+
+.members-list{display:flex;flex-direction:column;gap:0}
+.member-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--bd2);cursor:pointer;transition:background .12s}
+.member-row:hover{background:rgba(255,0,80,.025)}
+.mr-av-wrap{position:relative;flex-shrink:0}
+.mr-av{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.08);display:block}
+.mr-online{position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;background:#22c55e;border:2px solid var(--dark)}
+.mr-info{flex:1;min-width:0}
+.mr-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+.mr-role{font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;flex-shrink:0}
+.role-mod{background:rgba(255,200,0,.12);color:#ffd000;border:1px solid rgba(255,200,0,.2)}
+.role-top{background:rgba(255,0,80,.12);color:var(--acc2);border:1px solid rgba(255,0,80,.2)}
+.role-writer{background:rgba(150,100,255,.12);color:#b47fff;border:1px solid rgba(150,100,255,.2)}
+.mr-handle{font-size:11px;color:var(--muted);margin-top:1px}
+.mr-stats{display:flex;gap:8px;margin-top:3px}
+.mr-stat{font-size:10px;color:var(--muted)}
+.mr-follow{background:transparent;border:1px solid var(--bd);color:var(--soft);padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;transition:.15s}
+.mr-follow:hover{border-color:var(--acc);color:var(--acc)}
+.mr-follow.ing{background:rgba(255,0,80,.1);border-color:rgba(255,0,80,.3);color:var(--acc)}
+
+/* ══════════════════════════════════════
+   STORIES TAB
+══════════════════════════════════════ */
+.stories-list{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.story-card-full{background:var(--card);border:1px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .12s}
+.story-card-full:hover{border-color:rgba(255,0,80,.3);transform:translateY(-2px)}
+.scf-img{width:100%;height:120px;object-fit:cover;display:block}
+.scf-body{padding:12px 14px 14px}
+.scf-cat{font-size:9px;font-weight:800;color:var(--acc);letter-spacing:.3px;margin-bottom:4px}
+.scf-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.scf-excerpt{font-size:12px;color:var(--soft);line-height:1.5;margin-bottom:8px}
+.scf-meta{display:flex;align-items:center;gap:8px}
+.scf-av{width:20px;height:20px;border-radius:50%;object-fit:cover;border:1.5px solid var(--acc)}
+.scf-writer{font-size:11px;color:var(--muted);flex:1}
+.scf-likes{font-size:11px;color:var(--muted)}
+.scf-read{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 12px var(--glow)}
+
+/* ══════════════════════════════════════
+   ABOUT TAB
+══════════════════════════════════════ */
+.about-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:0 16px 10px}
+.about-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.about-text{font-size:13px;line-height:1.65;color:var(--soft)}
+.about-rule-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.about-rule{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.5;color:var(--soft)}
+.rule-num{width:20px;height:20px;border-radius:50%;background:rgba(255,0,80,.15);border:1px solid rgba(255,0,80,.25);color:var(--acc);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.admin-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd2)}
+.admin-row:last-child{border-bottom:none}
+.admin-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);flex-shrink:0}
+.admin-info{flex:1}
+.admin-name{font-size:12px;font-weight:700}
+.admin-role{font-size:10px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat-box{background:var(--card2);border:1px solid var(--bd);border-radius:12px;padding:14px;text-align:center}
+.stat-box .sn{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc)}
+.stat-box .sl{font-size:10px;color:var(--muted);margin-top:3px}
+.related-comm{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.related-comm::-webkit-scrollbar{display:none}
+.rc-card{flex-shrink:0;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 13px;width:150px;cursor:pointer;transition:border-color .2s}
+.rc-card:hover{border-color:rgba(255,0,80,.3)}
+.rc-emoji{font-size:24px;margin-bottom:6px;display:block}
+.rc-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.rc-members{font-size:10px;color:var(--muted)}
+.rc-join{background:var(--acc);color:#fff;border:none;padding:5px 12px;border-radius:16px;font-size:10px;font-weight:700;cursor:pointer;width:100%;margin-top:8px;font-family:'DM Sans',sans-serif}
+
+/* ══════════════════════════════════════
+   CHALLENGES / EVENTS TAB
+══════════════════════════════════════ */
+.challenge-banner{margin:0 16px 10px;border-radius:16px;overflow:hidden;position:relative;cursor:pointer}
+.cb-bg{height:140px;background-size:cover;background-position:center}
+.cb-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 60%)}
+.cb-body{position:absolute;bottom:0;left:0;right:0;padding:12px 14px}
+.cb-badge{background:var(--acc);padding:3px 10px;border-radius:20px;font-size:9px;font-weight:800;display:inline-block;margin-bottom:5px}
+.cb-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;line-height:1.2;margin-bottom:4px}
+.cb-meta{font-size:10px;color:#bbb;display:flex;gap:12px}
+.challenge-list{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.chal-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;transition:border-color .2s;cursor:pointer}
+.chal-card:hover{border-color:rgba(255,0,80,.3)}
+.chal-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.chal-title{font-size:14px;font-weight:700;line-height:1.3;flex:1}
+.chal-type{font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px;margin-left:8px;flex-shrink:0}
+.ctype-writing{background:rgba(150,100,255,.12);color:#b47fff;border:1px solid rgba(150,100,255,.2)}
+.ctype-vote{background:rgba(0,200,100,.1);color:#00c864;border:1px solid rgba(0,200,100,.2)}
+.ctype-discussion{background:rgba(255,200,0,.1);color:#ffd000;border:1px solid rgba(255,200,0,.2)}
+.chal-desc{font-size:12px;color:var(--soft);line-height:1.5;margin-bottom:10px}
+.chal-foot{display:flex;align-items:center;gap:10px}
+.chal-entries{font-size:11px;color:var(--muted)}
+.chal-deadline{font-size:11px;color:var(--acc2);font-weight:600;display:flex;align-items:center;gap:4px}
+.chal-join{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:auto;box-shadow:0 0 10px var(--glow)}
+.chal-join.entered{background:rgba(255,255,255,.08);border:1px solid var(--bd);color:#888;box-shadow:none}
+.progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px}
+
+/* ── WEEKLY SCHEDULE ── */
+.schedule-list{display:flex;flex-direction:column;gap:0;padding:0 16px}
+.sched-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd2)}
+.sched-item:last-child{border-bottom:none}
+.sched-day{width:36px;flex-shrink:0;text-align:center}
+.sched-day-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.sched-day-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--acc);line-height:1}
+.sched-info{flex:1}
+.sched-event{font-size:13px;font-weight:600}
+.sched-host{font-size:10px;color:var(--muted);margin-top:2px}
+.sched-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:5px;display:inline-block}
+.sb-live{background:rgba(255,0,80,.15);color:var(--acc);border:1px solid rgba(255,0,80,.25);animation:pulse .8s ease infinite alternate}
+@keyframes pulse{from{opacity:.7}to{opacity:1}}
+.sb-upcoming{background:rgba(100,150,255,.1);color:#7ba7ff;border:1px solid rgba(100,150,255,.2)}
+.sb-done{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--bd)}
+.sched-join{background:var(--acc);color:#fff;border:none;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;margin-top:auto}
+
+/* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(6,6,12,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:10px 0 env(safe-area-inset-bottom,16px);z-index:100}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 10px}
+.bn-item i{font-size:21px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1c2a;border:1px solid var(--bd);color:#fff;padding:10px 22px;border-radius:30px;font-size:12px;font-weight:600;z-index:600;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.8)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HERO BANNER ── -->
+  <div class="hero">
+    <div class="hero-bg" id="heroBg" style="background-image:url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&q=80')"></div>
+    <div class="hero-noise"></div>
+    <div class="hero-grad"></div>
+
+    <div class="hero-top-bar">
+      <div class="hb-back" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></div>
+      <div class="hb-actions">
+        <div class="hb-btn" onclick="toast('🔔 Notifications on for this community')"><i class="fas fa-bell"></i></div>
+        <div class="hb-btn" onclick="openShareModal()"><i class="fas fa-share-alt"></i></div>
+        <div class="hb-btn" onclick="toast('⚙️ Community settings')"><i class="fas fa-ellipsis-v"></i></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <span class="hero-emoji">💔</span>
+      <div class="hero-name">Heartbreak Collective</div>
+      <div class="hero-tagline">A space for readers and writers who live in the heartbreak genre. Cry together, heal together.</div>
+      <div class="hero-meta">
+        <div class="member-stack" id="memberStack"></div>
+        <span class="hero-stat"><i class="fas fa-users"></i> 12,418 members</span>
+        <span class="hero-stat"><i class="fas fa-circle" style="font-size:8px;color:#22c55e"></i> 847 online</span>
+        <span class="joined-pill">✓ Joined</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMPOSE BAR ── -->
+  <div class="compose-bar" onclick="openCompose()">
+    <div class="compose-av">AW</div>
+    <div class="compose-placeholder">Share a thought, story, confession…</div>
+    <div class="compose-icon-btn" onclick="event.stopPropagation();openCompose('poll')"><i class="fas fa-chart-bar"></i></div>
+    <div class="compose-icon-btn" onclick="event.stopPropagation();openCompose('question')"><i class="fas fa-question-circle"></i></div>
+  </div>
+
+  <!-- ── TABS ── */
+  <div class="tabs">
+    <button class="tab active" data-tab="feed" onclick="switchTab('feed',this)">Feed <span class="tbadge">24</span></button>
+    <button class="tab" data-tab="stories" onclick="switchTab('stories',this)">Stories</button>
+    <button class="tab" data-tab="challenges" onclick="switchTab('challenges',this)">Events</button>
+    <button class="tab" data-tab="members" onclick="switchTab('members',this)">Members</button>
+    <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
+  </div>
+
+  <!-- ── SCROLL BODY ── -->
+  <div class="body" id="mainBody">
+
+    <!-- ════════ FEED ════════ -->
+    <div id="panel-feed" class="panel active">
+      <div class="feed-list" id="feedList"></div>
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">You're all caught up ✦</div>
+    </div>
+
+    <!-- ════════ STORIES ════════ -->
+    <div id="panel-stories" class="panel">
+      <div class="sh">
+        <div class="sh-left"><div class="sh-title">💔 Community Stories</div><div class="sh-sub">Heartbreak fiction loved by this community</div></div>
+        <div class="sh-more">Filter</div>
+      </div>
+      <div class="stories-list" id="storiesList"></div>
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- ════════ CHALLENGES ════════ -->
+    <div id="panel-challenges" class="panel">
+
+      <!-- Active challenge hero -->
+      <div class="sh"><div class="sh-left"><div class="sh-title">🔥 Live Now</div></div></div>
+      <div class="challenge-banner" style="margin-bottom:14px">
+        <div class="cb-bg" style="background-image:url('https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=700&q=75')"></div>
+        <div class="cb-grad"></div>
+        <div class="cb-body">
+          <span class="cb-badge">🔴 LIVE · DISCUSSION</span>
+          <div class="cb-title">Late Night Confessions Live</div>
+          <div class="cb-meta">
+            <span><i class="fas fa-microphone"></i> 342 listening</span>
+            <span><i class="fas fa-clock"></i> Started 22 min ago</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh"><div class="sh-left"><div class="sh-title">✨ Active Challenges</div><div class="sh-sub">Join before the deadline</div></div></div>
+      <div class="challenge-list" id="challengeList"></div>
+
+      <div class="sh"><div class="sh-left"><div class="sh-title">📅 Weekly Schedule</div><div class="sh-sub">Regular community events</div></div></div>
+      <div class="schedule-list" id="scheduleList"></div>
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- ════════ MEMBERS ════════ -->
+    <div id="panel-members" class="panel">
+      <div class="members-search">
+        <div class="msearch-box">
+          <i class="fas fa-search"></i>
+          <input id="memberSearch" placeholder="Search members…" oninput="filterMembers(this.value)"/>
+        </div>
+      </div>
+      <div style="padding:6px 16px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none">
+        <div class="fpill on" onclick="filterMemberRole('all',this)" style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;background:var(--acc);border:1px solid var(--acc);color:#fff">All</div>
+        <div class="fpill" onclick="filterMemberRole('mod',this)" style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;background:var(--card);border:1px solid var(--bd);color:#999">Moderators</div>
+        <div class="fpill" onclick="filterMemberRole('writer',this)" style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;background:var(--card);border:1px solid var(--bd);color:#999">Writers</div>
+        <div class="fpill" onclick="filterMemberRole('top',this)" style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;background:var(--card);border:1px solid var(--bd);color:#999">Top Contributors</div>
+        <div class="fpill" onclick="filterMemberRole('online',this)" style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;background:var(--card);border:1px solid var(--bd);color:#999">🟢 Online</div>
+      </div>
+      <div class="members-list" id="membersList"></div>
+    </div>
+
+    <!-- ════════ ABOUT ════════ -->
+    <div id="panel-about" class="panel">
+      <div style="padding:14px 0 0">
+
+        <!-- Stats -->
+        <div style="padding:0 16px 14px">
+          <div class="stat-grid">
+            <div class="stat-box"><div class="sn">12.4K</div><div class="sl">Members</div></div>
+            <div class="stat-box"><div class="sn" style="color:var(--acc2)">847</div><div class="sl">Online Now</div></div>
+            <div class="stat-box"><div class="sn">3,218</div><div class="sl">Posts This Week</div></div>
+            <div class="stat-box"><div class="sn">⭐ 4.9</div><div class="sl">Community Rating</div></div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="about-card">
+          <div class="about-label">About</div>
+          <div class="about-text">The Heartbreak Collective is Droboard's largest genre community — a space for readers and writers who find meaning in the complicated space between love and loss. We share stories, confessions, polls and recommendations. This is a safe space. Be kind.</div>
+        </div>
+
+        <!-- Rules -->
+        <div class="about-card">
+          <div class="about-label">Community Rules</div>
+          <div class="about-rule-list">
+            <div class="about-rule"><div class="rule-num">1</div>Be kind. No personal attacks, shaming, or mockery.</div>
+            <div class="about-rule"><div class="rule-num">2</div>No spoilers without a warning tag.</div>
+            <div class="about-rule"><div class="rule-num">3</div>Story recommendations must include the author's name.</div>
+            <div class="about-rule"><div class="rule-num">4</div>Keep posts related to heartbreak, betrayal, or emotional fiction.</div>
+            <div class="about-rule"><div class="rule-num">5</div>Confessions are posted with care. Don't share someone else's story.</div>
+          </div>
+        </div>
+
+        <!-- Moderators -->
+        <div class="about-card">
+          <div class="about-label">Moderators</div>
+          <div class="admin-row">
+            <img class="admin-av" src="https://i.pravatar.cc/100?img=32" loading="lazy"/>
+            <div class="admin-info"><div class="admin-name">Ada_Writes</div><div class="admin-role">Community Founder · Top Writer</div></div>
+          </div>
+          <div class="admin-row">
+            <img class="admin-av" src="https://i.pravatar.cc/100?img=47" loading="lazy"/>
+            <div class="admin-info"><div class="admin-name">Chiamaka_N</div><div class="admin-role">Senior Moderator</div></div>
+          </div>
+          <div class="admin-row">
+            <img class="admin-av" src="https://i.pravatar.cc/100?img=22" loading="lazy"/>
+            <div class="admin-info"><div class="admin-name">Efe_O</div><div class="admin-role">Moderator · Events Lead</div></div>
+          </div>
+        </div>
+
+        <!-- Related communities -->
+        <div class="sh"><div class="sh-left"><div class="sh-title">More Communities</div></div></div>
+        <div style="padding:0 16px 6px">
+          <div class="related-comm">
+            <div class="rc-card"><span class="rc-emoji">⚔️</span><div class="rc-name">Revenge Arc Society</div><div class="rc-members">6.7k members</div><button class="rc-join" onclick="toast('Joined Revenge Arc Society!')">Join</button></div>
+            <div class="rc-card"><span class="rc-emoji">👑</span><div class="rc-name">Family Legacy Readers</div><div class="rc-members">9.3k members</div><button class="rc-join" onclick="toast('Joined Family Legacy!')">Join</button></div>
+            <div class="rc-card"><span class="rc-emoji">✨</span><div class="rc-name">Twist &amp; Turns Club</div><div class="rc-members">5.1k members</div><button class="rc-join" onclick="toast('Joined Twist Club!')">Join</button></div>
+            <div class="rc-card"><span class="rc-emoji">🌙</span><div class="rc-name">Midnight Writers</div><div class="rc-members">3.4k members</div><button class="rc-join" onclick="toast('Joined Midnight Writers!')">Join</button></div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bn-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+    <div class="bn-item" onclick="window.location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn-item" onclick="window.location.href='create.html'"><i class="fas fa-plus-circle"></i>Create</div>
+    <div class="bn-item active" onclick="window.location.href='people.html'"><i class="fas fa-users"></i>People</div>
+    <div class="bn-item" onclick="window.location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- ══ COMPOSE MODAL ══ -->
+<div class="modal-bg" id="composeModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <h3 id="composeTitle">New Post</h3>
+      <div class="modal-close" onclick="closeModal('composeModal')">✕</div>
+    </div>
+    <div class="type-chips" id="typeChips">
+      <div class="type-chip sel" data-type="discussion" onclick="pickPostType('discussion',this)">💬 Discussion</div>
+      <div class="type-chip" data-type="confession" onclick="pickPostType('confession',this)">🔥 Confession</div>
+      <div class="type-chip" data-type="question" onclick="pickPostType('question',this)">❓ Question</div>
+      <div class="type-chip" data-type="recommendation" onclick="pickPostType('recommendation',this)">📖 Recommendation</div>
+      <div class="type-chip" data-type="writeup" onclick="pickPostType('writeup',this)">✍️ Write-up</div>
+      <div class="type-chip" data-type="poll" onclick="pickPostType('poll',this)">📊 Poll</div>
+    </div>
+    <div class="compose-form">
+      <input class="cf-input" id="postTitleInput" placeholder="Give your post a title (optional)…"/>
+      <textarea class="cf-textarea" id="postBodyInput" rows="5" placeholder="What's on your mind? Share a story, confession, recommendation or question…"></textarea>
+      <div id="pollBlock" style="display:none;margin-bottom:10px">
+        <div class="cf-label">Poll Options</div>
+        <input class="cf-input" id="poll1" placeholder="Option 1…" style="margin-bottom:6px"/>
+        <input class="cf-input" id="poll2" placeholder="Option 2…" style="margin-bottom:6px"/>
+        <input class="cf-input" id="poll3" placeholder="Option 3 (optional)…"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input id="anonPost" type="checkbox" style="accent-color:var(--acc);width:14px;height:14px"/>
+        <label for="anonPost" style="font-size:12px;color:var(--muted)">Post anonymously</label>
+      </div>
+      <button class="cf-post-btn" onclick="submitPost()">Post to Community 🔥</button>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- ══ SHARE MODAL ══ -->
+<div class="modal-bg" id="shareModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><h3>Share Community 📤</h3><div class="modal-close" onclick="closeModal('shareModal')">✕</div></div>
+    <div style="padding:0 16px 16px">
+      <div style="background:rgba(255,0,80,.06);border:1px solid rgba(255,0,80,.15);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:28px">💔</span>
+        <div><div style="font-size:13px;font-weight:700">Heartbreak Collective</div><div style="font-size:11px;color:var(--muted);margin-top:2px">12.4k members · droboard.app/c/heartbreak</div></div>
+      </div>
+      <div style="display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;justify-content:center">
+        <div onclick="toast('📲 Shared on WhatsApp!')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer"><div style="width:46px;height:46px;border-radius:13px;background:#1ebe57;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff"><i class="fab fa-whatsapp"></i></div><span style="font-size:9px;color:var(--muted)">WhatsApp</span></div>
+        <div onclick="toast('🐦 Shared on X!')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer"><div style="width:46px;height:46px;border-radius:13px;background:#000;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff"><i class="fab fa-x-twitter"></i></div><span style="font-size:9px;color:var(--muted)">X</span></div>
+        <div onclick="toast('✅ Link copied!')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer"><div style="width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff"><i class="fas fa-link"></i></div><span style="font-size:9px;color:var(--muted)">Copy Link</span></div>
+        <div onclick="toast('📨 Invite sent!')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer"><div style="width:46px;height:46px;border-radius:13px;background:rgba(255,0,80,.2);border:1px solid rgba(255,0,80,.3);display:flex;align-items:center;justify-content:center;font-size:18px"><i class="fas fa-user-plus" style="color:var(--acc2)"></i></div><span style="font-size:9px;color:var(--muted)">Invite</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const FEED_POSTS = [
+  {
+    id:'p1', pinned:true, type:'discussion',
+    name:'Ada_Writes', handle:'Ada_Writes', av:'https://i.pravatar.cc/100?img=32',
+    verified:true, online:true, time:'2h ago',
+    title:'The "other woman" trope — are we too hard on her in Nigerian fiction?',
+    body:'I\'ve noticed that in almost every heartbreak story on this platform, the other woman is written as purely evil — no depth, no backstory, no humanity. Is this a narrative convenience or are we projecting real-world anger into fiction? I genuinely think the best heartbreak stories are the ones where everyone is a little bit wrong.',
+    tags:['#Discussion','#Craft','#Storytelling'],
+    likes:312, comments:94, liked:false, hot:true,
+    storyMention:null, poll:null
+  },
+  {
+    id:'p2', pinned:false, type:'confession',
+    name:'Anonymous 🕶️', handle:null, av:null,
+    verified:false, online:false, time:'4h ago',
+    title:null,
+    body:'I re-read his last message to me at least once a week. It\'s been 14 months. The story "I came home early…" by Ada_Writes literally saved me from spiralling last January. I told no one. I just read it three times in one night and cried until I felt something loosen. I\'m posting this here because this community is the only place that would understand.',
+    tags:['#Confession','#Healing'],
+    likes:841, comments:203, liked:false, hot:true,
+    storyMention:{img:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=75',cat:'💔 BETRAYAL',title:'I came home early and caught my husband…',meta:'Ada_Writes · 24.3k likes'},
+    poll:null
+  },
+  {
+    id:'p3', pinned:false, type:'question',
+    name:'Emeka_T', handle:'Emeka_T', av:'https://i.pravatar.cc/100?img=15',
+    verified:false, online:true, time:'6h ago',
+    title:'Do you re-read heartbreak stories? What draws you back?',
+    body:'Genuinely curious — I\'ve re-read "The Letter He Never Sent" three times. There\'s something about knowing the ending and still feeling devastated that feels almost intentional. Is this just me?',
+    tags:['#Question','#ReaderLife'],
+    likes:178, comments:67, liked:false, hot:false,
+    storyMention:null,
+    poll:{
+      opts:[
+        {text:'Yes — they get more painful each time',votes:521,pct:52},
+        {text:'Yes — they become comforting eventually',votes:312,pct:31},
+        {text:'No — once is enough for me',votes:171,pct:17}
+      ],
+      total:1004, voted:-1
+    }
+  },
+  {
+    id:'p4', pinned:false, type:'recommendation',
+    name:'Chioma_R', handle:'Chioma_R', av:'https://i.pravatar.cc/100?img=47',
+    verified:false, online:false, time:'9h ago',
+    title:'5 stories that healed something in me this month 🧵',
+    body:'If you\'re going through something, please start with Zara_M\'s revenge arc. It\'s not about revenge really — it\'s about reclaiming yourself after someone made you small. Then read Efe_O\'s poem. Keep tissues nearby. You\'ve been warned.',
+    tags:['#Recommendations','#ReadingList','#Healing'],
+    likes:624, comments:118, liked:false, hot:true,
+    storyMention:{img:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&q=75',cat:'🔥 REVENGE',title:'My stepmother stole my university fund',meta:'Zara_M · 28k likes'},
+    poll:null
+  },
+  {
+    id:'p5', pinned:false, type:'writeup',
+    name:'Efe_O', handle:'Efe_O', av:'https://i.pravatar.cc/100?img=22',
+    verified:false, online:false, time:'1d ago',
+    title:'Why heartbreak fiction matters in Nigerian storytelling',
+    body:'We have always had proverbs about love and loss — "Onye wetara oji wetara ndụ" carries more than kola, it carries everything we leave unsaid. Nigerian heartbreak fiction is doing something new: it is naming the pain our parents swallowed whole. It is writing the things that used to be whispered at kitchens and never recorded. When Droboard readers post "this story saved me" they are not being dramatic. They are acknowledging that the story did what the silence could not.',
+    tags:['#Essay','#Culture','#NigerianLiterature'],
+    likes:1204, comments:234, liked:false, hot:true,
+    storyMention:null, poll:null
+  },
+  {
+    id:'p6', pinned:false, type:'question',
+    name:'Zara_M', handle:'Zara_M', av:'https://i.pravatar.cc/100?img=16',
+    verified:false, online:true, time:'1d ago',
+    title:null,
+    body:'Calling all writers: what\'s the hardest scene you\'ve ever had to write? Mine was the moment my character finds out her stepmother lied — not because it was plot, but because it was mine.',
+    tags:['#WritersLife','#Craft'],
+    likes:397, comments:149, liked:false, hot:false,
+    storyMention:null,
+    poll:{
+      opts:[
+        {text:'A goodbye scene',votes:445,pct:41},
+        {text:'The moment of betrayal',votes:378,pct:35},
+        {text:'The character giving up',votes:260,pct:24}
+      ],
+      total:1083, voted:-1
+    }
+  }
+];
+
+const COMMUNITY_STORIES = [
+  {img:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',cat:'💔 BETRAYAL · S2 CH4',title:'I came home early and caught my husband kissing my late sister\'s photograph',excerpt:'He held the frame like someone begging forgiveness from a ghost. When he turned and saw me, the expression wasn\'t guilt.',writer:'Ada_Writes',writerAv:'https://i.pravatar.cc/100?img=32',likes:'24.3k'},
+  {img:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=80',cat:'🌙 ELEGY · POEM',title:'The letter he never sent was folded inside the pocket of his old jacket',excerpt:'"I did not want you to watch me get smaller. I wanted you to keep the one who danced badly at Chidi\'s party."',writer:'Efe_O',writerAv:'https://i.pravatar.cc/100?img=22',likes:'36.5k'},
+  {img:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=80',cat:'💔 HEARTBREAK · S1 CH3',title:'He proposed with my best friend\'s ring — and she giggled before he even knelt',excerpt:'Three years together. One ring box. Her giggle gave everything away before he even opened it.',writer:'Kemi_A',writerAv:'https://i.pravatar.cc/100?img=28',likes:'19.2k'},
+  {img:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=600&q=80',cat:'🏙️ URBAN LOVE · S2 CH9',title:'She rejected me 3 times. Now we share a mortgage and a dog named \'Finally\'',excerpt:'Three no\'s. A move to Lagos. Two years of painting. A gallery opening she somehow appeared at.',writer:'Dami_Cole',writerAv:'https://i.pravatar.cc/100?img=64',likes:'22.4k'},
+];
+
+const CHALLENGES = [
+  {title:'"Write the scene you couldn\'t survive without writing"',type:'writing',typeLabel:'✍️ Writing',desc:'Write a scene — real or fictional — of emotional reckoning. Max 300 words. The best three get pinned and featured on the Discover page.',entries:218,deadline:'3 days left',progress:62,entered:false},
+  {title:'Most devastating opening line — Reader Vote',type:'vote',typeLabel:'🗳️ Vote',desc:'We collected 40 opening lines from community stories. Vote for the one that punched you hardest. Top 5 get shared on the main feed.',entries:1847,deadline:'1 day left',progress:91,entered:true},
+  {title:'Monthly Theme: "The Thing Left Unsaid"',type:'discussion',typeLabel:'💬 Theme',desc:'This month\'s reading theme is silence as a narrative device. Share stories, quotes, and moments where what wasn\'t said mattered more.',entries:143,deadline:'12 days left',progress:28,entered:false},
+];
+
+const SCHEDULE = [
+  {dayName:'SAT',dayNum:'17',event:'Late Night Confessions 🌙',host:'Hosted by Efe_O',badge:'live',badgeLabel:'🔴 LIVE NOW'},
+  {dayName:'SUN',dayNum:'18',event:'Sunday Cry Session 😭',host:'Community open — all welcome',badge:'upcoming',badgeLabel:'Tomorrow 8PM'},
+  {dayName:'TUE',dayNum:'20',event:'Writers\' Workshop: Pacing Heartbreak',host:'Hosted by Ada_Writes',badge:'upcoming',badgeLabel:'Tue 7PM'},
+  {dayName:'WED',dayNum:'21',event:'Book Club: "The Lagos Wives" S2 Finale',host:'Community reading + reaction',badge:'upcoming',badgeLabel:'Wed 9PM'},
+  {dayName:'FRI',dayNum:'23',event:'Monthly Challenge Reveal',host:'Moderation team',badge:'upcoming',badgeLabel:'Fri 6PM'},
+];
+
+const MEMBERS = [
+  {name:'Ada_Writes',handle:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',role:'mod',roleLabel:'Founder',genre:'💔 Betrayal',posts:48,joined:true,online:true},
+  {name:'Chiamaka N.',handle:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',role:'mod',roleLabel:'Moderator',genre:'👑 Family',posts:31,joined:false,online:false},
+  {name:'Ifeanyi Story',handle:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',role:'writer',roleLabel:'Top Writer',genre:'✨ Twist',posts:62,joined:true,online:true},
+  {name:'Efe O.',handle:'Efe_O',av:'https://i.pravatar.cc/100?img=22',role:'writer',roleLabel:'Writer',genre:'🌙 Elegy',posts:29,joined:false,online:true},
+  {name:'Zara M.',handle:'Zara_M',av:'https://i.pravatar.cc/100?img=16',role:'top',roleLabel:'Top Contributor',genre:'🔥 Revenge',posts:44,joined:false,online:false},
+  {name:'Chioma_R',handle:'Chioma_R',av:'https://i.pravatar.cc/100?img=47',role:'top',roleLabel:'Top Contributor',genre:'💔 Heartbreak',posts:37,joined:true,online:false},
+  {name:'Emeka_T',handle:'Emeka_T',av:'https://i.pravatar.cc/100?img=15',role:'',roleLabel:'',genre:'🎓 Campus',posts:22,joined:false,online:true},
+  {name:'Kemi A.',handle:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',role:'writer',roleLabel:'Writer',genre:'💔 Heartbreak',posts:19,joined:false,online:false},
+  {name:'Dami Cole',handle:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',role:'',roleLabel:'',genre:'🏙️ Urban Love',posts:14,joined:true,online:true},
+  {name:'CampusQueen',handle:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',role:'',roleLabel:'',genre:'🎓 Campus',posts:11,joined:false,online:false},
+  {name:'Adaeze K.',handle:'Adaeze_K',av:'https://i.pravatar.cc/100?img=47',role:'top',roleLabel:'Top Contributor',genre:'💔 Heartbreak',posts:28,joined:false,online:false},
+  {name:'Temi Stories',handle:'Temi_Stories',av:'https://i.pravatar.cc/100?img=55',role:'',roleLabel:'',genre:'✨ Twist',posts:8,joined:false,online:true},
+];
+
+const TYPE_BADGE = {
+  discussion:'ptb-discussion', confession:'ptb-confession', question:'ptb-question',
+  recommendation:'ptb-recommendation', writeup:'ptb-writeup', poll:'ptb-question'
+};
+const TYPE_LABEL = {
+  discussion:'💬 Discussion', confession:'🔥 Confession', question:'❓ Question',
+  recommendation:'📖 Recommendation', writeup:'✍️ Write-up', poll:'📊 Poll'
+};
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function fmtN(n){return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':String(n)}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openShareModal(){document.getElementById('shareModal').classList.add('open')}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===e.currentTarget)m.classList.remove('open')}));
+
+// ═══════════════════════════════════════════════
+// MEMBER STACK
+// ═══════════════════════════════════════════════
+function buildMemberStack(){
+  const imgs=['https://i.pravatar.cc/100?img=32','https://i.pravatar.cc/100?img=47','https://i.pravatar.cc/100?img=22','https://i.pravatar.cc/100?img=53'];
+  document.getElementById('memberStack').innerHTML =
+    imgs.map(src=>`<img class="ms-av" src="${src}" loading="lazy"/>`).join('') +
+    `<div class="ms-more">+12k</div>`;
+}
+
+// ═══════════════════════════════════════════════
+// FEED
+// ═══════════════════════════════════════════════
+function renderFeed(){
+  document.getElementById('feedList').innerHTML = FEED_POSTS.map(p => renderPost(p)).join('');
+}
+
+function renderPost(p){
+  const avHtml = p.av
+    ? `<img class="post-av" src="${p.av}" loading="lazy"/>`
+    : `<div class="post-av-init">${p.name[0]}</div>`;
+
+  const badgeHtml = TYPE_BADGE[p.type]
+    ? `<span class="post-type-badge ${TYPE_BADGE[p.type]}">${TYPE_LABEL[p.type]}</span>` : '';
+
+  const hotHtml = p.hot ? `<span class="hot-badge">🔥 Hot</span>` : '';
+
+  const storyHtml = p.storyMention ? `
+    <div class="story-mention" onclick="toast('📖 Opening story…')">
+      <img class="sm-img" src="${p.storyMention.img}" loading="lazy"/>
+      <div class="sm-body">
+        <div class="sm-cat">${p.storyMention.cat}</div>
+        <div class="sm-title">${p.storyMention.title}</div>
+        <div class="sm-meta">${p.storyMention.meta}</div>
+      </div>
+    </div>` : '';
+
+  const pollHtml = p.poll ? `
+    <div class="post-poll" id="poll-${p.id}">
+      ${p.poll.opts.map((o,i)=>`
+        <div class="poll-opt${p.poll.voted===i?' voted':''}" onclick="votePoll('${p.id}',${i})">
+          <div class="poll-bar" style="width:${p.poll.voted>=0?o.pct:0}%"></div>
+          <div class="poll-label">
+            <span>${o.text}${p.poll.voted===i?' <span class="poll-voted-label">Your vote</span>':''}</span>
+            <span class="poll-pct">${p.poll.voted>=0?o.pct+'%':''}</span>
+          </div>
+        </div>`).join('')}
+      <div class="poll-total">${fmtN(p.poll.total)} votes${p.poll.voted<0?' · Tap to vote':''}</div>
+    </div>` : '';
+
+  const tagsHtml = p.tags ? `<div class="post-tags">${p.tags.map(t=>`<span class="ptag${t.includes('#')?'':' acc'}">${t}</span>`).join('')}</div>` : '';
+
+  const pinnedHtml = p.pinned ? `<div class="pinned-bar"><i class="fas fa-thumbtack" style="font-size:10px"></i> Pinned by moderator</div>` : '';
+
+  return `
+    <div class="post-card" id="post-${p.id}">
+      ${pinnedHtml}
+      <div class="post-header">
+        <div class="post-av-wrap">
+          ${avHtml}
+          ${p.online?'<div class="post-online"></div>':''}
+        </div>
+        <div class="post-meta">
+          <div class="post-name">${p.name}${p.verified?'<span class="post-verified">✓</span>':''} ${hotHtml}</div>
+          <div class="post-time">${p.time}</div>
+        </div>
+        ${badgeHtml}
+      </div>
+      ${p.title?`<div class="post-title">${p.title}</div>`:''}
+      <div class="post-body" id="body-${p.id}">${p.body.replace(/\n/g,'<br>')}</div>
+      ${p.body.length>220?`<span class="read-more" onclick="expandPost('${p.id}')">Read more</span>`:''}
+      ${storyHtml}
+      ${pollHtml}
+      ${tagsHtml}
+      <div class="post-actions">
+        <button class="pa-btn${p.liked?' liked':''}" id="like-${p.id}" onclick="likePost('${p.id}')">
+          <i class="${p.liked?'fas':'far'} fa-heart"></i> <span id="likes-${p.id}">${fmtN(p.likes)}</span>
+        </button>
+        <button class="pa-btn" onclick="toast('💬 Opening thread…')">
+          <i class="far fa-comment"></i> ${fmtN(p.comments)}
+        </button>
+        <button class="pa-btn" onclick="toast('🔖 Post saved!')">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="pa-btn pa-share" onclick="toast('🔗 Link copied!')">
+          <i class="fas fa-share-alt"></i>
+        </button>
+      </div>
+    </div>`;
+}
+
+function likePost(id){
+  const p = FEED_POSTS.find(x=>x.id===id); if(!p) return;
+  p.liked=!p.liked; p.likes+=p.liked?1:-1;
+  const btn=document.getElementById('like-'+id);
+  const ct=document.getElementById('likes-'+id);
+  if(btn){btn.classList.toggle('liked',p.liked);btn.querySelector('i').className=p.liked?'fas fa-heart':'far fa-heart';}
+  if(ct) ct.textContent=fmtN(p.likes);
+  if(p.liked) toast('❤️ Liked!');
+}
+
+function expandPost(id){
+  const el=document.getElementById('body-'+id);
+  const rm=el.nextElementSibling;
+  if(el){el.classList.add('expanded');}
+  if(rm&&rm.classList.contains('read-more')) rm.remove();
+}
+
+function votePoll(postId, optIdx){
+  const p=FEED_POSTS.find(x=>x.id===postId); if(!p||!p.poll||p.poll.voted>=0) return;
+  p.poll.voted=optIdx; p.poll.opts[optIdx].votes++;
+  // Recalculate percentages
+  const total=p.poll.opts.reduce((s,o)=>s+o.votes,0);
+  p.poll.opts.forEach(o=>o.pct=Math.round(o.votes/total*100));
+  p.poll.total=total;
+  const container=document.getElementById('poll-'+postId);
+  if(container) container.outerHTML = FEED_POSTS.find(x=>x.id===postId).poll ? renderPollInner(p) : '';
+  toast('🗳️ Vote recorded!');
+}
+
+function renderPollInner(p){
+  return `<div class="post-poll" id="poll-${p.id}">
+    ${p.poll.opts.map((o,i)=>`
+      <div class="poll-opt${p.poll.voted===i?' voted':''}">
+        <div class="poll-bar" style="width:${o.pct}%"></div>
+        <div class="poll-label">
+          <span>${o.text}${p.poll.voted===i?' <span class="poll-voted-label">Your vote</span>':''}</span>
+          <span class="poll-pct">${o.pct}%</span>
+        </div>
+      </div>`).join('')}
+    <div class="poll-total">${fmtN(p.poll.total)} votes</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// STORIES
+// ═══════════════════════════════════════════════
+function renderStories(){
+  document.getElementById('storiesList').innerHTML = COMMUNITY_STORIES.map(s=>`
+    <div class="story-card-full">
+      <img class="scf-img" src="${s.img}" loading="lazy"/>
+      <div class="scf-body">
+        <div class="scf-cat">${s.cat}</div>
+        <div class="scf-title">${s.title}</div>
+        <div class="scf-excerpt">${s.excerpt}</div>
+        <div class="scf-meta">
+          <img class="scf-av" src="${s.writerAv}" loading="lazy"/>
+          <span class="scf-writer">@${s.writer}</span>
+          <span class="scf-likes">❤️ ${s.likes}</span>
+          <button class="scf-read" onclick="toast('📖 Opening story…')">Read →</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// CHALLENGES
+// ═══════════════════════════════════════════════
+function renderChallenges(){
+  document.getElementById('challengeList').innerHTML = CHALLENGES.map((c,i)=>`
+    <div class="chal-card">
+      <div class="chal-top">
+        <div class="chal-title">${c.title}</div>
+        <span class="chal-type ctype-${c.type}">${c.typeLabel}</span>
+      </div>
+      <div class="chal-desc">${c.desc}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+      <div class="chal-foot" style="margin-top:8px">
+        <span class="chal-entries"><i class="fas fa-users" style="font-size:10px"></i> ${c.entries} entries</span>
+        <span class="chal-deadline"><i class="far fa-clock"></i> ${c.deadline}</span>
+        <button class="chal-join${c.entered?' entered':''}" onclick="joinChallenge(${i},this)">${c.entered?'✓ Entered':'Join'}</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('scheduleList').innerHTML = SCHEDULE.map(s=>`
+    <div class="sched-item">
+      <div class="sched-day">
+        <div class="sched-day-name">${s.dayName}</div>
+        <div class="sched-day-num">${s.dayNum}</div>
+      </div>
+      <div class="sched-info">
+        <div class="sched-event">${s.event}</div>
+        <div class="sched-host">${s.host}</div>
+        <span class="sched-badge ${s.badge==='live'?'sb-live':s.badge==='upcoming'?'sb-upcoming':'sb-done'}">${s.badgeLabel}</span>
+      </div>
+      ${s.badge!=='done'?`<button class="sched-join" onclick="toast('${s.badge==='live'?'🔴 Joining live session!':'📅 RSVP confirmed!'}')">${s.badge==='live'?'Join Live':'RSVP'}</button>`:''}
+    </div>`).join('');
+}
+
+function joinChallenge(idx, btn){
+  const c=CHALLENGES[idx];
+  c.entered=!c.entered;
+  btn.classList.toggle('entered',c.entered);
+  btn.textContent=c.entered?'✓ Entered':'Join';
+  toast(c.entered?'🔥 You\'re in! Good luck.':'Left challenge');
+}
+
+// ═══════════════════════════════════════════════
+// MEMBERS
+// ═══════════════════════════════════════════════
+let memberRoleFilter='all';
+let memberSearchQ='';
+
+function renderMembers(){
+  let list=[...MEMBERS];
+  if(memberRoleFilter==='mod') list=list.filter(m=>m.role==='mod');
+  else if(memberRoleFilter==='writer') list=list.filter(m=>m.role==='writer');
+  else if(memberRoleFilter==='top') list=list.filter(m=>m.role==='top');
+  else if(memberRoleFilter==='online') list=list.filter(m=>m.online);
+  if(memberSearchQ) list=list.filter(m=>m.name.toLowerCase().includes(memberSearchQ)||m.handle.toLowerCase().includes(memberSearchQ));
+
+  const roleMap={mod:'role-mod',writer:'role-writer',top:'role-top'};
+  const roleLabelMap={mod:'Moderator',writer:'Writer',top:'Top Contributor'};
+
+  document.getElementById('membersList').innerHTML = list.map(m=>`
+    <div class="member-row">
+      <div class="mr-av-wrap">
+        <img class="mr-av" src="${m.av}" loading="lazy"/>
+        ${m.online?'<div class="mr-online"></div>':''}
+      </div>
+      <div class="mr-info">
+        <div class="mr-name">${m.name} ${m.role?`<span class="mr-role ${roleMap[m.role]||''}">${m.roleLabel}</span>`:''}</div>
+        <div class="mr-handle">@${m.handle} · ${m.genre}</div>
+        <div class="mr-stats"><span class="mr-stat"><i class="far fa-comment" style="font-size:9px"></i> ${m.posts} posts</span>${m.online?'<span class="mr-stat" style="color:#22c55e">● Online</span>':''}</div>
+      </div>
+      <button class="mr-follow${m.joined?' ing':''}" onclick="toggleMemberFollow('${m.handle}',this)">${m.joined?'✓ Following':'Follow'}</button>
+    </div>`).join('') || '<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">No members found</div>';
+}
+
+function toggleMemberFollow(handle, btn){
+  const m=MEMBERS.find(x=>x.handle===handle); if(!m) return;
+  m.joined=!m.joined;
+  btn.classList.toggle('ing',m.joined);
+  btn.textContent=m.joined?'✓ Following':'Follow';
+  toast(m.joined?`✅ Following @${handle}`:`Unfollowed @${handle}`);
+}
+
+function filterMembers(q){
+  memberSearchQ=q.toLowerCase();
+  renderMembers();
+}
+
+function filterMemberRole(role, el){
+  memberRoleFilter=role;
+  document.querySelectorAll('#panel-members .fpill').forEach(x=>{
+    x.classList.remove('on');
+    x.style.background='var(--card)';x.style.borderColor='var(--bd)';x.style.color='#999';
+  });
+  el.classList.add('on');
+  el.style.background='var(--acc)';el.style.borderColor='var(--acc)';el.style.color='#fff';
+  renderMembers();
+}
+
+// ═══════════════════════════════════════════════
+// COMPOSE
+// ═══════════════════════════════════════════════
+let selectedPostType='discussion';
+function openCompose(type){
+  selectedPostType=type||'discussion';
+  document.querySelectorAll('.type-chip').forEach(c=>{c.classList.toggle('sel',c.dataset.type===selectedPostType)});
+  document.getElementById('pollBlock').style.display=selectedPostType==='poll'?'block':'none';
+  document.getElementById('postTitleInput').value='';
+  document.getElementById('postBodyInput').value='';
+  document.getElementById('composeModal').classList.add('open');
+}
+
+function pickPostType(type, el){
+  selectedPostType=type;
+  document.querySelectorAll('.type-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('pollBlock').style.display=type==='poll'?'block':'none';
+}
+
+function submitPost(){
+  const title=document.getElementById('postTitleInput').value.trim();
+  const body=document.getElementById('postBodyInput').value.trim();
+  if(!body){toast('✍️ Write something first!');return;}
+  const anon=document.getElementById('anonPost').checked;
+  FEED_POSTS.unshift({
+    id:'p_'+Date.now(), pinned:false, type:selectedPostType,
+    name:anon?'Anonymous 🕶️':'You',handle:anon?null:'You',av:null,
+    verified:false,online:true,time:'Just now',
+    title:title||null,body,tags:['#'+selectedPostType.charAt(0).toUpperCase()+selectedPostType.slice(1)],
+    likes:0,comments:0,liked:false,hot:false,storyMention:null,poll:null
+  });
+  closeModal('composeModal');
+  renderFeed();
+  document.getElementById('mainBody').scrollTop=0;
+  toast('🔥 Post published to community!');
+}
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function switchTab(tab, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  document.getElementById('mainBody').scrollTop=0;
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+function init(){
+  setTimeout(()=>document.getElementById('heroBg').classList.add('loaded'),100);
+  buildMemberStack();
+  renderFeed();
+  renderStories();
+  renderChallenges();
+  renderMembers();
+}
+init();
+</script>
+</body>
+</html>

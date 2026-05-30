@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · @Ada_Writes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.28);--glow2:rgba(255,0,80,.12);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;--card2:#15151f;
+  --tx:#f5f5f7;--muted:#666;--muted2:#999;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.05);
+  --gold:#f59e0b;--blue:#00aaff;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 76px)}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:rgba(255,0,80,.3);border-radius:2px}
+
+/* ─── TOP BAR ─── */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(7,7,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.top-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px}
+.top-right{display:flex;align-items:center;gap:8px}
+.top-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#ccc;transition:.15s;position:relative;flex-shrink:0}
+.top-icon-btn:active{transform:scale(.9)}
+.bell-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:1.5px solid var(--dark)}
+.menu-trigger{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#ccc;transition:.15s}
+.menu-trigger:active{transform:scale(.9)}
+
+/* ─── HERO COVER ─── */
+.profile-hero{position:relative;width:100%;height:220px;overflow:hidden;flex-shrink:0}
+.hero-cover{position:absolute;inset:0;background:linear-gradient(135deg,#1a0010 0%,#2d0030 30%,#0d0020 60%,#0a0a14 100%);overflow:hidden}
+.hero-cover-img{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80');background-size:cover;background-position:center 30%;opacity:.22}
+.hero-cover-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(7,7,11,1) 0%,rgba(7,7,11,.6) 50%,rgba(7,7,11,.1) 100%)}
+/* Decorative particles */
+.hero-particles{position:absolute;inset:0;pointer-events:none}
+.hp{position:absolute;border-radius:50%;background:var(--acc);opacity:.15;animation:hpFloat linear infinite}
+@keyframes hpFloat{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-18px) scale(1.1)}100%{transform:translateY(0) scale(1)}}
+.hero-edit-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+.hero-edit-btn i{font-size:10px}
+
+/* ─── STATUS STRIP (post status) ─── */
+.status-strip{position:absolute;bottom:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:10px;padding:8px 14px;background:linear-gradient(to top,rgba(7,7,11,.95),transparent)}
+.status-strip-av{width:36px;height:36px;border-radius:50%;background:conic-gradient(#00aaff,#0066ff,#00eeff,#0088ff,#00aaff);padding:2px;flex-shrink:0;animation:spinRing 3s linear infinite;cursor:pointer}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.status-strip-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--dark)}
+.status-strip-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.status-strip-box{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:7px 14px;font-size:11px;color:#888;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s}
+.status-strip-box:hover{background:rgba(255,255,255,.1);border-color:rgba(255,0,80,.3)}
+.status-strip-box i{color:var(--acc);font-size:12px}
+.status-strip-icons{display:flex;gap:6px}
+.ss-icon-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa;transition:.15s}
+.ss-icon-btn:active{transform:scale(.9)}
+
+/* ─── PROFILE INFO ─── */
+.profile-info{padding:0 14px 0;margin-top:-8px;position:relative;z-index:5}
+.profile-av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+.profile-av-outer{position:relative;flex-shrink:0}
+.profile-av-ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--acc),#ff6b8a,var(--acc2),var(--acc),var(--acc));padding:3px;box-shadow:0 0 24px var(--glow)}
+.profile-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--dark)}
+.profile-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.profile-av-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--gold);border:2px solid var(--dark);display:flex;align-items:center;justify-content:center;font-size:10px}
+.profile-action-row{display:flex;gap:7px;align-items:center}
+.pact-btn{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.pact-btn:active{transform:scale(.96)}
+.pact-btn.follow{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow2)}
+.pact-btn.follow.ing{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:#ccc;box-shadow:none}
+.pact-btn.msg{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);color:#ccc}
+.pact-btn.tip{background:rgba(245,158,11,.12);border:1.5px solid rgba(245,158,11,.3);color:var(--gold)}
+.profile-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:2px}
+.profile-handle{font-size:12px;color:var(--muted2);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.verified-badge{background:rgba(0,170,255,.15);border:1px solid rgba(0,170,255,.3);color:var(--blue);font-size:8px;font-weight:800;padding:1px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
+.verified-badge i{font-size:8px}
+.profile-bio{font-size:13px;color:#ccc;line-height:1.55;margin-bottom:10px;max-width:340px}
+.profile-bio .bio-link{color:var(--acc2);font-weight:600;cursor:pointer}
+.profile-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.profile-tag{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.18);color:var(--acc2)}
+
+/* ─── STATS ROW ─── */
+.stats-row{display:flex;gap:0;border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:16px;background:var(--card)}
+.stat-item{flex:1;text-align:center;padding:12px 6px;border-right:1px solid var(--bd);cursor:pointer;transition:.15s}
+.stat-item:last-child{border-right:none}
+.stat-item:active{background:rgba(255,255,255,.04)}
+.stat-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;line-height:1}
+.stat-num.acc{color:var(--acc)}
+.stat-label{font-size:9px;color:var(--muted2);margin-top:2px;font-weight:600}
+
+/* ─── ACHIEVEMENT CHIPS ─── */
+.achievements-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;scrollbar-width:none}
+.achievements-row::-webkit-scrollbar{display:none}
+.ach-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid;flex-shrink:0;cursor:pointer}
+.ach-chip:active{transform:scale(.95)}
+.ach-chip.gold{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--gold)}
+.ach-chip.blue{background:rgba(0,170,255,.1);border-color:rgba(0,170,255,.25);color:var(--blue)}
+.ach-chip.red{background:rgba(255,0,80,.08);border-color:rgba(255,0,80,.2);color:var(--acc2)}
+.ach-chip.green{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.25);color:#10b981}
+.ach-chip.purple{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:#a78bfa}
+
+/* ─── PROFILE TABS ─── */
+.profile-tabs{display:flex;border-bottom:1px solid var(--bd);position:sticky;top:57px;z-index:100;background:rgba(7,7,11,.97);backdrop-filter:blur(12px);overflow-x:auto;scrollbar-width:none}
+.profile-tabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
+.ptab.active{color:#fff;border-bottom-color:var(--acc)}
+.ptab-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,0,80,.2);color:var(--acc2);font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;vertical-align:middle}
+
+/* ─── PANELS ─── */
+.tab-panel{display:none;padding:14px}
+.tab-panel.active{display:block}
+
+/* ─── STORY CARD ─── */
+.story-card-list{display:flex;flex-direction:column;gap:10px}
+.sc{background:var(--card);border:1px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.sc:hover{border-color:rgba(255,0,80,.3)}
+.sc-img{width:100%;height:140px;object-fit:cover;display:block;background-size:cover;background-position:center}
+.sc-body{padding:11px 12px 12px}
+.sc-cat{font-size:8px;font-weight:800;color:var(--acc);letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.sc-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1.3;margin-bottom:7px;color:#fff}
+.sc-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-stat{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--muted2);font-weight:600}
+.sc-stat i{font-size:10px}
+.sc-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.sc-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px}
+.sc-badge.new{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
+.sc-badge.trending{background:rgba(255,0,80,.12);color:var(--acc2);border:1px solid rgba(255,0,80,.2)}
+.sc-badge.complete{background:rgba(255,255,255,.06);color:#888;border:1px solid var(--bd)}
+.sc-badge.series{background:rgba(0,170,255,.1);color:var(--blue);border:1px solid rgba(0,170,255,.2)}
+
+/* ─── PINNED STORY (horizontal hero card) ─── */
+.pinned-story{background:var(--card);border:1px solid rgba(255,0,80,.2);border-radius:18px;overflow:hidden;cursor:pointer;position:relative;margin-bottom:12px}
+.pinned-label{position:absolute;top:10px;left:10px;z-index:4;background:var(--acc);padding:3px 9px;border-radius:10px;font-size:8px;font-weight:800;display:flex;align-items:center;gap:4px}
+.pinned-img{width:100%;height:160px;background-size:cover;background-position:center 30%;display:block}
+.pinned-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.3) 50%,transparent 100%)}
+.pinned-body{position:absolute;bottom:0;left:0;right:0;padding:12px 14px}
+.pinned-cat{font-size:8px;font-weight:800;color:var(--acc2);margin-bottom:3px}
+.pinned-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;line-height:1.25;color:#fff;margin-bottom:6px}
+.pinned-acts{display:flex;gap:8px}
+.pinned-act{font-size:10px;color:#ccc;display:flex;align-items:center;gap:3px;font-weight:600}
+
+/* ─── SAVED QUOTES ─── */
+.quote-card-list{display:flex;flex-direction:column;gap:9px}
+.qc{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 14px 11px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.qc:hover{border-color:rgba(255,0,80,.25)}
+.qc::before{content:'"';position:absolute;right:10px;top:2px;font-family:'Playfair Display',serif;font-size:56px;color:var(--acc);opacity:.07;pointer-events:none;line-height:1}
+.qc-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.06}
+.qc-body{position:relative;z-index:2}
+.qc-text{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;line-height:1.5;color:#fff;margin-bottom:9px}
+.qc-from{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.qc-av{width:20px;height:20px;border-radius:50%;object-fit:cover;border:1px solid var(--acc);flex-shrink:0}
+.qc-writer{font-size:10px;color:var(--acc2);font-weight:700}
+.qc-story{font-size:9px;color:var(--muted)}
+.qc-actions{display:flex;align-items:center;gap:6px}
+.qc-act{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;padding:3px 7px;border-radius:8px;border:1px solid var(--bd);background:rgba(255,255,255,.03);transition:.15s}
+.qc-act:active{transform:scale(.95)}
+.qc-act.remove{color:#ff4444;border-color:rgba(255,68,68,.25);background:rgba(255,68,68,.05)}
+.qc-share-btn{background:var(--acc);color:#fff;border:none;padding:4px 12px;border-radius:14px;font-size:9px;font-weight:800;cursor:pointer;margin-left:auto;font-family:'DM Sans',sans-serif}
+
+/* ─── SAVED STORIES (in saved panel) ─── */
+.saved-sc{display:flex;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .2s;margin-bottom:8px}
+.saved-sc:hover{border-color:rgba(255,0,80,.25)}
+.saved-sc-img{width:80px;height:88px;background-size:cover;background-position:center;flex-shrink:0}
+.saved-sc-body{flex:1;padding:9px 11px 9px 0;min-width:0}
+.saved-sc-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:3px}
+.saved-sc-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;line-height:1.3;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.saved-sc-meta{display:flex;align-items:center;gap:6px}
+.saved-sc-act{font-size:9px;color:var(--muted2);display:flex;align-items:center;gap:2px}
+.saved-remove{margin-left:auto;font-size:9px;color:#ff4444;cursor:pointer;padding:2px 6px;border-radius:6px;border:1px solid rgba(255,68,68,.2);background:rgba(255,68,68,.05);white-space:nowrap;font-weight:700}
+
+/* ─── NOTIFY ME PANEL ─── */
+.notify-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;display:flex;gap:10px;overflow:hidden;padding-right:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;align-items:center}
+.notify-card:hover{border-color:rgba(255,0,80,.2)}
+.notify-img{width:70px;height:78px;background-size:cover;background-position:center;flex-shrink:0}
+.notify-body{flex:1;padding:8px 0;min-width:0}
+.notify-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:2px}
+.notify-title{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.notify-when{font-size:9px;color:var(--muted2);display:flex;align-items:center;gap:3px}
+.notify-when i{color:var(--acc);font-size:9px}
+.notify-toggle{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.ntog{width:36px;height:20px;border-radius:10px;background:var(--acc);border:none;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
+.ntog::after{content:'';position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.ntog.off{background:#2a2a35}
+.ntog.off::after{right:auto;left:2px}
+.ntog-label{font-size:8px;font-weight:700;color:var(--muted2)}
+
+/* ─── DASHBOARD PANEL ─── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.dash-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:border-color .15s}
+.dash-card:hover{border-color:rgba(255,0,80,.25)}
+.dash-icon{font-size:22px;margin-bottom:6px}
+.dash-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;line-height:1;margin-bottom:2px}
+.dash-num.acc{color:var(--acc)}
+.dash-num.gold{color:var(--gold)}
+.dash-num.blue{color:var(--blue)}
+.dash-num.green{color:#10b981}
+.dash-label{font-size:9px;color:var(--muted2);font-weight:600}
+.dash-trend{font-size:8px;font-weight:700;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:2px}
+.dash-trend.up{color:#10b981}
+.dash-trend.down{color:#ff4444}
+.dash-section-title{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.dash-section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+.earnings-card{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(255,0,80,.05));border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:16px;margin-bottom:14px}
+.earnings-label{font-size:9px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.earnings-amount{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.earnings-sub{font-size:11px;color:#999}
+.earnings-actions{display:flex;gap:8px;margin-top:12px}
+.earn-btn{flex:1;padding:8px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.earn-btn:active{transform:scale(.96)}
+.earn-btn.withdraw{background:var(--gold);color:#07070b}
+.earn-btn.history{background:rgba(255,255,255,.06);border:1px solid var(--bd);color:#ccc}
+.top-stories-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.ts-item{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:10px;padding:9px 11px;cursor:pointer}
+.ts-rank{font-size:13px;font-weight:900;color:var(--muted);min-width:18px}
+.ts-rank.gold{color:var(--gold)}
+.ts-rank.silver{color:#9ca3af}
+.ts-rank.bronze{color:#cd7c4b}
+.ts-info{flex:1;min-width:0}
+.ts-title{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts-sub{font-size:9px;color:var(--muted2);margin-top:1px;display:flex;align-items:center;gap:5px}
+.ts-num{font-size:12px;font-weight:800;color:var(--acc)}
+.chart-bar-wrap{margin-bottom:14px}
+.chart-bar-label{font-size:9px;font-weight:700;color:var(--muted2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+.chart-bars{display:flex;align-items:flex-end;gap:3px;height:60px}
+.chart-bar{flex:1;border-radius:4px 4px 0 0;background:rgba(255,0,80,.2);position:relative;cursor:pointer;transition:.3s;min-height:4px}
+.chart-bar:hover{background:var(--acc);box-shadow:0 0 10px var(--glow2)}
+.chart-bar-day{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--muted);font-weight:600;white-space:nowrap}
+.chart-x-labels{display:flex;gap:3px;margin-top:18px;padding:0 0}
+
+/* ─── ABOUT PANEL ─── */
+.about-section{margin-bottom:18px}
+.about-section-title{font-size:11px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.about-section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+.about-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.about-item:last-child{border-bottom:none}
+.about-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.about-info{flex:1}
+.about-label{font-size:10px;font-weight:600;color:var(--muted2)}
+.about-val{font-size:13px;font-weight:600;color:#fff;margin-top:1px;line-height:1.35}
+.genre-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.genre-chip{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.15);color:var(--acc2)}
+
+/* ─── FOLLOWERS/FOLLOWING PANEL ─── */
+.people-list{display:flex;flex-direction:column;gap:0}
+.people-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd2);cursor:pointer}
+.people-item:last-child{border-bottom:none}
+.people-av-ring{width:40px;height:40px;border-radius:50%;padding:2px;flex-shrink:0}
+.people-av-ring.new-ring{background:conic-gradient(#00aaff,#0066ff,#00eeff,#0088ff,#00aaff);animation:spinRing 3s linear infinite}
+.people-av-ring.no-ring{background:rgba(80,80,100,.4)}
+.people-av-ring.viewed-ring{background:#3a3a55}
+.people-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--dark)}
+.people-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.people-info{flex:1;min-width:0}
+.people-name{font-size:12px;font-weight:700;color:#fff}
+.people-meta{font-size:10px;color:var(--muted2);margin-top:1px}
+.people-follow-btn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.18);color:#ccc;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;font-family:'DM Sans',sans-serif}
+.people-follow-btn:active{transform:scale(.95)}
+.people-follow-btn.ing{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* ─── SLIDE-IN MENU ─── */
+.menu-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.menu-overlay.open{display:flex}
+.menu-sheet{width:100%;background:#13131a;border-radius:24px 24px 0 0;animation:slideUp .28s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.menu-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.menu-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:12px auto 6px}
+/* Profile mini in menu */
+.menu-profile-mini{display:flex;align-items:center;gap:11px;padding:12px 18px 14px;border-bottom:1px solid var(--bd)}
+.menu-mini-av{width:44px;height:44px;border-radius:50%;border:2px solid var(--acc);overflow:hidden;flex-shrink:0}
+.menu-mini-av img{width:100%;height:100%;object-fit:cover;display:block}
+.menu-mini-info{flex:1}
+.menu-mini-name{font-size:13px;font-weight:800;color:#fff}
+.menu-mini-handle{font-size:10px;color:var(--muted2);margin-top:1px}
+.menu-mini-badge{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--gold);margin-top:3px;display:inline-block}
+.menu-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa;flex-shrink:0}
+/* Menu sections */
+.menu-section{padding:8px 0 4px}
+.menu-section-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 18px 6px}
+.menu-item{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
+.menu-item:active{background:rgba(255,255,255,.04)}
+.menu-item-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:.15s}
+.menu-item-text{flex:1}
+.menu-item-title{font-size:13px;font-weight:700;color:#fff}
+.menu-item-sub{font-size:10px;color:var(--muted2);margin-top:1px}
+.menu-item-right{font-size:10px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:4px}
+.menu-badge{background:var(--acc);color:#fff;font-size:8px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
+.menu-badge.gold{background:var(--gold);color:#07070b}
+.menu-divider{height:1px;background:var(--bd);margin:4px 18px}
+
+/* ─── STATUS COMPOSER ─── */
+.status-composer-ov{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.status-composer-ov.open{display:flex}
+.status-composer-sheet{width:100%;background:#13131a;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:90vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.status-composer-sheet::-webkit-scrollbar{display:none}
+.scs-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:12px auto 0}
+.scs-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.scs-header h3{font-size:14px;font-weight:800;display:flex;align-items:center;gap:6px;color:#fff}
+.scs-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.scs-types{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.scs-types::-webkit-scrollbar{display:none}
+.scs-type{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#888;transition:.2s;user-select:none}
+.scs-type.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.scs-preview{margin:0 16px 12px;border-radius:14px;height:140px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--bd)}
+.scs-preview-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,transparent 100%)}
+.scs-preview-label{position:absolute;bottom:10px;left:12px;font-size:10px;color:rgba(255,255,255,.6);font-weight:600}
+.scs-preview-change{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 9px;border-radius:10px;font-size:9px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.scs-text-area{margin:0 16px 12px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.scs-textarea{width:100%;background:transparent;border:none;color:#fff;font-family:'Playfair Display',serif;font-size:14px;font-weight:700;outline:none;resize:none;padding:12px 13px;line-height:1.5;min-height:60px}
+.scs-textarea::placeholder{color:#444;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400}
+.scs-caption{width:100%;background:transparent;border:none;border-top:1px solid var(--bd);color:#ccc;font-family:'DM Sans',sans-serif;font-size:11px;outline:none;resize:none;padding:8px 13px;line-height:1.4;min-height:36px}
+.scs-caption::placeholder{color:#444}
+.scs-bottom-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px}
+.scs-audience{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:10px;font-weight:700;color:#ccc}
+.scs-audience i{font-size:10px;color:var(--acc)}
+.scs-post-btn{background:var(--acc);color:#fff;border:none;padding:9px 22px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 16px var(--glow2);transition:.15s}
+.scs-post-btn:active{transform:scale(.96)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:#1e1e28;border:1px solid var(--bd);color:#fff;padding:8px 17px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,14px)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px}
+.bn-item i{font-size:20px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ─── SECTION DIVIDER ─── */
+.sdiv{height:1px;background:var(--bd);margin:16px 0}
+.empty-state{text-align:center;padding:36px 16px;color:var(--muted2)}
+.empty-state .es-icon{font-size:38px;margin-bottom:8px}
+.empty-state h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#ccc;margin-bottom:5px}
+.empty-state p{font-size:11px;line-height:1.5;max-width:200px;margin:0 auto}
+
+/* ─── READ PROGRESS ─── */
+.reading-progress-card{background:linear-gradient(135deg,rgba(0,170,255,.07),rgba(255,0,80,.04));border:1px solid rgba(0,170,255,.15);border-radius:14px;padding:13px 14px;margin-bottom:10px;cursor:pointer}
+.rpc-label{font-size:9px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.rpc-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.rpc-bar-bg{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.rpc-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--acc2));border-radius:3px}
+.rpc-meta{font-size:9px;color:var(--muted2);display:flex;justify-content:space-between}
+
+/* ─── SHIMMER skeleton ─── */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-logo">D</div>
+  <div class="top-right">
+    <div class="top-icon-btn" onclick="window.location.href='alerts.html'">
+      <i class="fas fa-bell"></i>
+      <div class="bell-dot"></div>
+    </div>
+    <div class="menu-trigger" onclick="openMenu()">
+      <i class="fas fa-bars"></i>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE HERO -->
+<div class="profile-hero">
+  <div class="hero-cover">
+    <div class="hero-cover-img"></div>
+    <div class="hero-cover-grad"></div>
+    <!-- Decorative particles -->
+    <div class="hero-particles" id="heroParticles"></div>
+  </div>
+  <button class="hero-edit-btn" onclick="toast('✏️ Edit cover photo')">
+    <i class="fas fa-camera"></i> Edit Cover
+  </button>
+  <!-- Status Post Strip -->
+  <div class="status-strip">
+    <div class="status-strip-av" onclick="openStatusComposer()">
+      <div class="status-strip-av-inner">
+        <img src="https://i.pravatar.cc/100?img=32" alt=""/>
+      </div>
+    </div>
+    <div class="status-strip-box" onclick="openStatusComposer()">
+      <i class="fas fa-pen-nib"></i>
+      <span>Post a status or story update…</span>
+    </div>
+    <div class="status-strip-icons">
+      <div class="ss-icon-btn" onclick="openStatusComposer('image')" title="Photo"><i class="fas fa-image"></i></div>
+      <div class="ss-icon-btn" onclick="openStatusComposer('quote')" title="Quote"><i class="fas fa-quote-right"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE INFO -->
+<div class="profile-info">
+  <div class="profile-av-row">
+    <div class="profile-av-outer">
+      <div class="profile-av-ring">
+        <div class="profile-av-inner">
+          <img src="https://i.pravatar.cc/100?img=32" alt="Ada_Writes"/>
+        </div>
+      </div>
+      <div class="profile-av-badge">🏆</div>
+    </div>
+    <div class="profile-action-row">
+      <button class="pact-btn follow" id="followBtn" onclick="toggleFollow()">+ Follow</button>
+      <button class="pact-btn msg" onclick="toast('💬 Opening DM…')"><i class="fas fa-paper-plane"></i></button>
+      <button class="pact-btn tip" onclick="toast('💛 Tip sent — thank you!')"><i class="fas fa-coins"></i></button>
+    </div>
+  </div>
+
+  <div class="profile-name">Ada_Writes</div>
+  <div class="profile-handle">
+    @ada_writes
+    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Writer</span>
+  </div>
+  <div class="profile-bio">
+    Telling stories that live in your chest long after you close the tab. 💔 Betrayal · Family · Redemption.<br/>
+    <span class="bio-link" onclick="toast('🔗 Opening link…')">droboard.app/ada</span>
+  </div>
+  <div class="profile-tags">
+    <div class="profile-tag">💔 Betrayal</div>
+    <div class="profile-tag">👑 Family</div>
+    <div class="profile-tag">✨ Twist</div>
+    <div class="profile-tag">🌙 Elegy</div>
+    <div class="profile-tag">🔥 Revenge</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-item" onclick="switchTab('followers')">
+      <div class="stat-num acc">12.4k</div>
+      <div class="stat-label">Followers</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('following')">
+      <div class="stat-num">421</div>
+      <div class="stat-label">Following</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('stories')">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Stories</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('dashboard')">
+       <!-- <div class="stat-item" onclick="window.location.href='writer-dashboard.html'"> -->
+        <div class="stat-num acc">171k</div>
+      <div class="stat-label">Total Reads</div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="achievements-row">
+    <div class="ach-chip gold" onclick="toast('🏆 #1 Writer this week!')"><i class="fas fa-trophy"></i> #1 This Week</div>
+    <div class="ach-chip blue" onclick="toast('✅ Verified Writer')"><i class="fas fa-check-circle"></i> Verified</div>
+    <div class="ach-chip red" onclick="toast('🔥 Trending now!')"><i class="fas fa-fire"></i> Trending</div>
+    <div class="ach-chip green" onclick="toast('🎖️ 50+ chapter streak!')"><i class="fas fa-star"></i> 50-Ch Streak</div>
+    <div class="ach-chip purple" onclick="toast('👑 Community Favourite')"><i class="fas fa-crown"></i> Fav Writer</div>
+    <div class="ach-chip gold" onclick="toast('💛 100k reads milestone!')"><i class="fas fa-book-open"></i> 100k Reads</div>
+  </div>
+</div>
+
+<!-- PROFILE TABS -->
+<div class="profile-tabs" id="profileTabs">
+  <div class="ptab active" data-tab="stories" onclick="switchTab('stories')">📖 Stories <span class="ptab-badge">8</span></div>
+  <div class="ptab" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</div>
+ <!--  <div class="ptab" data-tab="dashboard" onclick="window.location.href='writer-dashboard.html'">📊 Dashboard</div>  -->
+  <div class="ptab" data-tab="saved-stories" onclick="switchTab('saved-stories')">🔖 Saved <span class="ptab-badge" id="savedBadge">5</span></div>
+  <div class="ptab" data-tab="saved-quotes" onclick="switchTab('saved-quotes')">💬 Quotes <span class="ptab-badge" id="quotesBadge">4</span></div>
+  <div class="ptab" data-tab="notify" onclick="switchTab('notify')">🔔 Notify Me <span class="ptab-badge" id="notifyBadge">3</span></div>
+  <div class="ptab" data-tab="followers" onclick="switchTab('followers')">👥 Followers</div>
+  <div class="ptab" data-tab="following" onclick="switchTab('following')">➕ Following</div>
+  <div class="ptab" data-tab="about" onclick="switchTab('about')">✦ About</div>
+</div>
+
+<!-- ══════ PANEL: STORIES ══════ -->
+<div class="tab-panel active" id="panel-stories">
+  <!-- Pinned -->
+  <div class="pinned-story" onclick="toast('📖 Opening story…')">
+    <div class="pinned-label"><i class="fas fa-thumbtack"></i> Pinned</div>
+    <div class="pinned-img" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80')"></div>
+    <div class="pinned-grad"></div>
+    <div class="pinned-body">
+      <div class="pinned-cat">✨ TWIST · Short Story</div>
+      <div class="pinned-title">The runaway bride — I left at the altar in my socked feet and found my actual life</div>
+      <div class="pinned-acts">
+        <div class="pinned-act"><i class="far fa-heart"></i> 45k</div>
+        <div class="pinned-act"><i class="far fa-comment"></i> 7.4k</div>
+        <div class="pinned-act"><i class="far fa-eye"></i> 312k reads</div>
+      </div>
+    </div>
+  </div>
+  <!-- Continue reading -->
+  <div class="reading-progress-card" onclick="toast('📖 Continue reading…')">
+    <div class="rpc-label"><i class="fas fa-book-reader"></i> Continue Reading</div>
+    <div class="rpc-title">I came home early and caught my husband kissing my late sister's photograph</div>
+    <div class="rpc-bar-bg"><div class="rpc-bar-fill" style="width:62%"></div></div>
+    <div class="rpc-meta"><span>S2 · Ch4 · 62% complete</span><span>~3 min left</span></div>
+  </div>
+  <div class="story-card-list">
+    <div class="sc" onclick="toast('📖 Opening story…')">
+      <div class="sc-img" style="background-image:url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=700&q=80');height:130px;display:block;width:100%"></div>
+      <div class="sc-body">
+        <div class="sc-cat">💔 BETRAYAL <span style="color:var(--muted)">· S2·Ch4</span></div>
+        <div class="sc-title">I came home early and caught my husband kissing my late sister's photograph</div>
+        <div class="sc-meta">
+          <div class="sc-stat"><i class="far fa-heart"></i> 24.3k</div>
+          <div class="sc-stat"><i class="far fa-comment"></i> 4.1k</div>
+          <div class="sc-stat"><i class="far fa-eye"></i> 171k</div>
+        </div>
+        <div class="sc-badges"><span class="sc-badge trending">🔥 Trending</span><span class="sc-badge series">Series</span></div>
+      </div>
+    </div>
+    <div class="sc" onclick="toast('📖 Opening story…')">
+      <div class="sc-img" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=700&q=80');height:130px;display:block;width:100%"></div>
+      <div class="sc-body">
+        <div class="sc-cat">👑 FAMILY <span style="color:var(--muted)">· S3·Ch12</span></div>
+        <div class="sc-title">My grandmother's will revealed I wasn't her blood — but she left everything to me</div>
+        <div class="sc-meta">
+          <div class="sc-stat"><i class="far fa-heart"></i> 31k</div>
+          <div class="sc-stat"><i class="far fa-comment"></i> 5.7k</div>
+          <div class="sc-stat"><i class="far fa-eye"></i> 204k</div>
+        </div>
+        <div class="sc-badges"><span class="sc-badge new">✨ New Chapter</span><span class="sc-badge series">Series</span></div>
+      </div>
+    </div>
+    <div class="sc" onclick="toast('📖 Opening story…')">
+      <div class="sc-img" style="background-image:url('https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=700&q=80');height:130px;display:block;width:100%"></div>
+      <div class="sc-body">
+        <div class="sc-cat">🌙 ELEGY <span style="color:var(--muted)">· Poem</span></div>
+        <div class="sc-title">The letter he never sent was folded inside the pocket of his old jacket</div>
+        <div class="sc-meta">
+          <div class="sc-stat"><i class="far fa-heart"></i> 36.5k</div>
+          <div class="sc-stat"><i class="far fa-comment"></i> 5.2k</div>
+          <div class="sc-stat"><i class="far fa-eye"></i> 218k</div>
+        </div>
+        <div class="sc-badges"><span class="sc-badge complete">Complete</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PANEL: DASHBOARD ══════ -->
+<div class="tab-panel" id="panel-dashboard">
+  <!-- Earnings Card -->
+  <div class="earnings-card">
+    <div class="earnings-label"><i class="fas fa-coins"></i> Total Earnings</div>
+    <div class="earnings-amount">₦84,200</div>
+    <div class="earnings-sub">This month: <strong style="color:var(--gold)">₦12,400</strong> · Last month: ₦9,800</div>
+    <div class="earnings-actions">
+      <button class="earn-btn withdraw" onclick="toast('💳 Withdrawal initiated!')">Withdraw</button>
+      <button class="earn-btn history" onclick="toast('📋 Earnings history')">History</button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="dash-grid">
+    <div class="dash-card" onclick="toast('📖 Story reads breakdown')">
+      <div class="dash-icon">📖</div>
+      <div class="dash-num acc">171k</div>
+      <div class="dash-label">Total Reads</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +12.4% this week</div>
+    </div>
+    <div class="dash-card" onclick="toast('❤️ Likes breakdown')">
+      <div class="dash-icon">❤️</div>
+      <div class="dash-num acc">88.2k</div>
+      <div class="dash-label">Total Likes</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +8.1% this week</div>
+    </div>
+    <div class="dash-card" onclick="toast('💬 Comments breakdown')">
+      <div class="dash-icon">💬</div>
+      <div class="dash-num blue">16.8k</div>
+      <div class="dash-label">Comments</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +5.3% this week</div>
+    </div>
+    <div class="dash-card" onclick="toast('👥 Follower growth')">
+      <div class="dash-icon">👥</div>
+      <div class="dash-num green">12.4k</div>
+      <div class="dash-label">Followers</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +744 this week</div>
+    </div>
+    <div class="dash-card" onclick="toast('🔥 Debate votes')">
+      <div class="dash-icon">⚔️</div>
+      <div class="dash-num acc">8.2k</div>
+      <div class="dash-label">Debate Votes</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +2.1k today</div>
+    </div>
+    <div class="dash-card" onclick="toast('📤 Shares count')">
+      <div class="dash-icon">📤</div>
+      <div class="dash-num gold">34.1k</div>
+      <div class="dash-label">Story Shares</div>
+      <div class="dash-trend up"><i class="fas fa-arrow-up"></i> +890 today</div>
+    </div>
+  </div>
+
+  <!-- Weekly chart -->
+  <div class="dash-section-title">📈 Reads This Week</div>
+  <div class="chart-bar-wrap">
+    <div class="chart-bars" id="weekChart"></div>
+    <div class="chart-x-labels"></div>
+  </div>
+
+  <div class="sdiv"></div>
+
+  <!-- Top performing stories -->
+  <div class="dash-section-title">🏆 Top Stories</div>
+  <div class="top-stories-list">
+    <div class="ts-item">
+      <div class="ts-rank gold">1</div>
+      <div class="ts-info">
+        <div class="ts-title">The runaway bride — I left at the altar…</div>
+        <div class="ts-sub"><span><i class="fas fa-eye" style="color:var(--acc)"></i> 312k</span><span><i class="fas fa-heart" style="color:var(--acc)"></i> 45k</span></div>
+      </div>
+      <div class="ts-num">+2.1k</div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-rank silver">2</div>
+      <div class="ts-info">
+        <div class="ts-title">The letter he never sent…</div>
+        <div class="ts-sub"><span><i class="fas fa-eye" style="color:var(--acc)"></i> 218k</span><span><i class="fas fa-heart" style="color:var(--acc)"></i> 36.5k</span></div>
+      </div>
+      <div class="ts-num">+1.4k</div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-rank bronze">3</div>
+      <div class="ts-info">
+        <div class="ts-title">My grandmother's will revealed…</div>
+        <div class="ts-sub"><span><i class="fas fa-eye" style="color:var(--acc)"></i> 204k</span><span><i class="fas fa-heart" style="color:var(--acc)"></i> 31k</span></div>
+      </div>
+      <div class="ts-num">+987</div>
+    </div>
+  </div>
+
+  <div class="sdiv"></div>
+  <div class="dash-section-title">😭 Top Reactions Today</div>
+  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px" id="reactionBars"></div>
+</div>
+
+<!-- ══════ PANEL: SAVED STORIES ══════ -->
+<div class="tab-panel" id="panel-saved-stories">
+  <div style="margin-bottom:12px;font-size:11px;color:var(--muted2)">📌 <strong style="color:#fff">5 stories</strong> saved to your library</div>
+  <div id="savedStoriesList"></div>
+</div>
+
+<!-- ══════ PANEL: SAVED QUOTES ══════ -->
+<div class="tab-panel" id="panel-saved-quotes">
+  <div style="margin-bottom:12px;font-size:11px;color:var(--muted2)">💬 <strong style="color:#fff">4 quotes</strong> saved from stories</div>
+  <div class="quote-card-list" id="savedQuotesList"></div>
+</div>
+
+<!-- ══════ PANEL: NOTIFY ME ══════ -->
+<div class="tab-panel" id="panel-notify">
+  <div style="margin-bottom:12px;font-size:11px;color:var(--muted2)">🔔 Get notified when your <strong style="color:#fff">3 stories</strong> drop new chapters</div>
+  <div id="notifyList"></div>
+  <div class="sdiv"></div>
+  <div style="background:rgba(255,0,80,.06);border:1px solid rgba(255,0,80,.15);border-radius:14px;padding:14px;text-align:center">
+    <div style="font-size:20px;margin-bottom:6px">🔔</div>
+    <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">Never Miss a Chapter</div>
+    <div style="font-size:11px;color:var(--muted2);line-height:1.5;max-width:220px;margin:0 auto">Open any story and tap "Notify Me" to get alerts when the next chapter drops.</div>
+  </div>
+</div>
+
+<!-- ══════ PANEL: FOLLOWERS ══════ -->
+<div class="tab-panel" id="panel-followers">
+  <div style="margin-bottom:10px;font-size:11px;color:var(--muted2)">👥 <strong style="color:#fff">12,400</strong> people follow this writer</div>
+  <div class="people-list" id="followersList"></div>
+</div>
+
+<!-- ══════ PANEL: FOLLOWING ══════ -->
+<div class="tab-panel" id="panel-following">
+  <div style="margin-bottom:10px;font-size:11px;color:var(--muted2)">➕ Following <strong style="color:#fff">421</strong> writers</div>
+  <div class="people-list" id="followingList"></div>
+</div>
+
+<!-- ══════ PANEL: ABOUT ══════ -->
+<div class="tab-panel" id="panel-about">
+  <div class="about-section">
+    <div class="about-section-title">✦ Writer Bio</div>
+    <div style="font-size:13px;color:#ccc;line-height:1.65;padding:2px 0 14px">
+      Ada has been writing emotional fiction since 2019, with a focus on betrayal, grief, and redemption arcs rooted in Nigerian family dynamics. Her stories have been featured in Droboard's Top 10 for 8 consecutive weeks.
+      <br/><br/>
+      She writes best at 2am with candles and cold jollof rice. She apologises for nothing.
+    </div>
+  </div>
+  <div class="about-section">
+    <div class="about-section-title">✦ Details</div>
+    <div class="about-item">
+      <div class="about-icon"><i class="fas fa-map-marker-alt" style="color:var(--acc)"></i></div>
+      <div class="about-info"><div class="about-label">Location</div><div class="about-val">Lagos, Nigeria 🇳🇬</div></div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon"><i class="fas fa-calendar-alt" style="color:var(--acc)"></i></div>
+      <div class="about-info"><div class="about-label">Joined Droboard</div><div class="about-val">March 2021 · 3 years writing</div></div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon"><i class="fas fa-link" style="color:var(--acc)"></i></div>
+      <div class="about-info"><div class="about-label">Website</div><div class="about-val" style="color:var(--acc2);cursor:pointer" onclick="toast('🔗 Opening link…')">droboard.app/ada</div></div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon"><i class="fas fa-book" style="color:var(--acc)"></i></div>
+      <div class="about-info">
+        <div class="about-label">Genres</div>
+        <div class="genre-chips">
+          <div class="genre-chip">💔 Betrayal</div>
+          <div class="genre-chip">👑 Family</div>
+          <div class="genre-chip">✨ Twist</div>
+          <div class="genre-chip">🌙 Elegy</div>
+          <div class="genre-chip">🔥 Revenge</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon"><i class="fas fa-fire" style="color:var(--acc)"></i></div>
+      <div class="about-info"><div class="about-label">Current Streak</div><div class="about-val">🔥 51 chapters · 14-week streak</div></div>
+    </div>
+  </div>
+  <div class="about-section">
+    <div class="about-section-title">✦ Achievements</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)">
+        <div style="font-size:22px">🏆</div>
+        <div><div style="font-size:12px;font-weight:700;color:#fff">#1 Writer — 8 Consecutive Weeks</div><div style="font-size:10px;color:var(--muted2);margin-top:1px">Highest engagement · June–July 2025</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)">
+        <div style="font-size:22px">📖</div>
+        <div><div style="font-size:12px;font-weight:700;color:#fff">100k Reads Milestone</div><div style="font-size:10px;color:var(--muted2);margin-top:1px">Reached in under 6 months</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)">
+        <div style="font-size:22px">💬</div>
+        <div><div style="font-size:12px;font-weight:700;color:#fff">Most Quoted Writer</div><div style="font-size:10px;color:var(--muted2);margin-top:1px">34k quote shares this year</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0">
+        <div style="font-size:22px">✅</div>
+        <div><div style="font-size:12px;font-weight:700;color:#fff">Verified Writer Badge</div><div style="font-size:10px;color:var(--muted2);margin-top:1px">Droboard editorial team selection</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="window.location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item" onclick="toast('✏️ Create — coming soon')"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn-item" onclick="window.location.href='alerts.html'"><i class="fas fa-bell"></i>Alerts</div>
+  <div class="bn-item active"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<!-- ══════ SLIDE-IN MENU ══════ -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()">
+  <div class="menu-sheet" onclick="event.stopPropagation()">
+    <div class="menu-handle"></div>
+    <!-- Profile mini -->
+    <div class="menu-profile-mini">
+      <div class="menu-mini-av"><img src="https://i.pravatar.cc/100?img=32" alt=""/></div>
+      <div class="menu-mini-info">
+        <div class="menu-mini-name">Ada_Writes</div>
+        <div class="menu-mini-handle">@ada_writes · 12.4k followers</div>
+        <div class="menu-mini-badge">🏆 #1 Writer This Week</div>
+      </div>
+      <div class="menu-close" onclick="closeMenu()">✕</div>
+    </div>
+
+    <!-- Creator -->
+    <div class="menu-section">
+      <div class="menu-section-label">Creator</div>
+      <div class="menu-item" onclick="switchTabFromMenu('dashboard')">
+     <!--  <div class="menu-item" onclick="window.location.href='writer-dashboard.html'">-->
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.15)"><i class="fas fa-chart-line" style="color:var(--acc)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Dashboard</div><div class="menu-item-sub">Stats, earnings & analytics</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="openStatusComposer()">
+        <div class="menu-item-icon" style="background:rgba(0,170,255,.1);border:1px solid rgba(0,170,255,.15)"><i class="fas fa-circle-notch" style="color:var(--blue)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Post Status</div><div class="menu-item-sub">Share a story update or quote</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('✏️ Write new story…')">
+        <div class="menu-item-icon" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.15)"><i class="fas fa-pen-nib" style="color:var(--gold)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Write New Story</div><div class="menu-item-sub">Start a new chapter or series</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('📅 Scheduling…')">
+        <div class="menu-item-icon" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.15)"><i class="fas fa-calendar-check" style="color:#a78bfa"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Scheduled Posts</div><div class="menu-item-sub">2 chapters queued</div></div>
+        <div class="menu-item-right"><span style="color:var(--acc2);font-weight:800">2</span></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <!-- Library -->
+    <div class="menu-section">
+      <div class="menu-section-label">Library</div>
+      <div class="menu-item" onclick="switchTabFromMenu('saved-stories')">
+        <div class="menu-item-icon" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.15)"><i class="fas fa-bookmark" style="color:#10b981"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Saved Stories</div><div class="menu-item-sub">5 stories in your library</div></div>
+        <div class="menu-item-right"><span class="menu-badge">5</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('saved-quotes')">
+        <div class="menu-item-icon" style="background:rgba(255,107,138,.1);border:1px solid rgba(255,107,138,.15)"><i class="fas fa-quote-right" style="color:var(--acc2)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Saved Quotes</div><div class="menu-item-sub">4 quotes saved</div></div>
+        <div class="menu-item-right"><span class="menu-badge">4</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('notify')">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.15)"><i class="fas fa-bell" style="color:var(--acc)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Notify Me</div><div class="menu-item-sub">3 stories — get chapter alerts</div></div>
+        <div class="menu-item-right"><span class="menu-badge">3</span></div>
+      </div>
+      <div class="menu-item" onclick="toast('📚 Reading history…')">
+        <div class="menu-item-icon" style="background:rgba(0,170,255,.07);border:1px solid rgba(0,170,255,.15)"><i class="fas fa-history" style="color:var(--blue)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Reading History</div><div class="menu-item-sub">Stories you've read</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <!-- Community -->
+    <div class="menu-section">
+      <div class="menu-section-label">Community</div>
+      <div class="menu-item" onclick="window.location.href='alerts.html'">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.15)"><i class="fas fa-bell" style="color:var(--acc)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Alerts</div><div class="menu-item-sub">New likes, comments & replies</div></div>
+        <div class="menu-item-right"><span class="menu-badge">12</span></div>
+      </div>
+      <div class="menu-item" onclick="toast('👥 Communities…')">
+        <div class="menu-item-icon" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.15)"><i class="fas fa-users" style="color:#a78bfa"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">My Communities</div><div class="menu-item-sub">3 communities joined</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('⚔️ Your debates…')">
+        <div class="menu-item-icon" style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.15)"><i class="fas fa-gavel" style="color:#ff6666"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">My Debates</div><div class="menu-item-sub">Arguments posted & votes cast</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('💬 Ask responses…')">
+        <div class="menu-item-icon" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)"><i class="fas fa-comment-dots" style="color:var(--gold)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Ask Responses</div><div class="menu-item-sub">Questions you've answered</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <!-- Account -->
+    <div class="menu-section">
+      <div class="menu-section-label">Account</div>
+      <div class="menu-item" onclick="toast('✏️ Edit profile…')">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.06);border:1px solid var(--bd)"><i class="fas fa-user-edit" style="color:#ccc"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Edit Profile</div><div class="menu-item-sub">Name, bio, genres</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('💳 Subscription & billing…')">
+        <div class="menu-item-icon" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)"><i class="fas fa-crown" style="color:var(--gold)"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Pro Writer Plan</div><div class="menu-item-sub">Active · Renews Aug 15</div></div>
+        <div class="menu-item-right"><span class="menu-badge gold">PRO</span></div>
+      </div>
+      <div class="menu-item" onclick="toast('⚙️ Settings…')">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.06);border:1px solid var(--bd)"><i class="fas fa-cog" style="color:#ccc"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Settings</div><div class="menu-item-sub">Notifications, privacy, display</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('🤝 Refer a friend…')">
+        <div class="menu-item-icon" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)"><i class="fas fa-share-alt" style="color:#10b981"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title">Refer a Friend</div><div class="menu-item-sub">Earn ₦500 per referral</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toast('👋 Signed out — see you soon!')">
+        <div class="menu-item-icon" style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.15)"><i class="fas fa-sign-out-alt" style="color:#ff6666"></i></div>
+        <div class="menu-item-text"><div class="menu-item-title" style="color:#ff6666">Sign Out</div><div class="menu-item-sub">@ada_writes</div></div>
+        <div class="menu-item-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- ══════ STATUS COMPOSER OVERLAY ══════ -->
+<div class="status-composer-ov" id="statusComposerOv" onclick="if(event.target===this)closeStatusComposer()">
+  <div class="status-composer-sheet">
+    <div class="scs-handle"></div>
+    <div class="scs-header">
+      <h3><i class="fas fa-circle-notch" style="color:var(--acc);font-size:13px"></i> Post Status</h3>
+      <button class="scs-close" onclick="closeStatusComposer()">✕</button>
+    </div>
+    <div class="scs-types">
+      <div class="scs-type active" data-type="story-update">📖 Story Update</div>
+      <div class="scs-type" data-type="quote">💬 Quote</div>
+      <div class="scs-type" data-type="teaser">✨ Teaser</div>
+      <div class="scs-type" data-type="thought">🖊️ Thought</div>
+      <div class="scs-type" data-type="poll">📊 Quick Poll</div>
+    </div>
+    <div class="scs-preview" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80')">
+      <div class="scs-preview-grad"></div>
+      <div class="scs-preview-label">Background image — tap to change</div>
+      <div class="scs-preview-change" onclick="toast('🖼️ Choose image…')">Change</div>
+    </div>
+    <div class="scs-text-area">
+      <textarea class="scs-textarea" id="statusQuoteText" rows="3" placeholder="Write a quote from your story…">"Sometimes love is just grief wearing a familiar face."</textarea>
+      <textarea class="scs-caption" id="statusCaption" rows="2" placeholder="Add a caption or update for your readers…"></textarea>
+    </div>
+    <div class="scs-bottom-bar">
+      <div class="scs-audience" onclick="toast('👥 Audience: All followers')">
+        <i class="fas fa-globe-africa"></i> Everyone
+      </div>
+      <button class="scs-post-btn" onclick="postStatus()">Post Status ✓</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
+const SAVED_STORIES = [
+  {cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=75',cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',writer:'CampusQueen',likes:'18.1k',ch:'S1·Ch7'},
+  {cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=75',cat:'💔 Heartbreak',title:'He proposed with my best friend\'s ring — and she giggled before he even knelt',writer:'Kemi_A',likes:'19.2k',ch:'S1·Ch3'},
+  {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I quietly uncovered her entire secret life',writer:'Zara_M',likes:'28k',ch:'S1·Ch5'},
+  {cover:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400&q=75',cat:'🏙️ Urban Love',title:'She rejected me 3 times. Now we share a mortgage and a dog named \'Finally\'',writer:'Dami_Cole',likes:'22.4k',ch:'S2·Ch9'},
+  {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',cat:'👑 Family',title:'My grandmother\'s will revealed I wasn\'t her blood — but she left everything to me',writer:'Chiamaka_N',likes:'31k',ch:'S3·Ch12'},
+];
+const SAVED_QUOTES = [
+  {text:'Sometimes love is just grief wearing a familiar face.',writer:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',story:'I came home early…',bg:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',saves:4812,liked:false},
+  {text:'I walked out in socked feet and found my actual life.',writer:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',story:'The runaway bride…',bg:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',saves:3201,liked:true},
+  {text:'I did not want you to watch me get smaller. So I was cruel instead. I have regretted it every day.',writer:'Efe_O',av:'https://i.pravatar.cc/100?img=22',story:'The letter he never sent',bg:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=75',saves:5907,liked:false},
+  {text:'Blood is not the beginning or end of love. I chose you. That is the whole story.',writer:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',story:'My grandmother\'s will…',bg:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',saves:3810,liked:true},
+];
+const NOTIFY_STORIES = [
+  {cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=75',cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',when:'Chapter 8 · Drops Friday midnight',on:true},
+  {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',cat:'🔥 Revenge',title:'My stepmother stole my university fund',when:'Chapter 6 · Writer drafting now',on:true},
+  {cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=75',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing my late sister\'s photograph',when:'Chapter 5 · Date TBA',on:false},
+];
+const FOLLOWERS = [
+  {name:'Chioma_R',meta:'Reader · Lagos · 4.2k reads',av:'https://i.pravatar.cc/100?img=47',ring:'no-ring',following:true},
+  {name:'Emeka_T',meta:'Writer · Abuja · 6.5k followers',av:'https://i.pravatar.cc/100?img=15',ring:'new-ring',following:false},
+  {name:'CampusQueen',meta:'Writer · Port Harcourt · 8.1k followers',av:'https://i.pravatar.cc/100?img=12',ring:'new-ring',following:true},
+  {name:'Kemi_A',meta:'Writer · Lagos · 6.5k followers',av:'https://i.pravatar.cc/100?img=28',ring:'viewed-ring',following:true},
+  {name:'Zara_M',meta:'Writer · Enugu · 14.8k followers',av:'https://i.pravatar.cc/100?img=16',ring:'no-ring',following:false},
+  {name:'Dami_Cole',meta:'Writer · Lagos · 9.4k followers',av:'https://i.pravatar.cc/100?img=64',ring:'new-ring',following:true},
+  {name:'Efe_O',meta:'Writer · Benin · 22.3k followers',av:'https://i.pravatar.cc/100?img=22',ring:'viewed-ring',following:false},
+  {name:'Reader_9021',meta:'Reader · Anonymous',av:null,ring:'no-ring',following:false},
+];
+const FOLLOWING = [
+  {name:'Chiamaka_N',meta:'Writer · Family · 19.2k followers',av:'https://i.pravatar.cc/100?img=47',ring:'no-ring',following:true},
+  {name:'Efe_O',meta:'Writer · Emotional · 22.3k followers',av:'https://i.pravatar.cc/100?img=22',ring:'viewed-ring',following:true},
+  {name:'Ifeanyi_Story',meta:'Writer · Twist · 31.7k followers',av:'https://i.pravatar.cc/100?img=53',ring:'new-ring',following:true},
+  {name:'Dami_Cole',meta:'Writer · Urban Love · 9.4k followers',av:'https://i.pravatar.cc/100?img=64',ring:'new-ring',following:true},
+];
+const WEEK_READS = [12400,8900,15200,19800,11400,22100,18300];
+const WEEK_DAYS = ['M','T','W','T','F','S','S'];
+const REACTIONS = [{e:'😭',label:'Crying',n:12400},{e:'💔',label:'Heartbroken',n:9400},{e:'🥹',label:'Emotional',n:8200},{e:'😱',label:'Shocked',n:5100},{e:'🔥',label:'Savage',n:3400},{e:'😡',label:'Angry',n:2100}];
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+// ════════════════════════════════════════════
+// HERO PARTICLES
+// ════════════════════════════════════════════
+(function(){
+  const container=document.getElementById('heroParticles');
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');p.className='hp';
+    const s=Math.random()*8+4;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*4}s;opacity:${0.06+Math.random()*0.12}`;
+    container.appendChild(p);
+  }
+})();
+
+// ════════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════════
+function switchTab(tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('panel-'+tab);
+  if(panel)panel.classList.add('active');
+  // Scroll tabs into view
+  const activeTab=document.querySelector('.ptab.active');
+  if(activeTab)activeTab.scrollIntoView({inline:'center',behavior:'smooth'});
+}
+function switchTabFromMenu(tab){closeMenu();setTimeout(()=>{switchTab(tab);},180);}
+
+// ════════════════════════════════════════════
+// FOLLOW
+// ════════════════════════════════════════════
+let _following=false;
+function toggleFollow(){
+  _following=!_following;
+  const btn=document.getElementById('followBtn');
+  btn.textContent=_following?'✓ Following':'+ Follow';
+  btn.classList.toggle('ing',_following);
+  toast(_following?'✅ Following @ada_writes':'Unfollowed @ada_writes');
+}
+
+// ════════════════════════════════════════════
+// MENU
+// ════════════════════════════════════════════
+function openMenu(){document.getElementById('menuOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('menuOverlay').classList.remove('open');document.body.style.overflow='';}
+
+// ════════════════════════════════════════════
+// STATUS COMPOSER
+// ════════════════════════════════════════════
+function openStatusComposer(type){
+  document.getElementById('statusComposerOv').classList.add('open');
+  document.body.style.overflow='hidden';
+  if(type){
+    document.querySelectorAll('.scs-type').forEach(t=>{
+      t.classList.toggle('active',t.dataset.type===type);
+    });
+  }
+}
+function closeStatusComposer(){
+  document.getElementById('statusComposerOv').classList.remove('open');
+  document.body.style.overflow='';
+}
+function postStatus(){
+  const text=document.getElementById('statusQuoteText').value.trim();
+  if(!text){toast('✍️ Write something first!');return;}
+  closeStatusComposer();
+  toast('✅ Status posted! Your readers will see it now 🎉');
+}
+document.querySelectorAll('.scs-type').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.scs-type').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ════════════════════════════════════════════
+// RENDER SAVED STORIES
+// ════════════════════════════════════════════
+function renderSavedStories(){
+  const list=document.getElementById('savedStoriesList');
+  list.innerHTML=SAVED_STORIES.map((s,i)=>`
+    <div class="saved-sc" onclick="toast('📖 Opening story…')">
+      <div class="saved-sc-img" style="background-image:url('${s.cover}')"></div>
+      <div class="saved-sc-body">
+        <div class="saved-sc-cat">${s.cat} · ${s.ch}</div>
+        <div class="saved-sc-title">${s.title}</div>
+        <div class="saved-sc-meta">
+          <div class="saved-sc-act"><i class="far fa-heart"></i> ${s.likes}</div>
+          <div class="saved-sc-act">@${s.writer}</div>
+          <div class="saved-remove" onclick="event.stopPropagation();removeSaved(${i},this)">✕ Remove</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function removeSaved(idx, el){
+  const card=el.closest('.saved-sc');
+  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
+  toast('🗑️ Removed from saved');
+  const badge=document.getElementById('savedBadge');
+  if(badge)badge.textContent=Math.max(0,(parseInt(badge.textContent)||0)-1);
+}
+
+// ════════════════════════════════════════════
+// RENDER SAVED QUOTES
+// ════════════════════════════════════════════
+function renderSavedQuotes(){
+  const list=document.getElementById('savedQuotesList');
+  list.innerHTML=SAVED_QUOTES.map((q,i)=>`
+    <div class="qc">
+      <div class="qc-bg" style="background-image:url('${q.bg}')"></div>
+      <div class="qc-body">
+        <div class="qc-text">"${q.text}"</div>
+        <div class="qc-from">
+          <img class="qc-av" src="${q.av}" loading="lazy"/>
+          <span class="qc-writer">@${q.writer}</span>
+          <span class="qc-story">· ${q.story}</span>
+        </div>
+        <div class="qc-actions">
+          <div class="qc-act${q.liked?' liked':''}" onclick="likeQuote(${i},this)">
+            <i class="${q.liked?'fas':'far'} fa-heart"></i> ${fmtN(q.saves)}
+          </div>
+          <div class="qc-act" onclick="toast('📤 Sharing quote…')"><i class="fas fa-share-alt"></i></div>
+          <div class="qc-act" onclick="navigator.clipboard?.writeText('${q.text.replace(/'/g,"\\'")}');toast('📋 Quote copied!')"><i class="far fa-copy"></i> Copy</div>
+          <div class="qc-act remove" onclick="removeQuote(${i},this)"><i class="fas fa-times"></i> Remove</div>
+          <button class="qc-share-btn" onclick="toast('🃏 Share as card…')">Share Card</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function likeQuote(idx,el){
+  const q=SAVED_QUOTES[idx];q.liked=!q.liked;q.saves+=q.liked?1:-1;
+  el.classList.toggle('liked',q.liked);
+  el.innerHTML=`<i class="${q.liked?'fas':'far'} fa-heart"></i> ${fmtN(q.saves)}`;
+}
+function removeQuote(idx,el){
+  const card=el.closest('.qc');
+  if(card){card.style.opacity='0.3';card.style.pointerEvents='none';}
+  toast('🗑️ Quote removed');
+  const badge=document.getElementById('quotesBadge');
+  if(badge)badge.textContent=Math.max(0,(parseInt(badge.textContent)||0)-1);
+}
+
+// ════════════════════════════════════════════
+// RENDER NOTIFY ME
+// ════════════════════════════════════════════
+function renderNotifyList(){
+  const list=document.getElementById('notifyList');
+  list.innerHTML=NOTIFY_STORIES.map((n,i)=>`
+    <div class="notify-card">
+      <div class="notify-img" style="background-image:url('${n.cover}')"></div>
+      <div class="notify-body">
+        <div class="notify-cat">${n.cat}</div>
+        <div class="notify-title">${n.title}</div>
+        <div class="notify-when"><i class="fas fa-clock"></i> ${n.when}</div>
+      </div>
+      <div class="notify-toggle">
+        <button class="ntog${n.on?'':' off'}" id="ntog-${i}" onclick="toggleNotify(${i},this)"></button>
+        <div class="ntog-label" id="ntog-lbl-${i}">${n.on?'On':'Off'}</div>
+      </div>
+    </div>`).join('');
+}
+function toggleNotify(idx,btn){
+  NOTIFY_STORIES[idx].on=!NOTIFY_STORIES[idx].on;
+  btn.classList.toggle('off',!NOTIFY_STORIES[idx].on);
+  document.getElementById('ntog-lbl-'+idx).textContent=NOTIFY_STORIES[idx].on?'On':'Off';
+  toast(NOTIFY_STORIES[idx].on?'🔔 Notifications ON for this story!':'🔕 Notifications turned off');
+}
+
+// ════════════════════════════════════════════
+// RENDER PEOPLE LISTS
+// ════════════════════════════════════════════
+function renderPeople(containerId, data){
+  const list=document.getElementById(containerId);
+  list.innerHTML=data.map((p,i)=>`
+    <div class="people-item">
+      <div class="people-av-ring ${p.ring}">
+        <div class="people-av-inner">
+          ${p.av?`<img src="${p.av}" loading="lazy"/>`:`<div style="width:100%;height:100%;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">${p.name[0]}</div>`}
+        </div>
+      </div>
+      <div class="people-info">
+        <div class="people-name">@${p.name}</div>
+        <div class="people-meta">${p.meta}</div>
+      </div>
+      <button class="people-follow-btn${p.following?' ing':''}" onclick="togglePeopleFollow(${i},'${containerId}',this)">${p.following?'✓ Following':'+ Follow'}</button>
+    </div>`).join('');
+}
+function togglePeopleFollow(idx,lid,btn){
+  const arr=lid==='followersList'?FOLLOWERS:FOLLOWING;
+  arr[idx].following=!arr[idx].following;
+  btn.textContent=arr[idx].following?'✓ Following':'+ Follow';
+  btn.classList.toggle('ing',arr[idx].following);
+  toast(arr[idx].following?`✅ Following @${arr[idx].name}`:`Unfollowed @${arr[idx].name}`);
+}
+
+// ════════════════════════════════════════════
+// RENDER DASHBOARD CHART
+// ════════════════════════════════════════════
+function renderWeekChart(){
+  const max=Math.max(...WEEK_READS);
+  const chart=document.getElementById('weekChart');
+  chart.innerHTML=WEEK_READS.map((v,i)=>`
+    <div class="chart-bar" style="height:${Math.round((v/max)*56)}px" title="${v.toLocaleString()} reads" onclick="toast('${WEEK_DAYS[i]}: ${(v/1000).toFixed(1)}k reads')">
+      <div class="chart-bar-day">${WEEK_DAYS[i]}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// RENDER REACTION BARS
+// ════════════════════════════════════════════
+function renderReactionBars(){
+  const max=REACTIONS[0].n;
+  document.getElementById('reactionBars').innerHTML=REACTIONS.map(r=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:26px;font-size:16px;text-align:center;flex-shrink:0">${r.e}</div>
+      <div style="flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="height:100%;width:${Math.round((r.n/max)*100)}%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:6px;transition:width 1s ease"></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted2);min-width:36px;text-align:right">${fmtN(r.n)}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+renderSavedStories();
+renderSavedQuotes();
+renderNotifyList();
+renderPeople('followersList', FOLLOWERS);
+renderPeople('followingList', FOLLOWING);
+renderWeekChart();
+renderReactionBars();
+</script>
+</body>
+</html>

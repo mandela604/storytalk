@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StoryLoom — Discover Stories</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0e0c0a;
+    --parchment: #f5f0e8;
+    --cream: #faf7f2;
+    --warm-white: #fffef9;
+    --rust: #c1440e;
+    --rust-light: #e05a28;
+    --gold: #c9962a;
+    --gold-light: #e8b84b;
+    --sage: #4a6741;
+    --sage-light: #6b9462;
+    --muted: #8a7e72;
+    --muted-light: #b5a898;
+    --card-bg: #ffffff;
+    --border: #e8e0d4;
+    --shadow-warm: rgba(14,12,10,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--parchment); }
+  ::-webkit-scrollbar-thumb { background: var(--muted-light); border-radius: 3px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 3rem;
+    height: 68px;
+    background: rgba(250,247,242,0.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 32px var(--shadow-warm); }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.4rem;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--rust); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -3px; left: 0; width: 0; height: 1.5px;
+    background: var(--rust); border-radius: 2px;
+    transition: width 0.25s ease;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--ink); }
+  .nav-links a.active::after { width: 100%; }
+
+  .nav-actions {
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .btn-ghost {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem; font-weight: 500;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 0.4rem 0.8rem;
+    border-radius: 8px; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-ghost:hover { color: var(--ink); background: var(--parchment); }
+  .btn-primary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem; font-weight: 600;
+    color: var(--warm-white); background: var(--ink);
+    border: none; cursor: pointer;
+    padding: 0.5rem 1.2rem; border-radius: 8px;
+    transition: all 0.2s;
+    text-decoration: none; letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { background: var(--rust); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(193,68,14,0.25); }
+
+  /* ── HERO ── */
+  .hero {
+    padding-top: 68px;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5rem 4rem 5rem 5rem;
+    position: relative; z-index: 2;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--rust); text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 1.5rem;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 28px; height: 1.5px; background: var(--rust);
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 900; line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0; transform: translateY(24px);
+    animation: fadeUp 0.7s 0.25s forwards;
+  }
+  .hero-title em {
+    font-style: italic; color: var(--rust);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem; color: var(--muted);
+    line-height: 1.7; font-weight: 400;
+    max-width: 440px;
+    margin-bottom: 2.5rem;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.7s 0.4s forwards;
+  }
+
+  .hero-cta {
+    display: flex; align-items: center; gap: 1.2rem;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.7s 0.55s forwards;
+  }
+  .btn-cta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--warm-white); background: var(--rust);
+    border: none; cursor: pointer;
+    padding: 0.85rem 2rem; border-radius: 12px;
+    transition: all 0.25s; letter-spacing: 0.01em;
+    box-shadow: 0 4px 24px rgba(193,68,14,0.3);
+  }
+  .btn-cta:hover { background: var(--rust-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(193,68,14,0.35); }
+  .btn-browse {
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+    transition: color 0.2s; letter-spacing: 0.01em;
+  }
+  .btn-browse svg { transition: transform 0.2s; }
+  .btn-browse:hover { color: var(--ink); }
+  .btn-browse:hover svg { transform: translateX(4px); }
+
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3.5rem;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp 0.7s 0.7s forwards;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700; color: var(--ink);
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Hero Right — Featured Card Stack */
+  .hero-right {
+    position: relative; overflow: hidden;
+    background: var(--parchment);
+    display: flex; align-items: center; justify-content: center;
+    padding: 3rem;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 40%, rgba(201,150,42,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 80%, rgba(193,68,14,0.08) 0%, transparent 50%);
+  }
+
+  .card-stack {
+    position: relative; width: 320px; height: 440px;
+    opacity: 0; transform: translateX(40px) rotate(3deg);
+    animation: slideIn 0.8s 0.5s forwards;
+  }
+
+  .stack-card {
+    position: absolute; width: 300px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(14,12,10,0.14), 0 6px 20px rgba(14,12,10,0.08);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+  }
+  .stack-card:nth-child(1) {
+    top: 0; left: 0; z-index: 3;
+    transform: rotate(-2deg);
+  }
+  .stack-card:nth-child(2) {
+    top: 18px; left: 24px; z-index: 2;
+    transform: rotate(1.5deg);
+  }
+  .stack-card:nth-child(3) {
+    top: 34px; left: 46px; z-index: 1;
+    transform: rotate(3.5deg);
+    opacity: 0.6;
+  }
+  .card-stack:hover .stack-card:nth-child(1) { transform: rotate(-2deg) translateY(-8px); box-shadow: 0 32px 80px rgba(14,12,10,0.18); }
+
+  .stack-cover {
+    width: 100%; height: 200px; object-fit: cover;
+    background: var(--parchment);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+  }
+  .cover-gradient-1 { background: linear-gradient(135deg, #2d1b0e 0%, #7a3a1a 40%, #c1440e 100%); }
+  .cover-gradient-2 { background: linear-gradient(135deg, #1a2d2a 0%, #2d5a4a 50%, #4a6741 100%); }
+  .cover-gradient-3 { background: linear-gradient(135deg, #1a1a2d 0%, #2d1a5a 50%, #6b3fa0 100%); }
+  .cover-title-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700; color: white;
+    padding: 1.5rem; line-height: 1.3;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .stack-body { padding: 1.2rem 1.4rem 1.4rem; }
+  .stack-genre {
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--rust); margin-bottom: 0.4rem;
+  }
+  .stack-name {
+    font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--ink); line-height: 1.25; margin-bottom: 0.5rem;
+  }
+  .stack-author { font-size: 0.8rem; color: var(--muted); }
+  .stack-meta {
+    display: flex; align-items: center; gap: 1rem; margin-top: 0.8rem;
+    padding-top: 0.8rem; border-top: 1px solid var(--border);
+  }
+  .stack-rating { font-size: 0.78rem; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 0.3rem; }
+  .stack-reads { font-size: 0.75rem; color: var(--muted-light); }
+
+  /* ── SEARCH BAR ── */
+  .search-section {
+    padding: 0 5rem;
+    margin-top: -28px;
+    position: relative; z-index: 10;
+    opacity: 0; animation: fadeUp 0.6s 0.9s forwards;
+  }
+  .search-bar {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px var(--shadow-warm), 0 0 0 1px var(--border);
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.6rem 0.6rem 0.6rem 1.5rem;
+  }
+  .search-icon { color: var(--muted-light); flex-shrink: 0; }
+  .search-input {
+    flex: 1; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; color: var(--ink);
+    background: transparent;
+  }
+  .search-input::placeholder { color: var(--muted-light); }
+  .search-divider { width: 1px; height: 28px; background: var(--border); }
+  .search-filters {
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .filter-chip {
+    font-size: 0.8rem; font-weight: 500;
+    color: var(--muted); background: var(--parchment);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.35rem 0.9rem; cursor: pointer;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .filter-chip:hover, .filter-chip.active {
+    background: var(--ink); color: var(--warm-white); border-color: var(--ink);
+  }
+  .search-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem; font-weight: 600;
+    color: var(--warm-white); background: var(--rust);
+    border: none; cursor: pointer;
+    padding: 0.7rem 1.5rem; border-radius: 10px;
+    transition: all 0.2s; letter-spacing: 0.01em;
+  }
+  .search-btn:hover { background: var(--rust-light); }
+
+  /* ── SECTIONS COMMON ── */
+  .section { padding: 5rem 5rem; }
+  .section-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--rust); margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 800; line-height: 1.1; color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .section-title em { font-style: italic; color: var(--rust); }
+  .see-all {
+    font-size: 0.85rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+    transition: color 0.2s; white-space: nowrap;
+    padding-bottom: 4px;
+  }
+  .see-all:hover { color: var(--rust); }
+
+  /* ── GENRE PILLS ── */
+  .genre-strip { padding: 2rem 5rem 0; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .genre-pill {
+    font-size: 0.82rem; font-weight: 600;
+    padding: 0.5rem 1.2rem; border-radius: 100px;
+    border: 1.5px solid var(--border);
+    color: var(--muted); background: var(--card-bg);
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .genre-pill:hover { border-color: var(--ink); color: var(--ink); transform: translateY(-1px); }
+  .genre-pill.selected { background: var(--ink); color: var(--warm-white); border-color: var(--ink); }
+  .genre-pill.selected-rust { background: var(--rust); color: white; border-color: var(--rust); }
+
+  /* ── STORY CARD ── */
+  .stories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.75rem; }
+  .story-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+    cursor: pointer;
+    position: relative;
+  }
+  .story-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 60px var(--shadow-warm), 0 0 0 1px rgba(193,68,14,0.1);
+    border-color: transparent;
+  }
+  .story-card:hover .card-read-btn { opacity: 1; transform: translateY(0); }
+
+  .card-cover {
+    width: 100%; height: 200px;
+    display: flex; align-items: flex-end;
+    padding: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .card-cover-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.65) 100%);
+  }
+  .card-badge {
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0.25rem 0.6rem; border-radius: 6px;
+    background: rgba(255,255,255,0.95); color: var(--ink);
+  }
+  .card-badge.new { background: var(--rust); color: white; }
+  .card-badge.hot { background: var(--gold); color: var(--ink); }
+  .card-cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700; color: white;
+    line-height: 1.3; position: relative; z-index: 1;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  }
+
+  .card-body { padding: 1rem 1.1rem 1.1rem; }
+  .card-genre-tag {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--rust); margin-bottom: 0.3rem;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700; color: var(--ink);
+    line-height: 1.3; margin-bottom: 0.3rem;
+  }
+  .card-author { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.7rem; }
+  .card-excerpt {
+    font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 0.9rem;
+  }
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 0.75rem; border-top: 1px solid var(--border);
+  }
+  .card-rating { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; font-weight: 600; color: var(--gold); }
+  .card-reads { font-size: 0.73rem; color: var(--muted-light); }
+  .card-read-btn {
+    position: absolute; bottom: 1.1rem; right: 1.1rem;
+    font-size: 0.75rem; font-weight: 600;
+    background: var(--rust); color: white;
+    border: none; cursor: pointer;
+    padding: 0.4rem 0.9rem; border-radius: 8px;
+    opacity: 0; transform: translateY(4px);
+    transition: all 0.25s;
+  }
+
+  /* ── FEATURED ROW ── */
+  .featured-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 1.75rem; }
+  .featured-large {
+    background: var(--card-bg); border-radius: 20px;
+    overflow: hidden; border: 1px solid var(--border);
+    transition: all 0.3s; cursor: pointer;
+  }
+  .featured-large:hover { transform: translateY(-4px); box-shadow: 0 24px 60px var(--shadow-warm); border-color: transparent; }
+  .featured-cover {
+    width: 100%; height: 280px;
+    display: flex; align-items: flex-end; padding: 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .featured-cover-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.8) 100%);
+  }
+  .featured-cover-content { position: relative; z-index: 1; }
+  .featured-badge {
+    display: inline-block; font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    background: var(--rust); color: white;
+    padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 0.6rem;
+  }
+  .featured-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 800; color: white;
+    line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .featured-body { padding: 1.4rem 1.6rem 1.6rem; }
+  .featured-excerpt {
+    font-size: 0.87rem; color: var(--muted); line-height: 1.7;
+    margin-bottom: 1rem;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .featured-meta { display: flex; align-items: center; gap: 1.5rem; }
+  .featured-author-row { display: flex; align-items: center; gap: 0.6rem; }
+  .author-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .featured-author-name { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+  .featured-author-label { font-size: 0.72rem; color: var(--muted); }
+  .featured-stats { display: flex; gap: 1rem; margin-left: auto; }
+  .fstat { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+  .fstat-num { font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+  .fstat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ── COMPACT CARD ── */
+  .compact-stack { display: flex; flex-direction: column; gap: 1.2rem; }
+  .compact-card {
+    display: flex; gap: 1rem; align-items: flex-start;
+    background: var(--card-bg); border-radius: 14px;
+    padding: 1rem; border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.25s;
+  }
+  .compact-card:hover { transform: translateX(4px); box-shadow: 0 8px 32px var(--shadow-warm); border-color: transparent; }
+  .compact-thumb {
+    width: 64px; height: 80px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .compact-info { flex: 1; min-width: 0; }
+  .compact-genre { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--rust); }
+  .compact-title {
+    font-family: 'Playfair Display', serif; font-size: 0.92rem; font-weight: 700;
+    color: var(--ink); line-height: 1.25; margin: 0.2rem 0 0.3rem;
+  }
+  .compact-author { font-size: 0.75rem; color: var(--muted); }
+  .compact-rating { font-size: 0.75rem; font-weight: 600; color: var(--gold); margin-top: 0.4rem; }
+
+  /* ── AUTHOR SPOTLIGHT ── */
+  .authors-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; }
+  .author-card {
+    background: var(--card-bg); border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    text-align: center; cursor: pointer;
+    transition: all 0.25s;
+  }
+  .author-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px var(--shadow-warm); border-color: transparent; }
+  .author-img {
+    width: 72px; height: 72px; border-radius: 50%;
+    margin: 0 auto 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; font-weight: 800; color: white;
+    position: relative;
+  }
+  .author-img::after {
+    content: '';
+    position: absolute; inset: -3px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-light);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .author-card:hover .author-img::after { opacity: 1; }
+  .author-card-name { font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 700; color: var(--ink); margin-bottom: 0.2rem; }
+  .author-card-genre { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.6rem; }
+  .author-card-stats { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+  .author-follow-btn {
+    margin-top: 0.9rem;
+    font-size: 0.77rem; font-weight: 600;
+    padding: 0.4rem 1rem; border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: none; cursor: pointer;
+    color: var(--muted); transition: all 0.2s;
+    width: 100%;
+  }
+  .author-follow-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
+  .author-follow-btn.following { background: var(--parchment); border-color: var(--parchment); color: var(--muted); }
+
+  /* ── READING NOW BANNER ── */
+  .reading-banner {
+    margin: 0 5rem 5rem;
+    background: var(--ink);
+    border-radius: 24px;
+    padding: 3rem 4rem;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 2rem; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .reading-banner::before {
+    content: '';
+    position: absolute; top: -60%; right: 5%;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,150,42,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .reading-banner::after {
+    content: '"';
+    position: absolute; top: -1rem; left: 3rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 12rem; font-weight: 900; color: rgba(255,255,255,0.04);
+    line-height: 1; pointer-events: none;
+  }
+  .banner-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); margin-bottom: 0.8rem; }
+  .banner-quote {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: white; line-height: 1.45;
+    max-width: 580px;
+  }
+  .banner-source { font-size: 0.82rem; color: rgba(255,255,255,0.45); margin-top: 1rem; font-style: italic; }
+  .banner-cta {
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    color: var(--ink); background: var(--gold-light);
+    border: none; cursor: pointer;
+    padding: 0.9rem 2rem; border-radius: 12px;
+    white-space: nowrap; transition: all 0.2s;
+  }
+  .banner-cta:hover { background: #f0cc6a; transform: scale(1.03); }
+
+  /* ── RECENTLY UPDATED ── */
+  .updates-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .update-card {
+    display: flex; gap: 1.1rem; align-items: center;
+    background: var(--card-bg); border-radius: 14px;
+    padding: 1rem 1.2rem; border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.25s;
+  }
+  .update-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px var(--shadow-warm); border-color: transparent; }
+  .update-thumb { width: 52px; height: 68px; border-radius: 8px; flex-shrink: 0; }
+  .update-info { flex: 1; min-width: 0; }
+  .update-title { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 0.25rem; }
+  .update-chapter { font-size: 0.75rem; font-weight: 600; color: var(--rust); margin-bottom: 0.2rem; }
+  .update-time { font-size: 0.72rem; color: var(--muted-light); }
+  .update-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rust); flex-shrink: 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,0.6);
+    padding: 4rem 5rem 2.5rem;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-brand .nav-logo { color: white; margin-bottom: 1rem; display: block; }
+  .footer-brand .nav-logo span { color: var(--gold-light); }
+  .footer-desc { font-size: 0.85rem; line-height: 1.7; max-width: 260px; margin-bottom: 1.5rem; }
+  .footer-social { display: flex; gap: 0.75rem; }
+  .social-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(255,255,255,0.08); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.2s; color: rgba(255,255,255,0.6);
+  }
+  .social-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+  .footer-col-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); margin-bottom: 1rem; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+  .footer-links a { font-size: 0.85rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: white; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .footer-copy { font-size: 0.8rem; }
+  .footer-bottom-links { display: flex; gap: 1.5rem; }
+  .footer-bottom-links a { font-size: 0.8rem; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+  .footer-bottom-links a:hover { color: rgba(255,255,255,0.8); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0) rotate(0deg); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 1200px) {
+    .stories-grid { grid-template-columns: repeat(3, 1fr); }
+    .authors-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 900px) {
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-left { padding: 3rem 2rem; }
+    .hero-right { display: none; }
+    .section, .genre-strip, .search-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .stories-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-row { grid-template-columns: 1fr; }
+    .authors-grid { grid-template-columns: repeat(3, 1fr); }
+    .updates-list { grid-template-columns: 1fr; }
+    .reading-banner { margin: 0 1.5rem 3rem; padding: 2rem; grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer { padding: 3rem 1.5rem 2rem; }
+  }
+  @media (max-width: 560px) {
+    .stories-grid { grid-template-columns: 1fr; }
+    .authors-grid { grid-template-columns: repeat(2, 1fr); }
+    .search-filters { display: none; }
+    .search-divider { display: none; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">Story<span>Loom</span></a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Discover</a></li>
+    <li><a href="#">Library</a></li>
+    <li><a href="#">Authors</a></li>
+    <li><a href="#">Genres</a></li>
+    <li><a href="#">Community</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">Sign in</a>
+    <a href="#" class="btn-primary">Start Reading</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">✦ New stories every day</div>
+    <h1 class="hero-title">
+      Where every page<br>
+      begins a new <em>world.</em>
+    </h1>
+    <p class="hero-sub">
+      Discover thousands of stories across every genre — from sweeping epics to quiet literary gems. Find your next obsession today.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-cta">Explore Stories</button>
+      <button class="btn-browse">
+        Browse genres
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">48K+</span>
+        <span class="stat-label">Stories</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">2.1M</span>
+        <span class="stat-label">Readers</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">12K</span>
+        <span class="stat-label">Authors</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="card-stack">
+      <!-- Card 1 -->
+      <div class="stack-card">
+        <div class="stack-cover cover-gradient-1">
+          <div class="cover-title-text">The Ember<br>Throne</div>
+        </div>
+        <div class="stack-body">
+          <div class="stack-genre">Fantasy · Epic</div>
+          <div class="stack-name">The Ember Throne</div>
+          <div class="stack-author">by Aria Calloway</div>
+          <div class="stack-meta">
+            <div class="stack-rating">★ 4.9</div>
+            <div class="stack-reads">240K reads</div>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="stack-card">
+        <div class="stack-cover cover-gradient-2">
+          <div class="cover-title-text">Roots &amp;<br>Rain</div>
+        </div>
+        <div class="stack-body">
+          <div class="stack-genre">Literary Fiction</div>
+          <div class="stack-name">Roots &amp; Rain</div>
+          <div class="stack-author">by James Osei</div>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="stack-card">
+        <div class="stack-cover cover-gradient-3">
+          <div class="cover-title-text">Signal<br>Lost</div>
+        </div>
+        <div class="stack-body">
+          <div class="stack-genre">Sci-Fi · Thriller</div>
+          <div class="stack-name">Signal Lost</div>
+          <div class="stack-author">by Maya Chen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SEARCH ── -->
+<div class="search-section">
+  <div class="search-bar">
+    <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input class="search-input" type="text" placeholder="Search stories, authors, genres…" />
+    <div class="search-divider"></div>
+    <div class="search-filters">
+      <button class="filter-chip active" onclick="setFilter(this)">All</button>
+      <button class="filter-chip" onclick="setFilter(this)">Fiction</button>
+      <button class="filter-chip" onclick="setFilter(this)">Romance</button>
+      <button class="filter-chip" onclick="setFilter(this)">Thriller</button>
+      <button class="filter-chip" onclick="setFilter(this)">Fantasy</button>
+    </div>
+    <button class="search-btn">Search</button>
+  </div>
+</div>
+
+<!-- ── GENRE STRIP ── -->
+<div class="genre-strip reveal">
+  <button class="genre-pill selected-rust" onclick="selectGenre(this)">🔥 Trending</button>
+  <button class="genre-pill" onclick="selectGenre(this)">📖 All Genres</button>
+  <button class="genre-pill" onclick="selectGenre(this)">⚔️ Fantasy</button>
+  <button class="genre-pill" onclick="selectGenre(this)">💕 Romance</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🚀 Sci-Fi</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🔪 Thriller</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🏛️ Historical</button>
+  <button class="genre-pill" onclick="selectGenre(this)">👻 Horror</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🌊 Adventure</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🧠 Mystery</button>
+  <button class="genre-pill" onclick="selectGenre(this)">✨ Literary</button>
+  <button class="genre-pill" onclick="selectGenre(this)">🎭 Drama</button>
+</div>
+
+<!-- ── TRENDING STORIES ── -->
+<section class="section reveal">
+  <div class="section-header">
+    <div>
+      <div class="section-label">✦ Trending now</div>
+      <h2 class="section-title">Stories everyone's<br><em>talking about</em></h2>
+    </div>
+    <a href="#" class="see-all">View all
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="stories-grid" id="storiesGrid">
+    <!-- Cards injected by JS -->
+  </div>
+</section>
+
+<!-- ── FEATURED ── -->
+<section class="section reveal" style="padding-top: 0;">
+  <div class="section-header">
+    <div>
+      <div class="section-label">✦ Editor's pick</div>
+      <h2 class="section-title">Featured <em>this week</em></h2>
+    </div>
+    <a href="#" class="see-all">All features
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="featured-row">
+    <!-- Featured Large -->
+    <div class="featured-large">
+      <div class="featured-cover" style="background: linear-gradient(135deg, #0e1a2d 0%, #1e3a5f 40%, #2d5f8a 100%);">
+        <div class="featured-cover-overlay"></div>
+        <div class="featured-cover-content">
+          <div class="featured-badge">✦ Editor's Choice</div>
+          <div class="featured-title">A Thousand<br>Paper Skies</div>
+        </div>
+      </div>
+      <div class="featured-body">
+        <div class="card-genre-tag">Literary Fiction</div>
+        <p class="featured-excerpt">In the summer of her mother's disappearance, seventeen-year-old Nadia begins folding paper cranes — one for every unanswered question — until the cranes start answering back in ways she never expected.</p>
+        <div class="featured-meta">
+          <div class="featured-author-row">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #c1440e, #e05a28);">SK</div>
+            <div>
+              <div class="featured-author-name">Sunita Krishnan</div>
+              <div class="featured-author-label">Author</div>
+            </div>
+          </div>
+          <div class="featured-stats">
+            <div class="fstat"><span class="fstat-num">4.8★</span><span class="fstat-label">Rating</span></div>
+            <div class="fstat"><span class="fstat-num">189K</span><span class="fstat-label">Reads</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Compact stack -->
+    <div class="compact-stack">
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #2d1b0e, #c1440e);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Historical</div>
+          <div class="compact-title">The Silk Road Widow</div>
+          <div class="compact-author">by Hassan Al-Rafiq</div>
+          <div class="compact-rating">★★★★★ 4.9</div>
+        </div>
+      </div>
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #0e1a0e, #2d5a2d);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Horror</div>
+          <div class="compact-title">What Sleeps Below</div>
+          <div class="compact-author">by Elara Moss</div>
+          <div class="compact-rating">★★★★☆ 4.6</div>
+        </div>
+      </div>
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #1a0e2d, #5a2d9a);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Sci-Fi</div>
+          <div class="compact-title">Echo Protocol</div>
+          <div class="compact-author">by Dmitri Volkov</div>
+          <div class="compact-rating">★★★★★ 4.7</div>
+        </div>
+      </div>
+    </div>
+    <div class="compact-stack">
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #2d1a0e, #8a4a1a);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Romance</div>
+          <div class="compact-title">Letters From Nowhere</div>
+          <div class="compact-author">by Cleo Hartwell</div>
+          <div class="compact-rating">★★★★★ 4.9</div>
+        </div>
+      </div>
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #0e1a2d, #1a4a6a);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Thriller</div>
+          <div class="compact-title">The Glass Archive</div>
+          <div class="compact-author">by Miriam Solano</div>
+          <div class="compact-rating">★★★★☆ 4.5</div>
+        </div>
+      </div>
+      <div class="compact-card">
+        <div class="compact-thumb" style="background: linear-gradient(135deg, #2d2a0e, #8a7a1a);"></div>
+        <div class="compact-info">
+          <div class="compact-genre">Adventure</div>
+          <div class="compact-title">Storm Riders</div>
+          <div class="compact-author">by Tobias Meer</div>
+          <div class="compact-rating">★★★★★ 4.8</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUOTE BANNER ── -->
+<div class="reading-banner reveal">
+  <div>
+    <div class="banner-label">✦ Quote of the week</div>
+    <div class="banner-quote">"A reader lives a thousand lives before he dies. The man who never reads lives only one."</div>
+    <div class="banner-source">— George R.R. Martin</div>
+  </div>
+  <button class="banner-cta">Find Your Next Story →</button>
+</div>
+
+<!-- ── SPOTLIGHT AUTHORS ── -->
+<section class="section reveal" style="padding-top: 0;">
+  <div class="section-header">
+    <div>
+      <div class="section-label">✦ Spotlight</div>
+      <h2 class="section-title">Authors to <em>follow</em></h2>
+    </div>
+    <a href="#" class="see-all">All authors
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="authors-grid" id="authorsGrid">
+  </div>
+</section>
+
+<!-- ── RECENTLY UPDATED ── -->
+<section class="section reveal" style="padding-top: 0;">
+  <div class="section-header">
+    <div>
+      <div class="section-label">✦ Fresh chapters</div>
+      <h2 class="section-title">Recently <em>updated</em></h2>
+    </div>
+    <a href="#" class="see-all">View all
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="updates-list" id="updatesList">
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">Story<span>Loom</span></a>
+      <p class="footer-desc">A home for stories that matter. Discover, read, and connect with writers from around the world.</p>
+      <div class="footer-social">
+        <button class="social-btn">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        </button>
+        <button class="social-btn">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path fill="none" stroke="var(--ink)" stroke-width="2" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="var(--ink)" stroke-width="2"/></svg>
+        </button>
+        <button class="social-btn">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Discover</div>
+      <ul class="footer-links">
+        <li><a href="#">Trending Stories</a></li>
+        <li><a href="#">New Releases</a></li>
+        <li><a href="#">Editor's Picks</a></li>
+        <li><a href="#">Award Winners</a></li>
+        <li><a href="#">Free Stories</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Write</div>
+      <ul class="footer-links">
+        <li><a href="#">Start Writing</a></li>
+        <li><a href="#">Writer's Hub</a></li>
+        <li><a href="#">Contests</a></li>
+        <li><a href="#">Publishing Guide</a></li>
+        <li><a href="#">Community</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 StoryLoom. All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Settings</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── DATA ──
+const stories = [
+  { title: "The Ember Throne", author: "Aria Calloway", genre: "Fantasy", rating: 4.9, reads: "240K", badge: "hot", gradient: "linear-gradient(135deg,#2d1b0e 0%,#7a3a1a 40%,#c1440e 100%)", excerpt: "An exiled queen returns to a kingdom of ash, armed only with a forbidden magic and a burning desire for justice." },
+  { title: "Beneath Still Waters", author: "Lena Park", genre: "Romance", rating: 4.8, reads: "187K", badge: "new", gradient: "linear-gradient(135deg,#0e1a2d 0%,#1e4a7a 100%)", excerpt: "Two strangers trapped in a lakeside town discover that silence can be louder than any confession." },
+  { title: "Signal Lost", author: "Maya Chen", genre: "Sci-Fi", rating: 4.7, reads: "312K", badge: "", gradient: "linear-gradient(135deg,#1a1a2d 0%,#3a2a6a 50%,#6b3fa0 100%)", excerpt: "When the last satellite goes dark, a teenage hacker discovers it was deliberately killed — and she's next." },
+  { title: "The Cartographer's Lie", author: "James Osei", genre: "Historical", rating: 4.9, reads: "95K", badge: "new", gradient: "linear-gradient(135deg,#2d2a0e 0%,#6a5a1a 60%,#c9962a 100%)", excerpt: "A mapmaker in Renaissance Venice discovers that every map he's drawn leads to the same impossible island." },
+  { title: "Roots & Rain", author: "Elena Morse", genre: "Literary", rating: 4.6, reads: "72K", badge: "", gradient: "linear-gradient(135deg,#1a2d1a 0%,#2d5a2d 50%,#4a6741 100%)", excerpt: "Three generations of women. One crumbling farmhouse. And a secret buried beneath the oldest oak tree." },
+  { title: "Hollow Men", author: "Victor Cross", genre: "Thriller", rating: 4.8, reads: "420K", badge: "hot", gradient: "linear-gradient(135deg,#1a1a1a 0%,#3a1a1a 50%,#6a2a2a 100%)", excerpt: "A forensic psychologist profiles a killer who leaves no traces — except notes addressed only to her." },
+  { title: "Star Orphans", author: "Zara Ibarra", genre: "Sci-Fi", rating: 4.7, reads: "220K", badge: "", gradient: "linear-gradient(135deg,#0e0e2d 0%,#1a2a5a 50%,#2a4a8a 100%)", excerpt: "In a galaxy where children are born on ships, one girl searches for a planet that no longer exists." },
+  { title: "The Widow's Garden", author: "Miriam Solano", genre: "Mystery", rating: 4.9, reads: "134K", badge: "new", gradient: "linear-gradient(135deg,#1a2d1a 0%,#4a2d4a 60%,#8a5a8a 100%)", excerpt: "Every flower in the garden was planted on the anniversary of a death. But whose? And why are new ones appearing?" },
+];
+
+const authors = [
+  { name: "Aria Calloway", genre: "Fantasy", initials: "AC", color: "linear-gradient(135deg,#c1440e,#e05a28)", stories: 12, followers: "48K" },
+  { name: "Maya Chen", genre: "Sci-Fi", initials: "MC", color: "linear-gradient(135deg,#3a2a6a,#6b3fa0)", stories: 8, followers: "72K" },
+  { name: "James Osei", genre: "Literary", initials: "JO", color: "linear-gradient(135deg,#1a4a2d,#4a6741)", stories: 5, followers: "31K" },
+  { name: "Elena Morse", genre: "Romance", initials: "EM", color: "linear-gradient(135deg,#2a1a4a,#7a3a6a)", stories: 19, followers: "110K" },
+  { name: "Victor Cross", genre: "Thriller", initials: "VC", color: "linear-gradient(135deg,#3a1a1a,#7a2a1a)", stories: 7, followers: "95K" },
+];
+
+const updates = [
+  { title: "The Ember Throne", chapter: "Chapter 34: The Burning Door", time: "2 hours ago", gradient: "linear-gradient(135deg,#2d1b0e,#c1440e)" },
+  { title: "Signal Lost", chapter: "Chapter 19: Dark Frequency", time: "4 hours ago", gradient: "linear-gradient(135deg,#1a1a2d,#6b3fa0)" },
+  { title: "Hollow Men", chapter: "Chapter 27: The Profiler", time: "6 hours ago", gradient: "linear-gradient(135deg,#1a1a1a,#6a2a2a)" },
+  { title: "Letters From Nowhere", chapter: "Chapter 11: The Last Postmark", time: "8 hours ago", gradient: "linear-gradient(135deg,#2d1a0e,#8a4a1a)" },
+  { title: "Star Orphans", chapter: "Chapter 22: Dead Star Maps", time: "12 hours ago", gradient: "linear-gradient(135deg,#0e0e2d,#2a4a8a)" },
+  { title: "The Widow's Garden", chapter: "Chapter 6: Nightshade", time: "14 hours ago", gradient: "linear-gradient(135deg,#1a2d1a,#8a5a8a)" },
+];
+
+// ── RENDER STORIES ──
+function renderStories() {
+  const grid = document.getElementById('storiesGrid');
+  grid.innerHTML = stories.map(s => `
+    <div class="story-card" onclick="this.style.transform='scale(0.98)';setTimeout(()=>this.style.transform='',150)">
+      <div class="card-cover" style="background:${s.gradient};">
+        <div class="card-cover-overlay"></div>
+        ${s.badge ? `<div class="card-badge ${s.badge}">${s.badge === 'hot' ? '🔥 Hot' : '✦ New'}</div>` : ''}
+        <div class="card-cover-title">${s.title}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-genre-tag">${s.genre}</div>
+        <div class="card-title">${s.title}</div>
+        <div class="card-author">by ${s.author}</div>
+        <div class="card-excerpt">${s.excerpt}</div>
+        <div class="card-footer">
+          <div class="card-rating">★ ${s.rating}</div>
+          <div class="card-reads">${s.reads} reads</div>
+        </div>
+      </div>
+      <button class="card-read-btn">Read Now</button>
+    </div>
+  `).join('');
+}
+
+// ── RENDER AUTHORS ──
+function renderAuthors() {
+  const grid = document.getElementById('authorsGrid');
+  grid.innerHTML = authors.map(a => `
+    <div class="author-card">
+      <div class="author-img" style="background:${a.color}">${a.initials}</div>
+      <div class="author-card-name">${a.name}</div>
+      <div class="author-card-genre">${a.genre}</div>
+      <div class="author-card-stats">${a.stories} stories · ${a.followers} followers</div>
+      <button class="author-follow-btn" onclick="toggleFollow(this)">+ Follow</button>
+    </div>
+  `).join('');
+}
+
+// ── RENDER UPDATES ──
+function renderUpdates() {
+  const list = document.getElementById('updatesList');
+  list.innerHTML = updates.map(u => `
+    <div class="update-card">
+      <div class="update-thumb" style="background:${u.gradient};border-radius:8px;"></div>
+      <div class="update-info">
+        <div class="update-chapter">${u.chapter}</div>
+        <div class="update-title">${u.title}</div>
+        <div class="update-time">${u.time}</div>
+      </div>
+      <div class="update-dot"></div>
+    </div>
+  `).join('');
+}
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── FILTER CHIPS ──
+function setFilter(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── GENRE PILLS ──
+function selectGenre(el) {
+  document.querySelectorAll('.genre-pill').forEach(p => { p.classList.remove('selected', 'selected-rust'); });
+  el.classList.add('selected-rust');
+}
+
+// ── FOLLOW TOGGLE ──
+function toggleFollow(btn) {
+  const isFollowing = btn.classList.contains('following');
+  btn.classList.toggle('following', !isFollowing);
+  btn.textContent = isFollowing ? '+ Follow' : '✓ Following';
+  if (!isFollowing) { btn.style.background = 'var(--sage-light)'; btn.style.color = 'white'; btn.style.borderColor = 'var(--sage-light)'; }
+  else { btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+}
+
+// ── INIT ──
+renderStories();
+renderAuthors();
+renderUpdates();
+</script>
+</body>
+</html>

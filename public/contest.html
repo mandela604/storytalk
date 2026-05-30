@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · Launch Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.28);--glow2:rgba(255,0,80,.14);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;--card2:#13131e;
+  --tx:#f5f5f7;--muted:#666;--muted2:#999;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.05);
+  --gold:#f59e0b;--blue:#00aaff;--green:#10b981;
+  --nav-h:66px;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--nav-h) + 8px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.3)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* ── TOP BAR ── */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:13px 14px 11px;background:rgba(7,7,11,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.back-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#ccc;transition:.15s;flex-shrink:0}
+.back-btn:active{transform:scale(.9)}
+.top-center{display:flex;flex-direction:column;align-items:center;gap:1px}
+.top-title{font-size:15px;font-weight:600;color:#fff;letter-spacing:.01em}
+.top-sub-line{font-size:10px;color:var(--muted2);font-weight:500}
+.sponsor-pill{background:rgba(255,255,255,.06);color:var(--muted2);font-size:10px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--bd);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.sponsor-pill .sp-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* ── HERO CARD ── */
+.hero-card{margin:12px 14px 0;border-radius:18px;overflow:hidden;position:relative;border:1px solid rgba(255,0,80,.18);background:var(--card)}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0010 0%,#2d0030 35%,#0d0020 65%,#07070b 100%)}
+.hero-bg-glow{position:absolute;top:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,0,80,.12),transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:16px 16px 14px}
+.hero-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.hero-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff;line-height:1.25;flex:1}
+.hero-live-badge{display:flex;align-items:center;gap:4px;background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.28);color:var(--acc2);font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.hero-live-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pulse 1.3s ease-in-out infinite;flex-shrink:0}
+.hero-meta{font-size:11px;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.hero-meta-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.hstat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 8px 9px;text-align:center}
+.hstat-num{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--acc);line-height:1;margin-bottom:2px}
+.hstat-lbl{font-size:9px;color:var(--muted);font-weight:500}
+
+/* JOIN BANNER */
+.join-banner{margin:10px 14px 0;background:linear-gradient(90deg,rgba(255,0,80,.1),rgba(255,107,138,.07));border:1px solid rgba(255,0,80,.22);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.jb-icon{font-size:22px;flex-shrink:0}
+.jb-text{flex:1;min-width:0}
+.jb-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.jb-sub{font-size:10px;color:var(--muted2)}
+.jb-btn{background:var(--acc);color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 14px var(--glow2);white-space:nowrap;flex-shrink:0;transition:.18s}
+.jb-btn:active{transform:scale(.95)}
+
+/* COUNTDOWN */
+.cd-bar{margin:10px 14px 0;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.cd-left{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);font-weight:500}
+.cd-left i{color:var(--acc);font-size:12px}
+.cd-timer{font-size:13px;font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+/* TABS */
+.tabs-wrap{display:flex;gap:0;margin:12px 14px 0;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:14px;padding:3px;overflow:hidden}
+.tab-btn{flex:1;font-size:11px;font-weight:600;padding:7px 4px;border-radius:11px;cursor:pointer;color:var(--muted);background:transparent;border:none;transition:.2s;font-family:'DM Sans',sans-serif;white-space:nowrap;text-align:center}
+.tab-btn.active{background:var(--acc);color:#fff;font-weight:700;box-shadow:0 0 12px var(--glow2)}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;padding:16px 14px 10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── PODIUM ── */
+.podium-outer{padding:4px 14px 16px}
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.pod{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:110px}
+.pod.first{transform:translateY(-12px)}
+.pod-emoji{font-size:20px;line-height:1;margin-bottom:1px}
+.pod-av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;border:2px solid #2a2a3a;flex-shrink:0;font-size:13px}
+.pod.first .pod-av{width:52px;height:52px;border-color:var(--acc);box-shadow:0 0 18px var(--glow);font-size:15px}
+.pod.second .pod-av{width:42px;height:42px}
+.pod.third .pod-av{width:36px;height:36px}
+.pod-name{font-size:10px;color:#ccc;font-weight:600;text-align:center;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.pod-score{font-size:10px;font-weight:700;font-variant-numeric:tabular-nums}
+.pod.first .pod-score{color:var(--gold)}
+.pod.second .pod-score,.pod.third .pod-score{color:var(--muted2)}
+.pod-bar{width:100%;border-radius:6px 6px 0 0}
+.pod.first .pod-bar{height:64px;background:linear-gradient(to top,rgba(255,0,80,.8),rgba(255,0,80,.3));border:1px solid rgba(255,0,80,.3);border-bottom:none}
+.pod.second .pod-bar{height:46px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-bottom:none}
+.pod.third .pod-bar{height:34px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-bottom:none}
+.pod-bar-floor{width:calc(100% + 28px * 3 + 8px * 2);height:2px;background:rgba(255,255,255,.07);margin:0 auto}
+
+/* ── RANK ROW ── */
+.rankings-wrap{padding:0 14px}
+.rank-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid rgba(255,255,255,.05);animation:fadeUp .2s ease both}
+.rank-row:last-child{border-bottom:none}
+.rank-num{font-size:12px;font-weight:800;min-width:18px;text-align:center;flex-shrink:0;font-family:'Playfair Display',serif}
+.rank-num.r1{color:var(--gold)}.rank-num.r2{color:#9ca3af}.rank-num.r3{color:#cd7c4b}.rank-num.rn{color:rgba(255,255,255,.2)}
+.rank-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:1.5px solid transparent}
+.rank-info{flex:1;min-width:0}
+.rank-title{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;line-height:1.3}
+.rank-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.rank-author{font-size:10px;color:var(--muted2)}
+.genre-pill{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600;display:inline-block}
+.contest-pill{font-size:9px;padding:2px 7px;border-radius:10px;background:#2a2200;color:var(--gold);border:.5px solid #3a3000;font-weight:600;display:inline-block}
+.rank-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.rank-pts{font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:var(--acc)}
+.movement{font-size:9px;font-weight:700;padding:1px 5px;border-radius:7px;font-variant-numeric:tabular-nums}
+.mv-up{color:#3B6D11;background:rgba(16,185,129,.12)}
+.mv-zero{color:rgba(255,255,255,.2)}
+.mv-down{color:#e74c3c;background:rgba(231,76,60,.1)}
+/* ROW ACTION BAR — heart/comment/view/share */
+.rank-actions{display:flex;align-items:center;gap:10px;margin-top:6px}
+.rk-act{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;user-select:none}
+.rk-act:active{color:var(--acc2)}
+.rk-act i{font-size:12px}
+.rk-act.liked i,.rk-act.liked span{color:var(--acc)}
+.rk-share-btn{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--muted2);cursor:pointer;padding:3px 9px;border-radius:10px;border:.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:.15s}
+.rk-share-btn:active{background:rgba(255,0,80,.1);color:var(--acc2)}
+
+/* ── STORY CARDS (stories tab) ── */
+.stories-wrap{padding:0 14px;display:flex;flex-direction:column;gap:10px}
+.sc{background:var(--card);border:1px solid var(--bd);border-radius:16px;overflow:hidden;animation:fadeUp .22s ease both}
+.sc:active{opacity:.95}
+.sc-cover{width:100%;height:130px;object-fit:cover;display:block;background-size:cover;background-position:center 30%}
+.sc-body{padding:11px 12px 12px}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:6px}
+.sc-pills{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1}
+.sc-ch-pill{background:rgba(255,255,255,.06);color:var(--muted);font-size:9px;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.sc-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-author-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.sc-author{font-size:11px;color:var(--muted2)}
+.sc-follow{border:.5px solid rgba(255,255,255,.15);color:var(--muted2);font-size:10px;padding:3px 11px;border-radius:20px;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.18s}
+.sc-follow.ing{color:var(--acc2);border-color:rgba(255,0,80,.3)}
+.sc-follow:active{transform:scale(.95)}
+/* icon row matching index.html + trending top10 style */
+.sc-icon-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.sci{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;user-select:none}
+.sci i{font-size:12px}
+.sci.liked i,.sci.liked span{color:var(--acc)}
+.sci-share{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--muted2);cursor:pointer;padding:3px 9px;border-radius:10px;border:.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:.15s}
+.sci-share:active{background:rgba(255,0,80,.1);color:var(--acc2)}
+.sc-read-btn{width:100%;background:var(--acc);color:#fff;border:none;border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.18s;box-shadow:0 2px 14px var(--glow2)}
+.sc-read-btn:active{transform:scale(.98)}
+
+/* ── MY RANK ── */
+.myrank-wrap{padding:0 14px}
+.mr-card{background:var(--card);border:1px solid rgba(255,0,80,.15);border-radius:18px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.mr-card-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,0,80,.08),transparent 70%);pointer-events:none}
+.mr-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.mr-rank-num{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:var(--acc);line-height:1;flex-shrink:0}
+.mr-rank-info{flex:1}
+.mr-rank-label{font-size:11px;color:var(--muted2);margin-bottom:3px}
+.mr-rank-story{font-size:13px;font-weight:600;color:#fff;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mr-divider{height:.5px;background:rgba(255,255,255,.08);margin-bottom:14px}
+.mr-pts-row{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.mr-pts{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff}
+.mr-pts-lbl{font-size:11px;color:var(--muted2)}
+.mr-progress-lbl{font-size:10px;color:var(--muted2);margin-bottom:6px}
+.mr-prog-bg{width:100%;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.mr-prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.mr-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 0}
+.mr-stat{background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:12px;padding:11px 10px;text-align:center}
+.mr-stat-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--acc);line-height:1;margin-bottom:2px}
+.mr-stat-lbl{font-size:9px;color:var(--muted);font-weight:500}
+/* nudge */
+.nudge-card{background:linear-gradient(90deg,rgba(255,0,80,.08),rgba(255,107,138,.05));border:1px solid rgba(255,0,80,.18);border-radius:14px;padding:13px 14px;display:flex;align-items:flex-start;gap:11px;margin-bottom:12px}
+.nudge-icon{font-size:22px;flex-shrink:0;margin-top:1px;animation:float 2.8s ease-in-out infinite}
+.nudge-body{flex:1}
+.nudge-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.nudge-text{font-size:11px;color:var(--muted2);line-height:1.5;margin-bottom:9px}
+.nudge-actions{display:flex;gap:7px;flex-wrap:wrap}
+.nudge-btn{padding:7px 15px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.18s}
+.nudge-btn.pri{background:var(--acc);color:#fff;box-shadow:0 0 12px var(--glow2)}
+.nudge-btn.sec{background:rgba(255,255,255,.07);border:1px solid var(--bd);color:var(--muted2)}
+.nudge-btn:active{transform:scale(.96)}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,14px)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px;position:relative}
+.bn-item i{font-size:20px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ── SHARE MODAL (from alerts.html) ── */
+.modal-bg{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:flex-end;max-width:480px;margin:0 auto}
+.modal-bg.open{display:flex}
+.share-sheet{width:100%;background:#13131a;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:90vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.share-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:34px;height:4px;background:rgba(255,255,255,.18);border-radius:4px;margin:10px auto 0}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 10px}
+.modal-hdr h3{font-size:15px;font-weight:800}
+.modal-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#ccc;border:none;flex-shrink:0}
+.share-preview-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:12px;padding:10px;margin:0 16px 12px;border:1px solid var(--bd2)}
+.share-preview-img{width:46px;height:46px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0}
+.share-preview-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;line-height:1.3}
+.share-preview-sub{font-size:10px;color:var(--muted2)}
+/* special post buttons */
+.share-special-row{display:flex;gap:10px;padding:0 16px 12px}
+.sh-special{flex:1;padding:10px 8px;border-radius:14px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;transition:.15s}
+.sh-special:active{transform:scale(.95)}
+.sh-special i{font-size:17px}
+.sh-special.status-opt{background:linear-gradient(135deg,#0044ff,#00aaff)}
+.sh-special.profile-opt{background:rgba(255,0,80,.25);border:1px solid rgba(255,0,80,.35)}
+/* link row */
+.share-link-row{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:11px;padding:8px 11px;margin:0 16px 12px}
+.share-link-row input{flex:1;background:transparent;border:none;color:#bbb;font-size:11px;outline:none}
+.copy-link-btn{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}
+/* platform icons */
+.share-icons-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:0 16px 8px}
+.sh-icon{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s}
+.sh-icon:active{transform:scale(.9)}
+.sh-icon-bg{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.sh-icon span{font-size:9px;font-weight:600;color:var(--muted2)}
+.sh-copy-msg{text-align:center;font-size:11px;color:var(--acc2);font-weight:600;height:16px;padding-bottom:14px}
+/* NOTE MODAL */
+.note-sheet{width:100%;background:#16161f;border-radius:20px 20px 0 0;animation:slideUp .26s ease;padding-bottom:env(safe-area-inset-bottom,20px)}
+.note-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--bd)}
+.note-hdr h3{font-size:13px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+.note-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.note-preview-mini{display:flex;gap:9px;margin:10px 16px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;align-items:center}
+.note-mini-img{width:36px;height:36px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.note-mini-title{font-size:11px;font-weight:700;color:#fff;line-height:1.3}
+.note-textarea{width:calc(100% - 32px);margin:0 16px 12px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;line-height:1.5;min-height:70px}
+.note-textarea::placeholder{color:#444}
+.note-audience-row{display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px}
+.note-aud-label{font-size:10px;color:var(--muted2);font-weight:600}
+.note-aud-sel{background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;color:#ccc;font-family:'DM Sans',sans-serif;font-size:10px;padding:5px 10px;outline:none;cursor:pointer}
+.note-aud-sel option{background:#1a1a24}
+.note-post-btn{display:block;width:calc(100% - 32px);margin:0 16px;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 16px var(--glow2)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:#1e1e28;border:1px solid rgba(255,255,255,.12);color:#fff;padding:9px 20px;border-radius:30px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.7)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="back-btn" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></div>
+  <div class="top-center">
+    <div class="top-title">Launch Challenge</div>
+    <div class="top-sub-line" id="topSubLine">Week 2 of 4</div>
+  </div>
+  <div class="sponsor-pill" id="sponsorPill"><span class="sp-dot"></span>by Paystack</div>
+</div>
+
+<!-- HERO CARD -->
+<div class="hero-card">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-glow"></div>
+  <div class="hero-content">
+    <div class="hero-top-row">
+      <div class="hero-name" id="heroName">The Droboard Launch Writer Challenge</div>
+      <div class="hero-live-badge"><div class="hero-live-dot"></div>Live</div>
+    </div>
+    <div class="hero-meta" id="heroMeta">
+      <span>38 stories entered</span>
+      <span class="hero-meta-sep"></span>
+      <span>Week 2 of 4</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-num" id="hstStories">38</div><div class="hstat-lbl">Stories</div></div>
+      <div class="hstat"><div class="hstat-num" id="hstReads">12.4k</div><div class="hstat-lbl">Reads</div></div>
+      <div class="hstat"><div class="hstat-num" id="hstDebates">3.1k</div><div class="hstat-lbl">Debates</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- JOIN BANNER -->
+<div class="join-banner" id="joinBanner">
+  <div class="jb-icon">✍️</div>
+  <div class="jb-text">
+    <div class="jb-title">Contest is live — enter now</div>
+    <div class="jb-sub">Submit your story before the deadline</div>
+  </div>
+  <button class="jb-btn" onclick="handleJoin()">Join Contest</button>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="cd-bar">
+  <div class="cd-left"><i class="fas fa-clock"></i> Contest ends in</div>
+  <div class="cd-timer" id="cdTimer">14d 00:00:00</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <button class="tab-btn active" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+  <button class="tab-btn" onclick="switchTab('stories',this)">Stories</button>
+  <button class="tab-btn" onclick="switchTab('myrank',this)">My Rank</button>
+</div>
+
+<!-- ══ LEADERBOARD PANEL ══ -->
+<div class="panel" id="panel-leaderboard">
+  <div class="sec-label">Top 3 this week</div>
+  <div class="podium-outer"><div class="podium-wrap" id="podiumWrap"></div></div>
+  <div class="sec-label">Full rankings</div>
+  <div class="rankings-wrap" id="rankingsList"></div>
+</div>
+
+<!-- ══ STORIES PANEL ══ -->
+<div class="panel" id="panel-stories" style="display:none">
+  <div class="sec-label" style="margin-top:4px">All contest stories</div>
+  <div class="stories-wrap" id="storiesList"></div>
+</div>
+
+<!-- ══ MY RANK PANEL ══ -->
+<div class="panel" id="panel-myrank" style="display:none;padding:4px 0 0">
+  <div class="sec-label">Your contest stats</div>
+  <div class="myrank-wrap">
+    <div class="mr-card">
+      <div class="mr-card-glow"></div>
+      <div class="mr-top">
+        <div class="mr-rank-num" id="mrNum">#7</div>
+        <div class="mr-rank-info">
+          <div class="mr-rank-label">Your current rank</div>
+          <div class="mr-rank-story" id="mrTitle">Lecturer said my work was plagiarised. It was his.</div>
+        </div>
+      </div>
+      <div id="mrGenrePill" style="margin-bottom:12px"></div>
+      <div class="mr-divider"></div>
+      <div class="mr-pts-row"><div class="mr-pts" id="mrPts">3,204</div><div class="mr-pts-lbl">points</div></div>
+      <div class="mr-progress-lbl" id="mrProgLbl">328 pts to reach #6</div>
+      <div class="mr-prog-bg"><div class="mr-prog-fill" id="mrProgFill" style="width:0%"></div></div>
+      <div class="mr-stats">
+        <div class="mr-stat"><div class="mr-stat-num" id="mrReads">3.2k</div><div class="mr-stat-lbl">Story reads</div></div>
+        <div class="mr-stat"><div class="mr-stat-num" id="mrDebates">411</div><div class="mr-stat-lbl">Debates</div></div>
+        <div class="mr-stat"><div class="mr-stat-num" id="mrQuotes">189</div><div class="mr-stat-lbl">Quotes shared</div></div>
+        <div class="mr-stat"><div class="mr-stat-num" id="mrComments">624</div><div class="mr-stat-lbl">Comments</div></div>
+      </div>
+    </div>
+    <div class="nudge-card">
+      <div class="nudge-icon">🔥</div>
+      <div class="nudge-body">
+        <div class="nudge-title">Climb the leaderboard</div>
+        <div class="nudge-text">Every read, debate vote, and quote share earns points. Share your story now to move up.</div>
+        <div class="nudge-actions">
+          <button class="nudge-btn pri" id="myShareBtn">📤 Share My Story</button>
+          <button class="nudge-btn sec" onclick="toast('📊 Opening analytics…')">View Stats</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="toast('🏠 Home')"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="toast('🔍 Discover')"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item active"><i class="fas fa-trophy"></i>Contest</div>
+  <div class="bn-item" onclick="toast('🔔 Alerts')"><i class="fas fa-bell"></i>Alerts</div>
+  <div class="bn-item" onclick="toast('👤 Profile')"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<!-- ══ SHARE MODAL ══ -->
+<div class="modal-bg" id="shareModal">
+  <div class="share-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <h3>Share <span id="shareTypeLabel"></span></h3>
+      <button class="modal-close" onclick="closeShareModal()">✕</button>
+    </div>
+    <div class="share-preview-row" id="sharePreviewRow"></div>
+    <div class="share-special-row">
+      <div class="sh-special status-opt" onclick="openNoteModal('status')"><i class="fas fa-circle-notch"></i>Post to Status</div>
+      <div class="sh-special profile-opt" onclick="openNoteModal('profile')"><i class="fas fa-user-circle"></i>Post to Profile</div>
+    </div>
+    <div class="share-link-row">
+      <input type="text" id="shareLinkInput" readonly/>
+      <button class="copy-link-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div class="share-icons-row">
+      <div class="sh-icon" onclick="shareVia('whatsapp')"><div class="sh-icon-bg" style="background:#1ebe57"><i class="fab fa-whatsapp" style="color:#fff;font-size:20px"></i></div><span>WhatsApp</span></div>
+      <div class="sh-icon" onclick="shareVia('twitter')"><div class="sh-icon-bg" style="background:#000;border:1px solid #333"><i class="fab fa-x-twitter" style="color:#fff;font-size:19px"></i></div><span>X</span></div>
+      <div class="sh-icon" onclick="shareVia('instagram')"><div class="sh-icon-bg" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)"><i class="fab fa-instagram" style="color:#fff;font-size:20px"></i></div><span>Instagram</span></div>
+      <div class="sh-icon" onclick="shareVia('telegram')"><div class="sh-icon-bg" style="background:#0088cc"><i class="fab fa-telegram" style="color:#fff;font-size:20px"></i></div><span>Telegram</span></div>
+      <div class="sh-icon" onclick="shareVia('facebook')"><div class="sh-icon-bg" style="background:#1877f2"><i class="fab fa-facebook" style="color:#fff;font-size:20px"></i></div><span>Facebook</span></div>
+      <div class="sh-icon" onclick="copyShareLink()"><div class="sh-icon-bg" style="background:rgba(255,255,255,.08)"><i class="fas fa-link" style="color:#fff;font-size:17px"></i></div><span>Copy Link</span></div>
+    </div>
+    <div class="sh-copy-msg" id="shCopyMsg"></div>
+  </div>
+</div>
+
+<!-- ══ NOTE MODAL ══ -->
+<div class="modal-bg" id="noteModal">
+  <div class="note-sheet">
+    <div class="modal-handle"></div>
+    <div class="note-hdr">
+      <h3 id="noteTitle"><i class="fas fa-circle-notch" style="color:var(--acc);font-size:12px"></i> Post to Status</h3>
+      <button class="note-close" onclick="closeNoteModal()">✕</button>
+    </div>
+    <div class="note-preview-mini" id="notePreviewMini"></div>
+    <textarea class="note-textarea" id="noteTextarea" rows="3" placeholder="Add a note… your reaction, what makes this story unforgettable"></textarea>
+    <div class="note-audience-row">
+      <span class="note-aud-label">Share with:</span>
+      <select class="note-aud-sel" id="noteAudience">
+        <option value="followers">👥 My Followers</option>
+        <option value="public">🌍 Everyone</option>
+        <option value="private">🔒 Only Me</option>
+      </select>
+    </div>
+    <button class="note-post-btn" onclick="submitNote()">Post ✓</button>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   API LAYER
+   ═══════════════════════════════════════════ */
+const API_CONFIG = {
+  USE_LIVE_API: false,
+  BASE_URL: 'https://api.droboard.app/v1',
+  ENDPOINTS: {
+    contest:     '/contest/active',
+    leaderboard: '/contest/leaderboard',
+    myRank:      '/contest/my-rank',
+    stories:     '/contest/stories'
+  }
+};
+
+async function fetchData(endpoint) {
+  if (!API_CONFIG.USE_LIVE_API) return getDemoData(endpoint);
+  try {
+    const res = await fetch(API_CONFIG.BASE_URL + endpoint);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (err) {
+    console.warn('[Droboard] API error, falling back:', err);
+    toast('Using cached data');
+    return getDemoData(endpoint);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DEMO DATA
+   ═══════════════════════════════════════════ */
+const COVERS = [
+  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=700&q=80',
+  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=700&q=80',
+  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700&q=80',
+  'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=700&q=80',
+  'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80',
+  'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=700&q=80',
+  'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=700&q=80',
+  'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=700&q=80',
+  'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&q=80',
+  'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&q=80',
+];
+
+function getDemoData(endpoint) {
+  const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const LB = [
+    {rank:1, username:'@Ada_Writes',   title:'I came home early and caught my husband kissing my late sister\'s...', genre:'Betrayal',  points:11302, movement:0,  season:2,chapter:4},
+    {rank:2, username:'@TChioma',      title:'My grandmother\'s will revealed I wasn\'t her blood',                   genre:'Family',    points:8241,  movement:2,  season:3,chapter:12},
+    {rank:3, username:'@DamiKing',     title:'He deleted her number in front of me',                                  genre:'Campus',    points:6890,  movement:0,  season:1,chapter:7},
+    {rank:4, username:'@Nfancy',       title:'She sent the screenshot to the group chat',                             genre:'Heartbreak',points:5102,  movement:1,  season:1,chapter:3},
+    {rank:5, username:'@Kemi_E',       title:'The night before her wedding he called',                                genre:'Romance',   points:4823,  movement:0,  season:1,chapter:5},
+    {rank:6, username:'@IfeoluwaW',    title:'My father came back after 11 years with a new family',                  genre:'Family',    points:3901,  movement:3,  season:2,chapter:6},
+    {rank:7, username:'@CampusKing',   title:'Lecturer said my work was plagiarised. It was his.',                   genre:'Campus',    points:3204,  movement:-1, season:1,chapter:4},
+    {rank:8, username:'@NaijaDrama',   title:'She introduced me as her friend at her engagement',                    genre:'Betrayal',  points:2876,  movement:0,  season:1,chapter:2},
+    {rank:9, username:'@StoryByTemi',  title:'I found my mum\'s diary. I wish I hadn\'t.',                           genre:'Family',    points:2341,  movement:2,  season:1,chapter:3},
+    {rank:10,username:'@WriteByNight', title:'He blocked me on everything but kept reading my stories',              genre:'Romance',   points:1987,  movement:-1, season:1,chapter:1},
+  ];
+  const STORIES_DATA = LB.map((e, i) => ({
+    ...e,
+    cover: COVERS[i],
+    likes: Math.floor(Math.random() * 6000) + 800,
+    comments: Math.floor(Math.random() * 1200) + 120,
+    reads: Math.floor(Math.random() * 18000) + 2000,
+    liked: false,
+    followed: false
+  }));
+  const MAP = {
+    [API_CONFIG.ENDPOINTS.contest]: {
+      name:'The Droboard Launch Writer Challenge', sponsor:'by Paystack', status:'active',
+      week:2, totalWeeks:4, endDate:endDate.toISOString(),
+      totalStories:38, totalReads:12400, totalDebates:3100
+    },
+    [API_CONFIG.ENDPOINTS.leaderboard]: LB,
+    [API_CONFIG.ENDPOINTS.stories]: STORIES_DATA,
+    [API_CONFIG.ENDPOINTS.myRank]: {
+      username:'@YourWriter', rank:7, points:3204, pointsToNext:328,
+      storyTitle:'Lecturer said my work was plagiarised. It was his.',
+      genre:'Campus', reads:3200, debates:411, quotes:189, comments:624,
+      cover: COVERS[6]
+    }
+  };
+  return MAP[endpoint] || null;
+}
+
+/* ═══════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════ */
+function formatNumber(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'k';
+  return String(n);
+}
+function formatCountdown(endDate) {
+  const diff = Math.max(0, new Date(endDate) - Date.now());
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const p = n => String(n).padStart(2,'0');
+  return `${d}d ${p(h)}:${p(m)}:${p(s)}`;
+}
+function getInitials(u) {
+  const c = u.replace('@','');
+  const res = [c[0].toUpperCase()];
+  const m = c.match(/_([a-zA-Z])/);
+  if (m) res.push(m[1].toUpperCase());
+  else { const k = c.slice(1).match(/[A-Z]/); if (k) res.push(k[0]); }
+  return res.slice(0,2).join('');
+}
+function getGenreStyle(genre) {
+  const map = {
+    'Betrayal':  {bg:'#2a1218',color:'#ff6b8a',border:'rgba(255,107,138,.25)'},
+    'Heartbreak':{bg:'#2a1218',color:'#ff6b8a',border:'rgba(255,107,138,.25)'},
+    'Romance':   {bg:'#2a1218',color:'#ff6b8a',border:'rgba(255,107,138,.25)'},
+    'Family':    {bg:'#2a1a0a',color:'#f59e0b',border:'rgba(245,158,11,.25)'},
+    'Campus':    {bg:'#0d1a2a',color:'#38bdf8',border:'rgba(56,189,248,.25)'},
+    'Twist':     {bg:'#1a1228',color:'#a78bfa',border:'rgba(167,139,250,.25)'},
+    'Revenge':   {bg:'#2a1010',color:'#f97316',border:'rgba(249,115,22,.25)'},
+    'Elegy':     {bg:'#0a1a20',color:'#5bc4d4',border:'rgba(91,196,212,.25)'},
+  };
+  return map[genre] || {bg:'#1a1a1a',color:'#888',border:'rgba(255,255,255,.1)'};
+}
+function genrePillHTML(genre) {
+  const s = getGenreStyle(genre);
+  return `<span class="genre-pill" style="background:${s.bg};color:${s.color};border:.5px solid ${s.border}">${genre}</span>`;
+}
+function avColor(rank) {
+  if (rank === 1) return {bg:'rgba(255,0,80,.2)',border:'var(--acc)',color:'var(--acc)'};
+  if (rank <= 3) return {bg:'rgba(255,255,255,.07)',border:'rgba(255,255,255,.15)',color:'#ccc'};
+  return {bg:'rgba(255,255,255,.04)',border:'rgba(255,255,255,.07)',color:'#666'};
+}
+function mvHTML(mv) {
+  if (mv > 0) return `<span class="movement mv-up">▲ ${mv}</span>`;
+  if (mv < 0) return `<span class="movement mv-down">▼ ${Math.abs(mv)}</span>`;
+  return `<span class="movement mv-zero">—</span>`;
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════ */
+let _contestEndDate = null;
+let _leaderboard = [];
+let _stories = [];
+let _myRank = null;
+let _storyLikes = {};  // id -> {liked, count}
+let _storyComments = {}; // id -> count
+let _storyViews = {}; // id -> count
+let _rankLikes = {};  // rank -> liked
+let _followState = {}; // username -> followed
+let _shareData = {}; // current share context
+let _noteTarget = 'status';
+
+/* ═══════════════════════════════════════════
+   COUNTDOWN
+   ═══════════════════════════════════════════ */
+function startCountdown(endDate) {
+  _contestEndDate = endDate;
+  const el = document.getElementById('cdTimer');
+  function tick() { el.textContent = formatCountdown(_contestEndDate); }
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   TAB SWITCHING
+   ═══════════════════════════════════════════ */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['leaderboard','stories','myrank'].forEach(id => {
+    const el = document.getElementById('panel-'+id);
+    if (el) el.style.display = (id === tab) ? 'block' : 'none';
+  });
+  if (tab === 'myrank') setTimeout(animateProgress, 80);
+}
+
+/* ═══════════════════════════════════════════
+   JOIN
+   ═══════════════════════════════════════════ */
+let _joined = false;
+function handleJoin() {
+  _joined = true;
+  const banner = document.getElementById('joinBanner');
+  const btn = banner.querySelector('.jb-btn');
+  btn.textContent = '✓ Entered';
+  btn.style.background = '#10b981';
+  btn.style.boxShadow = '0 0 14px rgba(16,185,129,.3)';
+  banner.querySelector('.jb-title').textContent = "You're in! Write your best story";
+  banner.querySelector('.jb-sub').textContent = 'Entry submitted — check My Rank for your position';
+  toast('🎉 You\'ve joined the contest!');
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: HERO
+   ═══════════════════════════════════════════ */
+function renderHero(d) {
+  document.getElementById('heroName').textContent = d.name;
+  document.getElementById('heroMeta').innerHTML = `<span>${d.totalStories} stories entered</span><span class="hero-meta-sep"></span><span>Week ${d.week} of ${d.totalWeeks}</span>`;
+  document.getElementById('topSubLine').textContent = `Week ${d.week} of ${d.totalWeeks}`;
+  document.getElementById('sponsorPill').innerHTML = `<span class="sp-dot"></span>${d.sponsor}`;
+  document.getElementById('hstStories').textContent = formatNumber(d.totalStories);
+  document.getElementById('hstReads').textContent = formatNumber(d.totalReads);
+  document.getElementById('hstDebates').textContent = formatNumber(d.totalDebates);
+  if (d.status !== 'active') document.getElementById('joinBanner').style.display = 'none';
+  startCountdown(d.endDate);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: PODIUM
+   ═══════════════════════════════════════════ */
+function renderPodium(lb) {
+  const top3 = lb.slice(0,3);
+  const order = [top3[1], top3[0], top3[2]];
+  const cls   = ['second','first','third'];
+  const emojis= ['🥈','🥇','🥉'];
+  document.getElementById('podiumWrap').innerHTML = order.map((e, i) => {
+    const ac = avColor(e.rank);
+    const ini = getInitials(e.username);
+    return `<div class="pod ${cls[i]}">
+      <div class="pod-emoji">${emojis[i]}</div>
+      <div class="pod-av" style="background:${ac.bg};border-color:${ac.border};color:${ac.color}">${ini}</div>
+      <div class="pod-name">${e.username}</div>
+      <div class="pod-score">${formatNumber(e.points)} pts</div>
+      <div class="pod-bar"></div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: RANKINGS
+   ═══════════════════════════════════════════ */
+function renderRankings(lb) {
+  // init like state
+  lb.forEach(e => { if (!_rankLikes[e.rank]) _rankLikes[e.rank] = {liked:false, count: Math.floor(Math.random()*800)+50}; });
+  const numCls = r => r===1?'r1':r<=3?`r${r}`:'rn';
+  document.getElementById('rankingsList').innerHTML = lb.map((e, idx) => {
+    const ac = avColor(e.rank);
+    const ini = getInitials(e.username);
+    const lk = _rankLikes[e.rank];
+    return `<div class="rank-row" style="animation-delay:${idx*0.04}s">
+      <div class="rank-num ${numCls(e.rank)}">${e.rank}</div>
+      <div class="rank-av" style="background:${ac.bg};border-color:${ac.border};color:${ac.color}">${ini}</div>
+      <div class="rank-info">
+        <div class="rank-title">${e.title}</div>
+        <div class="rank-meta">
+          <span class="rank-author">${e.username}</span>
+          ${genrePillHTML(e.genre)}
+          <span class="contest-pill">Contest</span>
+        </div>
+        <div class="rank-actions">
+          <div class="rk-act${lk.liked?' liked':''}" id="rklike-${e.rank}" onclick="toggleRankLike(${e.rank})">
+            <i class="${lk.liked?'fas':'far'} fa-heart"></i><span>${formatNumber(lk.count)}</span>
+          </div>
+          <div class="rk-act" onclick="toast('💬 Opening story…')">
+            <i class="far fa-comment"></i><span>${formatNumber(Math.floor(Math.random()*400)+30)}</span>
+          </div>
+          <div class="rk-act" onclick="toast('👁 Opening story…')">
+            <i class="far fa-eye"></i><span>${formatNumber(Math.floor(Math.random()*4000)+500)}</span>
+          </div>
+          <div class="rk-share-btn" onclick="openShareForRank(${e.rank})"><i class="fas fa-share-alt"></i> Share</div>
+        </div>
+      </div>
+      <div class="rank-right">
+        <div class="rank-pts">${formatNumber(e.points)}</div>
+        ${mvHTML(e.movement)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRankLike(rank) {
+  const lk = _rankLikes[rank];
+  lk.liked = !lk.liked;
+  lk.count += lk.liked ? 1 : -1;
+  const el = document.getElementById('rklike-'+rank);
+  if (!el) return;
+  el.classList.toggle('liked', lk.liked);
+  el.querySelector('i').className = lk.liked ? 'fas fa-heart' : 'far fa-heart';
+  el.querySelector('span').textContent = formatNumber(lk.count);
+}
+
+function openShareForRank(rank) {
+  const e = _leaderboard.find(x => x.rank === rank);
+  if (!e) return;
+  openShareModal({
+    title: e.title,
+    sub: `${e.username} · ${formatNumber(e.points)} pts`,
+    img: COVERS[(rank-1) % COVERS.length],
+    url: `https://droboard.app/contest/story/${rank}`,
+    typeLabel: '📊 Ranking'
+  });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: STORIES
+   ═══════════════════════════════════════════ */
+function renderStories(stories) {
+  stories.forEach(s => {
+    if (!_storyLikes[s.rank]) _storyLikes[s.rank] = {liked: false, count: s.likes};
+    if (!_storyComments[s.rank]) _storyComments[s.rank] = s.comments;
+    if (!_storyViews[s.rank]) _storyViews[s.rank] = s.reads;
+    if (!_followState[s.username]) _followState[s.username] = false;
+  });
+  document.getElementById('storiesList').innerHTML = stories.map((s, idx) => {
+    const lk = _storyLikes[s.rank];
+    const fol = _followState[s.username];
+    return `<div class="sc" style="animation-delay:${idx*0.05}s">
+      <div class="sc-cover" style="background-image:url('${s.cover}');height:130px;display:block;width:100%"></div>
+      <div class="sc-body">
+        <div class="sc-top">
+          <div class="sc-pills">${genrePillHTML(s.genre)}<span class="contest-pill">Contest</span></div>
+          <span class="sc-ch-pill">S${s.season}·Ch${s.chapter}</span>
+        </div>
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-author-row">
+          <span class="sc-author">${s.username}</span>
+          <button class="sc-follow${fol?' ing':''}" id="scfol-${s.rank}" onclick="toggleScFollow('${s.username}',${s.rank})">${fol?'✓ Following':'+ Follow'}</button>
+        </div>
+        <div class="sc-icon-row">
+          <div class="sci${lk.liked?' liked':''}" id="sclike-${s.rank}" onclick="toggleScLike(${s.rank})">
+            <i class="${lk.liked?'fas':'far'} fa-heart"></i><span>${formatNumber(lk.count)}</span>
+          </div>
+          <div class="sci" onclick="toast('💬 Opening story…')">
+            <i class="far fa-comment"></i><span>${formatNumber(_storyComments[s.rank])}</span>
+          </div>
+          <div class="sci" onclick="toast('👁 ${formatNumber(_storyViews[s.rank])} reads')">
+            <i class="far fa-eye"></i><span>${formatNumber(_storyViews[s.rank])}</span>
+          </div>
+          <div class="sci-share" onclick="openShareForStory(${s.rank})"><i class="fas fa-share-alt"></i> Share</div>
+        </div>
+        <button class="sc-read-btn" onclick="toast('📖 Opening story…')">Read Story →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleScLike(rank) {
+  const lk = _storyLikes[rank];
+  lk.liked = !lk.liked;
+  lk.count += lk.liked ? 1 : -1;
+  const el = document.getElementById('sclike-'+rank);
+  if (!el) return;
+  el.classList.toggle('liked', lk.liked);
+  el.querySelector('i').className = lk.liked ? 'fas fa-heart' : 'far fa-heart';
+  el.querySelector('span').textContent = formatNumber(lk.count);
+}
+
+function toggleScFollow(username, rank) {
+  _followState[username] = !_followState[username];
+  const f = _followState[username];
+  const btn = document.getElementById('scfol-'+rank);
+  if (btn) { btn.textContent = f ? '✓ Following' : '+ Follow'; btn.classList.toggle('ing', f); }
+  toast(f ? `Following ${username}` : `Unfollowed ${username}`);
+}
+
+function openShareForStory(rank) {
+  const s = _stories.find(x => x.rank === rank);
+  if (!s) return;
+  openShareModal({
+    title: s.title,
+    sub: `${s.username} · Contest Story`,
+    img: s.cover,
+    url: `https://droboard.app/contest/story/${rank}`,
+    typeLabel: '📖 Story'
+  });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: MY RANK
+   ═══════════════════════════════════════════ */
+function renderMyRank(d) {
+  _myRank = d;
+  document.getElementById('mrNum').textContent = '#' + d.rank;
+  document.getElementById('mrTitle').textContent = d.storyTitle;
+  document.getElementById('mrGenrePill').innerHTML = genrePillHTML(d.genre);
+  document.getElementById('mrPts').textContent = d.points.toLocaleString();
+  document.getElementById('mrProgLbl').textContent = `${d.pointsToNext} pts to reach #${d.rank - 1}`;
+  document.getElementById('mrReads').textContent = formatNumber(d.reads);
+  document.getElementById('mrDebates').textContent = formatNumber(d.debates);
+  document.getElementById('mrQuotes').textContent = formatNumber(d.quotes);
+  document.getElementById('mrComments').textContent = formatNumber(d.comments);
+  document.getElementById('myShareBtn').onclick = () => openShareModal({
+    title: d.storyTitle,
+    sub: `${d.username} · #${d.rank} in contest`,
+    img: d.cover,
+    url: `https://droboard.app/contest/my-rank`,
+    typeLabel: '🏆 My Rank'
+  });
+}
+
+function animateProgress() {
+  if (!_myRank) return;
+  const pct = Math.round(_myRank.points / (_myRank.points + _myRank.pointsToNext) * 100);
+  document.getElementById('mrProgFill').style.width = pct + '%';
+}
+
+/* ═══════════════════════════════════════════
+   SHARE MODAL
+   ═══════════════════════════════════════════ */
+function openShareModal(data) {
+  _shareData = data;
+  document.getElementById('shareTypeLabel').textContent = data.typeLabel || '';
+  document.getElementById('shareLinkInput').value = data.url || 'https://droboard.app/contest';
+  document.getElementById('shCopyMsg').textContent = '';
+  document.getElementById('sharePreviewRow').innerHTML = `
+    ${data.img ? `<div class="share-preview-img" style="background-image:url('${data.img}')"></div>` : `<div style="width:46px;height:46px;border-radius:9px;background:rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏆</div>`}
+    <div><div class="share-preview-title">${data.title || 'Droboard Contest'}</div><div class="share-preview-sub">${data.sub || 'Share on Droboard'}</div></div>`;
+  document.getElementById('shareModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('shareModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeShareModal(); });
+
+function copyShareLink() {
+  navigator.clipboard?.writeText(document.getElementById('shareLinkInput').value).catch(()=>{});
+  document.getElementById('shCopyMsg').textContent = '✅ Link copied!';
+  toast('🔗 Link copied!');
+}
+function shareVia(platform) {
+  const url = encodeURIComponent(_shareData.url || 'https://droboard.app/contest');
+  const text = encodeURIComponent(`📖 "${_shareData.title}" — Droboard Contest`);
+  const links = {
+    whatsapp: `https://wa.me/?text=${text}%20${url}`,
+    twitter:  `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+    telegram: `https://t.me/share/url?url=${url}&text=${text}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    instagram: null
+  };
+  if (platform === 'instagram') { copyShareLink(); toast('📋 Caption copied! Paste in Instagram story.'); return; }
+  if (links[platform]) { window.open(links[platform], '_blank'); closeShareModal(); }
+}
+
+/* ═══════════════════════════════════════════
+   NOTE MODAL
+   ═══════════════════════════════════════════ */
+function openNoteModal(target) {
+  _noteTarget = target;
+  closeShareModal();
+  const isStatus = target === 'status';
+  document.getElementById('noteTitle').innerHTML = `<i class="fas fa-${isStatus?'circle-notch':'user-circle'}" style="color:var(--acc);font-size:12px"></i> Post to ${isStatus?'Status':'Profile'}`;
+  const d = _shareData;
+  document.getElementById('notePreviewMini').innerHTML = `
+    ${d.img ? `<div class="note-mini-img" style="background-image:url('${d.img}')"></div>` : `<div style="width:36px;height:36px;border-radius:7px;background:rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏆</div>`}
+    <div class="note-mini-title">${d.title || 'Droboard Contest'}</div>`;
+  document.getElementById('noteTextarea').value = '';
+  document.getElementById('noteModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('noteTextarea').focus(), 200);
+}
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('noteModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeNoteModal(); });
+function submitNote() {
+  const note = document.getElementById('noteTextarea').value.trim();
+  closeNoteModal();
+  toast(_noteTarget === 'status' ? `📢 Posted to your status${note ? ' with note' : ''}!` : `✅ Posted to your profile${note ? ' with note' : ''}!`);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════ */
+async function init() {
+  // API: contest
+  const contest = await fetchData(API_CONFIG.ENDPOINTS.contest);
+  // API: leaderboard
+  const lb = await fetchData(API_CONFIG.ENDPOINTS.leaderboard);
+  // API: stories
+  const stories = await fetchData(API_CONFIG.ENDPOINTS.stories);
+  // API: myRank
+  const myRank = await fetchData(API_CONFIG.ENDPOINTS.myRank);
+
+  _leaderboard = lb;
+  _stories = stories;
+
+  renderHero(contest);
+  renderPodium(lb);
+  renderRankings(lb);
+  renderStories(stories);
+  renderMyRank(myRank);
+}
+
+init();
+</script>
+</body>
+</html>

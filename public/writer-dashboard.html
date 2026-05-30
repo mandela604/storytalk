@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · Writer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.28);--glow2:rgba(255,0,80,.12);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;--elevated:#16161f;
+  --tx:#f5f5f7;--muted:#666;--muted2:#999;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.05);
+  --gold:#f59e0b;--emerald:#10b981;--sapphire:#3b82f6;
+  --for:#10b981;--ag:#ff4444;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,0,80,.3);border-radius:3px}
+
+/* ─── NOISE OVERLAY ─── */
+body::before{content:'';position:fixed;inset:0;z-index:1000;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.5;mix-blend-mode:overlay}
+
+/* ─── LAYOUT ─── */
+.layout{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ─── */
+.sidebar{width:240px;flex-shrink:0;background:rgba(10,10,16,.97);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:90;transition:transform .3s}
+.sb-logo{padding:20px 22px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd2)}
+.sb-logo-mark{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--acc);letter-spacing:-1px}
+.sb-logo-sub{font-size:10px;font-weight:700;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.sb-profile{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);flex-shrink:0}
+.sb-name{font-size:13px;font-weight:700;color:#fff}
+.sb-handle{font-size:10px;color:var(--muted2)}
+.sb-badge{margin-left:auto;background:rgba(255,0,80,.15);border:1px solid rgba(255,0,80,.3);color:var(--acc2);font-size:8px;font-weight:800;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.sb-nav{flex:1;padding:8px 10px;overflow-y:auto;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-section-label{font-size:9px;font-weight:800;color:#444;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;cursor:pointer;transition:.15s;color:var(--muted2);font-size:12px;font-weight:600;margin-bottom:2px;text-decoration:none;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.05);color:#ccc}
+.sb-item.active{background:rgba(255,0,80,.12);color:#fff;border:1px solid rgba(255,0,80,.2)}
+.sb-item.active i{color:var(--acc)}
+.sb-item i{font-size:14px;width:18px;text-align:center;color:#555;transition:.15s}
+.sb-item:hover i{color:#aaa}
+.sb-item .badge-dot{position:absolute;right:10px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;padding:2px 5px;border-radius:8px}
+.sb-bottom{padding:12px 10px;border-top:1px solid var(--bd2)}
+.sb-earnings-pill{display:flex;align-items:center;gap:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:10px 12px;cursor:pointer;transition:.15s}
+.sb-earnings-pill:hover{background:rgba(245,158,11,.12)}
+.sb-earnings-icon{width:30px;height:30px;border-radius:9px;background:rgba(245,158,11,.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sb-earnings-val{font-size:14px;font-weight:900;color:var(--gold)}
+.sb-earnings-label{font-size:9px;color:#888;font-weight:600;margin-top:1px}
+
+/* ─── MAIN ─── */
+.main{flex:1;margin-left:240px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(7,7,11,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.page-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff}
+.topbar-greeting{font-size:12px;color:var(--muted2)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#ccc;transition:.15s;position:relative}
+.tb-btn:hover{background:rgba(255,255,255,.1)}
+.tb-notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:2px solid #07070b}
+.write-btn{display:flex;align-items:center;gap:7px;background:var(--acc);color:#fff;border:none;padding:9px 18px;border-radius:30px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 0 20px var(--glow2);transition:.2s;font-family:'DM Sans',sans-serif}
+.write-btn:hover{box-shadow:0 0 28px var(--glow)}
+.write-btn:active{transform:scale(.96)}
+
+/* ─── PANEL SYSTEM ─── */
+.panel{display:none;flex:1;padding:24px}
+.panel.active{display:block}
+
+/* ─── STAT CARDS ─── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;transition:.2s;cursor:default}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:.2s}
+.stat-card:hover::before{opacity:1}
+.stat-card.sc-acc::before{background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.stat-card.sc-gold::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.stat-card.sc-emerald::before{background:linear-gradient(90deg,#059669,#10b981)}
+.stat-card.sc-sapphire::before{background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.sc-acc .stat-icon{background:rgba(255,0,80,.12)}
+.sc-gold .stat-icon{background:rgba(245,158,11,.12)}
+.sc-emerald .stat-icon{background:rgba(16,185,129,.12)}
+.sc-sapphire .stat-icon{background:rgba(59,130,246,.12)}
+.stat-val{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;line-height:1;margin-bottom:4px}
+.sc-acc .stat-val{color:var(--acc)}
+.sc-gold .stat-val{color:var(--gold)}
+.sc-emerald .stat-val{color:var(--emerald)}
+.sc-sapphire .stat-val{color:var(--sapphire)}
+.stat-label{font-size:11px;color:var(--muted2);font-weight:600}
+.stat-delta{position:absolute;top:14px;right:14px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px}
+.delta-up{background:rgba(16,185,129,.12);color:#10b981}
+.delta-down{background:rgba(255,68,68,.12);color:#ff4444}
+.stat-sparkline{margin-top:10px;height:30px;display:flex;align-items:flex-end;gap:3px}
+.spark-bar{flex:1;border-radius:3px 3px 0 0;opacity:.7;transition:.3s}
+
+/* ─── TWO-COL GRID ─── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.full-width{margin-bottom:14px}
+.section-card{background:var(--card);border:1px solid var(--bd2);border-radius:16px;overflow:hidden}
+.section-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd2)}
+.sc-title{font-size:13px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+.sc-title i{font-size:12px;color:var(--acc)}
+.sc-action{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,107,138,.25);transition:.15s}
+.sc-action:hover{background:rgba(255,0,80,.1)}
+
+/* ─── STORIES TABLE ─── */
+.stories-table{width:100%;border-collapse:collapse}
+.st-row{display:grid;grid-template-columns:2fr 80px 80px 80px 80px 90px;align-items:center;padding:11px 20px;border-bottom:1px solid var(--bd2);transition:.15s;gap:8px}
+.st-row:last-child{border-bottom:none}
+.st-row:hover{background:rgba(255,255,255,.02)}
+.st-row.hdr{font-size:9px;font-weight:800;color:#555;letter-spacing:.08em;text-transform:uppercase;padding-top:10px;padding-bottom:10px}
+.st-title-wrap{display:flex;align-items:center;gap:10px;min-width:0}
+.st-thumb{width:38px;height:38px;border-radius:9px;object-fit:cover;flex-shrink:0;background-size:cover;background-position:center}
+.st-info{min-width:0}
+.st-story-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.st-meta{font-size:10px;color:var(--muted2);margin-top:1px}
+.st-num{font-size:12px;font-weight:700;color:#ccc;text-align:center}
+.st-status{font-size:9px;font-weight:800;padding:3px 9px;border-radius:10px;text-align:center;white-space:nowrap}
+.st-status.live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
+.st-status.draft{background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.2)}
+.st-status.scheduled{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.st-actions{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.st-act-btn{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#888;transition:.15s}
+.st-act-btn:hover{background:rgba(255,0,80,.12);color:var(--acc);border-color:rgba(255,0,80,.25)}
+
+/* ─── CHART ─── */
+.chart-wrap{padding:16px 20px 12px}
+.chart-legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--muted2)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chart-area{position:relative;height:140px}
+.chart-svg{width:100%;height:100%}
+.chart-labels{display:flex;justify-content:space-between;padding:0 4px;margin-top:4px}
+.chart-label{font-size:9px;color:#555;font-weight:600}
+
+/* ─── COMMENTS FEED ─── */
+.cm-feed{padding:0 4px}
+.cm-item{display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--bd2);transition:.15s;cursor:pointer}
+.cm-item:last-child{border-bottom:none}
+.cm-item:hover{background:rgba(255,255,255,.02)}
+.cm-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;object-fit:cover;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}
+.cm-body{flex:1;min-width:0}
+.cm-name-row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.cm-name{font-size:11px;font-weight:700;color:#fff}
+.cm-story{font-size:9px;font-weight:700;color:var(--acc2);padding:1px 6px;border-radius:6px;background:rgba(255,107,138,.1)}
+.cm-time{font-size:9px;color:#555;margin-left:auto}
+.cm-text{font-size:12px;color:#bbb;line-height:1.42;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm-reply-btn{font-size:10px;font-weight:700;color:var(--acc2);margin-top:4px;cursor:pointer;display:inline-block}
+
+/* ─── TOP READERS ─── */
+.reader-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd2);transition:.15s}
+.reader-item:last-child{border-bottom:none}
+.reader-item:hover{background:rgba(255,255,255,.02)}
+.reader-rank{font-size:13px;font-weight:900;min-width:22px;text-align:center}
+.rank-1{color:var(--gold)}
+.rank-2{color:#9ca3af}
+.rank-3{color:#cd7c4b}
+.rank-rest{color:#555}
+.reader-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;object-fit:cover}
+.reader-info{flex:1}
+.reader-name{font-size:12px;font-weight:700;color:#fff}
+.reader-stat{font-size:10px;color:var(--muted2)}
+.reader-badge{font-size:10px;font-weight:800;color:var(--acc)}
+
+/* ─── EARNINGS ─── */
+.earn-total{display:flex;align-items:flex-end;gap:6px;padding:16px 20px 8px}
+.earn-val{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--gold);line-height:1}
+.earn-period{font-size:11px;color:#555;margin-bottom:4px}
+.earn-breakdown{padding:0 20px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.earn-item{background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:11px;padding:10px;text-align:center}
+.earn-item-val{font-size:14px;font-weight:900;color:#fff;margin-bottom:2px}
+.earn-item-label{font-size:9px;color:var(--muted2)}
+.earn-tx-list{padding:0 16px 12px}
+.earn-tx{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.earn-tx:last-child{border-bottom:none}
+.earn-tx-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.etx-tip{background:rgba(245,158,11,.12)}
+.etx-read{background:rgba(16,185,129,.1)}
+.etx-ad{background:rgba(59,130,246,.1)}
+.earn-tx-info{flex:1}
+.earn-tx-title{font-size:12px;font-weight:700;color:#fff}
+.earn-tx-sub{font-size:10px;color:var(--muted2)}
+.earn-tx-amount{font-size:13px;font-weight:800;color:var(--gold)}
+.earn-tx-amount.debit{color:#ff4444}
+.earn-cta{margin:0 16px 16px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.earn-cta-label{font-size:11px;color:#ccc;font-weight:600}
+.earn-cta-val{font-size:11px;font-weight:800;color:var(--gold);margin-top:2px}
+.withdraw-btn{background:var(--gold);color:#07070b;border:none;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.withdraw-btn:hover{opacity:.9}
+
+/* ─── DEBATE SNAPSHOT ─── */
+.debate-snap{padding:12px 20px 16px}
+.ds-motion{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;line-height:1.4;color:#fff;margin-bottom:12px;padding:12px 14px;background:rgba(255,0,80,.05);border:1px solid rgba(255,0,80,.12);border-radius:11px;position:relative}
+.ds-motion::before{content:'⚔️';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:24px;opacity:.1}
+.ds-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ds-side{border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,.06);text-align:center}
+.ds-side.for{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.2)}
+.ds-side.ag{background:rgba(255,68,68,.06);border-color:rgba(255,68,68,.2)}
+.ds-pct{font-size:22px;font-weight:900;font-family:'Playfair Display',serif}
+.ds-side.for .ds-pct{color:var(--for)}
+.ds-side.ag .ds-pct{color:var(--ag)}
+.ds-label{font-size:9px;font-weight:800;color:#888;margin-top:2px}
+.ds-total{font-size:10px;color:#555;text-align:center;margin-bottom:10px}
+.ds-view-btn{width:100%;padding:8px;border-radius:10px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.ds-view-btn:hover{background:rgba(255,0,80,.18)}
+
+/* ─── ACTIVITY FEED ─── */
+.af-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd2)}
+.af-item:last-child{border-bottom:none}
+.af-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.af-dot.view{background:var(--sapphire)}
+.af-dot.like{background:var(--acc)}
+.af-dot.comment{background:var(--acc2)}
+.af-dot.tip{background:var(--gold)}
+.af-dot.follow{background:var(--emerald)}
+.af-dot.debate{background:#a855f7}
+.af-text{flex:1;font-size:11px;color:#ccc;line-height:1.35}
+.af-time{font-size:9px;color:#555;flex-shrink:0}
+
+/* ─── WRITE PANEL ─── */
+.write-panel{background:var(--card);border:1px solid var(--bd2);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.write-toolbar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--bd2);flex-wrap:wrap}
+.tb-divider{width:1px;height:20px;background:var(--bd);margin:0 4px}
+.tb-tool{width:30px;height:30px;border-radius:8px;background:transparent;border:none;color:#888;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:inherit}
+.tb-tool:hover{background:rgba(255,255,255,.07);color:#fff}
+.tb-tool.active{background:rgba(255,0,80,.12);color:var(--acc)}
+.write-meta-bar{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--bd2);flex-wrap:wrap}
+.wm-input{background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:11px;color:#888;outline:none;flex:1;min-width:80px}
+.wm-input::placeholder{color:#444}
+.wm-sep{width:1px;height:16px;background:var(--bd)}
+.cat-select{background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.2);color:var(--acc2);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;outline:none;cursor:pointer}
+.cat-select option{background:#111118}
+.write-title-input{width:100%;background:transparent;border:none;font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;outline:none;padding:18px 20px 10px;resize:none;line-height:1.3}
+.write-title-input::placeholder{color:#2a2a35}
+.write-body-input{width:100%;background:transparent;border:none;font-family:'DM Serif Display',serif;font-size:15px;color:#ddd;outline:none;padding:10px 20px 20px;resize:none;line-height:1.78;min-height:220px}
+.write-body-input::placeholder{color:#2a2a35}
+.write-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--bd2);flex-wrap:wrap;gap:8px}
+.wf-meta{font-size:10px;color:#555}
+.wf-actions{display:flex;gap:8px}
+.wf-btn{padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.wf-btn.draft{background:rgba(255,255,255,.06);border:1px solid var(--bd);color:#bbb}
+.wf-btn.preview{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa}
+.wf-btn.publish{background:var(--acc);color:#fff;box-shadow:0 0 16px var(--glow2)}
+.wf-btn:active{transform:scale(.96)}
+
+/* ─── AI ASSIST ─── */
+.ai-card{background:linear-gradient(135deg,rgba(255,0,80,.07),rgba(168,85,247,.05));border:1px solid rgba(255,0,80,.18);border-radius:16px;padding:16px;margin-bottom:14px}
+.ai-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ai-title{font-size:12px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+.ai-title i{color:var(--acc)}
+.ai-pill{font-size:8px;font-weight:800;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc;padding:2px 8px;border-radius:10px;letter-spacing:.06em}
+.ai-prompts{display:flex;flex-direction:column;gap:6px}
+.ai-prompt{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid var(--bd2);cursor:pointer;transition:.15s}
+.ai-prompt:hover{background:rgba(255,0,80,.08);border-color:rgba(255,0,80,.2)}
+.ai-prompt-icon{font-size:15px}
+.ai-prompt-text{font-size:11px;color:#ccc;font-weight:600;flex:1}
+.ai-prompt-arrow{font-size:11px;color:#555}
+
+/* ─── SERIES MANAGER ─── */
+.series-grid{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.series-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:12px;cursor:pointer;transition:.15s}
+.series-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+.series-thumb{width:40px;height:40px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0}
+.series-info{flex:1;min-width:0}
+.series-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.series-meta{font-size:10px;color:var(--muted2);margin-top:1px}
+.series-status{font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px}
+.series-status.ongoing{background:rgba(16,185,129,.12);color:#10b981}
+.series-status.completed{background:rgba(59,130,246,.1);color:#60a5fa}
+.series-progress{margin-top:4px}
+.series-prog-track{height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.series-prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px;transition:.8s}
+.new-series-btn{margin:0 16px 16px;width:calc(100% - 32px);padding:9px;border-radius:12px;background:rgba(255,0,80,.07);border:1px dashed rgba(255,0,80,.25);color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.new-series-btn:hover{background:rgba(255,0,80,.12)}
+
+/* ─── SCHEDULE CALENDAR ─── */
+.cal-wrap{padding:14px 16px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-month{font-size:13px;font-weight:800;color:#fff}
+.cal-arrow{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;color:#888;cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day-label{font-size:9px;font-weight:700;color:#555;text-align:center;padding:3px 0}
+.cal-day{height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#555;cursor:pointer;position:relative;transition:.15s}
+.cal-day:hover{background:rgba(255,255,255,.05);color:#fff}
+.cal-day.today{background:rgba(255,0,80,.15);color:var(--acc);font-weight:800;border:1px solid rgba(255,0,80,.25)}
+.cal-day.has-post{color:#fff}
+.cal-day.has-post::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--acc)}
+.cal-day.other-month{opacity:.3}
+.cal-sched-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.sched-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--bd2)}
+.sched-date{font-size:10px;font-weight:800;color:var(--acc);min-width:32px}
+.sched-title{font-size:11px;font-weight:600;color:#ccc;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sched-time{font-size:9px;color:#555}
+
+/* ─── POLLS / ENGAGEMENT ─── */
+.poll-preview{padding:12px 16px 14px}
+.pp-motion{font-size:12px;font-weight:700;color:#ccc;line-height:1.4;margin-bottom:10px;font-style:italic}
+.pp-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.pp-bar-item{display:flex;align-items:center;gap:7px}
+.pp-bar-label{font-size:10px;color:#bbb;min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-bar-track{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
+.pp-bar-fill{height:100%;border-radius:6px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pp-bar-fill.for{background:linear-gradient(90deg,#059669,var(--for))}
+.pp-bar-fill.ag{background:linear-gradient(90deg,#dc2626,var(--ag))}
+.pp-bar-fill.neutral{background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.pp-pct{font-size:10px;font-weight:800;color:var(--muted2);min-width:28px;text-align:right}
+.pp-total{font-size:10px;color:#555;text-align:right}
+
+/* ─── NOTIFICATIONS PANEL ─── */
+.notif-item{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bd2);transition:.15s;cursor:pointer}
+.notif-item:hover{background:rgba(255,255,255,.02)}
+.notif-item.unread{background:rgba(255,0,80,.03)}
+.notif-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;object-fit:cover;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
+.notif-body{flex:1;min-width:0}
+.notif-text{font-size:12px;color:#ccc;line-height:1.42}
+.notif-text strong{color:#fff}
+.notif-time{font-size:10px;color:#555;margin-top:3px}
+.notif-badge{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:6px;opacity:0}
+.notif-item.unread .notif-badge{opacity:1}
+.notif-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ni-like{background:rgba(255,0,80,.12)}
+.ni-comment{background:rgba(255,107,138,.1)}
+.ni-follow{background:rgba(16,185,129,.1)}
+.ni-tip{background:rgba(245,158,11,.1)}
+.ni-debate{background:rgba(168,85,247,.1)}
+
+/* ─── AUDIENCE PANEL ─── */
+.audience-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.donut-wrap{padding:16px 20px 12px;display:flex;align-items:center;gap:16px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:7px}
+.donut-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#bbb}
+.donut-leg-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.donut-leg-pct{margin-left:auto;font-weight:800;color:#fff}
+.geo-list{padding:8px 16px 12px;display:flex;flex-direction:column;gap:8px}
+.geo-item{display:flex;align-items:center;gap:8px}
+.geo-flag{font-size:16px}
+.geo-country{font-size:12px;color:#ccc;flex:1}
+.geo-track{flex:2;height:5px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.geo-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.geo-pct{font-size:10px;font-weight:800;color:var(--muted2);min-width:28px;text-align:right}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:#1e1e28;border:1px solid var(--bd);color:#fff;padding:9px 18px;border-radius:30px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── MOBILE BOTTOM NAV ─── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:95;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,14px)}
+.mn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;padding:3px 8px}
+.mn-item i{font-size:20px;display:block;margin-bottom:2px}
+.mn-item.active{color:var(--acc)}
+
+/* ─── MODAL ─── */
+.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-sheet{width:100%;max-width:480px;max-height:85vh;background:#13131a;border-radius:20px 20px 0 0;animation:slideUp .25s ease;overflow-y:auto;scrollbar-width:none}
+.modal-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:34px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:10px auto 0}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 12px}
+.modal-hdr h3{font-size:15px;font-weight:800}
+.modal-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#ccc}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .two-col,.three-col{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .mobile-nav{display:flex}
+  .panel{padding:14px 14px 90px}
+  .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .topbar{padding:11px 14px}
+}
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .audience-grid{grid-template-columns:1fr}
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.panel.active .stat-card{animation:fadeUp .35s both ease}
+.panel.active .stat-card:nth-child(1){animation-delay:.04s}
+.panel.active .stat-card:nth-child(2){animation-delay:.08s}
+.panel.active .stat-card:nth-child(3){animation-delay:.12s}
+.panel.active .stat-card:nth-child(4){animation-delay:.16s}
+.panel.active .section-card{animation:fadeUp .4s .18s both ease}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div>
+      <div class="sb-logo-mark">Droboard</div>
+      <div class="sb-logo-sub">Writer Studio</div>
+    </div>
+  </div>
+  <div class="sb-profile">
+    <img class="sb-av" src="https://i.pravatar.cc/100?img=32" alt="Ada"/>
+    <div>
+      <div class="sb-name">Ada_Writes</div>
+      <div class="sb-handle">12.4k followers</div>
+    </div>
+    <div class="sb-badge">PRO</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section-label">Overview</div>
+    <div class="sb-item active" data-panel="dashboard" onclick="switchPanel('dashboard',this)">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </div>
+    <div class="sb-item" data-panel="write" onclick="switchPanel('write',this)">
+      <i class="fas fa-pen-nib"></i> Write Story
+    </div>
+    <div class="sb-item" data-panel="stories" onclick="switchPanel('stories',this)">
+      <i class="fas fa-book-open"></i> My Stories <span class="badge-dot">8</span>
+    </div>
+    <div class="sb-item" data-panel="series" onclick="switchPanel('series',this)">
+      <i class="fas fa-layer-group"></i> Series
+    </div>
+    <div class="sb-item" data-panel="schedule" onclick="switchPanel('schedule',this)">
+      <i class="fas fa-calendar-alt"></i> Schedule
+    </div>
+
+    <div class="sb-section-label">Engagement</div>
+    <div class="sb-item" data-panel="comments" onclick="switchPanel('comments',this)">
+      <i class="fas fa-comments"></i> Comments <span class="badge-dot">23</span>
+    </div>
+    <div class="sb-item" data-panel="debates" onclick="switchPanel('debates',this)">
+      <i class="fas fa-gavel"></i> Debates
+    </div>
+    <div class="sb-item" data-panel="audience" onclick="switchPanel('audience',this)">
+      <i class="fas fa-users"></i> Audience
+    </div>
+    <div class="sb-item" data-panel="notifications" onclick="switchPanel('notifications',this)">
+      <i class="fas fa-bell"></i> Notifications <span class="badge-dot">5</span>
+    </div>
+
+    <div class="sb-section-label">Monetise</div>
+    <div class="sb-item" data-panel="earnings" onclick="switchPanel('earnings',this)">
+      <i class="fas fa-coins"></i> Earnings
+    </div>
+    <div class="sb-item" onclick="toast('⚙️ Settings — coming soon!')">
+      <i class="fas fa-cog"></i> Settings
+    </div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-earnings-pill" onclick="switchPanel('earnings', document.querySelector('[data-panel=earnings]'))">
+      <div class="sb-earnings-icon">💰</div>
+      <div>
+        <div class="sb-earnings-val">₦47,820</div>
+        <div class="sb-earnings-label">Total earned</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="tb-btn" id="menuToggle" onclick="toggleSidebar()" style="display:none"><i class="fas fa-bars"></i></div>
+      <div>
+        <div class="page-title" id="panelTitle">Dashboard</div>
+        <div class="topbar-greeting">Good evening, Ada ✦</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-btn" onclick="switchPanel('notifications',document.querySelector('[data-panel=notifications]'))"><i class="fas fa-bell"></i><div class="tb-notif-dot"></div></div>
+      <div class="tb-btn" onclick="toast('🔍 Search your stories…')"><i class="fas fa-search"></i></div>
+      <button class="write-btn" onclick="switchPanel('write',document.querySelector('[data-panel=write]'))">
+        <i class="fas fa-pen-nib"></i> Write
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="stat-grid">
+      <div class="stat-card sc-acc">
+        <div class="stat-icon"><i class="fas fa-eye" style="color:var(--acc)"></i></div>
+        <div class="stat-delta delta-up">+18% ↑</div>
+        <div class="stat-val">248k</div>
+        <div class="stat-label">Total Reads this month</div>
+        <div class="stat-sparkline" id="spark-reads"></div>
+      </div>
+      <div class="stat-card sc-gold">
+        <div class="stat-icon"><i class="fas fa-coins" style="color:var(--gold)"></i></div>
+        <div class="stat-delta delta-up">+24% ↑</div>
+        <div class="stat-val">₦47.8k</div>
+        <div class="stat-label">Earnings this month</div>
+        <div class="stat-sparkline" id="spark-earn"></div>
+      </div>
+      <div class="stat-card sc-emerald">
+        <div class="stat-icon"><i class="fas fa-heart" style="color:var(--emerald)"></i></div>
+        <div class="stat-delta delta-up">+9% ↑</div>
+        <div class="stat-val">24.3k</div>
+        <div class="stat-label">Story Likes</div>
+        <div class="stat-sparkline" id="spark-likes"></div>
+      </div>
+      <div class="stat-card sc-sapphire">
+        <div class="stat-icon"><i class="fas fa-user-plus" style="color:var(--sapphire)"></i></div>
+        <div class="stat-delta delta-up">+312 ↑</div>
+        <div class="stat-val">12.4k</div>
+        <div class="stat-label">Followers</div>
+        <div class="stat-sparkline" id="spark-follow"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- READS CHART -->
+      <div class="section-card">
+        <div class="section-card-hdr">
+          <div class="sc-title"><i class="fas fa-chart-area"></i> Reads Over Time</div>
+          <div class="sc-action" onclick="toast('📊 Full analytics…')">Last 30d</div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--acc)"></div>Reads</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--sapphire)"></div>Unique readers</div>
+          </div>
+          <div class="chart-area">
+            <svg class="chart-svg" id="readsChart" viewBox="0 0 400 140" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="chart-labels" id="chartLabels"></div>
+        </div>
+      </div>
+
+      <!-- DEBATE SNAPSHOT -->
+      <div class="section-card">
+        <div class="section-card-hdr">
+          <div class="sc-title"><i class="fas fa-gavel"></i> Live Debate</div>
+          <div class="sc-action" onclick="switchPanel('debates',document.querySelector('[data-panel=debates]'))">View all</div>
+        </div>
+        <div class="debate-snap">
+          <div class="ds-motion">"Ada should stay and fight for her marriage, not leave."</div>
+          <div class="ds-bars">
+            <div class="ds-side for"><div class="ds-pct">38%</div><div class="ds-label">✅ FOR</div><div style="font-size:10px;color:#666;margin-top:3px">2,341 readers</div></div>
+            <div class="ds-side ag"><div class="ds-pct">62%</div><div class="ds-label">❌ AGAINST</div><div style="font-size:10px;color:#666;margin-top:3px">3,819 readers</div></div>
+          </div>
+          <div class="ds-total">6,160 total votes · 8.2k debating live</div>
+          <button class="ds-view-btn" onclick="toast('⚔️ Opening full debate…')">View full debate & arguments</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- RECENT ACTIVITY -->
+      <div class="section-card">
+        <div class="section-card-hdr">
+          <div class="sc-title"><i class="fas fa-bolt"></i> Live Activity</div>
+          <div class="sc-action" onclick="toast('🔄 Refreshing…')">Refresh</div>
+        </div>
+        <div id="activityFeed"></div>
+      </div>
+
+      <!-- TOP READERS -->
+      <div class="section-card">
+        <div class="section-card-hdr">
+          <div class="sc-title"><i class="fas fa-trophy"></i> Top Readers</div>
+          <div class="sc-action" onclick="switchPanel('audience',document.querySelector('[data-panel=audience]'))">All readers</div>
+        </div>
+        <div id="topReadersList"></div>
+      </div>
+    </div>
+
+    <!-- RECENT COMMENTS -->
+    <div class="full-width section-card">
+      <div class="section-card-hdr">
+        <div class="sc-title"><i class="fas fa-comments"></i> Recent Comments</div>
+        <div class="sc-action" onclick="switchPanel('comments',document.querySelector('[data-panel=comments]'))">See all 23</div>
+      </div>
+      <div id="recentCommentsFeed"></div>
+    </div>
+  </div>
+
+  <!-- ══ WRITE ══ -->
+  <div class="panel" id="panel-write">
+    <div class="ai-card">
+      <div class="ai-hdr">
+        <div class="ai-title"><i class="fas fa-wand-magic-sparkles"></i> AI Writing Assistant <span class="ai-pill">BETA</span></div>
+        <i class="fas fa-chevron-down" style="color:#666;font-size:12px;cursor:pointer"></i>
+      </div>
+      <div class="ai-prompts">
+        <div class="ai-prompt" onclick="applyAiPrompt('hook')"><span class="ai-prompt-icon">🎣</span><span class="ai-prompt-text">Suggest a compelling opening hook</span><i class="fas fa-arrow-right ai-prompt-arrow"></i></div>
+        <div class="ai-prompt" onclick="applyAiPrompt('tension')"><span class="ai-prompt-icon">⚡</span><span class="ai-prompt-text">Add tension to my current paragraph</span><i class="fas fa-arrow-right ai-prompt-arrow"></i></div>
+        <div class="ai-prompt" onclick="applyAiPrompt('continue')"><span class="ai-prompt-icon">✍️</span><span class="ai-prompt-text">Continue from where I stopped</span><i class="fas fa-arrow-right ai-prompt-arrow"></i></div>
+        <div class="ai-prompt" onclick="applyAiPrompt('debate')"><span class="ai-prompt-icon">⚔️</span><span class="ai-prompt-text">Generate a debate motion for this chapter</span><i class="fas fa-arrow-right ai-prompt-arrow"></i></div>
+      </div>
+    </div>
+
+    <div class="write-panel">
+      <div class="write-toolbar">
+        <button class="tb-tool active" title="Bold" onclick="fmt('bold')"><i class="fas fa-bold"></i></button>
+        <button class="tb-tool" title="Italic" onclick="fmt('italic')"><i class="fas fa-italic"></i></button>
+        <button class="tb-tool" title="Underline" onclick="fmt('underline')"><i class="fas fa-underline"></i></button>
+        <div class="tb-divider"></div>
+        <button class="tb-tool" title="Heading" onclick="insertHeading()"><i class="fas fa-heading"></i></button>
+        <button class="tb-tool" title="Quote" onclick="insertQuote()"><i class="fas fa-quote-left"></i></button>
+        <button class="tb-tool" title="Divider" onclick="insertDivider()"><i class="fas fa-minus"></i></button>
+        <div class="tb-divider"></div>
+        <button class="tb-tool" title="Image" onclick="toast('🖼️ Image upload — coming soon!')"><i class="fas fa-image"></i></button>
+        <button class="tb-tool" title="Link" onclick="toast('🔗 Link insert — coming soon!')"><i class="fas fa-link"></i></button>
+        <div class="tb-divider"></div>
+        <button class="tb-tool" title="Add Poll" onclick="openPollModal()"><i class="fas fa-poll"></i></button>
+        <button class="tb-tool" title="Add Debate" onclick="openDebateModal()"><i class="fas fa-gavel"></i></button>
+      </div>
+      <div class="write-meta-bar">
+        <input class="wm-input" id="seriesInput" placeholder="Series name…" value="Broken Vows"/>
+        <div class="wm-sep"></div>
+        <input class="wm-input" id="seasonInput" placeholder="S2 ·" value="Season 2 · Chapter 5"/>
+        <div class="wm-sep"></div>
+        <select class="cat-select" id="catSelect">
+          <option>💔 Betrayal</option>
+          <option>🎓 Campus</option>
+          <option>👑 Family</option>
+          <option>✨ Twist</option>
+          <option>🔥 Revenge</option>
+          <option>🏙️ Urban Love</option>
+          <option>🌙 Elegy</option>
+        </select>
+      </div>
+      <textarea class="write-title-input" id="writeTitle" placeholder="Chapter title — make it impossible to ignore…" rows="1"></textarea>
+      <textarea class="write-body-input" id="writeBody" placeholder="Your story begins here…&#10;&#10;Write freely. Your readers are waiting."></textarea>
+      <div class="write-footer">
+        <div class="wf-meta" id="writeWordCount">0 words &nbsp;·&nbsp; ~0 min read</div>
+        <div class="wf-actions">
+          <button class="wf-btn draft" onclick="saveDraft()">Save Draft</button>
+          <button class="wf-btn preview" onclick="toast('👁️ Preview mode — coming soon!')">Preview</button>
+          <button class="wf-btn publish" onclick="publishStory()">Publish ✦</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="three-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-clock"></i> Schedule</div></div>
+        <div style="padding:14px 16px">
+          <div style="font-size:11px;color:#888;margin-bottom:8px">Publish at a specific time</div>
+          <input type="datetime-local" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;outline:none" id="scheduleTime"/>
+          <button style="width:100%;margin-top:8px;padding:8px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s" onclick="schedulePost()">Set Schedule</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-poll"></i> Engagement</div></div>
+        <div style="padding:12px 16px">
+          <div style="font-size:11px;color:#888;margin-bottom:8px">Attach to this chapter</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);cursor:pointer" onclick="openPollModal()">
+              <span style="font-size:11px;font-weight:700;color:#10b981">📊 Poll</span><span style="font-size:9px;color:#555">+Add</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:rgba(255,0,80,.07);border:1px solid rgba(255,0,80,.18);cursor:pointer" onclick="openDebateModal()">
+              <span style="font-size:11px;font-weight:700;color:var(--acc2)">⚔️ Debate Motion</span><span style="font-size:9px;color:#555">+Add</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);cursor:pointer" onclick="toast('🔮 Prediction builder…')">
+              <span style="font-size:11px;font-weight:700;color:#c084fc">🔮 Prediction</span><span style="font-size:9px;color:#555">+Add</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-tag"></i> SEO & Tags</div></div>
+        <div style="padding:12px 16px">
+          <input placeholder="Add tags (heartbreak, love, betrayal…)" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;outline:none;margin-bottom:8px" id="tagsInput"/>
+          <div style="display:flex;flex-wrap:wrap;gap:5px" id="tagCloud">
+            <span style="background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;cursor:pointer" onclick="removeTag(this)">💔 betrayal ✕</span>
+            <span style="background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;cursor:pointer" onclick="removeTag(this)">marriage ✕</span>
+            <span style="background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;cursor:pointer" onclick="removeTag(this)">grief ✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STORIES ══ -->
+  <div class="panel" id="panel-stories">
+    <div class="full-width section-card">
+      <div class="section-card-hdr">
+        <div class="sc-title"><i class="fas fa-book-open"></i> All Stories <span style="font-size:10px;font-weight:600;color:#555;margin-left:4px">(8 total)</span></div>
+        <div style="display:flex;gap:8px">
+          <div class="sc-action" onclick="filterStories('all')">All</div>
+          <div class="sc-action" onclick="filterStories('live')">Live</div>
+          <div class="sc-action" onclick="filterStories('draft')">Drafts</div>
+        </div>
+      </div>
+      <div class="st-row hdr">
+        <div>Story</div><div style="text-align:center">Reads</div><div style="text-align:center">Likes</div><div style="text-align:center">Comments</div><div style="text-align:center">Status</div><div></div>
+      </div>
+      <div id="storiesTableBody"></div>
+    </div>
+  </div>
+
+  <!-- ══ SERIES ══ -->
+  <div class="panel" id="panel-series">
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-layer-group"></i> Your Series</div><div class="sc-action" onclick="toast('+ New series')">+ New</div></div>
+        <div class="series-grid" id="seriesGrid"></div>
+        <button class="new-series-btn" onclick="toast('📚 Create new series…')"><i class="fas fa-plus"></i> Start a new series</button>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-chart-bar"></i> Series Performance</div></div>
+        <div class="poll-preview">
+          <div class="pp-bars">
+            <div class="pp-bar-item"><div class="pp-bar-label">Broken Vows</div><div class="pp-bar-track"><div class="pp-bar-fill for" style="width:85%"></div></div><div class="pp-pct">248k</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">First Class</div><div class="pp-bar-track"><div class="pp-bar-fill neutral" style="width:62%"></div></div><div class="pp-pct">182k</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">The Covenant</div><div class="pp-bar-track"><div class="pp-bar-fill ag" style="width:45%"></div></div><div class="pp-pct">132k</div></div>
+          </div>
+          <div class="pp-total">Total series reads: 562k</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCHEDULE ══ -->
+  <div class="panel" id="panel-schedule">
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-calendar-alt"></i> Publication Calendar</div></div>
+        <div class="cal-wrap" id="calendarWrap"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-clock"></i> Upcoming Releases</div><div class="sc-action" onclick="toast('+ Schedule a chapter')">+ Add</div></div>
+        <div style="padding:12px 16px">
+          <div id="upcomingList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COMMENTS ══ -->
+  <div class="panel" id="panel-comments">
+    <div class="two-col">
+      <div class="section-card" style="grid-column:1/-1">
+        <div class="section-card-hdr">
+          <div class="sc-title"><i class="fas fa-comments"></i> All Comments <span style="font-size:10px;color:#555;font-weight:600">(23 unread)</span></div>
+          <div class="sc-action" onclick="toast('✅ Marked all as read')">Mark all read</div>
+        </div>
+        <div id="commentsPanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DEBATES ══ -->
+  <div class="panel" id="panel-debates">
+    <div class="stat-grid">
+      <div class="stat-card sc-acc"><div class="stat-icon"><i class="fas fa-gavel" style="color:var(--acc)"></i></div><div class="stat-val">6.2k</div><div class="stat-label">Total Votes</div></div>
+      <div class="stat-card sc-emerald"><div class="stat-icon"><i class="fas fa-comments" style="color:var(--emerald)"></i></div><div class="stat-val">142</div><div class="stat-label">Arguments</div></div>
+      <div class="stat-card sc-sapphire"><div class="stat-icon"><i class="fas fa-fire" style="color:var(--sapphire)"></i></div><div class="stat-val">8.2k</div><div class="stat-label">Live debaters</div></div>
+      <div class="stat-card sc-gold"><div class="stat-icon"><i class="fas fa-chart-pie" style="color:var(--gold)"></i></div><div class="stat-val">38/62</div><div class="stat-label">FOR / AGAINST</div></div>
+    </div>
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-gavel"></i> Active Debate</div><div class="sc-action" onclick="toast('🔗 Share debate')">Share</div></div>
+        <div class="debate-snap">
+          <div class="ds-motion">"Ada should stay and fight for her marriage, not leave."<br/><small style="font-size:9px;color:#666;font-style:normal">Season 2 · Chapter 4 · Broken Vows</small></div>
+          <div class="ds-bars">
+            <div class="ds-side for"><div class="ds-pct">38%</div><div class="ds-label">✅ FOR</div></div>
+            <div class="ds-side ag"><div class="ds-pct">62%</div><div class="ds-label">❌ AGAINST</div></div>
+          </div>
+          <div class="ds-total">6,160 total · 142 arguments · live</div>
+          <button class="ds-view-btn" onclick="window.location.href='debate.html'">Open full debate page →</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-chart-bar"></i> Poll Results</div></div>
+        <div class="poll-preview">
+          <div class="pp-motion">"Who was truly wrong here?"</div>
+          <div class="pp-bars">
+            <div class="pp-bar-item"><div class="pp-bar-label">🫀 Ada's husband</div><div class="pp-bar-track"><div class="pp-bar-fill ag" style="width:59%"></div></div><div class="pp-pct">59%</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">💔 Grief, no rules</div><div class="pp-bar-track"><div class="pp-bar-fill neutral" style="width:28%"></div></div><div class="pp-pct">28%</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">🤷 Nobody</div><div class="pp-bar-track"><div class="pp-bar-fill for" style="width:13%"></div></div><div class="pp-pct">13%</div></div>
+          </div>
+          <div class="pp-total">8,263 votes · closed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AUDIENCE ══ -->
+  <div class="panel" id="panel-audience">
+    <div class="stat-grid">
+      <div class="stat-card sc-acc"><div class="stat-icon"><i class="fas fa-users" style="color:var(--acc)"></i></div><div class="stat-val">12.4k</div><div class="stat-label">Followers</div></div>
+      <div class="stat-card sc-emerald"><div class="stat-icon"><i class="fas fa-user-check" style="color:var(--emerald)"></i></div><div class="stat-val">68%</div><div class="stat-label">Return Rate</div></div>
+      <div class="stat-card sc-gold"><div class="stat-icon"><i class="fas fa-clock" style="color:var(--gold)"></i></div><div class="stat-val">6.2m</div><div class="stat-label">Avg. Read Time</div></div>
+      <div class="stat-card sc-sapphire"><div class="stat-icon"><i class="fas fa-globe" style="color:var(--sapphire)"></i></div><div class="stat-val">18</div><div class="stat-label">Countries</div></div>
+    </div>
+    <div class="audience-grid">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-chart-pie"></i> Reader Demographics</div></div>
+        <div class="donut-wrap" id="donutWrap"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-globe-africa"></i> Top Locations</div></div>
+        <div class="geo-list">
+          <div class="geo-item"><div class="geo-flag">🇳🇬</div><div class="geo-country">Nigeria</div><div class="geo-track"><div class="geo-fill" style="width:78%"></div></div><div class="geo-pct">78%</div></div>
+          <div class="geo-item"><div class="geo-flag">🇬🇭</div><div class="geo-country">Ghana</div><div class="geo-track"><div class="geo-fill" style="width:8%"></div></div><div class="geo-pct">8%</div></div>
+          <div class="geo-item"><div class="geo-flag">🇬🇧</div><div class="geo-country">UK</div><div class="geo-track"><div class="geo-fill" style="width:5%"></div></div><div class="geo-pct">5%</div></div>
+          <div class="geo-item"><div class="geo-flag">🇿🇦</div><div class="geo-country">South Africa</div><div class="geo-track"><div class="geo-fill" style="width:4%"></div></div><div class="geo-pct">4%</div></div>
+          <div class="geo-item"><div class="geo-flag">🇺🇸</div><div class="geo-country">USA</div><div class="geo-track"><div class="geo-fill" style="width:3%"></div></div><div class="geo-pct">3%</div></div>
+          <div class="geo-item"><div class="geo-flag">🌍</div><div class="geo-country">Other</div><div class="geo-track"><div class="geo-fill" style="width:2%"></div></div><div class="geo-pct">2%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-trophy"></i> Top Readers</div></div>
+      <div id="audienceTopReaders"></div>
+    </div>
+  </div>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <div class="panel" id="panel-notifications">
+    <div class="full-width section-card">
+      <div class="section-card-hdr">
+        <div class="sc-title"><i class="fas fa-bell"></i> Notifications</div>
+        <div class="sc-action" onclick="toast('✅ All cleared')">Clear all</div>
+      </div>
+      <div id="notifList"></div>
+    </div>
+  </div>
+
+  <!-- ══ EARNINGS ══ -->
+  <div class="panel" id="panel-earnings">
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-coins"></i> Earnings Overview</div><div class="sc-action">This Month</div></div>
+        <div class="earn-total">
+          <div class="earn-val">₦47,820</div>
+          <div class="earn-period">May 2026</div>
+        </div>
+        <div class="earn-breakdown">
+          <div class="earn-item"><div class="earn-item-val">₦28,400</div><div class="earn-item-label">☕ Tips</div></div>
+          <div class="earn-item"><div class="earn-item-val">₦12,600</div><div class="earn-item-label">📖 Reads</div></div>
+          <div class="earn-item"><div class="earn-item-val">₦6,820</div><div class="earn-item-label">📢 Ad share</div></div>
+        </div>
+        <div class="earn-cta">
+          <div>
+            <div class="earn-cta-label">Available to withdraw</div>
+            <div class="earn-cta-val">₦42,300</div>
+          </div>
+          <button class="withdraw-btn" onclick="toast('💸 Withdrawal initiated — 1–2 business days')">Withdraw</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-list-alt"></i> Recent Transactions</div></div>
+        <div class="earn-tx-list" id="earningsTxList"></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-chart-line"></i> Earnings by Story</div></div>
+        <div class="poll-preview">
+          <div class="pp-bars">
+            <div class="pp-bar-item"><div class="pp-bar-label">I came home early…</div><div class="pp-bar-track"><div class="pp-bar-fill for" style="width:72%"></div></div><div class="pp-pct">₦34.2k</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">The richest boy…</div><div class="pp-bar-track"><div class="pp-bar-fill neutral" style="width:45%"></div></div><div class="pp-pct">₦21.4k</div></div>
+            <div class="pp-bar-item"><div class="pp-bar-label">The photograph</div><div class="pp-bar-track"><div class="pp-bar-fill ag" style="width:28%"></div></div><div class="pp-pct">₦13.3k</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-hdr"><div class="sc-title"><i class="fas fa-star"></i> Top Tippers</div></div>
+        <div id="topTippers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mn-item active" onclick="switchPanel('dashboard',null);setMobileActive(this)"><i class="fas fa-chart-line"></i>Home</div>
+  <div class="mn-item" onclick="switchPanel('write',null);setMobileActive(this)"><i class="fas fa-pen-nib"></i>Write</div>
+  <div class="mn-item" onclick="switchPanel('stories',null);setMobileActive(this)"><i class="fas fa-book-open"></i>Stories</div>
+  <div class="mn-item" onclick="switchPanel('earnings',null);setMobileActive(this)"><i class="fas fa-coins"></i>Earn</div>
+  <div class="mn-item" onclick="switchPanel('notifications',null);setMobileActive(this)"><i class="fas fa-bell"></i>Alerts</div>
+</div>
+
+<!-- POLL MODAL -->
+<div class="modal-bg" id="pollModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><h3>📊 Add Poll</h3><div class="modal-close" onclick="closeModal('pollModal')">✕</div></div>
+    <div style="padding:0 18px 24px;display:flex;flex-direction:column;gap:10px">
+      <input placeholder="Poll question…" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none" id="pollQ"/>
+      <input placeholder="Option 1" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none"/>
+      <input placeholder="Option 2" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none"/>
+      <input placeholder="Option 3 (optional)" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:9px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none"/>
+      <button style="background:var(--acc);color:#fff;border:none;padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="closeModal('pollModal');toast('📊 Poll attached to chapter!')">Attach Poll</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEBATE MODAL -->
+<div class="modal-bg" id="debateModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><h3>⚔️ Add Debate Motion</h3><div class="modal-close" onclick="closeModal('debateModal')">✕</div></div>
+    <div style="padding:0 18px 24px;display:flex;flex-direction:column;gap:10px">
+      <textarea placeholder='Enter the debate motion e.g. "Ada should leave her marriage."' style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:10px 13px;color:#fff;font-family:'DM Serif Display',serif;font-size:13px;outline:none;resize:none;line-height:1.6" rows="3" id="debateMotionInput"></textarea>
+      <button style="background:var(--acc);color:#fff;border:none;padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="closeModal('debateModal');toast('⚔️ Debate motion attached!')">Attach Motion</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const STORIES_DATA = [
+  {id:1,thumb:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80",title:"I came home early and caught my husband kissing my late sister's photograph",meta:"S2·Ch4 · Broken Vows",reads:248000,likes:24300,comments:4100,status:"live"},
+  {id:2,thumb:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80",title:"The richest boy in school suddenly started sitting beside me every morning",meta:"S1·Ch7 · First Class",reads:182000,likes:18100,comments:2300,status:"live"},
+  {id:3,thumb:"https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80",title:"The Runaway Bride — I left at the altar in my socked feet",meta:"Short Story",reads:410000,likes:45000,comments:7400,status:"live"},
+  {id:4,thumb:"https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=80",title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",meta:"S3·Ch12 · The Covenant",reads:132000,likes:31000,comments:5700,status:"live"},
+  {id:5,thumb:"https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=80",title:"He proposed with my best friend's ring — and she giggled before he even knelt",meta:"S1·Ch3 · Shattered",reads:91000,likes:19200,comments:3100,status:"draft"},
+  {id:6,thumb:"https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=80",title:"The letter he never sent was folded inside the pocket of his old jacket",meta:"Poem",reads:88000,likes:36500,comments:5200,status:"live"},
+  {id:7,thumb:"https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=80",title:"She rejected me 3 times. Now we share a mortgage and a dog named 'Finally'",meta:"S2·Ch9 · Finally",reads:74000,likes:22400,comments:2600,status:"scheduled"},
+  {id:8,thumb:"https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=80",title:"My stepmother stole my university fund",meta:"S1·Ch5 · Zara",reads:0,likes:0,comments:0,status:"draft"},
+];
+
+const ACTIVITY_DATA = [
+  {dot:"view",text:"<strong>Chioma_R</strong> just read Chapter 5 of Broken Vows",time:"just now"},
+  {dot:"like",text:"<strong>Emeka_T</strong> liked your story",time:"1m ago"},
+  {dot:"comment",text:"<strong>Zara_M</strong> commented: \"I literally cried reading this\"",time:"2m ago"},
+  {dot:"tip",text:"<strong>CampusQueen</strong> tipped you ₦500 ☕",time:"4m ago"},
+  {dot:"follow",text:"<strong>Dami_Cole</strong> started following you",time:"8m ago"},
+  {dot:"debate",text:"62% of readers are AGAINST the motion",time:"10m ago"},
+  {dot:"like",text:"<strong>Kemi_A</strong> liked your poem",time:"15m ago"},
+  {dot:"view",text:"3 new readers joined the debate",time:"18m ago"},
+];
+
+const TOP_READERS = [
+  {rank:1,name:"Chioma_R",avatar:"https://i.pravatar.cc/100?img=47",stat:"12 chapters read",badge:"👑"},
+  {rank:2,name:"Emeka_T",avatar:"https://i.pravatar.cc/100?img=15",stat:"9 chapters read",badge:"🔥"},
+  {rank:3,name:"CampusQueen",avatar:"https://i.pravatar.cc/100?img=12",stat:"7 chapters read",badge:"⭐"},
+  {rank:4,name:"Zara_M",avatar:"https://i.pravatar.cc/100?img=16",stat:"6 chapters read",badge:""},
+  {rank:5,name:"Dami_Cole",avatar:"https://i.pravatar.cc/100?img=64",stat:"5 chapters read",badge:""},
+];
+
+const COMMENTS_DATA = [
+  {avatar:"https://i.pravatar.cc/100?img=47",name:"Chioma_R",story:"Broken Vows S2·Ch4",text:"I literally cried reading this 😭 The author writes like they're living inside your chest.",time:"2m ago",unread:true},
+  {avatar:"https://i.pravatar.cc/100?img=15",name:"Emeka_T",story:"Broken Vows S2·Ch4",text:"He didn't cheat. He was grieving. Ada leaving would mean punishing grief.",time:"8m ago",unread:true},
+  {avatar:null,name:"Anonymous",story:"The Runaway Bride",text:"This hit so different at 2am. Can't sleep. When is the sequel?",time:"15m ago",unread:true},
+  {avatar:"https://i.pravatar.cc/100?img=28",name:"Kemi_A",story:"First Class S1·Ch7",text:"Every paragraph is a therapy session.",time:"1h ago",unread:false},
+  {avatar:"https://i.pravatar.cc/100?img=64",name:"Dami_Cole",story:"The Letter",text:"The last line. THE LAST LINE. I have to go lie down.",time:"2h ago",unread:false},
+  {avatar:"https://i.pravatar.cc/100?img=56",name:"Zara_XO",story:"The Runaway Bride",text:"Had me shaking on the bus. The stranger beside me asked if I was okay.",time:"3h ago",unread:false},
+];
+
+const NOTIFS_DATA = [
+  {icon:"ni-tip",emoji:"☕",name:"CampusQueen",text:"tipped you <strong>₦500</strong> on The Runaway Bride",time:"4m ago",unread:true},
+  {icon:"ni-follow",emoji:"👤",name:"Dami_Cole",text:"started following you",time:"8m ago",unread:true},
+  {icon:"ni-like",emoji:"❤️",name:"Chioma_R",text:"liked your chapter <strong>I came home early…</strong>",time:"12m ago",unread:true},
+  {icon:"ni-comment",emoji:"💬",name:"Emeka_T",text:'commented on your story: <strong>"He didn\'t cheat. He was grieving."</strong>',time:"20m ago",unread:true},
+  {icon:"ni-debate",emoji:"⚔️",name:"System",text:"Your debate is now <strong>trending</strong> — 8,263 readers live",time:"1h ago",unread:true},
+  {icon:"ni-like",emoji:"❤️",name:"Zara_M",text:"liked your poem The Letter",time:"2h ago",unread:false},
+  {icon:"ni-follow",emoji:"👤",name:"Reader_9021",text:"started following you",time:"3h ago",unread:false},
+  {icon:"ni-tip",emoji:"☕",name:"Kemi_A",text:"tipped you <strong>₦1,000</strong>",time:"5h ago",unread:false},
+];
+
+const TX_DATA = [
+  {icon:"etx-tip",emoji:"☕",title:"Tip from CampusQueen",sub:"The Runaway Bride",amount:"+ ₦500",debit:false,time:"4m ago"},
+  {icon:"etx-tip",emoji:"☕",title:"Tip from Kemi_A",sub:"Broken Vows S2·Ch4",amount:"+ ₦1,000",debit:false,time:"2h ago"},
+  {icon:"etx-read",emoji:"📖",title:"Read revenue",sub:"248k reads · Broken Vows",amount:"+ ₦12,600",debit:false,time:"Today"},
+  {icon:"etx-ad",emoji:"📢",title:"Ad share payout",sub:"May 2026 placement",amount:"+ ₦6,820",debit:false,time:"Yesterday"},
+  {icon:"etx-tip",emoji:"☕",title:"Tip from Dami_Cole",sub:"The Letter",amount:"+ ₦200",debit:false,time:"2d ago"},
+];
+
+const SERIES_DATA = [
+  {cover:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80",name:"Broken Vows",meta:"Season 2 · 4 of 12 chapters",status:"ongoing",prog:33},
+  {cover:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80",name:"First Class",meta:"Season 1 · 7 of 10 chapters",status:"ongoing",prog:70},
+  {cover:"https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80",name:"The Covenant",meta:"Season 3 · 12 of 12 chapters",status:"completed",prog:100},
+];
+
+const TOP_TIPPERS = [
+  {rank:1,name:"CampusQueen",avatar:"https://i.pravatar.cc/100?img=12",total:"₦6,500"},
+  {rank:2,name:"Emeka_T",avatar:"https://i.pravatar.cc/100?img=15",total:"₦4,200"},
+  {rank:3,name:"Kemi_A",avatar:"https://i.pravatar.cc/100?img=28",total:"₦3,800"},
+  {rank:4,name:"Zara_XO",avatar:"https://i.pravatar.cc/100?img=56",total:"₦2,100"},
+  {rank:5,name:"Dami_Cole",avatar:"https://i.pravatar.cc/100?img=64",total:"₦1,500"},
+];
+
+// ═══════════════════ UTILS ═══════════════════
+function fmtN(n){return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openPollModal(){document.getElementById('pollModal').classList.add('open');}
+function openDebateModal(){document.getElementById('debateModal').classList.add('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ═══════════════════ PANEL SWITCHING ═══════════════════
+const PANEL_TITLES = {
+  dashboard:'Dashboard',write:'Write Story',stories:'My Stories',series:'Series Manager',
+  schedule:'Schedule',comments:'Comments',debates:'Debates',audience:'Audience',
+  notifications:'Notifications',earnings:'Earnings',
+};
+
+function switchPanel(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('panelTitle').textContent = PANEL_TITLES[id]||id;
+  renderPanel(id);
+  // Close sidebar on mobile when menu item is clicked
+  if(window.innerWidth <= 768){
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+function setMobileActive(el){document.querySelectorAll('.mn-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Responsive menu toggle
+(function(){
+  const mq=window.matchMedia('(max-width:768px)');
+  function check(e){document.getElementById('menuToggle').style.display=e.matches?'flex':'none';}
+  mq.addListener(check);check(mq);
+})();
+
+// ═══════════════════ RENDERS ═══════════════════
+function renderPanel(id){
+  if(id==='dashboard') renderDashboard();
+  else if(id==='stories') renderStories();
+  else if(id==='series') renderSeries();
+  else if(id==='schedule') renderSchedule();
+  else if(id==='comments') renderComments();
+  else if(id==='audience') renderAudience();
+  else if(id==='notifications') renderNotifications();
+  else if(id==='earnings') renderEarnings();
+}
+
+function renderDashboard(){
+  renderSparklines();
+  renderChart();
+  renderActivity();
+  renderTopReaders('topReadersList');
+  renderRecentComments();
+}
+
+function renderSparklines(){
+  const sets = {
+    'spark-reads':[40,55,48,72,60,81,76,89,95,84,102,110,98,115,124],
+    'spark-earn': [20,30,25,40,35,55,50,65,72,68,80,88,82,95,103],
+    'spark-likes':[30,38,34,50,45,60,55,70,65,72,80,76,88,82,95],
+    'spark-follow':[10,14,12,18,16,22,20,28,24,30,26,34,32,38,42],
+  };
+  const colors = {'spark-reads':'var(--acc)','spark-earn':'var(--gold)','spark-likes':'var(--emerald)','spark-follow':'var(--sapphire)'};
+  Object.entries(sets).forEach(([id,data])=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const max=Math.max(...data);
+    el.innerHTML=data.map((v,i)=>{
+      const h=Math.max(4,Math.round(v/max*30));
+      return `<div class="spark-bar" style="height:${h}px;background:${colors[id]};animation-delay:${i*0.04}s"></div>`;
+    }).join('');
+  });
+}
+
+function renderChart(){
+  const svg=document.getElementById('readsChart');if(!svg)return;
+  const reads=[4200,5800,5100,7200,6800,8400,7900,9200,8800,10400,9600,11200,10800,12400,11800,13200,12600,14400,13800,15200,14400,16800,15600,17400,16800,18200,17400,19200,18600,20400];
+  const unique=reads.map(v=>Math.round(v*.62+Math.random()*800));
+  const labels=['Apr 19','Apr 26','May 3','May 10','May 17'];
+  const W=400,H=140,pad=20;
+  const max=Math.max(...reads)*1.1;
+  function pts(arr){return arr.map((v,i)=>`${pad+i*(W-pad*2)/(arr.length-1)},${H-pad-(v/max*(H-pad*2))}`).join(' ');}
+  const rPts=pts(reads),uPts=pts(unique);
+  function areaPath(pts){const arr=pts.split(' ');return `M${arr[0]} ${arr.slice(1).map(p=>`L${p}`).join(' ')} L${arr[arr.length-1].split(',')[0]},${H-pad} L${arr[0].split(',')[0]},${H-pad} Z`;}
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--acc)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--acc)" stop-opacity="0"/></linearGradient>
+      <linearGradient id="gU" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--sapphire)" stop-opacity="0.2"/><stop offset="100%" stop-color="var(--sapphire)" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path d="${areaPath(uPts)}" fill="url(#gU)"/>
+    <polyline points="${uPts}" fill="none" stroke="var(--sapphire)" stroke-width="1.5" stroke-linejoin="round" opacity="0.7"/>
+    <path d="${areaPath(rPts)}" fill="url(#gR)"/>
+    <polyline points="${rPts}" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linejoin="round"/>
+    ${reads.map((v,i)=>i%6===0?`<circle cx="${pad+i*(W-pad*2)/(reads.length-1)}" cy="${H-pad-(v/max*(H-pad*2))}" r="3" fill="var(--acc)"/>`:'').join('')}`;
+  const labelsEl=document.getElementById('chartLabels');
+  if(labelsEl)labelsEl.innerHTML=labels.map(l=>`<span class="chart-label">${l}</span>`).join('');
+}
+
+function renderActivity(){
+  const el=document.getElementById('activityFeed');if(!el)return;
+  el.innerHTML=ACTIVITY_DATA.map(a=>`
+    <div class="af-item">
+      <div class="af-dot ${a.dot}"></div>
+      <div class="af-text">${a.text}</div>
+      <div class="af-time">${a.time}</div>
+    </div>`).join('');
+}
+
+function renderTopReaders(elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=TOP_READERS.map(r=>`
+    <div class="reader-item">
+      <div class="reader-rank ${r.rank<=3?'rank-'+r.rank:'rank-rest'}">${r.rank<=3?['🥇','🥈','🥉'][r.rank-1]:r.rank}</div>
+      <img class="reader-av" src="${r.avatar}" loading="lazy"/>
+      <div class="reader-info">
+        <div class="reader-name">@${r.name}</div>
+        <div class="reader-stat">${r.stat}</div>
+      </div>
+      <div class="reader-badge">${r.badge}</div>
+    </div>`).join('');
+}
+
+function renderRecentComments(){
+  const el=document.getElementById('recentCommentsFeed');if(!el)return;
+  el.innerHTML=COMMENTS_DATA.slice(0,4).map(c=>`
+    <div class="cm-item">
+      ${c.avatar?`<img class="cm-av" src="${c.avatar}" loading="lazy"/>`:`<div class="cm-av">?</div>`}
+      <div class="cm-body">
+        <div class="cm-name-row">
+          <div class="cm-name">${c.name}</div>
+          <div class="cm-story">${c.story}</div>
+          <div class="cm-time">${c.time}</div>
+        </div>
+        <div class="cm-text">${c.text}</div>
+        <div class="cm-reply-btn" onclick="toast('💬 Reply to ${c.name}…')">Reply</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderStories(){
+  const el=document.getElementById('storiesTableBody');if(!el)return;
+  el.innerHTML=STORIES_DATA.map(s=>`
+    <div class="st-row">
+      <div class="st-title-wrap">
+        <div class="st-thumb" style="background-image:url('${s.thumb}')"></div>
+        <div class="st-info">
+          <div class="st-story-title">${s.title}</div>
+          <div class="st-meta">${s.meta}</div>
+        </div>
+      </div>
+      <div class="st-num">${fmtN(s.reads)}</div>
+      <div class="st-num">${fmtN(s.likes)}</div>
+      <div class="st-num">${fmtN(s.comments)}</div>
+      <div style="text-align:center"><div class="st-status ${s.status}">${s.status.charAt(0).toUpperCase()+s.status.slice(1)}</div></div>
+      <div class="st-actions">
+        <div class="st-act-btn" onclick="toast('✏️ Editing…')" title="Edit"><i class="fas fa-pen"></i></div>
+        <div class="st-act-btn" onclick="toast('📊 Analytics…')" title="Stats"><i class="fas fa-chart-bar"></i></div>
+        <div class="st-act-btn" onclick="toast('🗑️ Delete?')" title="Delete"><i class="fas fa-trash"></i></div>
+      </div>
+    </div>`).join('');
+}
+
+function filterStories(type){toast(`Showing ${type} stories`);}
+
+function renderSeries(){
+  const el=document.getElementById('seriesGrid');if(!el)return;
+  el.innerHTML=SERIES_DATA.map(s=>`
+    <div class="series-item" onclick="toast('📚 Opening ${s.name}…')">
+      <div class="series-thumb" style="background-image:url('${s.cover}')"></div>
+      <div class="series-info">
+        <div class="series-name">${s.name}</div>
+        <div class="series-meta">${s.meta}</div>
+        <div class="series-progress"><div class="series-prog-track"><div class="series-prog-fill" style="width:${s.prog}%"></div></div></div>
+      </div>
+      <div class="series-status ${s.status}">${s.status}</div>
+    </div>`).join('');
+}
+
+function renderSchedule(){
+  const wrap=document.getElementById('calendarWrap');if(!wrap)return;
+  const now=new Date();const m=now.getMonth(),y=now.getFullYear();
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days=['S','M','T','W','T','F','S'];
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const postDays=[3,7,12,18,21,25,28];
+  let calHTML=`<div class="cal-nav"><div class="cal-arrow" onclick="toast('←')">‹</div><div class="cal-month">${months[m]} ${y}</div><div class="cal-arrow" onclick="toast('→')">›</div></div>
+  <div class="cal-grid">`;
+  days.forEach(d=>calHTML+=`<div class="cal-day-label">${d}</div>`);
+  for(let i=0;i<firstDay;i++)calHTML+=`<div class="cal-day other-month"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===now.getDate();
+    const hasPost=postDays.includes(d);
+    calHTML+=`<div class="cal-day${isToday?' today':''}${hasPost?' has-post':''}" onclick="toast('📅 ${months[m]} ${d}')">${d}</div>`;
+  }
+  calHTML+=`</div>`;
+  calHTML+=`<div class="cal-sched-list">
+    <div class="sched-item"><div class="sched-date">May 21</div><div class="sched-title">Broken Vows S2·Ch5</div><div class="sched-time">Midnight</div></div>
+    <div class="sched-item"><div class="sched-date">May 25</div><div class="sched-title">First Class S1·Ch8</div><div class="sched-time">8:00 PM</div></div>
+    <div class="sched-item"><div class="sched-date">May 28</div><div class="sched-title">Zara — Chapter 6</div><div class="sched-time">10:00 PM</div></div>
+  </div>`;
+  wrap.innerHTML=calHTML;
+
+  const ul=document.getElementById('upcomingList');
+  if(ul)ul.innerHTML=`
+    <div class="sched-item" style="margin-bottom:6px"><div class="sched-date" style="min-width:44px">May 21</div><div class="sched-title">Broken Vows S2·Ch5 — "The Confession"</div><div class="sched-time">Midnight</div></div>
+    <div class="sched-item" style="margin-bottom:6px"><div class="sched-date" style="min-width:44px">May 25</div><div class="sched-title">First Class S1·Ch8</div><div class="sched-time">8:00 PM</div></div>
+    <div class="sched-item" style="margin-bottom:6px"><div class="sched-date" style="min-width:44px">May 28</div><div class="sched-title">Zara — Chapter 6</div><div class="sched-time">10:00 PM</div></div>
+    <div style="margin-top:14px;padding:11px;border-radius:12px;background:rgba(255,0,80,.06);border:1px dashed rgba(255,0,80,.2);text-align:center;cursor:pointer;font-size:11px;color:var(--acc2);font-weight:700" onclick="toast('+ Scheduling new chapter…')">+ Schedule a chapter</div>`;
+}
+
+function renderComments(){
+  const el=document.getElementById('commentsPanel');if(!el)return;
+  el.innerHTML=COMMENTS_DATA.map(c=>`
+    <div class="notif-item${c.unread?' unread':''}">
+      ${c.avatar?`<img class="notif-av" src="${c.avatar}" loading="lazy"/>`:`<div class="notif-av">?</div>`}
+      <div class="notif-body">
+        <div class="notif-text"><strong>${c.name}</strong> on <span style="color:var(--acc2)">${c.story}</span>: ${c.text}</div>
+        <div class="notif-time">${c.time}</div>
+        <div style="display:flex;gap:8px;margin-top:5px">
+          <span style="font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer" onclick="toast('💬 Reply box…')">Reply</span>
+          <span style="font-size:10px;color:#555;cursor:pointer" onclick="toast('👍 Liked!')">Like</span>
+          <span style="font-size:10px;color:#555;cursor:pointer" onclick="toast('🚩 Reported')">Report</span>
+        </div>
+      </div>
+      <div class="notif-badge"></div>
+    </div>`).join('');
+}
+
+function renderAudience(){
+  renderTopReaders('audienceTopReaders');
+  renderDonut();
+}
+
+function renderDonut(){
+  const el=document.getElementById('donutWrap');if(!el)return;
+  const slices=[
+    {label:'25–34',pct:38,color:'var(--acc)'},
+    {label:'18–24',pct:29,color:'var(--sapphire)'},
+    {label:'35–44',pct:19,color:'var(--emerald)'},
+    {label:'45+',pct:14,color:'var(--gold)'},
+  ];
+  let start=0;
+  const R=42,cx=50,cy=50,thick=16;
+  const arcs=slices.map(s=>{
+    const angle=(s.pct/100)*360;
+    const startRad=(start-90)*Math.PI/180;
+    const endRad=(start+angle-90)*Math.PI/180;
+    const x1=cx+R*Math.cos(startRad),y1=cy+R*Math.sin(startRad);
+    const x2=cx+R*Math.cos(endRad),y2=cy+R*Math.sin(endRad);
+    const large=angle>180?1:0;
+    const path=`M${x1},${y1} A${R},${R} 0 ${large} 1 ${x2},${y2}`;
+    start+=angle;
+    return {path,color:s.color,pct:s.pct,label:s.label};
+  });
+  el.innerHTML=`<svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">
+    ${arcs.map(a=>`<path d="${a.path}" fill="none" stroke="${a.color}" stroke-width="${thick}" stroke-linecap="butt"/>`).join('')}
+    <text x="50" y="46" text-anchor="middle" fill="#fff" font-size="9" font-weight="800" font-family="DM Sans">Age</text>
+    <text x="50" y="57" text-anchor="middle" fill="#666" font-size="7" font-family="DM Sans">Groups</text>
+  </svg>
+  <div class="donut-legend">
+    ${arcs.map(a=>`<div class="donut-leg-item"><div class="donut-leg-dot" style="background:${a.color}"></div>${a.label}<span class="donut-leg-pct">${a.pct}%</span></div>`).join('')}
+  </div>`;
+}
+
+function renderNotifications(){
+  const el=document.getElementById('notifList');if(!el)return;
+  el.innerHTML=NOTIFS_DATA.map(n=>`
+    <div class="notif-item${n.unread?' unread':''}">
+      <div class="notif-icon ${n.icon}">${n.emoji}</div>
+      <div class="notif-body">
+        <div class="notif-text"><strong>${n.name}</strong> ${n.text}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      <div class="notif-badge"></div>
+    </div>`).join('');
+}
+
+function renderEarnings(){
+  const el=document.getElementById('earningsTxList');if(!el)return;
+  el.innerHTML=TX_DATA.map(tx=>`
+    <div class="earn-tx">
+      <div class="earn-tx-icon ${tx.icon}">${tx.emoji}</div>
+      <div class="earn-tx-info">
+        <div class="earn-tx-title">${tx.title}</div>
+        <div class="earn-tx-sub">${tx.sub}</div>
+      </div>
+      <div class="earn-tx-amount${tx.debit?' debit':''}">${tx.amount}</div>
+    </div>`).join('');
+
+  const ttEl=document.getElementById('topTippers');
+  if(ttEl)ttEl.innerHTML=TOP_TIPPERS.map(t=>`
+    <div class="reader-item">
+      <div class="reader-rank ${t.rank<=3?'rank-'+t.rank:'rank-rest'}">${t.rank}</div>
+      <img class="reader-av" src="${t.avatar}" loading="lazy"/>
+      <div class="reader-info"><div class="reader-name">@${t.name}</div></div>
+      <div style="font-size:12px;font-weight:800;color:var(--gold)">${t.total}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════ WRITE PANEL LOGIC ═══════════════════
+const writeBody=document.getElementById('writeBody');
+const writeTitle=document.getElementById('writeTitle');
+if(writeBody){
+  writeBody.addEventListener('input',()=>{
+    const words=writeBody.value.trim().split(/\s+/).filter(Boolean).length;
+    const mins=Math.max(1,Math.ceil(words/200));
+    document.getElementById('writeWordCount').textContent=`${words} word${words!==1?'s':''} · ~${mins} min read`;
+  });
+  // auto resize
+  [writeBody,writeTitle].forEach(ta=>{
+    ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});
+  });
+}
+
+function fmt(cmd){document.execCommand(cmd,false,null);}
+function insertHeading(){const ta=document.getElementById('writeBody');if(!ta)return;const pos=ta.selectionStart;ta.value=ta.value.slice(0,pos)+'\n\n── ✦ ──\n\n'+ta.value.slice(pos);ta.selectionStart=ta.selectionEnd=pos+8;}
+function insertQuote(){const ta=document.getElementById('writeBody');if(!ta)return;const sel=ta.value.slice(ta.selectionStart,ta.selectionEnd)||'Your quote here';const pos=ta.selectionStart;ta.value=ta.value.slice(0,pos)+`\n"${sel}"\n`+ta.value.slice(ta.selectionEnd);toast('💬 Quote formatted!');}
+function insertDivider(){const ta=document.getElementById('writeBody');if(!ta)return;const pos=ta.selectionStart;ta.value=ta.value.slice(0,pos)+'\n\n✦ ✦ ✦\n\n'+ta.value.slice(pos);ta.selectionStart=ta.selectionEnd=pos+10;}
+
+function saveDraft(){toast('💾 Draft saved automatically!');}
+function publishStory(){
+  const title=document.getElementById('writeTitle').value.trim();
+  const body=document.getElementById('writeBody').value.trim();
+  if(!title){toast('✍️ Add a title first!');return;}
+  if(body.length<50){toast('✍️ Write at least a paragraph!');return;}
+  toast('🎉 Story published! Readers will see it now.');
+  document.getElementById('writeTitle').value='';
+  document.getElementById('writeBody').value='';
+  document.getElementById('writeWordCount').textContent='0 words · ~0 min read';
+}
+function schedulePost(){
+  const time=document.getElementById('scheduleTime').value;
+  if(!time){toast('⏰ Pick a date and time');return;}
+  toast('📅 Scheduled! Your chapter will go live then.');
+}
+function removeTag(el){el.remove();}
+
+// Tags input
+const tagsInput=document.getElementById('tagsInput');
+if(tagsInput){
+  tagsInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){
+      e.preventDefault();
+      const tag=tagsInput.value.trim().replace(',','');
+      if(!tag)return;
+      const tc=document.getElementById('tagCloud');
+      const span=document.createElement('span');
+      span.style.cssText='background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;cursor:pointer';
+      span.textContent=tag+' ✕';
+      span.onclick=()=>span.remove();
+      tc.appendChild(span);
+      tagsInput.value='';
+    }
+  });
+}
+
+function applyAiPrompt(type){
+  const hooks={
+    hook:"AI hook suggestion: Consider opening with the moment the protagonist realises everything they knew was wrong.",
+    tension:"AI: Try ending this paragraph mid-breath — leave the reader leaning forward.",
+    continue:"AI: Continuing your narrative thread…",
+    debate:'AI suggests debate motion: "Silence, not infidelity, is the real betrayal."',
+  };
+  toast(`✨ ${hooks[type]||'AI thinking…'}`);
+}
+
+// ═══════════════════ INIT ═══════════════════
+renderDashboard();
+</script>
+</body>
+</html>

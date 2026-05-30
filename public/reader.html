@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<title>Reader · Droboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --bg:#09090f;
+  --bg2:#0f0f1a;
+  --card:#141420;
+  --tx:#e8e4dc;
+  --tx2:#b8b2a8;
+  --muted:#6e6a62;
+  --muted2:#3a3830;
+  --acc:#ff0050;
+  --acc-light:rgba(255,0,80,.08);
+  --bd:rgba(255,255,255,.07);
+  --bd2:rgba(255,255,255,.04);
+  --green:#16a34a;
+  --blue:#3b82f6;
+  --gold:#d97706;
+  --glow:rgba(255,0,80,.2);
+  --font-s:'Lora',Georgia,serif;
+  --font-ui:'DM Sans',sans-serif;
+  --safe-b:env(safe-area-inset-bottom,16px);
+  --topbar:52px;
+  --bar:56px;
+  --reading-width:680px;
+  --font-size:17px;
+  --line-height:1.85;
+}
+[data-theme="light"]{
+  --bg:#faf8f4;--bg2:#f3f0e8;--card:#fff;
+  --tx:#1a1814;--tx2:#4a453e;--muted:#9a958c;--muted2:#d8d3c8;
+  --bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.04);
+}
+[data-theme="sepia"]{
+  --bg:#f5ede0;--bg2:#ede2d0;--card:#fbf5ec;
+  --tx:#2a2018;--tx2:#5a4a38;--muted:#9a8a78;--muted2:#d0c4b0;
+  --bd:rgba(90,60,20,.12);--bd2:rgba(90,60,20,.06);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-ui);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:var(--topbar);display:flex;align-items:center;gap:8px;padding:0 14px;
+  background:rgba(9,9,15,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);
+  transition:transform .3s ease,opacity .3s ease;
+}
+[data-theme="light"] .topbar{background:rgba(250,248,244,.92)}
+[data-theme="sepia"] .topbar{background:rgba(245,237,224,.92)}
+.topbar.hidden{transform:translateY(-100%);opacity:0}
+.tb-back{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--card);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--tx2);cursor:pointer;flex-shrink:0;transition:.15s;
+}
+.tb-back:active{transform:scale(.92)}
+.tb-info{flex:1;min-width:0;padding:0 6px}
+.tb-story{font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-chapter{font-size:12px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.tb-actions{display:flex;gap:6px}
+.tb-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--card);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx2);cursor:pointer;transition:.15s;
+}
+.tb-btn:active{transform:scale(.92)}
+.tb-btn.liked{color:var(--acc);background:var(--acc-light);border-color:rgba(255,0,80,.2)}
+
+/* ── PROGRESS BAR ── */
+.read-progress{
+  position:fixed;top:var(--topbar);left:0;right:0;z-index:299;
+  height:2px;background:var(--muted2);
+}
+.read-progress-fill{height:100%;background:var(--acc);width:0%;transition:width .15s linear}
+
+/* ── SCROLL BODY ── */
+.scroll-body{
+  height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding-top:var(--topbar);padding-bottom:calc(var(--bar) + var(--safe-b) + 20px);
+}
+.scroll-body::-webkit-scrollbar{display:none}
+
+/* ── CHAPTER HEADER ── */
+.ch-header{
+  max-width:var(--reading-width);margin:0 auto;
+  padding:40px 20px 32px;
+  border-bottom:1px solid var(--bd2);margin-bottom:0;
+}
+.ch-meta-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.ch-pill{
+  font-family:var(--font-ui);font-size:9px;font-weight:800;
+  padding:3px 10px;border-radius:999px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.ch-pill.series{background:var(--acc-light);color:var(--acc);border:1px solid rgba(255,0,80,.18)}
+.ch-pill.free{background:rgba(22,163,74,.08);color:var(--green);border:1px solid rgba(22,163,74,.18)}
+.ch-pill.new{background:rgba(59,130,246,.08);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
+.ch-num{font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--muted)}
+.ch-title-big{
+  font-family:var(--font-s);font-size:clamp(20px,5vw,30px);
+  font-weight:700;line-height:1.25;color:var(--tx);
+  margin-bottom:16px;font-style:italic;
+}
+.ch-read-meta{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:500;
+}
+.ch-read-meta span{display:flex;align-items:center;gap:4px}
+
+/* ── BODY TEXT ── */
+.story-body{
+  max-width:var(--reading-width);margin:0 auto;
+  padding:36px 20px 16px;
+}
+.story-body p{
+  font-family:var(--font-s);
+  font-size:var(--font-size);
+  line-height:var(--line-height);
+  color:var(--tx);margin-bottom:1.6em;
+  font-weight:400;
+}
+.story-body p:first-child::first-letter{
+  font-family:var(--font-s);
+  font-size:3.6em;font-weight:700;
+  float:left;line-height:.8;margin:5px 10px 0 0;
+  color:var(--acc);
+}
+.story-body .scene-break{
+  text-align:center;color:var(--muted);margin:2.2em 0;
+  font-size:18px;letter-spacing:.3em;user-select:none;
+}
+.story-body blockquote{
+  border-left:3px solid var(--acc);
+  padding:6px 16px;margin:1.6em 0;
+  font-style:italic;color:var(--tx2);
+}
+.story-body em{font-style:italic;color:var(--tx)}
+.story-body strong{font-weight:700;color:var(--tx)}
+
+/* ── END OF CHAPTER ── */
+.ch-end{
+  max-width:var(--reading-width);margin:0 auto;
+  padding:8px 20px 24px;
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+}
+.ch-end-divider{
+  width:100%;text-align:center;position:relative;margin:8px 0;
+}
+.ch-end-divider::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--bd)}
+.ch-end-divider span{
+  position:relative;background:var(--bg);padding:0 14px;
+  font-family:var(--font-ui);font-size:10px;font-weight:700;
+  color:var(--muted);letter-spacing:.1em;text-transform:uppercase;
+}
+[data-theme="sepia"] .ch-end-divider span{background:var(--bg)}
+[data-theme="light"] .ch-end-divider span{background:var(--bg)}
+.reaction-strip{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.rx-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:8px 13px;border-radius:999px;
+  background:var(--card);border:1px solid var(--bd);
+  font-family:var(--font-ui);font-size:11px;font-weight:600;color:var(--tx2);
+  cursor:pointer;transition:.18s;
+}
+.rx-btn:active{transform:scale(.94)}
+.rx-btn.picked{background:var(--acc-light);border-color:rgba(255,0,80,.25);color:var(--acc)}
+.rx-btn .rx-e{font-size:16px;line-height:1}
+.rx-btn .rx-c{font-size:10px;font-weight:800}
+
+/* ── NAV BUTTONS ── */
+.ch-nav-btns{display:flex;gap:10px;width:100%;max-width:420px}
+.nav-btn{
+  flex:1;padding:13px;border-radius:12px;
+  font-family:var(--font-ui);font-size:13px;font-weight:700;
+  cursor:pointer;transition:.18s;border:1.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  background:var(--card);color:var(--tx2);
+}
+.nav-btn:active{transform:scale(.97)}
+.nav-btn.next{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 4px 18px var(--glow)}
+.nav-btn:disabled{opacity:.3;pointer-events:none}
+
+/* ── COMMENT PREVIEW ── */
+.comment-preview{
+  width:100%;max-width:var(--reading-width);
+  background:var(--card);border:1px solid var(--bd);border-radius:14px;
+  overflow:hidden;
+}
+.cp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 15px 10px;border-bottom:1px solid var(--bd2);
+}
+.cp-title{font-family:var(--font-ui);font-size:12px;font-weight:700;color:var(--tx)}
+.cp-count{font-size:10px;color:var(--muted);font-weight:600}
+.cp-list{padding:4px 0}
+.cp-item{
+  display:flex;gap:10px;padding:10px 15px;
+  border-bottom:1px solid var(--bd2);
+}
+.cp-item:last-child{border-bottom:none}
+.cp-av{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.cp-body{flex:1;min-width:0}
+.cp-name{font-family:var(--font-ui);font-size:10px;font-weight:700;color:var(--tx)}
+.cp-text{font-family:var(--font-ui);font-size:11.5px;color:var(--tx2);line-height:1.45;margin-top:2px}
+.cp-meta{font-size:9px;color:var(--muted);margin-top:3px;display:flex;gap:8px;align-items:center}
+.cp-like{cursor:pointer;display:flex;align-items:center;gap:2px}
+.cp-like.liked{color:var(--acc)}
+.cp-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 13px;border-top:1px solid var(--bd);
+}
+.cp-input{
+  flex:1;font-family:var(--font-ui);font-size:12px;
+  border:none;background:transparent;color:var(--tx);outline:none;
+}
+.cp-input::placeholder{color:var(--muted)}
+.cp-send{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--acc);display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#fff;cursor:pointer;flex-shrink:0;
+  box-shadow:0 2px 8px var(--glow);transition:.15s;
+  pointer-events:none;opacity:.4;
+}
+.cp-send.active{pointer-events:auto;opacity:1}
+.cp-send:active{transform:scale(.9)}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  padding:10px 14px calc(10px + var(--safe-b));
+  background:rgba(9,9,15,.95);backdrop-filter:blur(20px);
+  border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:10px;
+  transition:transform .3s ease;
+}
+[data-theme="light"] .bottom-bar{background:rgba(250,248,244,.95)}
+[data-theme="sepia"] .bottom-bar{background:rgba(245,237,224,.95)}
+.bottom-bar.hidden{transform:translateY(100%)}
+.bb-center{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  gap:14px;
+}
+.bb-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--card);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--tx2);cursor:pointer;transition:.15s;flex-shrink:0;
+}
+.bb-icon:active{transform:scale(.9)}
+.bb-icon.liked{color:var(--acc);background:var(--acc-light)}
+.bb-progress{
+  flex:1;display:flex;flex-direction:column;gap:4px;cursor:pointer;
+}
+.bb-pct{font-family:var(--font-ui);font-size:10px;font-weight:700;color:var(--muted);text-align:center}
+.bb-bar-bg{height:3px;background:var(--muted2);border-radius:3px;overflow:hidden}
+.bb-bar-fill{height:100%;background:var(--acc);border-radius:3px;transition:width .2s}
+.bb-chs{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--card);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--tx2);cursor:pointer;transition:.15s;flex-shrink:0;
+}
+.bb-chs:active{transform:scale(.9)}
+
+/* ── CHAPTERS DRAWER ── */
+.drawer-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:var(--bg2);border-top:1px solid var(--bd);
+  border-radius:20px 20px 0 0;
+  max-height:80vh;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);
+  padding-bottom:calc(16px + var(--safe-b));
+}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{
+  width:36px;height:4px;border-radius:2px;background:var(--muted2);
+  margin:12px auto 0;flex-shrink:0;
+}
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 16px 12px;flex-shrink:0;
+}
+.drawer-title{font-family:var(--font-ui);font-size:15px;font-weight:800;color:var(--tx)}
+.drawer-close{
+  width:28px;height:28px;border-radius:50%;background:var(--card);
+  border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--muted);cursor:pointer;
+}
+.season-tabs-d{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.season-tabs-d::-webkit-scrollbar{display:none}
+.s-tab{
+  flex-shrink:0;padding:5px 14px;border-radius:999px;
+  font-family:var(--font-ui);font-size:10px;font-weight:700;
+  background:var(--card);border:1px solid var(--bd);color:var(--muted);cursor:pointer;transition:.18s;
+}
+.s-tab.active{background:var(--bg);border-color:var(--acc);color:var(--tx)}
+.ch-scroll{overflow-y:auto;flex:1;padding:0 12px;scrollbar-width:none}
+.ch-scroll::-webkit-scrollbar{display:none}
+.dch-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;cursor:pointer;
+  transition:.15s;margin-bottom:4px;
+}
+.dch-item:active{background:var(--card)}
+.dch-item.active-ch{background:var(--acc-light);border:1px solid rgba(255,0,80,.15)}
+.dch-num{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);font-size:10px;font-weight:800;flex-shrink:0;
+  background:var(--card);border:1px solid var(--bd);color:var(--muted);
+}
+.dch-num.done{background:rgba(22,163,74,.1);color:var(--green);border-color:rgba(22,163,74,.2)}
+.dch-num.current{background:var(--acc-light);color:var(--acc);border-color:rgba(255,0,80,.25)}
+.dch-body{flex:1;min-width:0}
+.dch-title{font-family:var(--font-ui);font-size:12px;font-weight:700;color:var(--tx)}
+.dch-meta{font-family:var(--font-ui);font-size:9.5px;color:var(--muted);margin-top:2px}
+.dch-tag{
+  font-size:8px;font-weight:800;padding:1.5px 7px;border-radius:999px;
+  margin-left:5px;display:inline-flex;
+}
+.dch-tag.new{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
+.dch-tag.free{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.18)}
+.dch-right{font-size:10px;font-weight:600;color:var(--green);flex-shrink:0}
+
+/* ── SETTINGS PANEL ── */
+.settings-panel{
+  position:fixed;top:var(--topbar);left:50%;transform:translateX(-50%) translateY(-8px);
+  z-index:350;width:min(320px,90vw);
+  background:var(--bg2);border:1px solid var(--bd);border-radius:16px;
+  padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:all .22s;
+}
+.settings-panel.open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(4px)}
+.sp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sp-row:last-child{margin-bottom:0}
+.sp-label{font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.sp-btns{display:flex;gap:5px}
+.sp-btn{
+  padding:6px 11px;border-radius:8px;
+  font-family:var(--font-ui);font-size:11px;font-weight:700;
+  background:var(--card);border:1px solid var(--bd);color:var(--tx2);cursor:pointer;transition:.15s;
+}
+.sp-btn.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.sp-btn:active{transform:scale(.93)}
+.font-slider{
+  width:100%;appearance:none;height:3px;
+  background:var(--muted2);border-radius:3px;outline:none;cursor:pointer;
+}
+.font-slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--glow);cursor:pointer}
+.theme-opts{display:flex;gap:6px}
+.theme-opt{
+  flex:1;padding:8px 6px;border-radius:9px;text-align:center;
+  font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--bd);transition:.15s;
+}
+.theme-opt[data-val="dark"]{background:#09090f;color:#e8e4dc}
+.theme-opt[data-val="sepia"]{background:#f5ede0;color:#2a2018}
+.theme-opt[data-val="light"]{background:#faf8f4;color:#1a1814}
+.theme-opt.active{border-color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:rgba(20,20,30,.95);color:#fff;
+  padding:8px 16px;border-radius:999px;
+  font-family:var(--font-ui);font-size:12px;font-weight:600;
+  z-index:900;opacity:0;transition:.22s;pointer-events:none;
+  white-space:nowrap;backdrop-filter:blur(10px);
+  box-shadow:0 4px 18px rgba(0,0,0,.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* locked state */
+.locked-overlay{
+  text-align:center;padding:48px 20px;
+  border:1.5px dashed var(--bd);border-radius:16px;margin:20px;
+}
+.locked-overlay .lock-icon{font-size:36px;margin-bottom:12px}
+.locked-overlay h3{font-family:var(--font-s);font-size:20px;font-weight:700;color:var(--tx);margin-bottom:8px}
+.locked-overlay p{font-family:var(--font-ui);font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:20px}
+.unlock-btn{
+  background:var(--acc);color:#fff;
+  padding:12px 28px;border-radius:999px;
+  font-family:var(--font-ui);font-size:13px;font-weight:800;
+  cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  box-shadow:0 4px 18px var(--glow);transition:.18s;
+}
+.unlock-btn:active{transform:scale(.96)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease both}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <div class="tb-back" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-info">
+    <div class="tb-story">Ada_Writes · Series</div>
+    <div class="tb-chapter" id="tbCh">Chapter 4 — The night she asked him to be honest</div>
+  </div>
+  <div class="tb-actions">
+    <div class="tb-btn" id="tbLike" onclick="toggleLike()"><i class="far fa-heart"></i></div>
+    <div class="tb-btn" onclick="toggleSettings()"><i class="fas fa-text-height"></i></div>
+  </div>
+</div>
+
+<!-- READING PROGRESS BAR -->
+<div class="read-progress"><div class="read-progress-fill" id="rpFill"></div></div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="sp-row">
+    <div class="sp-label">Font Size</div>
+    <div style="display:flex;align-items:center;gap:8px;flex:1;margin-left:14px">
+      <span style="font-family:var(--font-ui);font-size:10px;color:var(--muted)">A</span>
+      <input type="range" class="font-slider" min="14" max="22" value="17" id="fontSlider" oninput="changeFontSize(this.value)"/>
+      <span style="font-family:var(--font-ui);font-size:13px;color:var(--muted)">A</span>
+    </div>
+  </div>
+  <div class="sp-row">
+    <div class="sp-label">Spacing</div>
+    <div class="sp-btns">
+      <div class="sp-btn" onclick="setSpacing(1.6,this)">Tight</div>
+      <div class="sp-btn active" onclick="setSpacing(1.85,this)">Normal</div>
+      <div class="sp-btn" onclick="setSpacing(2.1,this)">Loose</div>
+    </div>
+  </div>
+  <div class="sp-row">
+    <div class="sp-label">Theme</div>
+  </div>
+  <div class="theme-opts">
+    <div class="theme-opt active" data-val="dark" onclick="setTheme('dark',this)">Dark</div>
+    <div class="theme-opt" data-val="sepia" onclick="setTheme('sepia',this)">Sepia</div>
+    <div class="theme-opt" data-val="light" onclick="setTheme('light',this)">Light</div>
+  </div>
+</div>
+
+<!-- SCROLL BODY -->
+<div class="scroll-body" id="scrollBody">
+  <div id="chapterContent" class="fade-in"></div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar" id="bottomBar">
+  <div class="bb-icon liked" id="bbLike" onclick="toggleLike()"><i class="fas fa-heart"></i></div>
+  <div class="bb-progress" onclick="toast('📖 Reading progress')">
+    <div class="bb-pct" id="bbPct">62%</div>
+    <div class="bb-bar-bg"><div class="bb-bar-fill" id="bbFill" style="width:62%"></div></div>
+  </div>
+  <div class="bb-chs" onclick="openDrawer()"><i class="fas fa-list"></i></div>
+</div>
+
+<!-- CHAPTERS DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-title">All Chapters</div>
+    <div class="drawer-close" onclick="closeDrawer()"><i class="fas fa-times"></i></div>
+  </div>
+  <div class="season-tabs-d" id="drawerSeasonTabs"></div>
+  <div class="ch-scroll" id="chScroll"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"></div>
+
+<script>
+/* ─── DATA ─── */
+const SEASONS=[
+  {label:'Season 1',chs:[
+    {n:1,title:'The knock on the door',meta:'3 min · 640 words',badge:'free',state:'done'},
+    {n:2,title:'The photograph he kept',meta:'4 min · 820 words',badge:null,state:'done'},
+    {n:3,title:'She asked him nothing that night',meta:'3 min · 700 words',badge:null,state:'done'},
+    {n:4,title:'The anniversary dinner',meta:'4 min · 790 words',badge:null,state:'done'},
+    {n:5,title:'What the neighbours heard',meta:'4 min · 810 words',badge:null,state:'done'},
+    {n:6,title:'Her mother knew',meta:'3 min · 670 words',badge:null,state:'done'},
+    {n:7,title:'Two sleepless mornings',meta:'4 min · 830 words',badge:null,state:'done'},
+    {n:8,title:'She packed the small bag first',meta:'5 min · 960 words',badge:null,state:'done'},
+    {n:9,title:'The last Sunday meal',meta:'4 min · 800 words',badge:null,state:'done'},
+    {n:10,title:'She left the key under the mat',meta:'5 min · 980 words',badge:null,state:'done'},
+    {n:11,title:'One year later',meta:'6 min · 1100 words',badge:null,state:'done'},
+  ]},
+  {label:'Season 2',chs:[
+    {n:1,title:'New apartment, same nightmares',meta:'4 min · 800 words',badge:null,state:'done'},
+    {n:2,title:'He texted. She waited.',meta:'3 min · 650 words',badge:null,state:'done'},
+    {n:3,title:'The therapist asked about her sister',meta:'4 min · 820 words',badge:null,state:'done'},
+    {n:4,title:'The night she asked him to be honest',meta:'5 min · 940 words',badge:'new',state:'current',progress:62},
+    {n:5,title:'What he finally told her',meta:'Coming soon',badge:'new',state:'locked'},
+  ]},
+];
+
+const CHAPTER_CONTENT={
+  's1c1':`
+<p>The knock came at a quarter past ten. Adaeze had not been expecting anyone — she never was, not since she moved to the flat on Adelaike Close, where the neighbours kept to themselves with the careful politeness of people who have seen too much of each other's lives.</p>
+<p>She was still in her work clothes, the blazer hung over the kitchen chair, her shoes at the door in a defeated little pile. The plate she hadn't finished sat on the counter. She'd been meaning to rinse it.</p>
+<div class="scene-break">· · ·</div>
+<p>It was her husband. Emeka stood in the doorway with the look of a man who had rehearsed this moment and forgotten all the lines. He was holding a small green bag from the pharmacy — paracetamol, she would later discover. She had mentioned, in a voice message four days prior, that she had a headache.</p>
+<p>He said her name. Just that. <em>Ada.</em></p>
+<blockquote>"I wasn't going to come," he said. "And then I was already here."</blockquote>
+<p>She stepped back. She let him in. She would think about this for a long time afterward — that step, that opening of the door — and whether it meant something about her that she had not been able to stop herself.</p>
+<p>He set the bag on the counter near the unfinished plate. He looked at it but said nothing. He had always been good at not saying the things that would make her have to respond.</p>
+<div class="scene-break">· · ·</div>
+<p>They sat on opposite ends of the sofa. The television was off. Outside, a generator hummed from somewhere three houses down, a sound so familiar to both of them that it was almost like silence.</p>
+<p>Neither of them mentioned Temi. They never did, that first year. Her sister existed in the space between their sentences, in the half-second before either of them laughed, in the way Emeka sometimes looked at the wedding photograph on the wall — not at Ada in it, but slightly past her, at something just over her shoulder.</p>
+<p>Adaeze had never asked about this. She told herself she didn't need to.</p>`,
+
+  's2c4':`
+<p>She came home early because the meeting had ended without warning — the client had a flight, everyone was apologising, and Adaeze had walked out into the afternoon light with nowhere particular to be and two extra hours she hadn't planned for.</p>
+<p>She bought groundnuts from the woman at the junction. She took the longer route home. She was thinking about almost nothing — a small mercy, those stretches of quiet mind — when she turned her key in the lock.</p>
+<div class="scene-break">· · ·</div>
+<p>Emeka was in the sitting room. He was standing in front of the bookshelf, the one they'd bought together at the market in Surulere and carried up four flights of stairs, arguing the whole way about who had the heavier end.</p>
+<p>He had Temi's photograph in both hands. Not the framed one — the loose one, the printed copy Adaeze kept tucked behind a row of novels, the one from Temi's last birthday, where she was laughing at something off-camera and her eyes were almost closed with the force of it.</p>
+<p>He was pressing it to his mouth.</p>
+<div class="scene-break">· · ·</div>
+<p>Adaeze stood in the doorway for what felt like a long time. The groundnuts were still in her hand. She heard herself place them on the small table by the entrance, the paper rustling, and the sound was very loud.</p>
+<p>Emeka turned.</p>
+<p>For a moment, neither of them performed anything. He didn't hide the photograph. She didn't look away. They were just two people in a room, caught in the full, terrible honesty of what had just happened.</p>
+<blockquote>"She was my friend first," he said. Not a defence. Just a fact, offered the way you offer something you've been holding too long.</blockquote>
+<p>Adaeze knew this. She had always known this. Temi and Emeka had grown up on the same street, had gone to the same secondary school, had had the kind of friendship that predated her entirely. She had never once felt threatened by it. She had thought of it, always, as a gift — that he had known her sister, that someone in the world had loved Temi long before Ada needed him to.</p>
+<div class="scene-break">· · ·</div>
+<p>She sat down. Not because her legs gave — she would not give herself that dramatic grace. She sat down because sitting seemed like the honest thing to do in a moment that was asking for honesty.</p>
+<p>"How long?" she asked.</p>
+<p>He looked at the photograph. "Always," he said. "And never. It isn't — it wasn't —" He stopped. He tried again. "You were the one I chose. That was real. That was true. But Temi was—"</p>
+<p>"Don't," she said. Her voice came out gentle, which surprised her. "Don't explain it right now. I don't want the explanation yet."</p>
+<p>He nodded. He sat down too, on the chair across from her. They were back in the geometry of that first night, the sofa, the distance, the generator somewhere outside filling the silence.</p>
+<p>She looked at her sister's face in his hands and felt something she had not expected: not rage, not betrayal — not yet — but a grief so sudden and so specific it had a shape. She was grieving Temi again. She was grieving the Temi that Emeka had known, the one she hadn't fully seen, the one who had maybe loved him back in some register she would never have access to now.</p>
+<blockquote>"She never told me," Ada said, quietly, to no one in particular.</blockquote>
+<p>Emeka looked up. His eyes were wet. "No," he said. "She was very careful about you."</p>
+<div class="scene-break">· · ·</div>
+<p>Later — much later, after he had gone, after Ada had sat alone with the groundnuts she never opened — she would think about what it meant to be loved carefully. To be protected by someone's silence. To have a sister who had, out of love, kept the one thing that might have broken you.</p>
+<p>She didn't know yet if she was grateful.</p>
+<p>She didn't know yet if there was a word for what she was.</p>`,
+
+  's2c5_locked':null
+};
+
+/* ─── STATE ─── */
+const S={
+  season:1, // 0-indexed
+  chapter:3, // 0-indexed within season
+  liked:true,
+  settingsOpen:false,
+  drawerSeason:1,
+  rxPicked:null,
+  theme:'dark',
+  comments:[
+    {av:'https://i.pravatar.cc/100?img=47',name:'Chioma_R',text:'The look on his face when she walked in… Ada writes grief like she lives in it 😭',time:'2h',likes:1842,liked:false},
+    {av:'https://i.pravatar.cc/100?img=15',name:'Emeka_T',text:'"She was very careful about you." I had to put my phone down after that sentence.',time:'4h',likes:1204,liked:false},
+    {av:'https://i.pravatar.cc/100?img=12',name:'CampusQueen',text:'The photograph detail. The whole story lives in that one image. Absolute storytelling.',time:'5h',likes:734,liked:true},
+  ],
+  reactions:[
+    {id:'cry',e:'😭',l:'Crying',n:9200},
+    {id:'broken',e:'💔',l:'Heartbroken',n:7800},
+    {id:'shock',e:'😱',l:'Shocked',n:4100},
+    {id:'emo',e:'🥹',l:'Emotional',n:5600},
+  ]
+};
+
+/* ─── UTILS ─── */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400)}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+function goBack(){toast('← Back to story page')}
+
+/* ─── LIKE ─── */
+function toggleLike(){
+  S.liked=!S.liked;
+  const icon=S.liked?'fas':'far';
+  document.getElementById('tbLike').innerHTML=`<i class="${icon} fa-heart"></i>`;
+  document.getElementById('tbLike').classList.toggle('liked',S.liked);
+  document.getElementById('bbLike').innerHTML=`<i class="${icon} fa-heart"></i>`;
+  document.getElementById('bbLike').classList.toggle('liked',S.liked);
+  toast(S.liked?'❤️ Liked':'Unliked');
+}
+
+/* ─── SETTINGS ─── */
+function toggleSettings(){
+  S.settingsOpen=!S.settingsOpen;
+  document.getElementById('settingsPanel').classList.toggle('open',S.settingsOpen);
+}
+document.getElementById('scrollBody').addEventListener('click',e=>{
+  if(S.settingsOpen&&!document.getElementById('settingsPanel').contains(e.target)&&!e.target.closest('.tb-btn')){
+    S.settingsOpen=false;document.getElementById('settingsPanel').classList.remove('open');
+  }
+});
+function changeFontSize(v){document.documentElement.style.setProperty('--font-size',v+'px')}
+function setSpacing(v,btn){
+  document.documentElement.style.setProperty('--line-height',v);
+  document.querySelectorAll('.sp-btn').forEach(b=>{if(['Tight','Normal','Loose'].includes(b.textContent))b.classList.remove('active')});
+  btn.classList.add('active');
+}
+function setTheme(theme,btn){
+  document.body.setAttribute('data-theme',theme);S.theme=theme;
+  document.querySelectorAll('.theme-opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ─── READING PROGRESS ─── */
+const sb=document.getElementById('scrollBody');
+let autoHideTimer;
+let barsVisible=true;
+function updateProgress(){
+  const st=sb.scrollTop,sh=sb.scrollHeight-sb.clientHeight;
+  const pct=sh>0?Math.round(st/sh*100):0;
+  document.getElementById('rpFill').style.width=pct+'%';
+  document.getElementById('bbFill').style.width=pct+'%';
+  document.getElementById('bbPct').textContent=pct+'%';
+}
+function showBars(){
+  if(!barsVisible){
+    barsVisible=true;
+    document.getElementById('topbar').classList.remove('hidden');
+    document.getElementById('bottomBar').classList.remove('hidden');
+  }
+  clearTimeout(autoHideTimer);
+  autoHideTimer=setTimeout(()=>{
+    barsVisible=false;
+    document.getElementById('topbar').classList.add('hidden');
+    document.getElementById('bottomBar').classList.add('hidden');
+  },3500);
+}
+sb.addEventListener('scroll',()=>{updateProgress();showBars()},{passive:true});
+document.getElementById('scrollBody').addEventListener('click',e=>{
+  if(!e.target.closest('.bottom-bar')&&!e.target.closest('.topbar'))showBars();
+});
+
+/* ─── CHAPTER NAVIGATION ─── */
+function getChapterKey(si,ci){
+  const seas=SEASONS[si];const ch=seas.chs[ci];
+  if(ch.state==='locked')return`s${si+1}c${ch.n}_locked`;
+  return`s${si+1}c${ch.n}`;
+}
+function getContent(key){
+  if(key.endsWith('_locked'))return null;
+  return CHAPTER_CONTENT[key]||generateContent(key);
+}
+function generateContent(key){
+  // Generic content for chapters without specific content
+  return`<p>The morning after always arrives with the same indifference as any other morning. The sun comes through the curtains without apology, the sounds of the street begin their familiar negotiations, and the body — reluctant, ordinary — moves through the motions of beginning again.</p>
+<p>Adaeze had always believed that the truest measure of grief was not its depth but its duration. The way it didn't announce itself but simply became the weather you lived in. You adapted, as people do, until one day you forgot that the weather had ever been different.</p>
+<div class="scene-break">· · ·</div>
+<p>But adaptation is not healing. She had learned this the hard way — in therapy, in silence, in the peculiar intimacy of sharing a bed with someone who was also grieving the same person, differently.</p>
+<p>Emeka's grief was loud at first, then very quiet. Hers had always been quiet. She wondered sometimes if that was what had drawn her to him in the first place — the company of another person who knew how to carry something without putting it down.</p>
+<blockquote>"You grieve like you're keeping a secret," her therapist had said once. "As if the feeling is something that shouldn't be witnessed."</blockquote>
+<p>She had not responded to that. Some truths are easier to acknowledge in retrospect than in the moment of being seen.</p>
+<div class="scene-break">· · ·</div>
+<p>The photograph had been moved. She didn't know when — sometime in the night, after she fell asleep on the sofa, before she woke to the early call to prayer drifting from the mosque at the end of the road. It was back in its place behind the novels. Emeka's side of the bedroom door was closed.</p>
+<p>She made tea she didn't drink. She stood at the window for a while. The street below was waking up with the efficiency of a city that doesn't have the luxury of slow mornings.</p>
+<p>She thought: <em>I have to decide something.</em></p>
+<p>She thought: <em>Not yet.</em></p>`;
+}
+
+function renderChapter(){
+  const si=S.season,ci=S.chapter;
+  const seas=SEASONS[si];const ch=seas.chs[ci];
+  const key=getChapterKey(si,ci);
+  const content=getContent(key);
+  document.getElementById('tbCh').textContent=`Chapter ${ch.n} — ${ch.title}`;
+  
+  // Is first chapter in entire story?
+  const isFirst=si===0&&ci===0;
+  // Is last overall?
+  const isLast=si===SEASONS.length-1&&ci===SEASONS[si].chs.length-1;
+  
+  let html=`
+  <div class="ch-header">
+    <div class="ch-meta-row">
+      <span class="ch-pill series">Season ${si+1}</span>
+      ${ch.badge==='new'?'<span class="ch-pill new">New</span>':''}
+      ${ch.badge==='free'?'<span class="ch-pill free">Free</span>':''}
+    </div>
+    <div class="ch-num">Chapter ${ch.n}</div>
+    <div class="ch-title-big">${ch.title}</div>
+    <div class="ch-read-meta">
+      <span><i class="far fa-clock"></i> ${ch.meta}</span>
+      <span><i class="far fa-eye"></i> ${Math.floor(Math.random()*15+8)}k reads</span>
+    </div>
+  </div>`;
+
+  if(!content){
+    // Locked
+    html+=`<div class="locked-overlay">
+      <div class="lock-icon">🔒</div>
+      <h3>Chapter ${ch.n} coming soon</h3>
+      <p>${ch.title}<br><br>Ada is writing the next chapter. Turn on notifications to be the first to read it when it drops.</p>
+      <div class="unlock-btn" onclick="toast('🔔 Notifications on!')"><i class="fas fa-bell"></i> Notify me when it's out</div>
+    </div>`;
+  } else {
+    html+=`<div class="story-body">${content}</div>`;
+    html+=renderChapterEnd(si,ci,isFirst,isLast);
+  }
+
+  const container=document.getElementById('chapterContent');
+  container.innerHTML=html;
+  container.className='fade-in';
+  sb.scrollTop=0;
+  updateProgress();
+  
+  // bind comment input
+  const inp=document.getElementById('cpInput');
+  const send=document.getElementById('cpSend');
+  if(inp&&send){
+    inp.addEventListener('input',()=>{
+      const v=inp.value.trim().length>0;
+      send.classList.toggle('active',v);
+    });
+    send.addEventListener('click',postComment);
+  }
+
+  renderDrawerChapters();
+}
+
+function renderChapterEnd(si,ci,isFirst,isLast){
+  const prevLabel=ci>0?SEASONS[si].chs[ci-1].title:si>0?SEASONS[si-1].chs[SEASONS[si-1].chs.length-1].title:null;
+  const nextLabel=ci<SEASONS[si].chs.length-1?SEASONS[si].chs[ci+1].title:si<SEASONS.length-1?SEASONS[si+1].chs[0].title:null;
+
+  return`
+  <div class="ch-end">
+    <div class="ch-end-divider"><span>End of Chapter</span></div>
+
+    <!-- Reactions -->
+    <div class="reaction-strip">
+      ${S.reactions.map(r=>`
+        <div class="rx-btn${S.rxPicked===r.id?' picked':''}" onclick="pickRx('${r.id}')">
+          <span class="rx-e">${r.e}</span>
+          <span class="rx-c" id="rc-${r.id}">${fmtN(r.n)}</span>
+        </div>`).join('')}
+    </div>
+
+    <!-- Prev / Next -->
+    <div class="ch-nav-btns">
+      <button class="nav-btn prev" onclick="prevChapter()" ${isFirst?'disabled':''}>
+        <i class="fas fa-chevron-left" style="font-size:11px"></i>
+        <span>${isFirst?'Start':'Prev'}</span>
+      </button>
+      <button class="nav-btn next" onclick="nextChapter()" ${isLast?'disabled':''}>
+        <span>${isLast?'Last':'Next'}</span>
+        <i class="fas fa-chevron-right" style="font-size:11px"></i>
+      </button>
+    </div>
+    ${prevLabel&&!isFirst?`<div style="font-family:var(--font-ui);font-size:9.5px;color:var(--muted);text-align:center;width:100%">← ${prevLabel}</div>`:''}
+    ${nextLabel&&!isLast?`<div style="font-family:var(--font-ui);font-size:9.5px;color:var(--muted);text-align:center;width:100%">Next → ${nextLabel}</div>`:''}
+
+    <!-- Comments -->
+    <div class="comment-preview">
+      <div class="cp-header">
+        <div class="cp-title">💬 Comments</div>
+        <div class="cp-count">${fmtN(S.comments.length + 4097)} total</div>
+      </div>
+      <div class="cp-list" id="cpList"></div>
+      <div class="cp-input-row">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--acc-light);border:1px solid rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);font-size:10px;font-weight:800;color:var(--acc);flex-shrink:0;">Y</div>
+        <input class="cp-input" id="cpInput" placeholder="Leave a comment…"/>
+        <div class="cp-send" id="cpSend"><i class="fas fa-paper-plane" style="font-size:10px"></i></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderComments(){
+  const el=document.getElementById('cpList');
+  if(!el)return;
+  el.innerHTML=S.comments.map((c,i)=>`
+    <div class="cp-item">
+      <img class="cp-av" src="${c.av}" alt="" loading="lazy"/>
+      <div class="cp-body">
+        <div class="cp-name">${c.name}</div>
+        <div class="cp-text">${c.text}</div>
+        <div class="cp-meta">
+          <span>${c.time}</span>
+          <span class="cp-like${c.liked?' liked':''}" onclick="likeCmt(${i})">
+            <i class="${c.liked?'fas':'far'} fa-heart" style="font-size:9px"></i> ${fmtN(c.likes)}
+          </span>
+          <span style="color:var(--blue);cursor:pointer;font-weight:700" onclick="toast('💬 Reply…')">Reply</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function likeCmt(i){S.comments[i].liked=!S.comments[i].liked;S.comments[i].likes+=S.comments[i].liked?1:-1;renderComments()}
+function postComment(){
+  const inp=document.getElementById('cpInput');
+  const text=inp&&inp.value.trim();if(!text)return;
+  S.comments.unshift({av:null,name:'You',text,time:'Just now',likes:0,liked:false});
+  inp.value='';document.getElementById('cpSend').classList.remove('active');
+  renderComments();toast('💬 Comment posted!');
+}
+
+function pickRx(id){
+  if(S.rxPicked===id){S.reactions.find(r=>r.id===id).n--;S.rxPicked=null;}
+  else{
+    if(S.rxPicked)S.reactions.find(r=>r.id===S.rxPicked).n--;
+    const r=S.reactions.find(r=>r.id===id);r.n++;S.rxPicked=id;toast(`${r.e} Reaction added!`);
+  }
+  document.querySelectorAll('.rx-btn').forEach(b=>{
+    const rid=b.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    if(!rid)return;
+    b.classList.toggle('picked',S.rxPicked===rid);
+    const counter=document.getElementById('rc-'+rid);
+    if(counter)counter.textContent=fmtN(S.reactions.find(r=>r.id===rid).n);
+  });
+}
+
+/* ─── PREV / NEXT ─── */
+function prevChapter(){
+  let si=S.season,ci=S.chapter;
+  if(ci>0){ci--;}
+  else if(si>0){si--;ci=SEASONS[si].chs.length-1;}
+  else return;
+  S.season=si;S.chapter=ci;renderChapter();setTimeout(renderComments,50);
+}
+function nextChapter(){
+  let si=S.season,ci=S.chapter;
+  if(ci<SEASONS[si].chs.length-1){ci++;}
+  else if(si<SEASONS.length-1){si++;ci=0;}
+  else return;
+  S.season=si;S.chapter=ci;renderChapter();setTimeout(renderComments,50);
+}
+
+/* ─── DRAWER ─── */
+let drawerSeason=1;
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  renderDrawerTabs();renderDrawerChapters();
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+function renderDrawerTabs(){
+  document.getElementById('drawerSeasonTabs').innerHTML=SEASONS.map((s,i)=>`
+    <div class="s-tab${i===drawerSeason?' active':''}" onclick="setDrawerSeason(${i})">${s.label}</div>`).join('');
+}
+function setDrawerSeason(i){drawerSeason=i;renderDrawerTabs();renderDrawerChapters()}
+function renderDrawerChapters(){
+  const chs=SEASONS[drawerSeason].chs;
+  document.getElementById('chScroll').innerHTML=chs.map((ch,ci)=>{
+    const isActive=drawerSeason===S.season&&ci===S.chapter;
+    const numEl=ch.state==='done'
+      ?`<div class="dch-num done"><i class="fas fa-check" style="font-size:9px"></i></div>`
+      :ch.state==='current'
+      ?`<div class="dch-num current">${ch.n}</div>`
+      :ch.state==='locked'
+      ?`<div class="dch-num"><i class="fas fa-lock" style="font-size:9px;color:var(--muted2)"></i></div>`
+      :`<div class="dch-num">${ch.n}</div>`;
+    const tagEl=ch.badge==='new'?`<span class="dch-tag new">NEW</span>`:ch.badge==='free'?`<span class="dch-tag free">FREE</span>`:'';
+    return`<div class="dch-item${isActive?' active-ch':''}" onclick="jumpTo(${drawerSeason},${ci})">
+      ${numEl}
+      <div class="dch-body">
+        <div class="dch-title">Ch.${ch.n} — ${ch.title}</div>
+        <div class="dch-meta">${ch.meta} ${tagEl}</div>
+      </div>
+      ${ch.state==='done'?'<div class="dch-right">✓</div>':''}
+    </div>`;
+  }).join('');
+}
+function jumpTo(si,ci){
+  S.season=si;S.chapter=ci;
+  closeDrawer();
+  renderChapter();
+  setTimeout(renderComments,50);
+}
+
+/* ─── INIT ─── */
+renderChapter();
+setTimeout(renderComments,50);
+showBars();
+</script>
+</body>
+</html>

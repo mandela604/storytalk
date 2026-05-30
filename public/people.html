@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · People</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.3);--glow2:rgba(255,0,80,.12);
+  --bg:#000000;--card:#0a0a0a;--card2:#111111;--surface:#0d0d0d;
+  --tx:#f5f5f7;--muted:#555;--muted2:#888;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.04);
+  --gold:#f59e0b;--blue:#00aaff;--green:#10b981;--purple:#a78bfa;
+  --nav-h:62px;
+  --safe-b:env(safe-area-inset-bottom,14px);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 8px)}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:rgba(255,0,80,.3);border-radius:2px}
+
+/* ── TOP BAR ── */
+.top-bar{
+  position:sticky;top:0;z-index:200;
+  padding:10px 14px 0;
+  background:rgba(0,0,0,.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);
+}
+.top-bar-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px}
+.top-right{display:flex;gap:8px;align-items:center}
+.top-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#ccc;position:relative;transition:.15s}
+.top-icon-btn:active{transform:scale(.9)}
+.ndot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--acc);border:1.5px solid #000}
+
+/* Search bar */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--card2);border:1.5px solid var(--bd);border-radius:24px;padding:8px 14px;margin-bottom:10px;transition:border-color .2s,box-shadow .2s}
+.search-bar:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,0,80,.1)}
+.search-bar i{color:var(--muted);font-size:13px;flex-shrink:0}
+.search-bar input{flex:1;background:transparent;border:none;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;outline:none}
+.search-bar input::placeholder{color:var(--muted)}
+.search-clear{font-size:12px;color:var(--muted);cursor:pointer;display:none;padding:2px}
+
+/* Segment tabs */
+.seg-row{display:flex;gap:0;margin-bottom:0}
+.seg{flex:1;text-align:center;padding:9px 4px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap;position:relative}
+.seg.active{color:#fff;border-bottom-color:var(--acc)}
+.seg-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,0,80,.2);color:var(--acc2);font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;vertical-align:middle}
+
+/* ── BODY ── */
+.body{min-height:100px}
+
+/* ── FILTER CHIPS ── */
+.filter-strip{display:flex;gap:6px;padding:10px 14px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd2)}
+.filter-strip::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;border:1.5px solid var(--bd);color:var(--muted);cursor:pointer;transition:.18s;white-space:nowrap;user-select:none}
+.fc.on{background:rgba(255,0,80,.12);border-color:rgba(255,0,80,.35);color:var(--acc2)}
+.fc:active{transform:scale(.95)}
+
+/* ── PANEL ── */
+.panel{display:none;padding:0}
+.panel.active{display:block}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px}
+.sh-title{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;white-space:nowrap;padding:3px 9px;border-radius:10px;background:rgba(255,0,80,.07);border:1px solid rgba(255,0,80,.18);flex-shrink:0}
+
+/* ── STORIES-LIKE HORIZONTAL SCROLL FOR STATUS RINGS ── */
+.status-row-wrap{padding:10px 14px 0;border-bottom:1px solid var(--bd2)}
+.status-row{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:12px}
+.status-row::-webkit-scrollbar{display:none}
+.s-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer}
+.s-item:active{opacity:.7}
+.s-ring{width:52px;height:52px;border-radius:50%;padding:2.5px}
+.s-ring.new{background:conic-gradient(var(--acc),var(--acc2),#ff4488,var(--acc));animation:spinRing 3s linear infinite}
+.s-ring.viewed{background:rgba(255,255,255,.12)}
+.s-ring.you{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.s-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
+.s-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.s-add{font-size:20px;color:var(--muted)}
+.s-name{font-size:9px;font-weight:700;color:#aaa;max-width:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.s-name.you-lbl{color:var(--acc2)}
+
+/* ── PEOPLE CARDS — main card style ── */
+.people-list{display:flex;flex-direction:column;gap:0}
+.person-card{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--bd2);position:relative;cursor:pointer;transition:.15s}
+.person-card:active{background:rgba(255,255,255,.03)}
+.person-card:last-child{border-bottom:none}
+
+/* Avatar with ring */
+.pc-av-wrap{position:relative;flex-shrink:0}
+.pc-av-ring{width:48px;height:48px;border-radius:50%;padding:2px}
+.pc-av-ring.new{background:conic-gradient(var(--acc),var(--acc2),#ff4488,var(--acc));animation:spinRing 3s linear infinite}
+.pc-av-ring.viewed{background:rgba(255,255,255,.1)}
+.pc-av-ring.none{background:rgba(255,255,255,.06)}
+.pc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111}
+.pc-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.pc-av-badge{position:absolute;bottom:0;right:-1px;font-size:7px;font-weight:800;padding:1px 5px;border-radius:6px;border:1.5px solid #000;white-space:nowrap}
+.badge-writer{background:var(--acc);color:#fff}
+.badge-reader{background:var(--blue);color:#fff}
+.badge-top{background:var(--gold);color:#000}
+
+/* Person info */
+.pc-info{flex:1;min-width:0}
+.pc-name{font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pc-verified{font-size:8px;font-weight:800;padding:1px 5px;border-radius:6px;background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.2);color:var(--acc2)}
+.pc-handle{font-size:10px;color:var(--muted2);margin-top:1px}
+.pc-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.pc-genre{font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.06);color:#bbb;border:1px solid var(--bd)}
+.pc-genre.active{background:rgba(255,0,80,.1);border-color:rgba(255,0,80,.25);color:var(--acc2)}
+.pc-stat{font-size:9px;color:var(--muted2);font-weight:600;display:flex;align-items:center;gap:2px}
+.pc-mutual{font-size:9px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:3px}
+
+/* Follow / Message button */
+.pc-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.follow-btn{padding:6px 13px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.follow-btn:active{transform:scale(.95)}
+.follow-btn.f-out{background:var(--acc);color:#fff;box-shadow:0 0 10px var(--glow2)}
+.follow-btn.f-ing{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+.msg-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa;transition:.15s}
+.msg-btn:active{background:rgba(255,0,80,.15);color:var(--acc)}
+
+/* ── FEATURED WRITER card (large horizontal scroll) ── */
+.featured-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.featured-scroll::-webkit-scrollbar{display:none}
+.fw-card{flex-shrink:0;width:220px;background:var(--card);border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;transition:.18s;position:relative}
+.fw-card:active{transform:scale(.98)}
+.fw-cover{height:80px;background-size:cover;background-position:center 30%;position:relative}
+.fw-cover-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.9),rgba(0,0,0,.2))}
+.fw-genre-badge{position:absolute;top:7px;left:8px;font-size:7px;font-weight:800;padding:2px 7px;border-radius:8px;background:var(--acc);color:#fff}
+.fw-av-wrap{position:absolute;bottom:-18px;left:12px;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:2px;box-shadow:0 0 12px var(--glow2)}
+.fw-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden}
+.fw-av-inner img{width:100%;height:100%;object-fit:cover}
+.fw-body{padding:24px 12px 12px}
+.fw-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-handle{font-size:9px;color:var(--muted2);margin-bottom:6px}
+.fw-stats{display:flex;gap:8px;margin-bottom:8px}
+.fw-stat{font-size:9px;color:#bbb;font-weight:600;display:flex;align-items:center;gap:2px}
+.fw-genres{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.fw-genre-chip{font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.18);color:var(--acc2)}
+.fw-follow-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:7px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 12px var(--glow2);transition:.2s}
+.fw-follow-btn.ing{background:rgba(255,255,255,.08);color:#ccc;border:1.5px solid rgba(255,255,255,.15);box-shadow:none}
+
+/* ── GENRE MATCH SECTION ── */
+.genre-match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px}
+.gm-card{background:var(--card);border:1.5px solid var(--bd);border-radius:14px;padding:12px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.gm-card:active{transform:scale(.98)}
+.gm-card-bg{position:absolute;inset:0;opacity:.06;background-size:cover;background-position:center}
+.gm-card-content{position:relative;z-index:2}
+.gm-emoji{font-size:22px;margin-bottom:6px;display:block}
+.gm-name{font-size:11px;font-weight:800;color:#fff;margin-bottom:3px}
+.gm-count{font-size:9px;color:var(--muted2);margin-bottom:8px}
+.gm-avatars{display:flex;gap:-4px;margin-bottom:8px}
+.gm-av{width:20px;height:20px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-right:-6px;flex-shrink:0}
+.gm-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.gm-join-btn{font-size:8px;font-weight:800;padding:3px 9px;border-radius:8px;background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2);cursor:pointer;transition:.15s}
+.gm-join-btn.joined{background:rgba(255,255,255,.06);border-color:var(--bd);color:#888}
+
+/* ── ACTIVITY FEED style (for Following tab) ── */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2)}
+.activity-item:last-child{border-bottom:none}
+.act-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#111;border:1.5px solid var(--bd)}
+.act-av img{width:100%;height:100%;object-fit:cover}
+.act-body{flex:1;min-width:0}
+.act-text{font-size:12px;color:#ccc;line-height:1.45}
+.act-text strong{color:#fff;font-weight:700}
+.act-text .acc{color:var(--acc2)}
+.act-time{font-size:9px;color:var(--muted);margin-top:3px}
+.act-story-mini{display:flex;gap:7px;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:10px;padding:7px 9px;margin-top:6px;cursor:pointer}
+.act-story-mini:active{background:rgba(255,255,255,.07)}
+.asm-img{width:30px;height:34px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.asm-title{font-size:10px;font-weight:700;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.asm-writer{font-size:8px;color:var(--muted2);margin-top:1px}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.act-dot.red{background:var(--acc)}
+.act-dot.blue{background:var(--blue)}
+.act-dot.green{background:var(--green)}
+.act-dot.gold{background:var(--gold)}
+
+/* ── SUGGESTED READERS (grid of compact cards) ── */
+.reader-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px}
+.rg-card{background:var(--card);border:1.5px solid var(--bd);border-radius:14px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:.18s;position:relative}
+.rg-card:active{transform:scale(.98)}
+.rg-av{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--bd);margin-bottom:7px;flex-shrink:0}
+.rg-av img{width:100%;height:100%;object-fit:cover}
+.rg-name{font-size:11px;font-weight:800;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rg-handle{font-size:9px;color:var(--muted2);margin-bottom:5px}
+.rg-genres{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-bottom:7px}
+.rg-genre{font-size:7px;font-weight:700;padding:2px 5px;border-radius:6px;background:rgba(255,255,255,.06);color:#aaa;border:1px solid var(--bd)}
+.rg-stat{font-size:9px;color:var(--muted2);margin-bottom:7px;display:flex;align-items:center;gap:3px;justify-content:center}
+.rg-follow-btn{width:100%;padding:5px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s}
+.rg-follow-btn.f-out{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+.rg-follow-btn.f-ing{background:var(--acc);color:#fff;box-shadow:0 0 8px var(--glow2)}
+.rg-mutual{position:absolute;top:8px;right:8px;font-size:7px;font-weight:800;padding:2px 5px;border-radius:6px;background:rgba(0,170,255,.12);border:1px solid rgba(0,170,255,.2);color:var(--blue)}
+
+/* ── LEADERBOARD ROW ── */
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd2)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;min-width:22px;text-align:center}
+.lb-rank.r1{color:var(--gold)}
+.lb-rank.r2{color:#9ca3af}
+.lb-rank.r3{color:#cd7c4b}
+.lb-rank.rn{color:var(--muted)}
+.lb-av{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid var(--bd)}
+.lb-av img{width:100%;height:100%;object-fit:cover}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:12px;font-weight:700;color:#fff}
+.lb-meta{font-size:9px;color:var(--muted2);margin-top:1px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.lb-score{font-size:12px;font-weight:800;color:var(--acc);display:flex;align-items:center;gap:3px;flex-shrink:0}
+.lb-badge-sm{font-size:7px;font-weight:800;padding:2px 5px;border-radius:6px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.2);color:var(--acc2)}
+
+/* ── DEBATE CHAMPIONS (horizontal card scroll) ── */
+.champ-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.champ-scroll::-webkit-scrollbar{display:none}
+.champ-card{flex-shrink:0;width:150px;background:var(--card);border:1.5px solid var(--bd);border-radius:14px;padding:13px 11px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:.18s;position:relative}
+.champ-card:active{transform:scale(.97)}
+.champ-trophy{font-size:22px;margin-bottom:6px}
+.champ-av{width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--acc);margin-bottom:5px}
+.champ-av img{width:100%;height:100%;object-fit:cover}
+.champ-name{font-size:11px;font-weight:800;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.champ-side{font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;margin-bottom:5px}
+.champ-side.for{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.champ-side.against{background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.2)}
+.champ-votes{font-size:10px;font-weight:800;color:var(--acc);display:flex;align-items:center;gap:3px;justify-content:center;margin-bottom:7px}
+.champ-follow-btn{width:100%;padding:5px;border-radius:8px;font-size:9px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;background:rgba(255,255,255,.06);border:1.5px solid var(--bd);color:#ccc}
+.champ-follow-btn.ing{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 0 8px var(--glow2)}
+
+/* ── PROFILE PREVIEW SHEET ── */
+.overlay-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.preview-sheet{width:100%;background:#0a0a0a;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.preview-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.preview-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:4px;margin:12px auto 0}
+.preview-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.preview-cover{height:100px;background-size:cover;background-position:center 30%;position:relative;margin-bottom:0}
+.preview-cover-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,10,1) 0%,rgba(10,10,10,.4) 100%)}
+.preview-av-row{display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;margin-top:-28px;position:relative;z-index:5}
+.preview-av-ring{width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:2.5px;box-shadow:0 0 18px var(--glow2)}
+.preview-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#0a0a0a}
+.preview-av-inner img{width:100%;height:100%;object-fit:cover}
+.preview-actions{display:flex;gap:7px}
+.pa-btn{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s}
+.pa-btn.follow-pa{background:var(--acc);color:#fff;box-shadow:0 0 12px var(--glow2)}
+.pa-btn.follow-pa.ing{background:rgba(255,255,255,.08);color:#ccc;border:1.5px solid rgba(255,255,255,.15);box-shadow:none}
+.pa-btn.msg-pa{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+.preview-info{padding:10px 16px 14px}
+.preview-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:2px}
+.preview-handle-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.preview-type-badge{font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px}
+.ptb-writer{background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.2);color:var(--acc2)}
+.ptb-reader{background:rgba(0,170,255,.1);border:1px solid rgba(0,170,255,.2);color:var(--blue)}
+.preview-bio{font-size:12px;color:#bbb;line-height:1.55;margin-bottom:10px}
+.preview-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.preview-genre{font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.18);color:var(--acc2)}
+.preview-stats-row{display:flex;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:12px;background:var(--card2)}
+.preview-stat{flex:1;text-align:center;padding:10px 4px;border-right:1px solid var(--bd)}
+.preview-stat:last-child{border-right:none}
+.preview-stat-num{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:#fff}
+.preview-stat-num.r{color:var(--acc)}
+.preview-stat-num.b{color:var(--blue)}
+.preview-stat-label{font-size:8px;color:var(--muted2);margin-top:1px;font-weight:600}
+.preview-shared{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--blue);font-weight:600;margin-bottom:10px}
+.preview-shared i{font-size:10px}
+.preview-recent-reads{margin-bottom:4px}
+.prr-label{font-size:9px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.prr-list{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.prr-list::-webkit-scrollbar{display:none}
+.prr-item{flex-shrink:0;width:52px;text-align:center}
+.prr-cover{width:52px;height:62px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:3px;border:1px solid var(--bd)}
+.prr-title{font-size:7px;font-weight:600;color:#aaa;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.preview-full-btn{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);color:#ccc;padding:10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* ── SEARCH RESULTS ── */
+.search-results{display:none;padding:0}
+.search-results.show{display:block}
+.sr-empty{text-align:center;padding:48px 20px;display:none}
+.sr-empty.show{display:block}
+.sr-empty-ico{font-size:38px;margin-bottom:10px}
+.sr-empty-t{font-family:'Playfair Display',serif;font-size:16px;font-weight:800;margin-bottom:5px;color:#ccc}
+.sr-empty-s{font-size:12px;color:var(--muted2);line-height:1.6}
+.sr-section-lbl{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px 5px;display:flex;align-items:center;gap:6px}
+.sr-section-lbl::after{content:'';flex:1;height:1px;background:var(--bd2)}
+
+/* ── AD CARD ── */
+.ad-strip{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(0,170,255,.05),rgba(255,0,80,.03));border:1px solid rgba(0,170,255,.12);border-radius:13px;padding:11px 13px;margin:0 14px 4px;position:relative;overflow:hidden}
+.ad-strip::after{content:'AD';position:absolute;top:5px;right:8px;font-size:7px;font-weight:800;color:#444;letter-spacing:.08em}
+.ad-logo{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd)}
+.ad-body{flex:1;min-width:0}
+.ad-brand{font-size:9px;font-weight:800;color:var(--blue);margin-bottom:1px}
+.ad-headline{font-size:11px;font-weight:700;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-sub{font-size:9px;color:#888}
+.ad-cta{background:var(--acc);color:#fff;border:none;padding:5px 10px;border-radius:8px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:#1a1a1a;border:1px solid var(--bd);color:#fff;padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 var(--safe-b);min-height:var(--nav-h)}
+.bn{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px;position:relative}
+.bn i{font-size:20px;display:block;margin-bottom:2px}
+.bn.on{color:var(--acc)}
+.bn-badge{position:absolute;top:0;right:2px;width:16px;height:16px;border-radius:50%;background:var(--acc);font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .3s ease both}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}
+.d4{animation-delay:.16s}.d5{animation-delay:.20s}.d6{animation-delay:.24s}
+.d7{animation-delay:.28s}.d8{animation-delay:.32s}.d9{animation-delay:.36s}
+
+/* divider */
+.sdiv{height:1px;background:var(--bd2);margin:8px 0}
+.spacer16{height:16px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-row1">
+    <div class="logo">People</div>
+    <div class="top-right">
+      <div class="top-icon-btn" onclick="toast('🔔 Notifications')">
+        <i class="fas fa-bell"></i>
+        <div class="ndot"></div>
+      </div>
+      <div class="top-icon-btn" onclick="toast('⚙️ Settings')">
+        <i class="fas fa-sliders-h"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <i class="fas fa-search"></i>
+    <input id="searchInput" placeholder="Search writers, readers, genres…" autocomplete="off"/>
+    <i class="fas fa-times search-clear" id="searchClear" onclick="clearSearch()"></i>
+  </div>
+
+  <!-- Segment tabs -->
+  <div class="seg-row">
+    <div class="seg active" data-seg="discover" onclick="switchSeg('discover',this)">Discover</div>
+    <div class="seg" data-seg="following" onclick="switchSeg('following',this)">Following <span class="seg-badge">47</span></div>
+    <div class="seg" data-seg="readers" onclick="switchSeg('readers',this)">Readers</div>
+    <div class="seg" data-seg="leaderboard" onclick="switchSeg('leaderboard',this)">Top 🏆</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- ══ SEARCH RESULTS ══ -->
+  <div class="search-results" id="searchResults">
+    <div class="sr-section-lbl">Writers</div>
+    <div class="people-list" id="srWriters"></div>
+    <div class="sr-section-lbl" id="srReadersLbl">Readers</div>
+    <div class="people-list" id="srReaders"></div>
+    <div class="sr-empty" id="srEmpty">
+      <div class="sr-empty-ico">🔍</div>
+      <div class="sr-empty-t">No results found</div>
+      <div class="sr-empty-s">Try a different name, genre or username.</div>
+    </div>
+  </div>
+
+  <!-- ══ DISCOVER PANEL ══ -->
+  <div class="panel active" id="panel-discover">
+
+    <!-- Status rings -->
+    <div class="status-row-wrap fu d1">
+      <div class="status-row" id="discoverStatusRow"></div>
+    </div>
+
+    <!-- Genre filter -->
+    <div class="filter-strip fu d2" id="discoverFilters">
+      <div class="fc on" data-f="all" onclick="setFilter('all',this)">🔥 All</div>
+      <div class="fc" data-f="betrayal" onclick="setFilter('betrayal',this)">💔 Betrayal</div>
+      <div class="fc" data-f="family" onclick="setFilter('family',this)">👑 Family</div>
+      <div class="fc" data-f="campus" onclick="setFilter('campus',this)">🎓 Campus</div>
+      <div class="fc" data-f="twist" onclick="setFilter('twist',this)">✨ Twist</div>
+      <div class="fc" data-f="revenge" onclick="setFilter('revenge',this)">🔥 Revenge</div>
+      <div class="fc" data-f="elegy" onclick="setFilter('elegy',this)">🌙 Elegy</div>
+      <div class="fc" data-f="love" onclick="setFilter('love',this)">🏙️ Urban Love</div>
+    </div>
+
+    <!-- Featured Writers -->
+    <div class="fu d2">
+      <div class="sh">
+        <div class="sh-title">✍️ Featured Writers</div>
+        <div class="sh-more" onclick="toast('Browse all writers')">Browse all</div>
+      </div>
+    </div>
+    <div class="featured-scroll fu d3" id="featuredWriters"></div>
+
+    <div class="sdiv fu d3"></div>
+
+    <!-- Genre communities -->
+    <div class="fu d4">
+      <div class="sh">
+        <div class="sh-title">🔖 Communities by Genre</div>
+        <div class="sh-more" onclick="toast('All communities')">See all</div>
+      </div>
+    </div>
+    <div class="genre-match-grid fu d4" id="genreMatchGrid"></div>
+
+    <div class="sdiv fu d5"></div>
+
+    <!-- Suggested Readers -->
+    <div class="fu d5">
+      <div class="sh">
+        <div class="sh-title">📖 Readers Like You</div>
+        <div class="sh-more" onclick="switchSeg('readers',document.querySelector('[data-seg=readers]'))">See all</div>
+      </div>
+    </div>
+    <div class="reader-grid fu d6" id="suggestedReaders"></div>
+
+    <div class="sdiv fu d6"></div>
+
+    <!-- Ad -->
+    <div class="ad-strip fu d7">
+      <img class="ad-logo" src="https://i.pravatar.cc/100?img=23" loading="lazy"/>
+      <div class="ad-body">
+        <div class="ad-brand">PiggyVest</div>
+        <div class="ad-headline">Save money. Build your future.</div>
+        <div class="ad-sub">Join 4M+ Nigerians saving smarter.</div>
+      </div>
+      <button class="ad-cta" onclick="toast('Opening PiggyVest…')">Start</button>
+    </div>
+
+    <!-- Debate Champions -->
+    <div class="fu d7">
+      <div class="sh">
+        <div class="sh-title">⚔️ Debate Champions</div>
+        <div class="sh-more" onclick="toast('Full debate leaderboard')">All</div>
+      </div>
+    </div>
+    <div class="champ-scroll fu d8" id="debateChamps"></div>
+
+    <div class="spacer16"></div>
+  </div>
+
+  <!-- ══ FOLLOWING PANEL ══ -->
+  <div class="panel" id="panel-following">
+    <div class="filter-strip" id="followingFilters">
+      <div class="fc on" data-ff="all" onclick="setFollowingFilter('all',this)">🔥 All</div>
+      <div class="fc" data-ff="writers" onclick="setFollowingFilter('writers',this)">✍️ Writers</div>
+      <div class="fc" data-ff="readers" onclick="setFollowingFilter('readers',this)">📖 Readers</div>
+      <div class="fc" data-ff="new_chapter" onclick="setFollowingFilter('new_chapter',this)">🟢 New Chapter</div>
+    </div>
+    <div class="people-list" id="followingList"></div>
+  </div>
+
+  <!-- ══ READERS PANEL ══ -->
+  <div class="panel" id="panel-readers">
+    <div class="filter-strip" id="readersFilters">
+      <div class="fc on" data-rf="all" onclick="setReadersFilter('all',this)">🔥 All</div>
+      <div class="fc" data-rf="betrayal" onclick="setReadersFilter('betrayal',this)">💔 Betrayal</div>
+      <div class="fc" data-rf="family" onclick="setReadersFilter('family',this)">👑 Family</div>
+      <div class="fc" data-rf="campus" onclick="setReadersFilter('campus',this)">🎓 Campus</div>
+      <div class="fc" data-rf="mutual" onclick="setReadersFilter('mutual',this)">👥 Mutual</div>
+      <div class="fc" data-rf="active" onclick="setReadersFilter('active',this)">⚡ Active Today</div>
+    </div>
+    <div class="sh" style="padding-top:10px">
+      <div class="sh-title">📖 All Readers</div>
+    </div>
+    <div class="people-list" id="readersList"></div>
+  </div>
+
+  <!-- ══ LEADERBOARD PANEL ══ -->
+  <div class="panel" id="panel-leaderboard">
+    <div class="filter-strip" id="lbFilters">
+      <div class="fc on" data-lf="reads" onclick="setLbFilter('reads',this)">📖 Most Read</div>
+      <div class="fc" data-lf="likes" onclick="setLbFilter('likes',this)">❤️ Most Liked</div>
+      <div class="fc" data-lf="debate" onclick="setLbFilter('debate',this)">⚔️ Best Debater</div>
+      <div class="fc" data-lf="streak" onclick="setLbFilter('streak',this)">🔥 Streak</div>
+    </div>
+    <div class="sh" style="padding-top:10px">
+      <div class="sh-title">🏆 Writer Rankings</div>
+    </div>
+    <div id="lbWriters"></div>
+    <div class="sh">
+      <div class="sh-title">📖 Top Readers</div>
+    </div>
+    <div id="lbReaders"></div>
+    <div class="spacer16"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn" onclick="window.location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn" onclick="window.location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn" onclick="toast('✏️ Create')"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn on"><i class="fas fa-users"></i>People</div>
+  <div class="bn" onclick="window.location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<!-- PROFILE PREVIEW SHEET -->
+<div class="overlay-bg" id="previewOverlay" onclick="if(event.target===this)closePreview()">
+  <div class="preview-sheet">
+    <div class="preview-handle"></div>
+    <div class="preview-header">
+      <h3 style="font-size:13px;font-weight:800;color:#fff" id="previewHeaderTitle">Profile</h3>
+      <button class="preview-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="preview-cover" id="previewCover">
+      <div class="preview-cover-grad"></div>
+    </div>
+    <div class="preview-av-row">
+      <div class="preview-av-ring" id="previewAvRing">
+        <div class="preview-av-inner"><img id="previewAvImg" src="" alt=""/></div>
+      </div>
+      <div class="preview-actions">
+        <button class="pa-btn follow-pa" id="previewFollowBtn" onclick="togglePreviewFollow()">+ Follow</button>
+        <button class="pa-btn msg-pa" onclick="toast('💬 Opening DM…')"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+    <div class="preview-info">
+      <div class="preview-name" id="previewName"></div>
+      <div class="preview-handle-row">
+        <span style="font-size:11px;color:var(--muted2)" id="previewHandle"></span>
+        <span class="preview-type-badge" id="previewTypeBadge"></span>
+      </div>
+      <div class="preview-bio" id="previewBio"></div>
+      <div class="preview-genres" id="previewGenres"></div>
+      <div class="preview-stats-row" id="previewStats"></div>
+      <div class="preview-shared" id="previewMutual"></div>
+      <div class="preview-recent-reads" id="previewRecentReads"></div>
+      <button class="preview-full-btn" onclick="toast('📖 Opening full profile…')">
+        <i class="fas fa-user-circle"></i> View Full Profile
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const ALL_PEOPLE = [
+  // WRITERS
+  {id:'w1',type:'writer',name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',
+   bio:'The writer who makes Lagos cry on their commute. 5 ongoing series. Write at 2am.',
+   genres:['betrayal','family','twist'],followers:12400,following:89,stories:48,reads:'1.1M',
+   mutual:3,hasStatus:true,viewed:false,verified:true,
+   cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75',
+   isFollowed:false,debateSide:'for',debateVotes:189,
+   recentReads:[
+     {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200',title:'The runaway bride'},
+     {cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200',title:'The letter'},
+     {cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',title:'Campus richest boy'},
+   ]},
+  {id:'w2',type:'writer',name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',
+   bio:'Bare Kitchen is real. 31k readers. I write plot twists that wreck you.',
+   genres:['twist','love'],followers:31700,following:44,stories:12,reads:'890k',
+   mutual:2,hasStatus:true,viewed:false,verified:true,
+   cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&q=75',
+   isFollowed:true,debateSide:'for',debateVotes:234,
+   recentReads:[
+     {cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:'Husband kissing photo'},
+     {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200',title:"Grandmother's will"},
+   ]},
+  {id:'w3',type:'writer',name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',
+   bio:"Family secrets. Inheritance. The truth that arrives too late.",
+   genres:['family','betrayal'],followers:19200,following:67,stories:31,reads:'740k',
+   mutual:5,hasStatus:false,viewed:false,verified:true,
+   cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&q=75',
+   isFollowed:false,debateSide:'against',debateVotes:310,
+   recentReads:[
+     {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200',title:'The runaway bride'},
+   ]},
+  {id:'w4',type:'writer',name:'CampusQueen',handle:'@campusqueen',avatar:'https://i.pravatar.cc/100?img=12',
+   bio:'All my stories happen between 8am lectures and 10pm curfews.',
+   genres:['campus','love'],followers:8100,following:120,stories:22,reads:'310k',
+   mutual:1,hasStatus:true,viewed:true,verified:false,
+   cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=75',
+   isFollowed:true,debateSide:'against',debateVotes:98,
+   recentReads:[]},
+  {id:'w5',type:'writer',name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',
+   bio:'Revenge arcs and reclaiming what was stolen. Justice, always.',
+   genres:['revenge','family'],followers:14800,following:55,stories:19,reads:'520k',
+   mutual:0,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=75',
+   isFollowed:false,debateSide:'against',debateVotes:176,
+   recentReads:[]},
+  {id:'w6',type:'writer',name:'Efe_O',handle:'@efe_o',avatar:'https://i.pravatar.cc/100?img=22',
+   bio:'I write grief as if it has a smell. Elegy, memory, love that arrived late.',
+   genres:['elegy','twist'],followers:22300,following:34,stories:14,reads:'610k',
+   mutual:4,hasStatus:true,viewed:true,verified:true,
+   cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=75',
+   isFollowed:false,debateSide:'for',debateVotes:142,
+   recentReads:[]},
+  {id:'w7',type:'writer',name:'Kemi_A',handle:'@kemi_a',avatar:'https://i.pravatar.cc/100?img=28',
+   bio:'Every heartbreak I write about happened to someone I love.',
+   genres:['betrayal','campus'],followers:6500,following:98,stories:16,reads:'280k',
+   mutual:2,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=75',
+   isFollowed:true,debateSide:'against',debateVotes:267,
+   recentReads:[]},
+  {id:'w8',type:'writer',name:'Dami_Cole',handle:'@dami_cole',avatar:'https://i.pravatar.cc/100?img=64',
+   bio:'She said yes to the dog name. We share a mortgage now.',
+   genres:['love','twist'],followers:9400,following:77,stories:11,reads:'195k',
+   mutual:0,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=600&q=75',
+   isFollowed:false,debateSide:'for',debateVotes:89,
+   recentReads:[]},
+
+  // READERS
+  {id:'r1',type:'reader',name:'Chioma_R',handle:'@chioma_r',avatar:'https://i.pravatar.cc/100?img=47',
+   bio:'I read so I don\'t have to deal with real people. 💔 Lagos girl.',
+   genres:['betrayal','family','twist'],followers:312,following:47,stories:0,reads:'94 saved',
+   mutual:8,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=75',
+   isFollowed:true,debateSide:'against',debateVotes:142,
+   recentReads:[
+     {cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:'Husband kissing photo'},
+     {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200',title:'The runaway bride'},
+   ]},
+  {id:'r2',type:'reader',name:'Emeka_T',handle:'@emeka_t',avatar:'https://i.pravatar.cc/100?img=15',
+   bio:'Debate mode always ON. FOR or AGAINST — I always have a take.',
+   genres:['betrayal','campus','family'],followers:489,following:62,stories:0,reads:'67 saved',
+   mutual:3,hasStatus:false,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=75',
+   isFollowed:true,debateSide:'for',debateVotes:78,
+   recentReads:[]},
+  {id:'r3',type:'reader',name:'Zainab_O',handle:'@zainab_o',avatar:'https://i.pravatar.cc/100?img=5',
+   bio:'Abuja reader. Found Droboard via my sister. Have not slept since.',
+   genres:['family','twist','elegy'],followers:144,following:29,stories:0,reads:'41 saved',
+   mutual:2,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&q=75',
+   isFollowed:false,debateSide:'against',debateVotes:34,
+   recentReads:[]},
+  {id:'r4',type:'reader',name:'Bayo_Reads',handle:'@bayo_reads',avatar:'https://i.pravatar.cc/100?img=3',
+   bio:'Ibadan. 2am reader. I finish every series I start. No exceptions.',
+   genres:['campus','betrayal'],followers:88,following:31,stories:0,reads:'28 saved',
+   mutual:1,hasStatus:false,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=75',
+   isFollowed:false,debateSide:'for',debateVotes:21,
+   recentReads:[]},
+  {id:'r5',type:'reader',name:'Ada_Lover',handle:'@ada_lover',avatar:'https://i.pravatar.cc/100?img=9',
+   bio:'Not a writer. Just a girl who loves Ada\'s betrayal series with her whole chest.',
+   genres:['betrayal','family'],followers:203,following:18,stories:0,reads:'52 saved',
+   mutual:5,hasStatus:true,viewed:true,verified:false,
+   cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75',
+   isFollowed:false,debateSide:'against',debateVotes:56,
+   recentReads:[]},
+  {id:'r6',type:'reader',name:'IjeReader',handle:'@ije_reader',avatar:'https://i.pravatar.cc/100?img=44',
+   bio:'PH girl. I cry every chapter and come back for more. 🔥',
+   genres:['elegy','family','betrayal'],followers:167,following:41,stories:0,reads:'39 saved',
+   mutual:4,hasStatus:true,viewed:false,verified:false,
+   cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=75',
+   isFollowed:false,debateSide:'against',debateVotes:44,
+   recentReads:[]},
+];
+
+const GENRE_COMMUNITIES = [
+  {id:'g1',emoji:'💔',name:'Betrayal Club',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300',count:4812,avatars:['https://i.pravatar.cc/100?img=32','https://i.pravatar.cc/100?img=47','https://i.pravatar.cc/100?img=15'],joined:true},
+  {id:'g2',emoji:'👑',name:'Family Drama',cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300',count:3241,avatars:['https://i.pravatar.cc/100?img=47','https://i.pravatar.cc/100?img=53','https://i.pravatar.cc/100?img=22'],joined:false},
+  {id:'g3',emoji:'🎓',name:'Campus Chronicles',cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300',count:2180,avatars:['https://i.pravatar.cc/100?img=12','https://i.pravatar.cc/100?img=15','https://i.pravatar.cc/100?img=28'],joined:true},
+  {id:'g4',emoji:'✨',name:'Plot Twist Army',cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=300',count:5674,avatars:['https://i.pravatar.cc/100?img=53','https://i.pravatar.cc/100?img=32','https://i.pravatar.cc/100?img=64'],joined:false},
+  {id:'g5',emoji:'🔥',name:'Revenge Arc',cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300',count:1892,avatars:['https://i.pravatar.cc/100?img=16','https://i.pravatar.cc/100?img=47','https://i.pravatar.cc/100?img=5'],joined:false},
+  {id:'g6',emoji:'🌙',name:'Elegy & Loss',cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300',count:1340,avatars:['https://i.pravatar.cc/100?img=22','https://i.pravatar.cc/100?img=9','https://i.pravatar.cc/100?img=44'],joined:true},
+];
+
+const ACTIVITY_FEED = [
+  {dot:'red',av:'https://i.pravatar.cc/100?img=32',name:'Ada_Writes',action:'posted a new chapter',story:{cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:'I came home early and caught my husband kissing my late sister\'s photograph',writer:'Ada_Writes'},time:'2h ago'},
+  {dot:'blue',av:'https://i.pravatar.cc/100?img=47',name:'Chioma_R',action:'reacted 😭 to',story:{cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200',title:'The runaway bride',writer:'Ifeanyi_Story'},time:'3h ago'},
+  {dot:'gold',av:'https://i.pravatar.cc/100?img=15',name:'Emeka_T',action:'joined the debate on',story:{cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:'I came home early…',writer:'Ada_Writes'},time:'4h ago'},
+  {dot:'green',av:'https://i.pravatar.cc/100?img=53',name:'Ifeanyi_Story',action:'started following','noStory':true,text:'Chioma_R and 2 others',time:'5h ago'},
+  {dot:'red',av:'https://i.pravatar.cc/100?img=22',name:'Efe_O',action:'saved a story to collection',story:{cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200',title:'The letter he never sent',writer:'Efe_O'},time:'6h ago'},
+  {dot:'blue',av:'https://i.pravatar.cc/100?img=28',name:'Kemi_A',action:'voted AGAINST in debate',story:{cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',title:'Ada should stay…',writer:'Debate'},time:'8h ago'},
+];
+
+const LB_DATA = {
+  reads:[
+    {id:'w2',rank:1,name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',type:'writer',score:'890k reads',badge:'🥇',isFollowed:true},
+    {id:'w6',rank:2,name:'Efe_O',handle:'@efe_o',avatar:'https://i.pravatar.cc/100?img=22',type:'writer',score:'610k reads',badge:'🥈',isFollowed:false},
+    {id:'w1',rank:3,name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',type:'writer',score:'1.1M reads',badge:'🥉',isFollowed:false},
+    {id:'w3',rank:4,name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',type:'writer',score:'740k reads',badge:'4',isFollowed:false},
+    {id:'w5',rank:5,name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',type:'writer',score:'520k reads',badge:'5',isFollowed:false},
+  ],
+  likes:[
+    {id:'w2',rank:1,name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',type:'writer',score:'45k likes',badge:'🥇',isFollowed:true},
+    {id:'w1',rank:2,name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',type:'writer',score:'24.3k likes',badge:'🥈',isFollowed:false},
+    {id:'w3',rank:3,name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',type:'writer',score:'31k likes',badge:'🥉',isFollowed:false},
+    {id:'w5',rank:4,name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',type:'writer',score:'28k likes',badge:'4',isFollowed:false},
+    {id:'w6',rank:5,name:'Efe_O',handle:'@efe_o',avatar:'https://i.pravatar.cc/100?img=22',type:'writer',score:'36.5k likes',badge:'5',isFollowed:false},
+  ],
+  debate:[
+    {id:'r1',rank:1,name:'Chioma_R',handle:'@chioma_r',avatar:'https://i.pravatar.cc/100?img=47',type:'reader',score:'142 wins',badge:'🥇',isFollowed:true},
+    {id:'w7',rank:2,name:'Kemi_A',handle:'@kemi_a',avatar:'https://i.pravatar.cc/100?img=28',type:'writer',score:'267 upvotes',badge:'🥈',isFollowed:true},
+    {id:'w3',rank:3,name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',type:'writer',score:'310 upvotes',badge:'🥉',isFollowed:false},
+    {id:'r2',rank:4,name:'Emeka_T',handle:'@emeka_t',avatar:'https://i.pravatar.cc/100?img=15',type:'reader',score:'78 upvotes',badge:'4',isFollowed:true},
+    {id:'w5',rank:5,name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',type:'writer',score:'176 upvotes',badge:'5',isFollowed:false},
+  ],
+  streak:[
+    {id:'r1',rank:1,name:'Chioma_R',handle:'@chioma_r',avatar:'https://i.pravatar.cc/100?img=47',type:'reader',score:'50 stories 🔥',badge:'🥇',isFollowed:true},
+    {id:'r2',rank:2,name:'Emeka_T',handle:'@emeka_t',avatar:'https://i.pravatar.cc/100?img=15',type:'reader',score:'38 stories 🔥',badge:'🥈',isFollowed:true},
+    {id:'r5',rank:3,name:'Ada_Lover',handle:'@ada_lover',avatar:'https://i.pravatar.cc/100?img=9',type:'reader',score:'29 stories 🔥',badge:'🥉',isFollowed:false},
+    {id:'r3',rank:4,name:'Zainab_O',handle:'@zainab_o',avatar:'https://i.pravatar.cc/100?img=5',type:'reader',score:'22 stories 🔥',badge:'4',isFollowed:false},
+    {id:'w4',rank:5,name:'CampusQueen',handle:'@campusqueen',avatar:'https://i.pravatar.cc/100?img=12',type:'writer',score:'18 stories 🔥',badge:'5',isFollowed:true},
+  ],
+};
+
+const LB_READERS = [
+  {rank:1,name:'Chioma_R',handle:'@chioma_r',avatar:'https://i.pravatar.cc/100?img=47',score:'94 saved · 8.4k reactions',badge:'🥇',isFollowed:true,id:'r1'},
+  {rank:2,name:'Emeka_T',handle:'@emeka_t',avatar:'https://i.pravatar.cc/100?img=15',score:'67 saved · 4.1k reactions',badge:'🥈',isFollowed:true,id:'r2'},
+  {rank:3,name:'IjeReader',handle:'@ije_reader',avatar:'https://i.pravatar.cc/100?img=44',score:'39 saved · 2.8k reactions',badge:'🥉',isFollowed:false,id:'r6'},
+  {rank:4,name:'Ada_Lover',handle:'@ada_lover',avatar:'https://i.pravatar.cc/100?img=9',score:'52 saved · 3.2k reactions',badge:'4',isFollowed:false,id:'r5'},
+];
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentSeg = 'discover';
+let discoverFilter = 'all';
+let followingFilter = 'all';
+let readersFilter = 'all';
+let lbFilter = 'reads';
+let previewPerson = null;
+let searchActive = false;
+
+/* ══════════════════════════════════════
+   UTILS
+══════════════════════════════════════ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function fmtN(n) {
+  if (typeof n === 'string') return n;
+  return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+}
+function getRingCls(person) {
+  if (!person.hasStatus) return 'none';
+  return person.viewed ? 'viewed' : 'new';
+}
+
+/* ══════════════════════════════════════
+   SEGMENT TABS
+══════════════════════════════════════ */
+function switchSeg(seg, el) {
+  currentSeg = seg;
+  document.querySelectorAll('.seg').forEach(s => s.classList.toggle('active', s.dataset.seg === seg));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + seg).classList.add('active');
+  if (el) el.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+  if (seg === 'following') renderFollowing();
+  if (seg === 'readers') renderReaders();
+  if (seg === 'leaderboard') renderLeaderboard('reads');
+}
+
+/* ══════════════════════════════════════
+   FILTERS
+══════════════════════════════════════ */
+function setFilter(f, el) {
+  discoverFilter = f;
+  document.querySelectorAll('#discoverFilters .fc').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+  renderFeaturedWriters();
+  renderSuggestedReaders();
+}
+function setFollowingFilter(f, el) {
+  followingFilter = f;
+  document.querySelectorAll('#followingFilters .fc').forEach(c => c.classList.toggle('on', c.dataset.ff === f));
+  renderFollowing();
+}
+function setReadersFilter(f, el) {
+  readersFilter = f;
+  document.querySelectorAll('#readersFilters .fc').forEach(c => c.classList.toggle('on', c.dataset.rf === f));
+  renderReaders();
+}
+function setLbFilter(f, el) {
+  lbFilter = f;
+  document.querySelectorAll('#lbFilters .fc').forEach(c => c.classList.toggle('on', c.dataset.lf === f));
+  renderLeaderboard(f);
+}
+
+/* ══════════════════════════════════════
+   RENDER: STATUS ROW
+══════════════════════════════════════ */
+function renderStatusRow() {
+  const row = document.getElementById('discoverStatusRow');
+  const withStatus = ALL_PEOPLE.filter(p => p.hasStatus);
+  const sorted = [...withStatus].sort((a, b) => {
+    if (!a.viewed && b.viewed) return -1;
+    if (a.viewed && !b.viewed) return 1;
+    return 0;
+  });
+  row.innerHTML = `
+    <div class="s-item" onclick="toast('📸 Post your status!')">
+      <div class="s-ring you">
+        <div class="s-inner"><div class="s-add">+</div></div>
+      </div>
+      <div class="s-name you-lbl">Add Story</div>
+    </div>
+    ${sorted.map(p => `
+      <div class="s-item" onclick="toast('Viewing @${p.name}\'s status…')">
+        <div class="s-ring ${getRingCls(p)}">
+          <div class="s-inner"><img src="${p.avatar}" loading="lazy"/></div>
+        </div>
+        <div class="s-name">${p.name.split('_')[0]}</div>
+      </div>
+    `).join('')}`;
+}
+
+/* ══════════════════════════════════════
+   RENDER: FEATURED WRITERS
+══════════════════════════════════════ */
+function renderFeaturedWriters() {
+  const writers = ALL_PEOPLE.filter(p => p.type === 'writer' &&
+    (discoverFilter === 'all' || p.genres.includes(discoverFilter)));
+  document.getElementById('featuredWriters').innerHTML = writers.map(w => `
+    <div class="fw-card" onclick="openPreview('${w.id}')">
+      <div class="fw-cover" style="background-image:url('${w.cover}')">
+        <div class="fw-cover-grad"></div>
+        <div class="fw-genre-badge">${genreLabel(w.genres[0])}</div>
+        <div class="fw-av-wrap">
+          <div class="fw-av-inner"><img src="${w.avatar}" loading="lazy"/></div>
+        </div>
+      </div>
+      <div class="fw-body">
+        <div class="fw-name">${w.name}</div>
+        <div class="fw-handle">${w.handle}</div>
+        <div class="fw-stats">
+          <div class="fw-stat"><i class="fas fa-users" style="font-size:8px"></i>${fmtN(w.followers)}</div>
+          <div class="fw-stat"><i class="fas fa-book" style="font-size:8px"></i>${w.stories} stories</div>
+          <div class="fw-stat"><i class="fas fa-eye" style="font-size:8px"></i>${w.reads}</div>
+        </div>
+        <div class="fw-genres">${w.genres.map(g => `<span class="fw-genre-chip">${genreLabel(g)}</span>`).join('')}</div>
+        <button class="fw-follow-btn${w.isFollowed ? ' ing' : ''}" onclick="event.stopPropagation();toggleFollow('${w.id}',this)">${w.isFollowed ? '✓ Following' : '+ Follow'}</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   RENDER: GENRE COMMUNITIES
+══════════════════════════════════════ */
+function renderGenreCommunities() {
+  document.getElementById('genreMatchGrid').innerHTML = GENRE_COMMUNITIES.map(g => `
+    <div class="gm-card" onclick="toggleJoin('${g.id}',this)">
+      <div class="gm-card-bg" style="background-image:url('${g.cover}')"></div>
+      <div class="gm-card-content">
+        <span class="gm-emoji">${g.emoji}</span>
+        <div class="gm-name">${g.name}</div>
+        <div class="gm-count">${fmtN(g.count)} members</div>
+        <div class="gm-avatars">
+          ${g.avatars.map(av => `<div class="gm-av"><img src="${av}" loading="lazy"/></div>`).join('')}
+        </div>
+        <div class="gm-join-btn${g.joined ? ' joined' : ''}" id="gm-btn-${g.id}">${g.joined ? '✓ Joined' : 'Join'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleJoin(id, card) {
+  const g = GENRE_COMMUNITIES.find(x => x.id === id);
+  if (!g) return;
+  g.joined = !g.joined;
+  g.count += g.joined ? 1 : -1;
+  card.querySelector('.gm-count').textContent = fmtN(g.count) + ' members';
+  const btn = card.querySelector('.gm-join-btn');
+  btn.textContent = g.joined ? '✓ Joined' : 'Join';
+  btn.classList.toggle('joined', g.joined);
+  toast(g.joined ? `✅ Joined ${g.name}!` : `Left ${g.name}`);
+}
+
+/* ══════════════════════════════════════
+   RENDER: SUGGESTED READERS
+══════════════════════════════════════ */
+function renderSuggestedReaders() {
+  const readers = ALL_PEOPLE.filter(p => p.type === 'reader' &&
+    (discoverFilter === 'all' || p.genres.includes(discoverFilter)));
+  document.getElementById('suggestedReaders').innerHTML = readers.map(r => `
+    <div class="rg-card" onclick="openPreview('${r.id}')">
+      ${r.mutual > 0 ? `<div class="rg-mutual">${r.mutual} mutual</div>` : ''}
+      <div class="rg-av"><img src="${r.avatar}" loading="lazy"/></div>
+      <div class="rg-name">${r.name}</div>
+      <div class="rg-handle">${r.handle}</div>
+      <div class="rg-genres">${r.genres.slice(0,3).map(g => `<span class="rg-genre">${genreEmoji(g)}</span>`).join('')}</div>
+      <div class="rg-stat"><i class="fas fa-bookmark" style="font-size:8px"></i>${r.reads}</div>
+      <button class="rg-follow-btn${r.isFollowed ? ' f-ing' : ' f-out'}" onclick="event.stopPropagation();toggleFollow('${r.id}',this)">${r.isFollowed ? '✓ Following' : '+ Follow'}</button>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   RENDER: DEBATE CHAMPIONS
+══════════════════════════════════════ */
+function renderDebateChamps() {
+  const champs = ALL_PEOPLE.filter(p => p.debateVotes > 0)
+    .sort((a, b) => b.debateVotes - a.debateVotes).slice(0, 6);
+  const trophies = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+  document.getElementById('debateChamps').innerHTML = champs.map((p, i) => `
+    <div class="champ-card" onclick="openPreview('${p.id}')">
+      <div class="champ-trophy">${trophies[i]}</div>
+      <div class="champ-av"><img src="${p.avatar}" loading="lazy"/></div>
+      <div class="champ-name">${p.name}</div>
+      <div class="champ-side ${p.debateSide}">${p.debateSide === 'for' ? '✅ FOR' : '❌ AGAINST'}</div>
+      <div class="champ-votes"><i class="fas fa-heart" style="font-size:9px"></i>${fmtN(p.debateVotes)} votes</div>
+      <button class="champ-follow-btn${p.isFollowed ? ' ing' : ''}" onclick="event.stopPropagation();toggleFollow('${p.id}',this)">${p.isFollowed ? '✓ Following' : '+ Follow'}</button>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   RENDER: FOLLOWING TAB
+══════════════════════════════════════ */
+function renderFollowing() {
+  let people = ALL_PEOPLE.filter(p => p.isFollowed);
+  if (followingFilter === 'writers') people = people.filter(p => p.type === 'writer');
+  if (followingFilter === 'readers') people = people.filter(p => p.type === 'reader');
+  if (followingFilter === 'new_chapter') people = people.filter(p => p.type === 'writer');
+
+  // Activity feed comes first for 'all'
+  let html = '';
+  if (followingFilter === 'all') {
+    html += renderActivityFeed();
+    const div = document.createElement('div');
+    div.className = 'sh';
+    div.innerHTML = '<div class="sh-title">Following</div>';
+  }
+
+  html += people.map(p => renderPersonCard(p)).join('');
+  document.getElementById('followingList').innerHTML = html;
+}
+
+function renderActivityFeed() {
+  return `<div style="padding:10px 14px 4px">
+    <div class="sh-title" style="margin-bottom:8px">⚡ Recent Activity</div>
+  </div>` +
+  ACTIVITY_FEED.map(a => `
+    <div class="activity-item">
+      <div class="act-dot ${a.dot}"></div>
+      <div class="act-av"><img src="${a.av}" loading="lazy"/></div>
+      <div class="act-body">
+        <div class="act-text">
+          <strong>${a.name}</strong> ${a.action}
+          ${a.noStory ? `<span class="acc">${a.text}</span>` : ''}
+        </div>
+        ${a.story ? `<div class="act-story-mini">
+          <div class="asm-img" style="background-image:url('${a.story.cover}')"></div>
+          <div>
+            <div class="asm-title">${a.story.title}</div>
+            <div class="asm-writer">by @${a.story.writer}</div>
+          </div>
+        </div>` : ''}
+        <div class="act-time">${a.time}</div>
+      </div>
+    </div>`).join('') +
+  `<div class="sh" style="padding-top:12px"><div class="sh-title">Following (${ALL_PEOPLE.filter(p=>p.isFollowed).length})</div></div>`;
+}
+
+/* ══════════════════════════════════════
+   RENDER: READERS TAB
+══════════════════════════════════════ */
+function renderReaders() {
+  let people = ALL_PEOPLE.filter(p => p.type === 'reader');
+  if (readersFilter === 'mutual') people = people.filter(p => p.mutual > 0);
+  if (readersFilter === 'active') people = people.filter((_, i) => i % 2 === 0);
+  if (['betrayal','family','campus','twist','revenge','elegy','love'].includes(readersFilter)) {
+    people = people.filter(p => p.genres.includes(readersFilter));
+  }
+  document.getElementById('readersList').innerHTML = people.map(p => renderPersonCard(p)).join('');
+}
+
+/* ══════════════════════════════════════
+   RENDER: LEADERBOARD
+══════════════════════════════════════ */
+function renderLeaderboard(filter) {
+  lbFilter = filter;
+  document.querySelectorAll('#lbFilters .fc').forEach(c => c.classList.toggle('on', c.dataset.lf === filter));
+  const data = LB_DATA[filter] || LB_DATA.reads;
+  const rankCls = r => r === 1 ? 'r1' : r === 2 ? 'r2' : r === 3 ? 'r3' : 'rn';
+  document.getElementById('lbWriters').innerHTML = data.map(lb => `
+    <div class="lb-row" onclick="openPreview('${lb.id}')">
+      <div class="lb-rank ${rankCls(lb.rank)}">${lb.rank <= 3 ? lb.badge : lb.rank}</div>
+      <div class="lb-av"><img src="${lb.avatar}" loading="lazy"/></div>
+      <div class="lb-info">
+        <div class="lb-name">${lb.name} ${lb.type === 'writer' ? '<span style="font-size:8px;color:var(--acc2)">✍️</span>' : '<span style="font-size:8px;color:var(--blue)">📖</span>'}</div>
+        <div class="lb-meta">
+          <span class="lb-badge-sm">${lb.score}</span>
+          <span>${lb.handle}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center">
+        <div class="lb-score"><i class="fas fa-fire" style="font-size:9px"></i></div>
+        <button class="follow-btn${lb.isFollowed ? ' f-ing' : ' f-out'}" onclick="event.stopPropagation();toggleLbFollow('${lb.id}',this)">${lb.isFollowed ? '✓' : '+'}</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('lbReaders').innerHTML = LB_READERS.map(lb => `
+    <div class="lb-row" onclick="openPreview('${lb.id}')">
+      <div class="lb-rank ${rankCls(lb.rank)}">${lb.rank <= 3 ? lb.badge : lb.rank}</div>
+      <div class="lb-av"><img src="${lb.avatar}" loading="lazy"/></div>
+      <div class="lb-info">
+        <div class="lb-name">${lb.name} <span style="font-size:8px;color:var(--blue)">📖</span></div>
+        <div class="lb-meta">
+          <span class="lb-badge-sm">${lb.score}</span>
+          <span>${lb.handle}</span>
+        </div>
+      </div>
+      <button class="follow-btn${lb.isFollowed ? ' f-ing' : ' f-out'}" onclick="event.stopPropagation();toggleLbFollow('${lb.id}',this)">${lb.isFollowed ? '✓' : '+'}</button>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   RENDER: PERSON CARD (reusable)
+══════════════════════════════════════ */
+function renderPersonCard(p) {
+  const ringCls = getRingCls(p);
+  return `<div class="person-card" onclick="openPreview('${p.id}')">
+    <div class="pc-av-wrap">
+      <div class="pc-av-ring ${ringCls}">
+        <div class="pc-av-inner"><img src="${p.avatar}" loading="lazy"/></div>
+      </div>
+      <div class="pc-av-badge ${p.type === 'writer' ? 'badge-writer' : 'badge-reader'}">${p.type === 'writer' ? '✍️' : '📖'}</div>
+    </div>
+    <div class="pc-info">
+      <div class="pc-name">
+        ${p.name}
+        ${p.verified ? '<span class="pc-verified">✓ Verified</span>' : ''}
+      </div>
+      <div class="pc-handle">${p.handle}</div>
+      <div class="pc-meta">
+        ${p.genres.slice(0,2).map(g => `<span class="pc-genre ${discoverFilter !== 'all' && g === discoverFilter ? 'active' : ''}">${genreLabel(g)}</span>`).join('')}
+        <span class="pc-stat"><i class="fas fa-users" style="font-size:8px"></i>${fmtN(p.followers)}</span>
+        ${p.mutual > 0 ? `<span class="pc-mutual"><i class="fas fa-user-friends" style="font-size:8px"></i>${p.mutual} mutual</span>` : ''}
+      </div>
+    </div>
+    <div class="pc-actions">
+      <button class="follow-btn${p.isFollowed ? ' f-ing' : ' f-out'}" onclick="event.stopPropagation();toggleFollow('${p.id}',this)">${p.isFollowed ? '✓' : '+ Follow'}</button>
+      <div class="msg-btn" onclick="event.stopPropagation();toast('💬 DM @${p.name}')"><i class="fas fa-paper-plane"></i></div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   FOLLOW TOGGLE
+══════════════════════════════════════ */
+function toggleFollow(id, btn) {
+  const p = ALL_PEOPLE.find(x => x.id === id);
+  if (!p) return;
+  p.isFollowed = !p.isFollowed;
+  p.followers += p.isFollowed ? 1 : -1;
+  btn.textContent = p.isFollowed ? '✓ Following' : '+ Follow';
+  btn.className = 'follow-btn ' + (p.isFollowed ? 'f-ing' : 'f-out');
+  toast(p.isFollowed ? `✅ Following @${p.name}` : `Unfollowed @${p.name}`);
+  if (previewPerson?.id === id) {
+    document.getElementById('previewFollowBtn').textContent = p.isFollowed ? '✓ Following' : '+ Follow';
+    document.getElementById('previewFollowBtn').className = 'pa-btn follow-pa' + (p.isFollowed ? ' ing' : '');
+  }
+}
+
+function toggleLbFollow(id, btn) {
+  const p = ALL_PEOPLE.find(x => x.id === id) ||
+    LB_DATA.reads.find(x => x.id === id) ||
+    LB_READERS.find(x => x.id === id);
+  if (!p) return;
+  // Update in ALL_PEOPLE
+  const ap = ALL_PEOPLE.find(x => x.id === id);
+  if (ap) { ap.isFollowed = !ap.isFollowed; p.isFollowed = ap.isFollowed; }
+  else { p.isFollowed = !p.isFollowed; }
+  btn.textContent = p.isFollowed ? '✓' : '+';
+  btn.className = 'follow-btn ' + (p.isFollowed ? 'f-ing' : 'f-out');
+  toast(p.isFollowed ? `✅ Following @${p.name || p.handle}` : 'Unfollowed');
+}
+
+function togglePreviewFollow() {
+  if (!previewPerson) return;
+  const p = ALL_PEOPLE.find(x => x.id === previewPerson.id);
+  if (!p) return;
+  p.isFollowed = !p.isFollowed;
+  p.followers += p.isFollowed ? 1 : -1;
+  const btn = document.getElementById('previewFollowBtn');
+  btn.textContent = p.isFollowed ? '✓ Following' : '+ Follow';
+  btn.className = 'pa-btn follow-pa' + (p.isFollowed ? ' ing' : '');
+  // Update stat
+  const statEls = document.querySelectorAll('.preview-stat-num');
+  if (statEls[0]) statEls[0].textContent = fmtN(p.followers);
+  toast(p.isFollowed ? `✅ Following @${p.name}` : `Unfollowed @${p.name}`);
+}
+
+/* ══════════════════════════════════════
+   PROFILE PREVIEW SHEET
+══════════════════════════════════════ */
+function openPreview(id) {
+  const p = ALL_PEOPLE.find(x => x.id === id);
+  if (!p) return;
+  previewPerson = p;
+
+  document.getElementById('previewHeaderTitle').textContent = '@' + p.name;
+  document.getElementById('previewCover').style.backgroundImage = `url('${p.cover}')`;
+  document.getElementById('previewAvImg').src = p.avatar;
+  document.getElementById('previewName').textContent = p.name;
+  document.getElementById('previewHandle').textContent = p.handle;
+  document.getElementById('previewBio').textContent = p.bio;
+
+  const typeBadge = document.getElementById('previewTypeBadge');
+  typeBadge.textContent = p.type === 'writer' ? '✍️ Writer' : '📖 Reader';
+  typeBadge.className = 'preview-type-badge ' + (p.type === 'writer' ? 'ptb-writer' : 'ptb-reader');
+
+  document.getElementById('previewGenres').innerHTML = p.genres.map(g =>
+    `<span class="preview-genre">${genreLabel(g)}</span>`).join('');
+
+  document.getElementById('previewStats').innerHTML = `
+    <div class="preview-stat">
+      <div class="preview-stat-num r">${fmtN(p.followers)}</div>
+      <div class="preview-stat-label">Followers</div>
+    </div>
+    <div class="preview-stat">
+      <div class="preview-stat-num">${p.following}</div>
+      <div class="preview-stat-label">Following</div>
+    </div>
+    ${p.type === 'writer' ? `
+    <div class="preview-stat">
+      <div class="preview-stat-num b">${p.stories}</div>
+      <div class="preview-stat-label">Stories</div>
+    </div>
+    <div class="preview-stat">
+      <div class="preview-stat-num r">${p.reads}</div>
+      <div class="preview-stat-label">Reads</div>
+    </div>` : `
+    <div class="preview-stat">
+      <div class="preview-stat-num b">${p.reads}</div>
+      <div class="preview-stat-label">Library</div>
+    </div>
+    <div class="preview-stat">
+      <div class="preview-stat-num">${fmtN(p.debateVotes)}</div>
+      <div class="preview-stat-label">Votes</div>
+    </div>`}`;
+
+  const mutualEl = document.getElementById('previewMutual');
+  mutualEl.innerHTML = p.mutual > 0
+    ? `<i class="fas fa-user-friends"></i> ${p.mutual} mutual followers`
+    : '';
+
+  const followBtn = document.getElementById('previewFollowBtn');
+  followBtn.textContent = p.isFollowed ? '✓ Following' : '+ Follow';
+  followBtn.className = 'pa-btn follow-pa' + (p.isFollowed ? ' ing' : '');
+
+  const recentEl = document.getElementById('previewRecentReads');
+  if (p.recentReads && p.recentReads.length) {
+    recentEl.innerHTML = `
+      <div class="prr-label">${p.type === 'writer' ? 'Recent Stories' : 'Recently Read'}</div>
+      <div class="prr-list">
+        ${p.recentReads.map(r => `
+          <div class="prr-item">
+            <div class="prr-cover" style="background-image:url('${r.cover}')"></div>
+            <div class="prr-title">${r.title}</div>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    recentEl.innerHTML = '';
+  }
+
+  document.getElementById('previewOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePreview() {
+  document.getElementById('previewOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  previewPerson = null;
+}
+
+/* ══════════════════════════════════════
+   SEARCH
+══════════════════════════════════════ */
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const searchResults = document.getElementById('searchResults');
+const panels = document.querySelectorAll('.panel');
+const topBar = document.querySelector('.top-bar');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  searchClear.style.display = q ? 'block' : 'none';
+  if (!q) {
+    showMainContent();
+    return;
+  }
+  runSearch(q);
+});
+
+function runSearch(q) {
+  panels.forEach(p => p.classList.remove('active'));
+  searchResults.classList.add('show');
+
+  const writers = ALL_PEOPLE.filter(p => p.type === 'writer' &&
+    (p.name.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q) ||
+     p.genres.some(g => g.includes(q)) || p.bio.toLowerCase().includes(q)));
+  const readers = ALL_PEOPLE.filter(p => p.type === 'reader' &&
+    (p.name.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q) ||
+     p.genres.some(g => g.includes(q))));
+
+  document.getElementById('srWriters').innerHTML = writers.map(p => renderPersonCard(p)).join('');
+  document.getElementById('srReaders').innerHTML = readers.map(p => renderPersonCard(p)).join('');
+  document.getElementById('srReadersLbl').style.display = readers.length ? 'flex' : 'none';
+
+  const empty = !writers.length && !readers.length;
+  document.getElementById('srEmpty').classList.toggle('show', empty);
+  document.querySelector('.sr-section-lbl').style.display = writers.length ? 'flex' : 'none';
+}
+
+function clearSearch() {
+  searchInput.value = '';
+  searchClear.style.display = 'none';
+  showMainContent();
+  searchInput.focus();
+}
+
+function showMainContent() {
+  searchResults.classList.remove('show');
+  document.getElementById('panel-' + currentSeg).classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   GENRE HELPERS
+══════════════════════════════════════ */
+const GENRE_MAP = {
+  betrayal:'💔 Betrayal',family:'👑 Family',twist:'✨ Twist',
+  campus:'🎓 Campus',revenge:'🔥 Revenge',elegy:'🌙 Elegy',
+  love:'🏙️ Urban Love',heartbreak:'💔 Heartbreak'
+};
+const GENRE_EMOJI_MAP = {
+  betrayal:'💔',family:'👑',twist:'✨',campus:'🎓',
+  revenge:'🔥',elegy:'🌙',love:'🏙️',heartbreak:'💔'
+};
+function genreLabel(g) { return GENRE_MAP[g] || g; }
+function genreEmoji(g) { return GENRE_EMOJI_MAP[g] || '📖'; }
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+renderStatusRow();
+renderFeaturedWriters();
+renderGenreCommunities();
+renderSuggestedReaders();
+renderDebateChamps();
+</script>
+</body>
+</html>

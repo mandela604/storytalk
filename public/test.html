@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#f2f2f7">
+<title>Narrative — Discover Stories</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,600&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --bg-page: #f2f2f7;
+    --bg-card: #ffffff;
+    --bg-surface: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.04);
+    --text-primary: #1c1c1e;
+    --text-secondary: #8e8e93;
+    --text-muted: #aeaeb2;
+    --accent: #ff2a6d;
+    --accent-soft: #ff6b8a;
+    --accent-glow: rgba(255, 42, 109, 0.15);
+    --border: #e5e5ea;
+    --border-light: #f0f0f5;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --gold: #f5a623;
+    --green: #2bde8f;
+    --blue: #5d9bff;
+    --safe-b: env(safe-area-inset-bottom, 14px);
+  }
+
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg-page);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(242, 242, 247, 0.96);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #1c1c1e, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .icon-btn {
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .icon-btn:active { transform: scale(0.96); background: rgba(0, 0, 0, 0.06); }
+
+  /* Category Pills */
+  .categories {
+    padding: 12px 16px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-page);
+  }
+  .categories::-webkit-scrollbar { height: 3px; }
+  .categories::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+  .cat-chip {
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+  }
+  .cat-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .cat-chip:active { transform: scale(0.95); }
+
+  /* Main Content */
+  .main-content {
+    padding: 16px 16px 90px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* Section Headers */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+  }
+  .section-header h2 i {
+    font-size: 18px;
+  }
+  .browse-all {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-soft);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .browse-all:active { opacity: 0.6; }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 0;
+  }
+
+  /* Grid Layouts */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* Story Card */
+  .story-card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease, box-shadow 0.2s;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .story-card:active { transform: scale(0.97); }
+  .story-card:hover { box-shadow: var(--shadow-hover); }
+  .story-cover {
+    aspect-ratio: 2 / 3;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .story-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--accent);
+    font-size: 8px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
+  .story-badge.green { background: var(--green); }
+  .story-badge.gold { background: var(--gold); color: #1c1c1e; }
+  .story-stats {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 9px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 2px 7px;
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .story-info {
+    padding: 10px 10px 12px;
+  }
+  .story-title {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+  .story-author {
+    font-size: 9px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .story-author i { font-size: 8px; }
+  .story-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .action-btn:active { opacity: 0.6; }
+  .action-btn i { font-size: 10px; }
+  .action-btn.saved { color: var(--accent); }
+
+  /* Horizontal Scrolls */
+  .h-scroll, .writers-scroll, .feat-scroll, .coll-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+  .h-scroll::-webkit-scrollbar, .writers-scroll::-webkit-scrollbar,
+  .feat-scroll::-webkit-scrollbar, .coll-scroll::-webkit-scrollbar {
+    height: 3px;
+  }
+  .h-scroll::-webkit-scrollbar-thumb, .writers-scroll::-webkit-scrollbar-thumb,
+  .feat-scroll::-webkit-scrollbar-thumb, .coll-scroll::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
+  }
+
+  /* Featured Card */
+  .feat-card {
+    flex-shrink: 0;
+    width: 160px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .feat-card:active { transform: scale(0.97); }
+  .feat-thumb {
+    position: relative;
+    width: 100%;
+    height: 100px;
+  }
+  .feat-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .feat-thumb-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7), transparent 55%);
+  }
+  .feat-cat-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--accent);
+    color: white;
+    font-size: 7px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+  .feat-stat-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 7px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .feat-body {
+    padding: 8px 8px 10px;
+  }
+  .feat-title {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .feat-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .feat-av {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .feat-author {
+    font-size: 8.5px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Writer Card */
+  .writer-card {
+    flex-shrink: 0;
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .writer-card:active { transform: scale(0.95); }
+  .writer-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    margin-bottom: 6px;
+  }
+  .writer-name {
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+  }
+  .writer-followers {
+    font-size: 8px;
+    color: var(--text-secondary);
+  }
+  .writer-genre {
+    font-size: 7px;
+    color: var(--accent-soft);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* Collection Card */
+  .collection-card {
+    flex-shrink: 0;
+    width: 145px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .collection-card:active { transform: scale(0.97); }
+  .coll-covers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 70px;
+    gap: 1px;
+  }
+  .coll-cover {
+    background-size: cover;
+    background-position: center;
+  }
+  .coll-info {
+    padding: 8px 8px 10px;
+  }
+  .coll-name {
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .coll-meta {
+    font-size: 8px;
+    color: var(--text-secondary);
+  }
+
+  /* Ranking Card (4 per row) */
+  .rank-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .rank-card:active { transform: scale(0.97); }
+  .rank-cover {
+    position: relative;
+    height: 75px;
+    background-size: cover;
+    background-position: center;
+  }
+  .rank-number {
+    position: absolute;
+    bottom: -8px;
+    left: 6px;
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 11px;
+    color: white;
+    border: 2px solid var(--bg-card);
+  }
+  .rank-number.gold { background: var(--gold); color: #1c1c1e; }
+  .rank-number.silver { background: #9ca3af; }
+  .rank-number.bronze { background: #cd7c4b; }
+  .rank-info {
+    padding: 10px 6px 8px;
+  }
+  .rank-title {
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .rank-stats {
+    font-size: 8px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Debate Card (2 per row) */
+  .debate-card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .debate-card:active { transform: scale(0.98); }
+  .debate-card.live { border-left: 3px solid var(--accent); }
+  .debate-cover {
+    position: relative;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+  }
+  .debate-cover-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.8), rgba(0,0,0,0.1) 60%);
+  }
+  .debate-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-size: 7px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    color: white;
+  }
+  .debate-badge.live { background: var(--accent); color: white; }
+  .debate-body {
+    padding: 10px;
+  }
+  .debate-motion {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .debate-bars {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .debate-side {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--border-light);
+  }
+  .debate-side.fill-for { background: var(--green); height: 100%; }
+  .debate-side.fill-against { background: var(--accent); height: 100%; }
+  .debate-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .debate-total {
+    font-size: 8px;
+    color: var(--text-secondary);
+  }
+  .debate-join {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Emotion Pills */
+  .emo-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 12px;
+    scrollbar-width: thin;
+  }
+  .emo-pills::-webkit-scrollbar { height: 2px; }
+  .emo-pill {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .emo-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .emo-pill:active { transform: scale(0.95); }
+
+  /* Flag Pills */
+  .flag-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 12px;
+    scrollbar-width: thin;
+  }
+  .flag-pill {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .flag-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 720px;
+    margin: 0 auto;
+    background: rgba(242, 242, 247, 0.97);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 20px;
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .nav-item i { font-size: 20px; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item:active { transform: scale(0.95); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1c1c1e;
+    border: 1px solid #2c2c2e;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    z-index: 200;
+    opacity: 0;
+    transition: 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+
+  /* Search Results */
+  .search-results {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-results.show { display: flex; }
+  .search-card {
+    display: flex;
+    gap: 12px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .search-img {
+    width: 50px;
+    height: 65px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  .search-info {
+    flex: 1;
+  }
+  .search-cat {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent-soft);
+    text-transform: uppercase;
+  }
+  .search-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 3px 0;
+  }
+  .search-meta {
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <div class="header">
+    <div class="logo">narrative.</div>
+    <div class="header-actions">
+      <div class="icon-btn" id="searchBtn"><i class="fas fa-search"></i> Search</div>
+      <div class="icon-btn" id="filterBtn"><i class="fas fa-sliders-h"></i> Filter</div>
+    </div>
+  </div>
+
+  <div class="categories" id="categoryTabs"></div>
+
+  <div class="main-content" id="mainContent"></div>
+  <div class="search-results" id="searchResults"></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" data-nav="home"><i class="fas fa-home"></i><span>Home</span></div>
+    <div class="nav-item" data-nav="discover"><i class="fas fa-compass"></i><span>Discover</span></div>
+    <div class="nav-item" data-nav="library"><i class="fas fa-bookmark"></i><span>Library</span></div>
+    <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i><span>Profile</span></div>
+  </div>
+</div>
+<div class="toast" id="toastMsg"></div>
+
+<script>
+  // ========== TOAST ==========
+  function toast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function fmtN(n) {
+    if (typeof n === 'string') return n;
+    return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+  }
+
+  // ========== SAVE STATE ==========
+  let savedStories = {};
+
+  function toggleSave(storyId, btnElement) {
+    savedStories[storyId] = !savedStories[storyId];
+    const icon = btnElement.querySelector('i');
+    const span = btnElement.querySelector('span');
+    if (savedStories[storyId]) {
+      icon.className = 'fas fa-bookmark';
+      span.textContent = 'Saved';
+      toast('📌 Saved to library');
+    } else {
+      icon.className = 'far fa-bookmark';
+      span.textContent = 'Save';
+      toast('🗑️ Removed');
+    }
+  }
+
+  function shareStory(storyId, title) {
+    toast(`📤 Sharing "${title}"`);
+  }
+
+  // ========== DATA ==========
+  const categories = ['All', 'Romance', 'Betrayal', 'Family', 'Campus', 'Revenge', 'Twist', 'Elegy', 'Comedy', 'Dark'];
+
+  const popularStories = [
+    { id: 1, cover: "https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&h=600&fit=crop", title: "The runaway bride in her socked feet", author: "Ifeanyi_Story", views: "312k", badge: "🔥 HOT", badgeType: "red" },
+    { id: 2, cover: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=600&fit=crop", title: "Caught my husband kissing her photograph", author: "Ada_Writes", views: "171k", badge: "", badgeType: "" },
+    { id: 3, cover: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=600&fit=crop", title: "My grandmother's will revealed I wasn't blood", author: "Chiamaka_N", views: "204k", badge: "FREE", badgeType: "green" },
+    { id: 4, cover: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&h=600&fit=crop", title: "The letter he never sent", author: "Efe_O", views: "218k", badge: "", badgeType: "" },
+    { id: 5, cover: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop", title: "The richest boy started sitting beside me", author: "CampusQueen", views: "134k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 6, cover: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&h=600&fit=crop", title: "He proposed with my best friend's ring", author: "Kemi_A", views: "96k", badge: "", badgeType: "" }
+  ];
+
+  const romanceStories = [
+    { id: 7, cover: "https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400&h=600&fit=crop", title: "She rejected me 3 times. Dog named 'Finally'", author: "Dami_Cole", views: "22k", badge: "", badgeType: "" },
+    { id: 8, cover: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop", title: "He sat next to me every single morning", author: "CampusQueen", views: "134k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 9, cover: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=600&fit=crop", title: "My twin and I switched lives for one month", author: "Ngozi_J", views: "89k", badge: "", badgeType: "" },
+    { id: 10, cover: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400&h=600&fit=crop", title: "We argued about puff puff and fell in love", author: "Dami_Cole", views: "61k", badge: "🔥 HOT", badgeType: "red" },
+    { id: 11, cover: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=600&fit=crop", title: "The intern who became my partner", author: "Kola_B", views: "44k", badge: "", badgeType: "" },
+    { id: 12, cover: "https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=400&h=600&fit=crop", title: "A Kiss from Lagos", author: "Olaide Brown", views: "89k", badge: "💕", badgeType: "gold" }
+  ];
+
+  const rankingStories = [
+    { id: 13, title: "The runaway bride", author: "Ifeanyi_Story", reads: "312k", rank: 1, cover: "https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&h=300&fit=crop" },
+    { id: 14, title: "Letters I Never Sent", author: "Chiamaka Eze", reads: "218k", rank: 2, cover: "https://images.unsplash.com/photo-1519791883288-dc8bd696e667?w=400&h=300&fit=crop" },
+    { id: 15, title: "My grandmother's will", author: "Chiamaka_N", reads: "204k", rank: 3, cover: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=300&fit=crop" },
+    { id: 16, title: "A Kiss from Lagos", author: "Olaide Brown", reads: "89k", rank: 4, cover: "https://images.unsplash.com/photo-1518621736915-f3b1c41a2120?w=400&h=300&fit=crop" },
+    { id: 17, title: "The letter he never sent", author: "Efe_O", reads: "218k", rank: 5, cover: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&h=300&fit=crop" },
+    { id: 18, title: "She rejected me 3 times", author: "Dami_Cole", reads: "22k", rank: 6, cover: "https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400&h=300&fit=crop" }
+  ];
+
+  const featData = [
+    { cover: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80", cat: "💔 BETRAYAL", title: "I came home early and caught my husband kissing her photograph", author: "Ada_Writes", avatar: "https://i.pravatar.cc/100?img=32", reads: "171k", statCls: "fs-cry", statIcon: "😭", statLabel: "12k" },
+    { cover: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=80", cat: "🌙 ELEGY", title: "The letter folded inside the pocket of his old jacket", author: "Efe_O", avatar: "https://i.pravatar.cc/100?img=22", reads: "218k", statCls: "fs-heart", statIcon: "💔", statLabel: "6k" },
+    { cover: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=80", cat: "👑 FAMILY", title: "My grandmother's will revealed I wasn't her blood", author: "Chiamaka_N", avatar: "https://i.pravatar.cc/100?img=47", reads: "204k", statCls: "fs-fire", statIcon: "🔥", statLabel: "Top" }
+  ];
+
+  const debateData = [
+    { id: 1, cover: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&q=75", cat: "BETRAYAL", motion: "Ada should stay and fight for her marriage, not leave.", forV: 2341, agV: 3819, live: true },
+    { id: 2, cover: "https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=300&q=75", cat: "TWIST", motion: "Walking out publicly was brave, not dramatic.", forV: 9800, agV: 2100, live: true },
+    { id: 3, cover: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300&q=75", cat: "REVENGE", motion: "Legal action was the only appropriate response.", forV: 5800, agV: 900, live: false },
+    { id: 4, cover: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300&q=75", cat: "ELEGY", motion: "He was right to end things quietly — that IS love.", forV: 3400, agV: 5600, live: true }
+  ];
+
+  const writers = [
+    { name: "Ifeanyi_Story", genre: "Twist", followers: "31.7k", avatar: "https://i.pravatar.cc/100?img=53" },
+    { name: "Chiamaka_N", genre: "Family", followers: "19.2k", avatar: "https://i.pravatar.cc/100?img=47" },
+    { name: "Efe_O", genre: "Elegy", followers: "22.3k", avatar: "https://i.pravatar.cc/100?img=22" },
+    { name: "Ada_Writes", genre: "Betrayal", followers: "12.4k", avatar: "https://i.pravatar.cc/100?img=32" },
+    { name: "Zara_M", genre: "Revenge", followers: "14.8k", avatar: "https://i.pravatar.cc/100?img=16" },
+    { name: "Dami_Cole", genre: "Love", followers: "9.4k", avatar: "https://i.pravatar.cc/100?img=64" }
+  ];
+
+  const collections = [
+    { name: "Stories That Wrecked Me", count: 14, curator: "Chioma_R", covers: ["https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200", "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200", "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200"] },
+    { name: "Best Plot Twists 2025", count: 8, curator: "Ada_Writes", covers: ["https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=200", "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200"] },
+    { name: "2am Crying Material", count: 11, curator: "Kemi_A", covers: ["https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200", "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=200"] },
+    { name: "Revenge Arc Masterclass", count: 9, curator: "Zara_M", covers: ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200"] }
+  ];
+
+  const emotions = [
+    { id: "all", emoji: "🌀", label: "All feels" },
+    { id: "heartbreak", emoji: "💔", label: "Heartbreak" },
+    { id: "rage", emoji: "😤", label: "Rage" },
+    { id: "shocked", emoji: "😱", label: "Shocked" },
+    { id: "emotional", emoji: "🥹", label: "Emotional" },
+    { id: "savage", emoji: "🔥", label: "Savage" }
+  ];
+
+  const emotionStories = {
+    all: popularStories,
+    heartbreak: [popularStories[1], romanceStories[0], popularStories[3]],
+    rage: [popularStories[5], romanceStories[2], popularStories[2]],
+    shocked: [popularStories[0], romanceStories[3], popularStories[4]],
+    emotional: [popularStories[2], romanceStories[1], popularStories[3]],
+    savage: [popularStories[0], romanceStories[4], popularStories[5]]
+  };
+
+  const countries = [
+    { flag: "🇳🇬", name: "Nigeria", code: "ng" },
+    { flag: "🇬🇭", name: "Ghana", code: "gh" },
+    { flag: "🇰🇪", name: "Kenya", code: "ke" },
+    { flag: "🇿🇦", name: "S.Africa", code: "za" },
+    { flag: "🇺🇬", name: "Uganda", code: "ug" }
+  ];
+
+  const countryStories = {
+    ng: [popularStories[0], romanceStories[0], popularStories[2]],
+    gh: [popularStories[1], romanceStories[1], popularStories[3]],
+    ke: [popularStories[2], romanceStories[2], popularStories[0]],
+    za: [popularStories[3], romanceStories[3], popularStories[1]],
+    ug: [popularStories[4], romanceStories[4], popularStories[5]]
+  };
+
+  const newReleases = [
+    { id: 101, cover: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&h=600&fit=crop", title: "He deleted our photos on our 5th anniversary", author: "Kemi_A", views: "14.7k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 102, cover: "https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=400&h=600&fit=crop", title: "We argued about puff puff at the wedding", author: "Dami_Cole", views: "9.3k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 103, cover: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=600&fit=crop", title: "My twin and I switched lives for a month", author: "Ngozi_J", views: "6.1k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 104, cover: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=600&fit=crop", title: "The intern who became my business partner", author: "Kola_B", views: "4.8k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 105, cover: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400&h=600&fit=crop", title: "Seventeen text messages he never answered", author: "Adaeze_K", views: "3.2k", badge: "🆕 NEW", badgeType: "green" },
+    { id: 106, cover: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&h=600&fit=crop", title: "The notebook she left in my office", author: "Emeka_D", views: "5.7k", badge: "🆕 NEW", badgeType: "green" }
+  ];
+
+  // ========== RENDER FUNCTIONS ==========
+  function getBadgeClass(type) {
+    if (type === 'green') return 'green';
+    if (type === 'gold') return 'gold';
+    return '';
+  }
+
+  function renderStoryCard(story, isSaved = false) {
+    const badgeClass = getBadgeClass(story.badgeType);
+    return `
+      <div class="story-card" data-id="${story.id}">
+        <div class="story-cover" style="background-image: url('${story.cover}')">
+          ${story.badge ? `<div class="story-badge ${badgeClass}">${story.badge}</div>` : ''}
+          <div class="story-stats"><i class="fas fa-eye"></i> ${story.views}</div>
+        </div>
+        <div class="story-info">
+          <div class="story-title">${story.title}</div>
+          <div class="story-author"><i class="fas fa-user-circle"></i> @${story.author}</div>
+          <div class="story-actions">
+            <div class="action-btn save-btn" data-id="${story.id}">
+              <i class="${isSaved ? 'fas' : 'far'} fa-bookmark"></i> <span>${isSaved ? 'Saved' : 'Save'}</span>
+            </div>
+            <div class="action-btn share-btn" data-id="${story.id}" data-title="${story.title.replace(/'/g, "\\'")}">
+              <i class="fas fa-share-alt"></i> Share
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  let currentEmotion = 'all';
+  let currentCountry = 'ng';
+
+  function buildHomepage() {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = `
+      <!-- 1. Popular Stories -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-fire" style="color: var(--accent);"></i> Popular Stories</h2><div class="browse-all" data-browse="popular">Browse all →</div></div>
+        <div class="grid-3" id="popularGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 2. Romance -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-heart" style="color: var(--accent-soft);"></i> Romance</h2><div class="browse-all" data-browse="romance">More romance →</div></div>
+        <div class="grid-3" id="romanceGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 3. Rankings -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-trophy" style="color: var(--gold);"></i> Story Rankings</h2><div class="browse-all" data-browse="ranking">Full ranking →</div></div>
+        <div class="grid-4" id="rankingsGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 4. Editor's Picks -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-star" style="color: var(--gold);"></i> Editor's Picks</h2><div class="browse-all" data-browse="editor">More →</div></div>
+        <div class="feat-scroll" id="featScroll"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 5. Live Debates -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-gavel" style="color: var(--accent);"></i> Live Debates</h2><div class="browse-all" data-browse="debate">See all →</div></div>
+        <div class="grid-2" id="debateGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 6. Browse by Feeling -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-face-smile"></i> Browse by Feeling</h2><div class="browse-all" data-browse="feeling">All moods →</div></div>
+        <div class="emo-pills" id="emoPills"></div>
+        <div class="grid-3" id="emotionGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 7. New Releases -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-sparkle"></i> New Releases</h2><div class="browse-all" data-browse="new">Browse all →</div></div>
+        <div class="grid-3" id="newGrid"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 8. Top Writers -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-pen-fancy"></i> Top Writers</h2><div class="browse-all" data-browse="writers">All writers →</div></div>
+        <div class="writers-scroll" id="writersRow"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 9. Collections -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-layer-group"></i> Curated Collections</h2><div class="browse-all" data-browse="collections">Explore →</div></div>
+        <div class="coll-scroll" id="collectionsScroll"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 10. Popular by Country -->
+      <div>
+        <div class="section-header"><h2><i class="fas fa-globe-africa"></i> Trending by Country</h2><div class="browse-all" data-browse="country">Worldwide →</div></div>
+        <div class="flag-pills" id="flagPills"></div>
+        <div class="grid-3" id="countryGrid"></div>
+      </div>
+    `;
+
+    // Populate grids
+    document.getElementById('popularGrid').innerHTML = popularStories.map(s => renderStoryCard(s, savedStories[s.id])).join('');
+    document.getElementById('romanceGrid').innerHTML = romanceStories.map(s => renderStoryCard(s, savedStories[s.id])).join('');
+    document.getElementById('rankingsGrid').innerHTML = rankingStories.map(r => `
+      <div class="rank-card" onclick="toast('📖 Opening ${r.title}')">
+        <div class="rank-cover" style="background-image: url('${r.cover}')">
+          <div class="rank-number ${r.rank === 1 ? 'gold' : r.rank === 2 ? 'silver' : r.rank === 3 ? 'bronze' : ''}">${r.rank}</div>
+        </div>
+        <div class="rank-info">
+          <div class="rank-title">${r.title}</div>
+          <div class="rank-stats"><span><i class="fas fa-eye"></i> ${r.reads}</span></div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('featScroll').innerHTML = featData.map(f => `
+      <div class="feat-card" onclick="toast('📖 Opening ${f.title}')">
+        <div class="feat-thumb">
+          <img src="${f.cover}" loading="lazy">
+          <div class="feat-thumb-scrim"></div>
+          <div class="feat-cat-badge">${f.cat}</div>
+        </div>
+        <div class="feat-body">
+          <div class="feat-title">${f.title}</div>
+          <div class="feat-meta">
+            <img class="feat-av" src="${f.avatar}" loading="lazy">
+            <span class="feat-author">@${f.author}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('debateGrid').innerHTML = debateData.map(d => {
+      const total = d.forV + d.agV;
+      const forPct = Math.round((d.forV / total) * 100);
+      return `
+        <div class="debate-card ${d.live ? 'live' : ''}" onclick="toast('⚔️ Opening debate')">
+          <div class="debate-cover" style="background-image: url('${d.cover}')">
+            <div class="debate-cover-scrim"></div>
+            <div class="debate-badge ${d.live ? 'live' : ''}">${d.live ? '🔴 LIVE' : d.cat}</div>
+          </div>
+          <div class="debate-body">
+            <div class="debate-motion">"${d.motion}"</div>
+            <div class="debate-bars">
+              <div class="debate-side"><div class="debate-side.fill-for" style="width: ${forPct}%"></div></div>
+              <div class="debate-side"><div class="debate-side.fill-against" style="width: ${100 - forPct}%"></div></div>
+            </div>
+            <div class="debate-footer">
+              <span class="debate-total"><i class="fas fa-fire"></i> ${fmtN(total)} debating</span>
+              <span class="debate-join">Join →</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('newGrid').innerHTML = newReleases.map(s => renderStoryCard(s, savedStories[s.id])).join('');
+    document.getElementById('writersRow').innerHTML = writers.map(w => `
+      <div class="writer-card" onclick="toast('@${w.name} profile')">
+        <img class="writer-avatar" src="${w.avatar}" loading="lazy">
+        <div class="writer-name">@${w.name.split('_')[0]}</div>
+        <div class="writer-genre">${w.genre}</div>
+        <div class="writer-followers">${w.followers}</div>
+      </div>
+    `).join('');
+    document.getElementById('collectionsScroll').innerHTML = collections.map(c => `
+      <div class="collection-card" onclick="toast('📂 ${c.name}')">
+        <div class="coll-covers">${c.covers.slice(0,4).map(img => `<div class="coll-cover" style="background-image: url('${img}')"></div>`).join('')}</div>
+        <div class="coll-info">
+          <div class="coll-name">${c.name}</div>
+          <div class="coll-meta">${c.count} stories · @${c.curator}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('emoPills').innerHTML = emotions.map(e => `<div class="emo-pill ${e.id === currentEmotion ? 'active' : ''}" data-emotion="${e.id}">${e.emoji} ${e.label}</div>`).join('');
+    document.getElementById('flagPills').innerHTML = countries.map(c => `<div class="flag-pill ${c.code === currentCountry ? 'active' : ''}" data-country="${c.code}">${c.flag} ${c.name}</div>`).join('');
+    document.getElementById('emotionGrid').innerHTML = (emotionStories[currentEmotion] || emotionStories.all).map(s => renderStoryCard(s, savedStories[s.id])).join('');
+    document.getElementById('countryGrid').innerHTML = (countryStories[currentCountry] || countryStories.ng).map(s => renderStoryCard(s, savedStories[s.id])).join('');
+
+    // Attach events
+    attachSaveEvents();
+    attachShareEvents();
+    attachCardClicks();
+    attachEmotionFilters();
+    attachCountryFilters();
+    attachBrowseAll();
+  }
+
+  function attachSaveEvents() {
+    document.querySelectorAll('.save-btn').forEach(btn => {
+      btn.removeEventListener('click', saveHandler);
+      btn.addEventListener('click', saveHandler);
+    });
+  }
+
+  function saveHandler(e) {
+    e.stopPropagation();
+    const id = parseInt(this.dataset.id);
+    toggleSave(id, this);
+  }
+
+  function attachShareEvents() {
+    document.querySelectorAll('.share-btn').forEach(btn => {
+      btn.removeEventListener('click', shareHandler);
+      btn.addEventListener('click', shareHandler);
+    });
+  }
+
+  function shareHandler(e) {
+    e.stopPropagation();
+    const id = this.dataset.id;
+    const title = this.dataset.title || 'story';
+    shareStory(id, title);
+  }
+
+  function attachCardClicks() {
+    document.querySelectorAll('.story-card').forEach(card => {
+      card.removeEventListener('click', cardClickHandler);
+      card.addEventListener('click', cardClickHandler);
+    });
+  }
+
+  function cardClickHandler(e) {
+    if (e.target.closest('.save-btn') || e.target.closest('.share-btn')) return;
+    const id = this.dataset.id;
+    toast(`📖 Opening story ${id}`);
+  }
+
+  function attachEmotionFilters() {
+    document.querySelectorAll('.emo-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        currentEmotion = pill.dataset.emotion;
+        document.querySelectorAll('.emo-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        document.getElementById('emotionGrid').innerHTML = (emotionStories[currentEmotion] || emotionStories.all).map(s => renderStoryCard(s, savedStories[s.id])).join('');
+        attachSaveEvents();
+        attachShareEvents();
+        attachCardClicks();
+        toast(`😭 Showing ${pill.textContent} stories`);
+      });
+    });
+  }
+
+  function attachCountryFilters() {
+    document.querySelectorAll('.flag-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        currentCountry = pill.dataset.country;
+        document.querySelectorAll('.flag-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        document.getElementById('countryGrid').innerHTML = (countryStories[currentCountry] || countryStories.ng).map(s => renderStoryCard(s, savedStories[s.id])).join('');
+        attachSaveEvents();
+        attachShareEvents();
+        attachCardClicks();
+        toast(`🌍 Showing stories from ${pill.textContent.trim()}`);
+      });
+    });
+  }
+
+  function attachBrowseAll() {
+    document.querySelectorAll('.browse-all').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toast(`🔍 Browsing all ${btn.dataset.browse} stories`);
+      });
+    });
+  }
+
+  function renderCategoryPills() {
+    const container = document.getElementById('categoryTabs');
+    container.innerHTML = categories.map((cat, i) => `<div class="cat-chip ${i === 0 ? 'active' : ''}" data-cat="${cat.toLowerCase()}">${cat}</div>`).join('');
+    document.querySelectorAll('.cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        toast(`📚 Showing ${chip.textContent} stories`);
+      });
+    });
+  }
+
+  function initNav() {
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      nav.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        nav.classList.add('active');
+        const navType = nav.dataset.nav;
+        if (navType === 'home') buildHomepage();
+        else if (navType === 'discover') toast('✨ Discover new stories soon!');
+        else if (navType === 'library') toast('📖 Your saved stories will appear here');
+        else toast('👤 Profile coming soon');
+      });
+    });
+  }
+
+  document.getElementById('searchBtn').addEventListener('click', () => toast('🔍 Search coming soon'));
+  document.getElementById('filterBtn').addEventListener('click', () => toast('🎛️ Filters coming soon'));
+
+  renderCategoryPills();
+  buildHomepage();
+  initNav();
+</script>
+</body>
+</html>

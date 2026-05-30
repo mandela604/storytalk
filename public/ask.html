@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Ask & AMAs</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.18);
+  --bg:#000000;--bg2:#0a0a0a;--card:#0d0d0d;--surface:#111111;--surface2:#161616;
+  --tx:#f0f0f0;--tx2:#a1a1aa;--muted:#555;--muted2:#888;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);
+  --green:#10b981;--green-s:rgba(16,185,129,.1);--green-bd:rgba(16,185,129,.2);
+  --blue:#00aaff;--blue-s:rgba(0,170,255,.08);--blue-bd:rgba(0,170,255,.2);
+  --amber:#f59e0b;--amber-s:rgba(245,158,11,.08);--amber-bd:rgba(245,158,11,.2);
+  --purple:#8b5cf6;--purple-s:rgba(139,92,246,.08);--purple-bd:rgba(139,92,246,.2);
+  --r:13px;--r-sm:9px;--r-pill:999px;
+  --font-d:'Playfair Display',serif;
+  --font-b:'DM Sans',sans-serif;
+  --safe-b:env(safe-area-inset-bottom,14px);
+  --nav-h:56px;--topbar-h:52px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;user-select:none}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+input,textarea,select{font-family:var(--font-b)}
+
+/* ════ SHELL ════ */
+.shell{position:fixed;inset:0;display:flex;flex-direction:column}
+
+/* ════ TOPBAR ════ */
+.topbar{
+  flex-shrink:0;height:var(--topbar-h);display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);
+  z-index:100;backdrop-filter:blur(20px);
+}
+.tb-logo{font-family:var(--font-d);font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px}
+.tb-center{flex:1;display:flex;flex-direction:column}
+.tb-title{font-family:var(--font-d);font-size:14px;font-weight:900;line-height:1;color:var(--tx)}
+.tb-sub{font-size:9.5px;color:var(--muted);font-weight:600;margin-top:1px}
+.tb-btns{display:flex;gap:7px}
+.tb-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--card);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--muted2);cursor:pointer;transition:.15s;
+}
+.tb-btn:active{transform:scale(.92)}
+
+/* ════ SUBTABS ════ */
+.subtabs{
+  flex-shrink:0;display:flex;background:var(--bg);
+  border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;
+}
+.subtabs::-webkit-scrollbar{display:none}
+.stab{
+  flex:0 0 auto;padding:11px 15px;font-size:11px;font-weight:700;
+  color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+  transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:5px;
+}
+.stab.on{color:var(--tx);border-bottom-color:var(--acc)}
+.stab-badge{
+  background:var(--card);color:var(--muted2);font-size:8px;font-weight:800;
+  padding:1px 6px;border-radius:8px;border:1px solid var(--bd);
+}
+.stab.on .stab-badge{background:rgba(255,0,80,.12);color:var(--acc);border-color:rgba(255,0,80,.2)}
+.live-pill{
+  display:inline-flex;align-items:center;gap:3px;
+  background:rgba(16,185,129,.1);border:1px solid var(--green-bd);
+  color:var(--green);font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:ldp 1.3s ease-in-out infinite;flex-shrink:0}
+@keyframes ldp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+
+/* ════ FILTER BAR ════ */
+.filter-bar{
+  flex-shrink:0;display:flex;gap:6px;padding:7px 14px;
+  overflow-x:auto;scrollbar-width:none;background:var(--bg);
+  border-bottom:1px solid var(--bd2);
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.fp{
+  flex-shrink:0;padding:5px 13px;border-radius:var(--r-pill);font-size:10px;font-weight:700;
+  border:1px solid var(--bd);background:transparent;color:var(--muted);cursor:pointer;transition:.15s;
+}
+.fp.on{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--tx2)}
+.fp:active{transform:scale(.95)}
+
+/* ════ BODY ════ */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 16px)}
+.body::-webkit-scrollbar{display:none}
+
+/* ════ COMPOSE BOX ════ */
+.compose-wrap{padding:12px 14px 8px}
+.compose-box{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  overflow:hidden;transition:border-color .2s;
+}
+.compose-box:focus-within{border-color:rgba(255,255,255,.14)}
+.compose-top{display:flex;gap:9px;align-items:flex-start;padding:12px 12px 0}
+.compose-av{
+  width:30px;height:30px;border-radius:50%;background:rgba(255,0,80,.2);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+  color:var(--acc);flex-shrink:0;border:1.5px solid rgba(255,0,80,.25);
+}
+.compose-ta{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--tx);font-size:13px;line-height:1.55;resize:none;min-height:52px;padding-top:2px;
+}
+.compose-ta::placeholder{color:#2a2a2a}
+.compose-opts{display:flex;align-items:center;gap:7px;padding:8px 12px 0;flex-wrap:wrap}
+.compose-anon{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--tx2);cursor:pointer;user-select:none}
+.compose-anon input{accent-color:var(--tx2);width:13px;height:13px}
+.compose-sel{
+  background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:8px;
+  color:var(--muted2);font-size:10px;padding:5px 8px;outline:none;cursor:pointer;
+}
+.compose-sel option{background:#0d0d0d}
+.compose-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 11px}
+.compose-chars{font-size:9.5px;color:var(--muted)}
+.compose-actions{display:flex;gap:7px;align-items:center}
+.poll-toggle-btn{
+  font-size:10px;font-weight:700;color:var(--muted2);
+  background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  padding:4px 10px;border-radius:8px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:4px;
+}
+.poll-toggle-btn.on{background:rgba(0,170,255,.08);border-color:var(--blue-bd);color:var(--blue)}
+.post-btn{
+  background:var(--surface);color:var(--tx);border:1px solid rgba(255,255,255,.12);
+  padding:6px 16px;border-radius:var(--r-pill);font-size:11px;font-weight:800;cursor:pointer;
+  transition:.15s;
+}
+.post-btn:not(:disabled):hover{background:var(--surface2);border-color:rgba(255,255,255,.2)}
+.post-btn:disabled{background:var(--bg2);color:#333;border-color:var(--bd);cursor:default}
+.poll-builder{padding:0 12px 10px;display:none}
+.poll-builder.show{display:block}
+.poll-opt-row{display:flex;gap:7px;align-items:center;margin-bottom:6px;margin-top:7px}
+.poll-opt-inp{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:9px;padding:7px 10px;color:var(--tx);font-size:12px;outline:none;
+}
+.poll-opt-inp:focus{border-color:rgba(255,255,255,.14)}
+.poll-opt-inp::placeholder{color:#2a2a2a}
+.poll-remove{
+  width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.04);
+  border:1px solid var(--bd);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+.add-opt-btn{font-size:10.5px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:4px;padding:3px 0}
+
+/* ════ SECTION HEADERS ════ */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 9px}
+.sec-title{
+  font-family:var(--font-d);font-size:13px;font-weight:800;
+  color:var(--tx);display:flex;align-items:center;gap:7px;
+  border-left:3px solid var(--bd);padding-left:9px;
+}
+.sec-title.live-title{border-left-color:var(--green)}
+.sec-more{font-size:10px;font-weight:700;color:var(--muted2);cursor:pointer;display:flex;align-items:center;gap:3px}
+
+/* ════ LIVE AMA HERO ════ */
+.live-ama-hero{
+  margin:12px 14px 0;background:var(--card);border:1.5px solid var(--bd);
+  border-radius:var(--r);overflow:hidden;
+}
+.lah-header{
+  display:flex;align-items:center;gap:10px;padding:13px 14px 11px;
+  border-bottom:1px solid var(--bd2);
+}
+.lah-av{position:relative;flex-shrink:0}
+.lah-av img{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--green)}
+.lah-live-badge{
+  position:absolute;bottom:-2px;right:-2px;
+  background:var(--green);color:#fff;font-size:7px;font-weight:800;
+  padding:2px 5px;border-radius:6px;border:1.5px solid var(--bg);
+}
+.lah-info{flex:1}
+.lah-name{font-size:13px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px}
+.lah-badge{font-size:8px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--green-s);color:var(--green);border:1px solid var(--green-bd)}
+.lah-meta{font-size:10px;color:var(--muted2);margin-top:2px;display:flex;align-items:center;gap:7px}
+.lah-dot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.lah-join{
+  background:var(--green);color:#fff;border:none;
+  padding:7px 16px;border-radius:var(--r-pill);font-size:10px;font-weight:800;cursor:pointer;
+  flex-shrink:0;transition:.15s;
+}
+.lah-join:active{transform:scale(.95)}
+.lah-story{padding:11px 14px 13px}
+.lah-story-label{font-size:8.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.lah-story-row{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:9px;padding:9px 11px}
+.lah-story-thumb{width:36px;height:42px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.lah-story-title{font-size:11px;font-weight:700;color:var(--tx);line-height:1.3}
+.lah-story-sub{font-size:9px;color:var(--muted2);margin-top:2px}
+.lah-cta-row{display:flex;gap:8px;padding:0 14px 13px}
+.lah-cta-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px;border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;transition:.15s;
+}
+.lah-cta-btn.primary{background:var(--green-s);border:1.5px solid var(--green-bd);color:var(--green)}
+.lah-cta-btn.secondary{background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--muted2)}
+.lah-cta-btn:active{transform:scale(.97)}
+
+/* ════ AMA PROGRESS BAR (status strip) ════ */
+.ama-prog-strip{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;margin-bottom:10px;margin-top:3px;
+}
+.ama-prog-text{font-size:9.5px;color:var(--muted2);font-weight:600}
+.ama-prog-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:3px;margin:0 10px;overflow:hidden}
+.ama-prog-bar{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease}
+
+/* ════ AMA QA THREAD ════ */
+.ama-thread{margin:0 14px 14px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.ama-thread-head{display:flex;align-items:center;gap:9px;padding:11px 13px;border-bottom:1px solid var(--bd2)}
+.ath-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--green)}
+.ath-info{flex:1}
+.ath-name{font-size:12px;font-weight:800;color:var(--tx)}
+.ath-sub{font-size:9.5px;color:var(--muted2);display:flex;align-items:center;gap:5px;margin-top:1px}
+.ath-ask-btn{
+  background:rgba(255,255,255,.06);border:1px solid var(--bd);
+  color:var(--tx2);padding:6px 13px;border-radius:var(--r-pill);
+  font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;transition:.15s;
+}
+.ath-ask-btn:active{transform:scale(.95)}
+.ama-qa-list{display:flex;flex-direction:column;gap:0;max-height:340px;overflow-y:auto;scrollbar-width:none}
+.ama-qa-list::-webkit-scrollbar{display:none}
+.ama-qa-item{border-bottom:1px solid var(--bd2)}
+.ama-qa-item:last-child{border-bottom:none}
+.ama-q-row{display:flex;gap:8px;padding:11px 13px 4px;cursor:pointer}
+.ama-q-av{width:22px;height:22px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;color:var(--muted2)}
+.ama-q-av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.ama-q-text{font-size:12px;font-weight:600;color:var(--tx2);line-height:1.45;flex:1}
+.ama-a-row{padding:4px 13px 9px 43px}
+.ama-a-text{font-size:12px;color:var(--tx);line-height:1.52}
+.ama-a-writer{font-size:9.5px;color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:4px;font-weight:600}
+.ama-a-writer span{color:var(--tx2);font-weight:700}
+.ama-qa-acts{padding:3px 13px 10px 43px;display:flex;align-items:center;gap:10px}
+.ama-qa-act{font-size:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:3px;user-select:none;padding:2px 5px;border-radius:6px}
+.ama-qa-act.liked{color:var(--acc)}
+.ama-qa-act i{font-size:11px}
+.ama-pending{padding:12px 13px;font-size:11px;color:var(--muted);font-style:italic;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.ama-inp-row{display:flex;gap:8px;align-items:center;padding:10px 13px;border-top:1px solid var(--bd2)}
+.ama-inp{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:var(--r-pill);padding:8px 13px;color:var(--tx);font-size:12px;outline:none;
+}
+.ama-inp:focus{border-color:rgba(255,255,255,.14)}
+.ama-inp::placeholder{color:#2a2a2a}
+.ama-send{
+  width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--muted2);
+  flex-shrink:0;transition:.15s;
+}
+.ama-send:not(:disabled):hover{background:var(--green-s);border-color:var(--green-bd);color:var(--green)}
+.ama-send:disabled{opacity:.35;cursor:default}
+
+/* ════ UPCOMING AMA CARDS ════ */
+.ama-cards-scroll{display:flex;gap:9px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.ama-cards-scroll::-webkit-scrollbar{display:none}
+.ama-card{
+  flex-shrink:0;width:186px;background:var(--card);border:1.5px solid var(--bd);
+  border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.15s;
+}
+.ama-card:active{transform:scale(.98)}
+.ama-card-cover{height:72px;position:relative;background-size:cover;background-position:center top}
+.ama-card-cover-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.9),rgba(0,0,0,.15) 55%)}
+.ama-card-when{position:absolute;bottom:7px;left:8px;font-size:8px;font-weight:800;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.65);color:var(--tx2);border:1px solid rgba(255,255,255,.1)}
+.ama-card-body{padding:8px 10px 10px}
+.ama-card-writer-row{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.ama-card-av{width:16px;height:16px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--bd)}
+.ama-card-name{font-size:10px;font-weight:700;color:var(--tx)}
+.ama-card-story{font-size:9.5px;color:var(--muted2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:5px}
+.ama-card-meta{font-size:8.5px;color:var(--muted);display:flex;align-items:center;gap:5px;font-weight:600}
+
+/* ════ ASK POST CARDS ════ */
+.ask-list{display:flex;flex-direction:column;gap:0;padding:0 14px}
+.ask-item{
+  background:var(--card);border:1px solid var(--bd);border-radius:var(--r);
+  margin-bottom:9px;overflow:hidden;transition:border-color .2s;
+}
+.ask-item.pinned{border-color:rgba(245,158,11,.2)}
+.ask-item-head{display:flex;align-items:center;gap:8px;padding:11px 12px 0}
+.ask-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.ask-av-init{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;flex-shrink:0;color:var(--tx2);
+  background:var(--surface2);border:1px solid var(--bd);
+}
+.ask-meta{flex:1;min-width:0}
+.ask-name{font-size:11px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ask-time{font-size:9px;color:var(--muted);margin-top:1px;font-weight:600}
+.ask-cat-badge{font-size:7.5px;font-weight:800;padding:2px 7px;border-radius:6px;flex-shrink:0}
+.cat-rel{background:rgba(255,0,80,.07);color:var(--acc2);border:1px solid rgba(255,0,80,.12)}
+.cat-fam{background:var(--amber-s);color:var(--amber);border:1px solid var(--amber-bd)}
+.cat-cam{background:var(--purple-s);color:var(--purple);border:1px solid var(--purple-bd)}
+.cat-mar{background:var(--green-s);color:var(--green);border:1px solid var(--green-bd)}
+.cat-hrt{background:rgba(255,100,100,.07);color:#f87171;border:1px solid rgba(255,100,100,.15)}
+.cat-sec{background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid var(--bd)}
+.pin-icon{color:var(--amber);font-size:10px;margin-left:auto;flex-shrink:0}
+.anon-badge{background:rgba(255,255,255,.05);color:var(--muted2);font-size:7.5px;font-weight:800;padding:1px 6px;border-radius:6px;border:1px solid var(--bd)}
+.ask-q{font-size:13px;font-weight:600;line-height:1.5;color:var(--tx);padding:8px 12px 4px}
+.ask-context{font-size:11.5px;color:var(--muted2);line-height:1.5;padding:0 12px 8px;font-style:italic;border-bottom:1px solid var(--bd2)}
+.ask-story-ref{
+  display:flex;align-items:center;gap:9px;margin:8px 12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:9px;
+  padding:8px 10px;cursor:pointer;
+}
+.ask-story-thumb{width:34px;height:40px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.ask-story-title{font-size:10px;font-weight:700;color:var(--tx);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ask-story-sub{font-size:8.5px;color:var(--muted2);margin-top:2px}
+.ask-story-cta{font-size:9px;font-weight:800;color:var(--blue);flex-shrink:0}
+
+/* POLL */
+.ask-poll{padding:6px 12px 4px;display:flex;flex-direction:column;gap:5px}
+.poll-opt{position:relative;border-radius:9px;padding:9px 11px;cursor:pointer;overflow:hidden;border:1px solid var(--bd2);transition:border-color .2s;user-select:none}
+.poll-opt:hover{border-color:rgba(255,255,255,.14)}
+.poll-opt.voted{border-color:rgba(255,255,255,.2)}
+.poll-opt.closed{cursor:default}
+.po-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.04);transition:width .6s cubic-bezier(.4,0,.2,1);z-index:0}
+.po-voted .po-bar{background:rgba(255,255,255,.06)}
+.po-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.po-txt{font-size:12px;font-weight:600;color:var(--tx)}
+.po-pct{font-size:11px;font-weight:800;color:var(--tx2)}
+.poll-meta{display:flex;justify-content:space-between;padding:4px 12px 4px;margin-bottom:2px}
+.poll-total{font-size:9.5px;color:var(--muted);font-weight:600}
+.poll-ends{font-size:9.5px;color:var(--muted);font-weight:600}
+
+/* ACTIONS */
+.ask-acts{display:flex;align-items:center;border-top:1px solid var(--bd2);margin-top:6px}
+.ask-act{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;padding:9px 4px;
+  transition:.15s;border-radius:0;user-select:none;
+}
+.ask-act:active{background:rgba(255,255,255,.03)}
+.ask-act.liked{color:var(--acc)}
+.ask-act i{font-size:12px}
+.ask-act-sep{width:1px;background:var(--bd2);height:14px;flex-shrink:0}
+
+/* REPLIES */
+.replies-wrap{display:none;border-top:1px solid var(--bd2);padding:10px 12px 12px}
+.replies-wrap.open{display:block}
+.replies-list{display:flex;flex-direction:column;gap:0}
+.reply-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.reply-item:last-child{border-bottom:none}
+.rep-av{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid var(--bd)}
+.rep-av-init{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;background:var(--surface2);color:var(--muted2)}
+.rep-body{flex:1;min-width:0}
+.rep-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap}
+.rep-name{font-size:11px;font-weight:700;color:var(--tx)}
+.rep-time{font-size:9px;color:var(--muted)}
+.rep-badge-writer{font-size:7.5px;font-weight:800;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--tx2);border:1px solid var(--bd)}
+.rep-badge-anon{font-size:7.5px;font-weight:800;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid var(--bd)}
+.rep-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.45;word-break:break-word}
+.rep-mention{font-weight:700;color:var(--blue)}
+.rep-actions{display:flex;align-items:center;gap:8px;margin-top:4px}
+.rep-act{font-size:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:3px;user-select:none;padding:2px 4px;border-radius:6px}
+.rep-act.liked{color:var(--acc)}
+.rep-more-btn{font-size:10.5px;font-weight:700;color:var(--blue);cursor:pointer;margin-top:6px;display:flex;align-items:center;gap:3px}
+.reply-input-row{display:flex;gap:7px;align-items:center;margin-top:10px}
+.reply-av-sm{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;color:var(--muted2);border:1px solid var(--bd)}
+.reply-inp{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:var(--r-pill);padding:7px 12px;color:var(--tx);font-size:12px;outline:none;
+}
+.reply-inp:focus{border-color:rgba(255,255,255,.14)}
+.reply-inp::placeholder{color:#2a2a2a}
+.reply-send{
+  width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--muted2);
+  flex-shrink:0;transition:.15s;
+}
+.reply-send:not(:disabled):hover{background:var(--surface2);border-color:rgba(255,255,255,.15)}
+.reply-send:disabled{opacity:.35;cursor:default}
+
+/* ════ TRENDING ════ */
+.trend-list{padding:0 14px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.trend-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--card);border:1px solid var(--bd);border-radius:10px;cursor:pointer;transition:.15s;
+}
+.trend-row:active{background:var(--surface)}
+.trend-num{font-family:var(--font-d);font-size:17px;font-weight:800;color:rgba(255,255,255,.12);min-width:22px;text-align:center}
+.trend-info{flex:1}
+.trend-tag{font-size:11px;font-weight:800;color:var(--tx)}
+.trend-sub{font-size:9.5px;color:var(--muted);font-weight:600;margin-top:1px}
+.trend-ct{font-size:10px;font-weight:800;color:var(--muted2);flex-shrink:0}
+
+/* ════ ANON BANNER ════ */
+.anon-hero{
+  margin:12px 14px 0;background:var(--card);border:1px solid var(--bd);
+  border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;
+}
+.anon-hero-icon{font-size:28px;flex-shrink:0}
+.anon-hero-title{font-family:var(--font-d);font-size:14px;font-weight:900;color:var(--tx);margin-bottom:2px}
+.anon-hero-sub{font-size:11px;color:var(--muted2);line-height:1.45}
+
+/* ════ EMPTY ════ */
+.empty-state{padding:44px 20px;text-align:center}
+.empty-icon{font-size:38px;margin-bottom:10px}
+.empty-h{font-family:var(--font-d);font-size:16px;font-weight:800;margin-bottom:5px}
+.empty-p{font-size:12px;color:var(--muted2);line-height:1.6;max-width:220px;margin:0 auto}
+
+/* ════ AMA MODAL ════ */
+.modal-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-sheet{
+  width:100%;background:#0d0d0d;border-radius:18px 18px 0 0;
+  animation:slideUp .26s ease;max-height:88vh;overflow-y:auto;
+  scrollbar-width:none;padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.modal-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:32px;height:3px;background:rgba(255,255,255,.1);border-radius:3px;margin:10px auto 0}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.modal-hdr h3{font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--tx)}
+.modal-close{
+  width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);
+  border:none;color:var(--muted2);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-body{padding:0 16px 14px}
+.modal-writer-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;margin-bottom:12px}
+.modal-writer-av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--green)}
+.modal-writer-name{font-size:13px;font-weight:700;color:var(--tx)}
+.modal-writer-sub{font-size:10px;color:var(--muted2);margin-top:1px}
+.modal-ta{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:12px;padding:11px 13px;color:var(--tx);font-size:13px;
+  outline:none;resize:none;line-height:1.5;min-height:80px;margin-bottom:10px;
+}
+.modal-ta:focus{border-color:rgba(255,255,255,.14)}
+.modal-ta::placeholder{color:#2a2a2a}
+.modal-anon-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;font-size:11px;color:var(--tx2);cursor:pointer;user-select:none}
+.modal-anon-row input{accent-color:var(--tx2);width:14px;height:14px}
+.modal-submit{
+  width:100%;background:var(--green);color:#fff;border:none;
+  padding:12px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;
+  font-family:var(--font-b);transition:.15s;
+}
+.modal-submit:active{transform:scale(.98)}
+
+/* ════ BOTTOM NAV ════ */
+.bnav{
+  position:absolute;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(0,0,0,.97);border-top:1px solid var(--bd);
+  display:flex;justify-content:space-around;
+  padding:8px 0 var(--safe-b);backdrop-filter:blur(20px);
+}
+.bn{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;padding:3px 8px;position:relative;transition:.15s}
+.bn i{font-size:20px;display:block;margin-bottom:2px}
+.bn.on{color:var(--acc)}
+.bn-badge{position:absolute;top:0;right:2px;width:16px;height:16px;border-radius:50%;background:var(--acc);font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+
+/* ════ TOAST ════ */
+.toast{
+  position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:rgba(18,18,22,.97);color:var(--tx);padding:8px 17px;border-radius:var(--r-pill);
+  font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.25s;pointer-events:none;
+  white-space:nowrap;border:1px solid var(--bd);backdrop-filter:blur(12px);
+  max-width:88vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ════ ANIMATIONS ════ */
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .28s ease both}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}
+.d4{animation-delay:.16s}.d5{animation-delay:.2s}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-logo">D</div>
+    <div class="tb-center">
+      <div class="tb-title">Ask & AMAs</div>
+      <div class="tb-sub">Anonymous questions · Live writer sessions</div>
+    </div>
+    <div class="tb-btns">
+      <div class="tb-btn" onclick="toast('🔍 Search coming soon')"><i class="fas fa-search"></i></div>
+      <div class="tb-btn" onclick="toast('🔔 Alerts')"><i class="fas fa-bell"></i></div>
+    </div>
+  </div>
+
+  <!-- SUBTABS -->
+  <div class="subtabs">
+    <div class="stab on" data-tab="forum" onclick="switchTab('forum')">
+      Forum <span class="stab-badge" id="forumCt">24</span>
+    </div>
+    <div class="stab" data-tab="ama" onclick="switchTab('ama')">
+      AMAs <span class="live-pill"><span class="live-dot"></span>3 Live</span>
+    </div>
+    <div class="stab" data-tab="trending" onclick="switchTab('trending')">
+      Trending
+    </div>
+    <div class="stab" data-tab="anon" onclick="switchTab('anon')">
+      Anonymous <span class="stab-badge">9</span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" id="filterBar">
+    <div class="fp on" data-f="all">All</div>
+    <div class="fp" data-f="rel">💕 Relationships</div>
+    <div class="fp" data-f="fam">👑 Family</div>
+    <div class="fp" data-f="cam">🎓 Campus</div>
+    <div class="fp" data-f="mar">💍 Marriage</div>
+    <div class="fp" data-f="hrt">💔 Heartbreak</div>
+    <div class="fp" data-f="sec">🤫 Secrets</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body" id="body">
+
+    <!-- ══ FORUM TAB ══ -->
+    <div id="tab-forum">
+      <div class="compose-wrap fu d1">
+        <div class="compose-box">
+          <div class="compose-top">
+            <div class="compose-av">Y</div>
+            <textarea class="compose-ta" id="composeTa" rows="2" placeholder="Ask the community something… anonymously or not" maxlength="600"></textarea>
+          </div>
+          <div class="compose-opts">
+            <label class="compose-anon"><input type="checkbox" id="anonChk" checked/> Anonymous</label>
+            <select class="compose-sel" id="catSel">
+              <option value="rel">💕 Relationships</option>
+              <option value="fam">👑 Family</option>
+              <option value="cam">🎓 Campus</option>
+              <option value="mar">💍 Marriage</option>
+              <option value="hrt">💔 Heartbreak</option>
+              <option value="sec">🤫 Secrets</option>
+            </select>
+          </div>
+          <div class="poll-builder" id="pollBuilder">
+            <div id="pollOpts">
+              <div class="poll-opt-row"><input class="poll-opt-inp" placeholder="Option 1"/><button class="poll-remove" style="visibility:hidden">×</button></div>
+              <div class="poll-opt-row"><input class="poll-opt-inp" placeholder="Option 2"/><button class="poll-remove">×</button></div>
+            </div>
+            <div class="add-opt-btn" id="addOptBtn"><i class="fas fa-plus" style="font-size:9px"></i> Add option</div>
+          </div>
+          <div class="compose-footer">
+            <span class="compose-chars" id="composeChars">0 / 600</span>
+            <div class="compose-actions">
+              <button class="poll-toggle-btn" id="pollToggle"><i class="fas fa-chart-bar" style="font-size:9px"></i> Poll</button>
+              <button class="post-btn" id="postBtn" disabled>Post →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ask-list fu d2" id="forumList"></div>
+    </div>
+
+    <!-- ══ AMA TAB ══ -->
+    <div id="tab-ama" style="display:none">
+
+      <!-- Live AMA hero -->
+      <div class="live-ama-hero fu d1" id="liveAmaHero"></div>
+
+      <!-- AMA progress -->
+      <div class="ama-prog-strip fu d1" id="amaProgStrip" style="display:none">
+        <span class="ama-prog-text">47 questions answered</span>
+        <div class="ama-prog-bar-wrap"><div class="ama-prog-bar" style="width:72%"></div></div>
+        <span class="ama-prog-text">~28 min left</span>
+      </div>
+
+      <!-- Live Q&A thread -->
+      <div id="amaThreadWrap" class="fu d2"></div>
+
+      <!-- Upcoming -->
+      <div class="sec-hdr fu d3">
+        <div class="sec-title">Upcoming AMAs</div>
+        <div class="sec-more" onclick="toast('📅 Full schedule')">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></div>
+      </div>
+      <div class="ama-cards-scroll fu d3" id="amaCardsScroll"></div>
+
+    </div>
+
+    <!-- ══ TRENDING TAB ══ -->
+    <div id="tab-trending" style="display:none">
+      <div class="sec-hdr fu d1"><div class="sec-title">Hot Topics Right Now</div></div>
+      <div class="trend-list fu d1" id="trendList"></div>
+      <div class="sec-hdr fu d2"><div class="sec-title">Most Liked This Week</div></div>
+      <div class="ask-list fu d2" id="trendPosts"></div>
+    </div>
+
+    <!-- ══ ANON TAB ══ -->
+    <div id="tab-anon" style="display:none">
+      <div class="anon-hero fu d1">
+        <div class="anon-hero-icon">👻</div>
+        <div>
+          <div class="anon-hero-title">Confess. Rant. Wonder.</div>
+          <div class="anon-hero-sub">100% anonymous — even verified writers can't see who you are. Scroll freely.</div>
+        </div>
+      </div>
+      <div class="ask-list fu d2 " id="anonList" style="margin-top:12px"></div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <div class="bn" onclick="location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+    <div class="bn" onclick="location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn" onclick="toast('✏️ Create')"><i class="fas fa-plus-circle"></i>Create</div>
+    <div class="bn on"><i class="fas fa-comments"></i>Ask</div>
+    <div class="bn" onclick="toast('👤 Profile')"><i class="fas fa-user-circle"></i>Profile</div>
+  </div>
+
+</div>
+
+<!-- AMA MODAL -->
+<div class="modal-bg" id="amaModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <h3 id="amaModalTitle">Ask a Question</h3>
+      <button class="modal-close" onclick="closeAmaModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-writer-row" id="amaModalWriter"></div>
+      <textarea class="modal-ta" id="amaModalTa" rows="4" placeholder="Ask anything — writing process, characters, story arcs, life…"></textarea>
+      <label class="modal-anon-row"><input type="checkbox" id="amaModalAnon" checked/> Ask anonymously</label>
+      <button class="modal-submit" onclick="submitAmaQ()">Submit Question</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+/* ── UTILS ── */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+function since(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function fmtTxt(t){return(t||'').replace(/(@[\w_]+)/g,'<span class="rep-mention">$1</span>');}
+function catCls(c){return{rel:'cat-rel',fam:'cat-fam',cam:'cat-cam',mar:'cat-mar',hrt:'cat-hrt',sec:'cat-sec'}[c]||'cat-sec';}
+function catLbl(c){return{rel:'💕 Relationships',fam:'👑 Family',cam:'🎓 Campus',mar:'💍 Marriage',hrt:'💔 Heartbreak',sec:'🤫 Secrets'}[c]||'General';}
+
+/* ── DATA ── */
+const FORUM=[
+  {id:'p1',anon:false,name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',cat:'rel',
+   q:'My boyfriend still talks to his ex every single day — "just friends". I told him it makes me uncomfortable and he said I was being insecure. Am I wrong?',
+   context:'We\'ve been together 2 years. The ex is someone he dated for 4 years before me. I\'ve met her twice.',
+   storyRef:{title:'The richest boy started sitting beside me every morning',cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300'},
+   ts:Date.now()-7200000,likes:142,liked:false,
+   poll:{opts:[{t:'You\'re not overreacting',v:348},{t:'Talk to him first',v:201},{t:'Leave quietly',v:89}],voted:-1},
+   replies:[
+     {id:'r1',anon:false,name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',isWriter:true,text:'Not insecure at all. Boundaries aren\'t about distrust — they\'re about comfort. And a partner who dismisses you with "you\'re insecure" is actually the bigger red flag here.',ts:Date.now()-3600000,likes:89,liked:false},
+     {id:'r2',anon:true,name:null,isWriter:false,text:'I had this exact situation. The daily contact escalated. Trust your gut, not his explanations.',ts:Date.now()-1800000,likes:34,liked:false},
+     {id:'r3',anon:false,name:'CampusQueen',avatar:'https://i.pravatar.cc/100?img=12',isWriter:false,text:'@Ada_Writes The dismissal is the actual problem. Even if the friendship is genuine, calling her insecure shuts down the conversation entirely.',ts:Date.now()-900000,likes:22,liked:false},
+   ],open:false,pinned:true},
+  {id:'p2',anon:false,name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',cat:'mar',
+   q:'My wife earns 3× what I earn and the dynamic has completely shifted. Has anyone navigated this successfully in a Nigerian household?',
+   context:'It started subtly — decisions I used to make together are now made without me. I feel invisible in my own home.',
+   storyRef:null,ts:Date.now()-14400000,likes:204,liked:false,
+   poll:{opts:[{t:'💬 Counselling helped us',v:510},{t:'💪 We worked through it ourselves',v:188},{t:'💔 We didn\'t survive it',v:43},{t:'🤷 Still figuring it out',v:127}],voted:-1},
+   replies:[
+     {id:'r4',anon:false,name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=47',isWriter:true,text:'The shift is usually not about the money itself — it\'s about who the primary earner unconsciously believes now owns the decisions.',ts:Date.now()-7200000,likes:142,liked:false},
+   ],open:false,pinned:false},
+  {id:'p3',anon:true,name:null,cat:'sec',
+   q:'My lecturer gave me B+ when I clearly deserved an A. I know it\'s because I rejected his advances last semester. I have evidence. What do I do?',
+   context:null,storyRef:null,ts:Date.now()-28800000,likes:317,liked:false,poll:null,
+   replies:[
+     {id:'r5',anon:false,name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',isWriter:false,text:'Document everything. Then go directly to the Dean of Students — not the department head.',ts:Date.now()-14400000,likes:98,liked:false},
+     {id:'r6',anon:true,isWriter:false,text:'This is sexual harassment. Most universities have a reporting pathway that protects your identity. Use it before you do anything else.',ts:Date.now()-7200000,likes:71,liked:false},
+   ],open:false,pinned:false},
+  {id:'p4',anon:false,name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',cat:'fam',
+   q:'My parents are pressuring me to marry someone I don\'t love because "love grows". I\'m 26. Am I being selfish by saying no?',
+   context:'The man is fine by every external metric. My parents think I\'m too picky.',
+   storyRef:{title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300'},
+   ts:Date.now()-43200000,likes:298,liked:false,
+   poll:{opts:[{t:'✅ Stand your ground',v:1240},{t:'🤔 Give him a real chance',v:187},{t:'💬 Have an honest talk first',v:243}],voted:-1},
+   replies:[],open:false,pinned:false},
+];
+
+const ANON=[
+  {id:'a1',anon:true,name:null,cat:'hrt',
+   q:'I\'ve been in a situationship for 18 months with someone who says they\'re not ready for a relationship. They just announced their engagement to someone they met 4 months ago. I need to scream.',
+   context:null,ts:Date.now()-3600000,likes:891,liked:false,poll:null,
+   replies:[
+     {id:'ar1',anon:true,isWriter:false,text:'"Not ready" was always a lie. "Not ready for you" was the full sentence. I\'m so sorry.',ts:Date.now()-1800000,likes:312,liked:false},
+     {id:'ar2',anon:false,name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',isWriter:true,text:'This is the plot of one of my chapters. I wrote it because it happened to someone very close to me. You are not alone in this.',ts:Date.now()-900000,likes:178,liked:false},
+   ],open:false,pinned:false},
+  {id:'a2',anon:true,name:null,cat:'fam',
+   q:'My mother reads my diary. I\'m 24. I found out by accident — she doesn\'t know I know. What do I do with this information?',
+   context:null,ts:Date.now()-86400000,likes:445,liked:false,poll:null,replies:[],open:false,pinned:false},
+  {id:'a3',anon:true,name:null,cat:'sec',
+   q:'I ghosted someone in 2021 and I still think about it three years later. They were lovely. I just panicked. If they\'re reading this — I\'m genuinely sorry.',
+   context:null,ts:Date.now()-172800000,likes:2341,liked:false,poll:null,
+   replies:[
+     {id:'ar3',anon:true,isWriter:false,text:'Plot twist: they think about it too and carry the same guilt.',ts:Date.now()-86400000,likes:567,liked:false},
+   ],open:false,pinned:false},
+  {id:'a4',anon:true,name:null,cat:'rel',
+   q:'Does anyone else read these Droboard stories and feel like the writers are watching your life? "The letter he never sent" described my exact situation and I cried for 40 minutes straight.',
+   context:null,ts:Date.now()-259200000,likes:1104,liked:false,poll:null,replies:[],open:false,pinned:false},
+];
+
+const AMA_WRITERS=[
+  {id:'w1',name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',
+   genre:'💔 Betrayal',live:true,viewers:342,qAnswered:47,storyTitle:"I came home early and caught my husband kissing my late sister's photograph",storyCover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400',
+   qa:[
+     {id:'q1',anon:false,name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',q:'Did you personally experience something similar to Ada\'s story?',a:'Parts of it. The grief and how it ripples through a family — that\'s real. The specific plot is fictional, but the emotional core came from a very honest place.',aTime:'2m ago',likes:89,liked:false,pending:false},
+     {id:'q2',anon:true,q:'Will Ada leave him at the end of the series?',a:'I know the ending. I\'m not ready to say yet. But I\'ll say this — the answer surprised even me when I wrote it.',aTime:'8m ago',likes:134,liked:false,pending:false},
+     {id:'q3',anon:false,name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',q:'How long does a single chapter take you to write?',a:null,aTime:null,likes:0,liked:false,pending:true},
+   ]},
+  {id:'w2',name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',genre:'✨ Twist',live:false,starts:'Tomorrow · 9PM',viewers:874,qAnswered:0,storyTitle:'The runaway bride — I left at the altar in my socked feet',storyCover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400',qa:[]},
+  {id:'w3',name:'CampusQueen',handle:'@campusqueen',avatar:'https://i.pravatar.cc/100?img=12',genre:'🎓 Campus',live:false,starts:'Friday · 8PM',viewers:128,qAnswered:0,storyTitle:'The richest boy started sitting beside me every morning',storyCover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',qa:[]},
+  {id:'w4',name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',genre:'👑 Family',live:false,starts:'Saturday · 7PM',viewers:391,qAnswered:0,storyTitle:"My grandmother's will revealed I wasn't her blood",storyCover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',qa:[]},
+];
+
+const TRENDS=[
+  {n:1,tag:'#ShouldAdaLeave',ct:'8.2k discussing',sub:'From "I came home early…" · Betrayal Series'},
+  {n:2,tag:'#SockedFeet',ct:'4.4k discussing',sub:'The altar walkout moment · Ifeanyi_Story'},
+  {n:3,tag:'#NotReadyWasALie',ct:'3.1k discussing',sub:'Anon situationship post went viral'},
+  {n:4,tag:'#BloodOrLove',ct:'2.8k discussing',sub:'From "Grandmother\'s will…" · Chiamaka_N'},
+  {n:5,tag:'#2amStoriesHit',ct:'1.9k discussing',sub:'Weekly late-night reading thread'},
+];
+
+/* ── STATE ── */
+let activeTab='forum', activeFilter='all', amaTarget=null;
+
+/* ── TABS ── */
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  ['forum','ama','trending','anon'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+  const filterBar=document.getElementById('filterBar');
+  filterBar.style.display=(tab==='forum'||tab==='anon')?'flex':'none';
+  if(tab==='forum')renderForum();
+  else if(tab==='ama')renderAma();
+  else if(tab==='trending')renderTrending();
+  else if(tab==='anon')renderAnon();
+}
+
+/* ── FILTERS ── */
+document.querySelectorAll('.fp').forEach(p=>p.addEventListener('click',()=>{
+  activeFilter=p.dataset.f;
+  document.querySelectorAll('.fp').forEach(x=>x.classList.toggle('on',x===p));
+  if(activeTab==='forum')renderForum();else renderAnon();
+}));
+
+/* ── COMPOSE ── */
+const cTa=document.getElementById('composeTa');
+cTa.addEventListener('input',()=>{
+  document.getElementById('composeChars').textContent=`${cTa.value.length} / 600`;
+  document.getElementById('postBtn').disabled=cTa.value.trim().length<8;
+});
+document.getElementById('pollToggle').addEventListener('click',()=>{
+  const pb=document.getElementById('pollBuilder');
+  const show=!pb.classList.contains('show');
+  pb.classList.toggle('show',show);
+  document.getElementById('pollToggle').classList.toggle('on',show);
+});
+document.getElementById('addOptBtn').addEventListener('click',()=>{
+  const opts=document.getElementById('pollOpts');
+  if(opts.children.length>=5){toast('Max 5 options');return;}
+  const row=document.createElement('div');row.className='poll-opt-row';
+  row.innerHTML=`<input class="poll-opt-inp" placeholder="Option ${opts.children.length+1}"/><button class="poll-remove">×</button>`;
+  row.querySelector('.poll-remove').addEventListener('click',()=>row.remove());
+  opts.appendChild(row);
+});
+document.querySelectorAll('.poll-remove').forEach(b=>b.addEventListener('click',()=>b.closest('.poll-opt-row').remove()));
+document.getElementById('postBtn').addEventListener('click',()=>{
+  const q=cTa.value.trim();if(!q)return;
+  const anon=document.getElementById('anonChk').checked;
+  const cat=document.getElementById('catSel').value;
+  let poll=null;
+  if(document.getElementById('pollBuilder').classList.contains('show')){
+    const vs=[...document.querySelectorAll('.poll-opt-inp')].map(i=>i.value.trim()).filter(Boolean);
+    if(vs.length>=2)poll={opts:vs.map(t=>({t,v:0})),voted:-1};
+  }
+  FORUM.unshift({id:'np_'+Date.now(),anon,name:anon?null:'You',avatar:null,cat,q,context:null,storyRef:null,ts:Date.now(),likes:0,liked:false,poll,replies:[],open:false,pinned:false});
+  cTa.value='';
+  document.getElementById('composeChars').textContent='0 / 600';
+  document.getElementById('postBtn').disabled=true;
+  document.getElementById('pollBuilder').classList.remove('show');
+  document.getElementById('pollToggle').classList.remove('on');
+  renderForum();
+  toast('✅ Posted!');
+});
+
+/* ── BUILD POST ── */
+function buildPost(p, data){
+  const avHtml=p.anon||!p.avatar
+    ?`<div class="ask-av-init">👻</div>`
+    :`<img class="ask-av" src="${p.avatar}" loading="lazy"/>`;
+  const nameHtml=p.anon
+    ?`<span>Anonymous</span><span class="anon-badge">Anon</span>`
+    :`<span>${p.name}</span>`;
+
+  const storyRef=p.storyRef?`<div class="ask-story-ref" onclick="toast('📖 Opening…')">
+    <div class="ask-story-thumb" style="background-image:url('${p.storyRef.cover}')"></div>
+    <div style="flex:1;min-width:0"><div class="ask-story-title">${p.storyRef.title}</div><div class="ask-story-sub">Referenced story</div></div>
+    <div class="ask-story-cta">Read →</div></div>`:'';
+
+  const pollHtml=p.poll?buildPollHtml(p):'';
+  const repliesHtml=buildRepliesHtml(p);
+
+  return`<div class="ask-item${p.pinned?' pinned':''}" id="post-${p.id}">
+    <div class="ask-item-head">
+      ${avHtml}
+      <div class="ask-meta">
+        <div class="ask-name">${nameHtml}${p.pinned?'<i class="fas fa-thumbtack pin-icon"></i>':''}</div>
+        <div class="ask-time">${since(p.ts)} · ${catLbl(p.cat)}</div>
+      </div>
+      <span class="ask-cat-badge ${catCls(p.cat)}">${catLbl(p.cat).split(' ')[0]}</span>
+    </div>
+    <div class="ask-q">${p.q}</div>
+    ${p.context?`<div class="ask-context">${p.context}</div>`:''}
+    ${storyRef}${pollHtml}
+    <div class="ask-acts">
+      <div class="ask-act${p.liked?' liked':''}" id="lk-${p.id}"><i class="${p.liked?'fas':'far'} fa-heart"></i> ${fmtN(p.likes)}</div>
+      <div class="ask-act-sep"></div>
+      <div class="ask-act" id="rc-${p.id}"><i class="far fa-comment"></i> ${p.replies.length} ${p.replies.length===1?'reply':'replies'}</div>
+      <div class="ask-act-sep"></div>
+      <div class="ask-act" onclick="toast('📤 Shared!')"><i class="fas fa-share-alt"></i> Share</div>
+    </div>
+    <div class="replies-wrap${p.open?' open':''}" id="rep-${p.id}">${repliesHtml}</div>
+  </div>`;
+}
+
+function buildPollHtml(p){
+  const tot=p.poll.opts.reduce((s,o)=>s+o.v,0)||1;
+  const closed=p.poll.voted>=0;
+  return`<div class="ask-poll">${p.poll.opts.map((o,i)=>{const pct=Math.round(o.v/tot*100);return`<div class="poll-opt${p.poll.voted===i?' voted po-voted':''}${closed?' closed':''}" data-pid="${p.id}" data-oi="${i}">
+    <div class="po-bar" style="width:${closed?pct:0}%"></div>
+    <div class="po-row"><span class="po-txt">${o.t}</span>${closed?`<span class="po-pct">${pct}%${p.poll.voted===i?' ✓':''}</span>`:''}</div>
+  </div>`;}).join('')}</div><div class="poll-meta"><span class="poll-total">${fmtN(tot)} votes</span>${p.poll.ends?`<span class="poll-ends">Ends in ${p.poll.ends}</span>`:''}</div>`;
+}
+
+function buildRepliesHtml(p){
+  const inp=`<div class="reply-input-row"><div class="reply-av-sm">Y</div><input class="reply-inp" id="ri-${p.id}" placeholder="Write a reply…"/><button class="reply-send" id="rs-${p.id}" disabled><i class="fas fa-paper-plane" style="font-size:10px"></i></button></div>`;
+  if(!p.replies.length)return inp;
+  const shown=p.replies.slice(0,3);const more=p.replies.length>3;
+  const html=shown.map(r=>{
+    const rav=r.anon||!r.avatar
+      ?`<div class="rep-av-init">👻</div>`
+      :`<img class="rep-av" src="${r.avatar}" loading="lazy"/>`;
+    return`<div class="reply-item">${rav}<div class="rep-body">
+      <div class="rep-name-row">
+        <span class="rep-name">${r.anon?'Anonymous':r.name}</span>
+        ${r.isWriter?'<span class="rep-badge-writer">Writer</span>':''}
+        ${r.anon?'<span class="rep-badge-anon">Anon</span>':''}
+        <span class="rep-time">${since(r.ts)}</span>
+      </div>
+      <div class="rep-text">${fmtTxt(r.text)}</div>
+      <div class="rep-actions">
+        <span class="rep-act${r.liked?' liked':''}" data-pid="${p.id}" data-rid="${r.id}"><i class="${r.liked?'fas':'far'} fa-heart"></i> ${fmtN(r.likes)}</span>
+        <span class="rep-act" onclick="toast('↩️ Reply')"><i class="fas fa-reply"></i> Reply</span>
+      </div>
+    </div></div>`;
+  }).join('');
+  return`<div class="replies-list">${html}</div>${more?`<div class="rep-more-btn"><i class="fas fa-chevron-down" style="font-size:9px"></i> ${p.replies.length-3} more replies</div>`:''}`+inp;
+}
+
+/* ── RENDER FORUM / ANON ── */
+function renderForum(){
+  let list=activeFilter==='all'?FORUM:FORUM.filter(p=>p.cat===activeFilter);
+  const el=document.getElementById('forumList');
+  el.innerHTML=list.length?list.map(p=>buildPost(p,FORUM)).join(''):`<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-h">Nothing here yet</div><div class="empty-p">Be the first to post in this category.</div></div>`;
+  document.getElementById('forumCt').textContent=FORUM.length;
+  wireList('forumList',FORUM);
+}
+
+function renderAnon(){
+  let list=activeFilter==='all'?ANON:ANON.filter(p=>p.cat===activeFilter);
+  document.getElementById('anonList').innerHTML=list.map(p=>buildPost(p,ANON)).join('');
+  wireList('anonList',ANON);
+}
+
+function wireList(containerId, data){
+  const el=document.getElementById(containerId);if(!el)return;
+  if(el._ev)el.removeEventListener('click',el._ev);
+  el._ev=e=>{
+    // Like post
+    const lk=e.target.closest('[id^="lk-"]');
+    if(lk){const p=data.find(x=>x.id===lk.id.slice(3));if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;lk.classList.toggle('liked',p.liked);lk.innerHTML=`<i class="${p.liked?'fas':'far'} fa-heart"></i> ${fmtN(p.likes)}`;return;}
+    // Toggle replies
+    const rc=e.target.closest('[id^="rc-"]');
+    if(rc){const pid=rc.id.slice(3);const p=data.find(x=>x.id===pid);if(!p)return;p.open=!p.open;const rw=document.getElementById('rep-'+pid);if(rw){rw.classList.toggle('open',p.open);rw.innerHTML=buildRepliesHtml(p);wireReply(pid,data);}return;}
+    // Like reply
+    const rl=e.target.closest('.rep-act[data-rid]');
+    if(rl&&rl.dataset.rid){const p=data.find(x=>x.id===rl.dataset.pid);if(!p)return;const r=p.replies.find(x=>x.id===rl.dataset.rid);if(!r)return;r.liked=!r.liked;r.likes+=r.liked?1:-1;rl.classList.toggle('liked',r.liked);rl.innerHTML=`<i class="${r.liked?'fas':'far'} fa-heart"></i> ${fmtN(r.likes)}`;return;}
+    // Vote poll
+    const po=e.target.closest('.poll-opt:not(.closed)[data-pid]');
+    if(po){const p=data.find(x=>x.id===po.dataset.pid);if(!p||!p.poll||p.poll.voted>=0)return;const oi=+po.dataset.oi;p.poll.opts[oi].v++;p.poll.voted=oi;activeTab==='anon'?renderAnon():renderForum();toast('✅ Voted!');return;}
+    // Send reply
+    const rs=e.target.closest('[id^="rs-"]');
+    if(rs){const pid=rs.id.slice(3);const inp=document.getElementById('ri-'+pid);if(!inp)return;const txt=inp.value.trim();if(!txt)return;const p=data.find(x=>x.id===pid);if(!p)return;p.replies.push({id:'r_'+Date.now(),anon:false,name:'You',avatar:null,isWriter:false,text:txt,ts:Date.now(),likes:0,liked:false});p.open=true;activeTab==='anon'?renderAnon():renderForum();toast('💬 Reply posted!');return;}
+  };
+  el.addEventListener('click',el._ev);
+  setTimeout(()=>{data.forEach(p=>{const i=document.getElementById('ri-'+p.id),s=document.getElementById('rs-'+p.id);if(i&&s)i.oninput=()=>{s.disabled=i.value.trim().length===0;};});},50);
+}
+
+function wireReply(pid,data){const i=document.getElementById('ri-'+pid),s=document.getElementById('rs-'+pid);if(i&&s)i.oninput=()=>{s.disabled=i.value.trim().length===0;};}
+
+/* ── AMA ── */
+function renderAma(){
+  const live=AMA_WRITERS.find(w=>w.live);
+  const hero=document.getElementById('liveAmaHero');
+  const progStrip=document.getElementById('amaProgStrip');
+
+  if(live){
+    progStrip.style.display='flex';
+    hero.innerHTML=`
+      <div class="lah-header">
+        <div class="lah-av">
+          <img src="${live.avatar}" loading="lazy" alt=""/>
+          <div class="lah-live-badge">LIVE</div>
+        </div>
+        <div class="lah-info">
+          <div class="lah-name">${live.name} <span class="lah-badge">Live AMA</span></div>
+          <div class="lah-meta">
+            <i class="fas fa-eye" style="font-size:9px"></i>${fmtN(live.viewers)} watching
+            <div class="lah-dot"></div>
+            <i class="fas fa-question-circle" style="font-size:9px"></i>${live.qAnswered} answered
+            <div class="lah-dot"></div>
+            ${live.genre}
+          </div>
+        </div>
+        <button class="lah-join" onclick="openAmaModal('${live.id}')">Ask →</button>
+      </div>
+      <div class="lah-story">
+        <div class="lah-story-label">From the series</div>
+        <div class="lah-story-row">
+          <div class="lah-story-thumb" style="background-image:url('${live.storyCover}')"></div>
+          <div>
+            <div class="lah-story-title">${live.storyTitle}</div>
+            <div class="lah-story-sub">by @${live.name} · ${live.genre}</div>
+          </div>
+        </div>
+      </div>
+      <div class="lah-cta-row">
+        <div class="lah-cta-btn primary" onclick="openAmaModal('${live.id}')">
+          <i class="fas fa-microphone" style="font-size:11px"></i> Ask a Question
+        </div>
+        <div class="lah-cta-btn secondary" onclick="toast('🔔 You\'ll be notified when session ends')">
+          <i class="fas fa-bell" style="font-size:11px"></i> Notify Me
+        </div>
+      </div>`;
+    renderAmaThread(live);
+  } else {
+    hero.style.display='none';
+    progStrip.style.display='none';
+  }
+
+  // Upcoming
+  const upcoming=AMA_WRITERS.filter(w=>!w.live);
+  document.getElementById('amaCardsScroll').innerHTML=upcoming.map(w=>`
+    <div class="ama-card" onclick="openAmaModal('${w.id}')">
+      <div class="ama-card-cover" style="background-image:url('${w.storyCover}')">
+        <div class="ama-card-cover-scrim"></div>
+        <div class="ama-card-when">${w.starts}</div>
+      </div>
+      <div class="ama-card-body">
+        <div class="ama-card-writer-row">
+          <img class="ama-card-av" src="${w.avatar}" loading="lazy"/>
+          <span class="ama-card-name">@${w.name}</span>
+        </div>
+        <div class="ama-card-story">${w.storyTitle}</div>
+        <div class="ama-card-meta">
+          <i class="fas fa-users" style="font-size:8px"></i>${fmtN(w.viewers)} interested
+          <span style="color:var(--bd)">·</span>
+          ${w.genre}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAmaThread(w){
+  const wrap=document.getElementById('amaThreadWrap');
+  const answered=w.qa.filter(q=>!q.pending);
+  const pending=w.qa.filter(q=>q.pending);
+
+  const qaHtml=answered.map(q=>{
+    const av=q.anon||!q.avatar
+      ?`<div class="ama-q-av">👻</div>`
+      :`<div class="ama-q-av"><img src="${q.avatar}" loading="lazy" alt=""/></div>`;
+    return`<div class="ama-qa-item">
+      <div class="ama-q-row">${av}<div class="ama-q-text">${q.q}</div></div>
+      ${q.a?`
+        <div class="ama-a-row">
+          <div class="ama-a-text">${q.a}</div>
+          <div class="ama-a-writer"><i class="fas fa-pen-nib" style="font-size:9px"></i> <span>${w.name}</span> · ${q.aTime}</div>
+        </div>
+        <div class="ama-qa-acts">
+          <span class="ama-qa-act${q.liked?' liked':''}" data-qid="${q.id}"><i class="${q.liked?'fas':'far'} fa-heart"></i> ${fmtN(q.likes)}</span>
+          <span class="ama-qa-act" onclick="toast('↩️ Reply')"><i class="fas fa-reply"></i> Reply</span>
+        </div>`:''}
+    </div>`;
+  }).join('');
+
+  const pendingHtml=pending.length
+    ?`<div class="ama-pending"><i class="fas fa-clock" style="font-size:11px;color:var(--muted)"></i> ${pending.length} question${pending.length>1?'s':''} waiting to be answered by ${w.name}…</div>`
+    :'';
+
+  wrap.innerHTML=`<div class="ama-thread">
+    <div class="ama-thread-head">
+      <img class="ath-av" src="${w.avatar}" loading="lazy" alt=""/>
+      <div class="ath-info">
+        <div class="ath-name">@${w.name}</div>
+        <div class="ath-sub">
+          <span class="live-pill"><span class="live-dot"></span>Live now</span>
+          &nbsp;${answered.length} answered
+        </div>
+      </div>
+      <button class="ath-ask-btn" onclick="openAmaModal('${w.id}')">Ask →</button>
+    </div>
+    <div class="ama-qa-list">${qaHtml}${pendingHtml}</div>
+    <div class="ama-inp-row">
+      <input class="ama-inp" id="amaInp" placeholder="Ask ${w.name} anything…"/>
+      <button class="ama-send" id="amaSend" disabled><i class="fas fa-paper-plane" style="font-size:11px"></i></button>
+    </div>
+  </div>`;
+
+  const inp=document.getElementById('amaInp');
+  const send=document.getElementById('amaSend');
+  if(inp&&send){
+    inp.oninput=()=>{send.disabled=inp.value.trim().length<3;};
+    send.addEventListener('click',()=>{
+      const q=inp.value.trim();if(!q)return;
+      w.qa.push({id:'q_'+Date.now(),anon:false,name:'You',avatar:null,q,a:null,aTime:null,likes:0,liked:false,pending:true});
+      w.qAnswered++;inp.value='';send.disabled=true;renderAmaThread(w);toast('✅ Question submitted!');
+    });
+  }
+  wrap.querySelectorAll('.ama-qa-act[data-qid]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const q=w.qa.find(x=>x.id===btn.dataset.qid);if(!q)return;
+      q.liked=!q.liked;q.likes+=q.liked?1:-1;
+      btn.classList.toggle('liked',q.liked);
+      btn.innerHTML=`<i class="${q.liked?'fas':'far'} fa-heart"></i> ${fmtN(q.likes)}`;
+    });
+  });
+}
+
+/* ── AMA MODAL ── */
+let _amaTarget=null;
+function openAmaModal(wid){
+  const w=AMA_WRITERS.find(x=>x.id===wid);if(!w)return;
+  _amaTarget=w;
+  document.getElementById('amaModalTitle').textContent=`Ask @${w.name}`;
+  document.getElementById('amaModalWriter').innerHTML=`
+    <img class="modal-writer-av" src="${w.avatar}" loading="lazy" alt=""/>
+    <div>
+      <div class="modal-writer-name">@${w.name}</div>
+      <div class="modal-writer-sub">${w.genre} · ${w.live?'🟢 Live now':w.starts}</div>
+    </div>`;
+  document.getElementById('amaModalTa').value='';
+  document.getElementById('amaModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('amaModalTa').focus(),200);
+}
+function closeAmaModal(){document.getElementById('amaModal').classList.remove('open');document.body.style.overflow='';}
+document.getElementById('amaModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAmaModal();});
+function submitAmaQ(){
+  const q=document.getElementById('amaModalTa').value.trim();
+  if(!q||!_amaTarget){toast('✍️ Write your question first!');return;}
+  const anon=document.getElementById('amaModalAnon').checked;
+  _amaTarget.qa.push({id:'q_'+Date.now(),anon,name:anon?null:'You',avatar:null,q,a:null,aTime:null,likes:0,liked:false,pending:true});
+  _amaTarget.qAnswered++;
+  closeAmaModal();
+  if(activeTab==='ama')renderAmaThread(_amaTarget);
+  toast(`✅ Sent to @${_amaTarget.name}!`);
+}
+
+/* ── TRENDING ── */
+function renderTrending(){
+  document.getElementById('trendList').innerHTML=TRENDS.map(t=>`
+    <div class="trend-row" onclick="toast('🔍 ${t.tag}')">
+      <div class="trend-num">${t.n}</div>
+      <div class="trend-info">
+        <div class="trend-tag">${t.tag}</div>
+        <div class="trend-sub">${t.sub}</div>
+      </div>
+      <div class="trend-ct">${t.ct}</div>
+    </div>`).join('');
+  const top=[...FORUM,...ANON].sort((a,b)=>b.likes-a.likes).slice(0,4);
+  const all=[...FORUM,...ANON];
+  document.getElementById('trendPosts').innerHTML=top.map(p=>buildPost(p,all)).join('');
+  wireList('trendPosts',all);
+}
+
+/* ── INIT ── */
+renderForum();
+</script>
+</body>
+</html>
