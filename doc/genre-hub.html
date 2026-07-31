@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard — Genre Communities</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;--glow:rgba(255,0,80,.25);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx-high:#f0f0f0;--tx-body:#a8b0ba;--tx-muted:#71717a;--tx-faint:#3f3f46;--tx-title:#dedede;
+  --up:#ff4500;--down:#7193ff;--gold:#fbbf24;--purple:#a78bfa;--blue:#38bdf8;--green:#34d399;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 14px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* ══ TOP BAR ══ */
+.top-bar{position:sticky;top:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:calc(var(--safe-t) + 10px) 14px 10px;display:flex;align-items:center;gap:10px}
+.back-btn{width:34px;height:34px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx-muted);cursor:pointer;flex-shrink:0;transition:.15s}
+.back-btn:active{background:rgba(255,0,80,.12);color:var(--acc2)}
+.back-btn.hidden{visibility:hidden;pointer-events:none}
+.tb-title{flex:1;min-width:0;font-family:'Playfair Display',serif;font-size:14.5px;font-weight:800;color:var(--tx-high);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-icon{width:34px;height:34px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx-muted);cursor:pointer;flex-shrink:0}
+.top-icon:active{background:rgba(255,0,80,.12);color:var(--acc2)}
+
+/* ══════════════════════════════════════════════
+   STEP 1 — GENRE SELECTION SCREEN
+   ══════════════════════════════════════════════ */
+#screenSelect{display:block}
+#screenHub{display:none}
+.select-intro{padding:16px 16px 2px}
+.select-eyebrow{font-size:9px;font-weight:800;color:var(--acc2);text-transform:uppercase;letter-spacing:.13em;display:flex;align-items:center;gap:6px}
+.select-h1{font-family:'Playfair Display',serif;font-size:23px;font-weight:900;color:var(--tx-high);margin-top:6px;line-height:1.15}
+.select-p{font-size:11.5px;color:var(--tx-muted);margin-top:6px;line-height:1.55;max-width:340px}
+.genre-grid{padding:16px 14px 24px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.genre-card{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:1/1.02;cursor:pointer;border:1px solid var(--bd);background:var(--l2);transition:transform .15s}
+.genre-card:active{transform:scale(.96)}
+.genre-card-bg{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;opacity:.9}
+.genre-card-bg div{background-size:cover;background-position:center}
+.genre-card-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.94) 100%)}
+.genre-card-top{position:absolute;top:9px;left:9px;right:9px;display:flex;justify-content:space-between;align-items:flex-start;z-index:2}
+.genre-card-emoji{width:34px;height:34px;border-radius:10px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:16px}
+.genre-card-body{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:11px}
+.genre-card-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#fff;line-height:1.15}
+.genre-card-tag{font-size:9.5px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.genre-card-stats{display:flex;gap:9px;margin-top:7px}
+.genre-card-stat{font-size:8.5px;font-weight:700;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:3px}
+.genre-card-stat i{font-size:7.5px;color:var(--acc2)}
+
+/* ══ COMMUNITY HEADER ══ */
+.comm-header{padding:14px 14px 12px;border-bottom:1px solid var(--bd)}
+.comm-top{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.comm-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--l2);border:1.5px solid var(--bd);flex-shrink:0}
+.comm-name-block{flex:1;min-width:0}
+.comm-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;line-height:1.15;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.comm-official{font-size:7.5px;font-weight:800;color:var(--acc3);background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);padding:2px 7px;border-radius:8px;letter-spacing:.05em;text-transform:uppercase}
+.comm-sub{font-size:10.5px;color:var(--tx-faint);margin-top:2px}
+.comm-desc{font-size:12px;color:var(--tx-body);line-height:1.55;margin-bottom:11px}
+.comm-stats{display:flex;gap:16px;margin-bottom:11px;flex-wrap:wrap}
+.comm-stat{display:flex;flex-direction:column;gap:0}
+.comm-stat b{font-size:13.5px;font-weight:800;color:var(--tx-high)}
+.comm-stat span{font-size:8.5px;color:var(--tx-faint);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.comm-stat.trend b{color:var(--green);display:flex;align-items:center;gap:4px}
+.comm-stat.trend b i{font-size:11px}
+.comm-acts{display:flex;gap:8px}
+.comm-follow-btn{flex:1;background:var(--acc);color:#fff;border:none;padding:9px;border-radius:11px;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 3px 14px var(--glow-sm)}
+.comm-follow-btn.on{background:rgba(255,255,255,.08);border:1.5px solid var(--bd);box-shadow:none;color:#fff}
+.comm-post-btn{background:rgba(255,255,255,.07);border:1.5px solid var(--bd);color:#fff;padding:9px 16px;border-radius:11px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+
+/* ══ SORT + FILTER BAR ══ */
+.control-bar{position:sticky;top:54px;z-index:180;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:9px 0}
+.sort-row{display:flex;gap:6px;padding:0 14px 8px;overflow-x:auto;scrollbar-width:none}
+.sort-row::-webkit-scrollbar{display:none}
+.sort-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:16px;font-size:11px;font-weight:700;border:1.5px solid var(--bd);background:transparent;color:var(--tx-muted);cursor:pointer}
+.sort-btn.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.filter-row{display:flex;gap:6px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{flex-shrink:0;padding:5px 11px;border-radius:14px;font-size:10.5px;font-weight:700;border:1px solid var(--bd);background:var(--l2);color:var(--tx-faint);cursor:pointer;white-space:nowrap}
+.filter-chip.on{background:var(--l4);color:var(--tx-high);border-color:var(--tx-faint)}
+
+/* ══ FEED ══ */
+.feed-wrap{padding:10px 0 4px}
+.note-strip{margin:0 14px 12px;padding:9px 12px;background:rgba(255,0,80,.05);border:1px solid var(--bd-acc);border-radius:11px;font-size:10.5px;color:var(--acc3);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.note-strip i{font-size:11px;margin-top:1px;flex-shrink:0}
+
+/* ══ PROMOTED / FEATURED CAROUSEL (now inline in-feed, not top-pinned) ══ */
+.promo-wrap{margin:4px 0 16px;padding-top:10px;border-top:1px solid var(--bd2)}
+.promo-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-bottom:9px}
+.promo-title{font-size:11.5px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:6px}
+.promo-title i{font-size:11px;color:var(--gold)}
+.promo-sub{font-size:9.5px;color:var(--tx-faint);margin-top:1px}
+.promo-scroll{display:flex;gap:10px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.promo-scroll::-webkit-scrollbar{display:none}
+.promo-card{flex-shrink:0;width:128px;cursor:pointer}
+.promo-cover{position:relative;width:128px;height:170px;border-radius:12px;overflow:hidden;background:var(--l2);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.promo-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.promo-cover-scrim{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(0deg,rgba(0,0,0,.9),transparent)}
+.promo-tag{position:absolute;top:7px;left:7px;font-size:7.5px;font-weight:900;padding:3px 8px;border-radius:8px;letter-spacing:.04em;text-transform:uppercase;z-index:2}
+.ptag-promoted{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#1a1200}
+.ptag-trending{background:var(--acc);color:#fff}
+.ptag-new{background:#3b0764;color:#d8b4fe}
+.promo-title-txt{font-size:11px;font-weight:700;color:var(--tx-title);line-height:1.32;margin-top:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.promo-author{font-size:9px;color:var(--tx-faint);margin-top:2px}
+.promo-sponsor{font-size:7.5px;color:var(--gold);margin-top:3px;display:flex;align-items:center;gap:3px;font-weight:700}
+
+/* ══ REDDIT-STYLE POST CARD ══ */
+.rpost{display:flex;gap:0;border-bottom:1px solid var(--bd2);padding:11px 14px;animation:fadeUp .2s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.rpost:active{background:rgba(255,255,255,.015)}
+.vote-col{display:flex;flex-direction:column;align-items:center;gap:2px;width:30px;flex-shrink:0;padding-top:2px}
+.vote-btn{width:24px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--tx-faint);cursor:pointer;font-size:13px;transition:.15s}
+.vote-btn:active{background:rgba(255,255,255,.06)}
+.vote-btn.up.on{color:var(--up)}
+.vote-btn.down.on{color:var(--down)}
+.vote-score{font-size:11.5px;font-weight:800;color:var(--tx-body)}
+.post-col{flex:1;min-width:0;padding-left:11px}
+.post-meta-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.post-av-wrap{position:relative;width:24px;height:24px;flex-shrink:0}
+.post-av{width:24px;height:24px;border-radius:50%;object-fit:cover;display:block;cursor:pointer}
+.post-av-init{width:24px;height:24px;border-radius:50%;background:rgba(255,0,80,.14);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:var(--acc2)}
+.post-av-wrap.has-status .post-av{border:2px solid var(--acc);padding:1px;box-shadow:0 0 0 1px var(--bg)}
+.post-type-tag{font-size:8px;font-weight:900;padding:2px 8px;border-radius:7px;letter-spacing:.04em;text-transform:uppercase;flex-shrink:0}
+.tag-discussion{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.tag-question{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.tag-review{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.tag-recommendation{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+.tag-poll{background:rgba(255,0,80,.08);color:var(--acc3);border:1px solid var(--bd-acc)}
+.tag-reader-post{background:rgba(255,255,255,.05);color:var(--tx-muted);border:1px solid var(--bd)}
+.post-author-row{font-size:10.5px;color:var(--tx-faint);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.post-author-row b{color:var(--tx-body);font-weight:700;cursor:pointer}
+.post-author-row .anon-badge{font-size:7.5px;font-weight:800;background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--tx-muted);padding:1px 6px;border-radius:6px}
+.post-title{font-size:14px;font-weight:700;color:var(--tx-high);line-height:1.38;margin-bottom:5px}
+.post-body{font-size:12.5px;color:var(--tx-body);line-height:1.58;margin-bottom:8px}
+.post-body.trunc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.rating-row{display:flex;align-items:center;gap:2px;margin-bottom:7px}
+.rating-row i{font-size:11px;color:var(--tx-faint)}
+.rating-row i.on{color:var(--gold)}
+.rating-row span{font-size:10.5px;font-weight:700;color:var(--gold);margin-left:5px}
+
+/* ══ STORY REFERENCE CHIP (only rendered when a post actually references a story) ══ */
+.storyref-row{display:flex;flex-direction:column;gap:6px;margin-bottom:9px}
+.storyref-lbl{font-size:8.5px;font-weight:800;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:4px}
+.storyref-chip{display:flex;align-items:center;gap:9px;background:var(--l2);border:1px solid var(--bd);border-radius:11px;padding:7px 9px;cursor:pointer;transition:border-color .15s}
+.storyref-chip:active{border-color:var(--bd-acc)}
+.storyref-thumb{width:30px;height:38px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.storyref-body{flex:1;min-width:0}
+.storyref-title{font-size:10.5px;font-weight:700;color:var(--tx-title);line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.storyref-writer{font-size:9px;color:var(--tx-faint);margin-top:1px}
+.storyref-arrow{font-size:10px;color:var(--acc3);flex-shrink:0}
+.storyref-multi{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.storyref-multi::-webkit-scrollbar{display:none}
+.storyref-multi .storyref-chip{flex-shrink:0;width:150px}
+
+/* ══ POLL ══ */
+.post-poll{margin-bottom:9px}
+.poll-opt{position:relative;border-radius:9px;padding:8px 10px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);margin-bottom:5px;cursor:pointer;overflow:hidden}
+.poll-opt.voted{border-color:var(--acc)}
+.poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.08);z-index:0}
+.poll-row{position:relative;z-index:1;display:flex;justify-content:space-between;gap:6px}
+.poll-txt{font-size:11.5px;font-weight:600;color:var(--tx-body)}
+.poll-pct{font-size:10.5px;font-weight:800;color:var(--acc)}
+.poll-meta{font-size:9px;color:var(--tx-faint);margin-top:3px}
+
+/* ══ FOOTER ══ */
+.post-footer{display:flex;align-items:center;gap:14px}
+.pf-act{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--tx-faint);cursor:pointer}
+.pf-act i{font-size:12.5px}
+.pf-act.saved{color:var(--acc2)}
+
+/* ══ EMPTY ══ */
+.empty-state{text-align:center;padding:44px 24px;color:var(--tx-muted)}
+.empty-state i{font-size:30px;margin-bottom:10px;display:block;color:var(--tx-faint)}
+.empty-state p{font-size:12px;line-height:1.55;max-width:230px;margin:0 auto}
+
+/* ══ COMPOSER ══ */
+.composer-bg{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.composer-bg.open{display:flex}
+.composer-sheet{width:100%;max-width:480px;background:var(--l1);border-radius:18px 18px 0 0;animation:slideUp .28s ease;padding-bottom:max(18px,env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto;scrollbar-width:none}
+.composer-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cmp-handle{width:32px;height:3px;background:rgba(255,255,255,.12);border-radius:3px;margin:10px auto 0}
+.cmp-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 10px}
+.cmp-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high)}
+.cmp-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--tx-muted)}
+.cmp-type-row{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.cmp-type-row::-webkit-scrollbar{display:none}
+.cmp-type-btn{flex-shrink:0;font-size:10.5px;font-weight:700;padding:6px 13px;border-radius:16px;border:1.5px solid var(--bd);background:var(--l2);color:var(--tx-muted);cursor:pointer;white-space:nowrap}
+.cmp-type-btn.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.cmp-field-lbl{font-size:9.5px;font-weight:800;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.06em;margin:0 16px 6px}
+.cmp-story-search{margin:0 16px 12px;position:relative}
+.cmp-story-search input{width:100%;background:var(--l2);border:1px solid var(--bd);border-radius:11px;padding:10px 12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none}
+.cmp-story-results{margin:0 16px 12px;display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto}
+.cmp-story-result-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;background:var(--l2);border:1px solid var(--bd);cursor:pointer}
+.cmp-story-result-item img{width:24px;height:30px;border-radius:5px;object-fit:cover;flex-shrink:0}
+.cmp-story-result-item span{font-size:11px;color:var(--tx-body);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp-selected-story{margin:0 16px 12px;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);border-radius:11px}
+.cmp-selected-story img{width:28px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.cmp-selected-story span{font-size:11.5px;color:var(--tx-title);flex:1;font-weight:600}
+.cmp-selected-story .rm{color:var(--tx-faint);cursor:pointer;font-size:12px}
+.cmp-box{margin:0 16px 12px}
+.cmp-box textarea{width:100%;background:var(--l2);border:1px solid var(--bd);border-radius:12px;padding:12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;min-height:80px;line-height:1.5}
+.cmp-box textarea::placeholder{color:var(--tx-faint)}
+.cmp-post-btn{display:block;width:calc(100% - 32px);margin:0 16px;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 0 16px var(--glow-sm)}
+
+/* ══ FAB / NAV / TOAST ══ */
+.fab{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);right:16px;z-index:150;width:52px;height:52px;border-radius:50%;background:var(--acc);border:none;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;cursor:pointer;box-shadow:0 4px 22px var(--glow)}
+.fab:active{transform:scale(.92)}
+.fab.hidden{display:none}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px}
+.bn-item.active{color:var(--acc)}
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="back-btn hidden" id="backBtn"><i class="fas fa-arrow-left"></i></div>
+  <div class="tb-title" id="tbTitle">Genre Communities</div>
+  <div class="top-icon" onclick="toast('🔍 Search')"><i class="fas fa-magnifying-glass"></i></div>
+</div>
+
+<!-- ═══ STEP 1: GENRE SELECTION ═══ -->
+<div id="screenSelect">
+  <div class="select-intro">
+    <div class="select-eyebrow"><i class="fas fa-layer-group"></i> Step 1 of 2 · One official community per genre</div>
+    <div class="select-h1">Choose a community</div>
+    <div class="select-p">Every genre on Droboard has exactly one system-created community — every discussion, review, question and poll about that genre lives here, in one place.</div>
+  </div>
+  <div class="genre-grid" id="genreGrid"></div>
+</div>
+
+<!-- ═══ STEP 2: SINGLE HUB ═══ -->
+<div id="screenHub">
+  <div class="comm-header" id="commHeader"></div>
+  <div class="control-bar">
+    <div class="sort-row" id="sortRow"></div>
+    <div class="filter-row" id="filterRow"></div>
+  </div>
+  <div class="feed-wrap">
+    <div class="note-strip"><i class="fas fa-circle-info"></i><span>This is a discussion hub. Talk about a specific story, ask a general question, share a recommendation, or just start a conversation — a story attachment is optional.</span></div>
+    <div id="feedList"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item active" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- FAB -->
+<button class="fab hidden" id="fabBtn"><i class="fas fa-pen"></i></button>
+
+<!-- COMPOSER -->
+<div class="composer-bg" id="cmpBg">
+  <div class="composer-sheet">
+    <div class="cmp-handle"></div>
+    <div class="cmp-hdr"><h3 id="cmpHdrTitle">New Post</h3><button class="cmp-close" onclick="closeComposer()">✕</button></div>
+    <div class="cmp-type-row" id="cmpTypeRow"></div>
+    <div class="cmp-field-lbl">Attach a story <span style="color:var(--tx-faint);text-transform:none;font-weight:600">(optional — leave blank for a general post or question)</span></div>
+    <div class="cmp-story-search" id="cmpStorySearchWrap">
+      <input type="text" id="cmpStorySearch" placeholder="Search stories in this genre…" autocomplete="off"/>
+    </div>
+    <div class="cmp-story-results" id="cmpStoryResults"></div>
+    <div class="cmp-selected-story" id="cmpSelectedStory" style="display:none"></div>
+    <div class="cmp-box"><textarea id="cmpText" placeholder="What do you want to say?"></textarea></div>
+    <button class="cmp-post-btn" onclick="submitComposer()">Post to Community →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Reusable components — do not inline these, they're already built -->
+<script src="components/status-viewer.js"></script>
+<script src="components/share-modal.js"></script>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   REDDIT-STYLE GENRE COMMUNITY — two-step flow
+   Step 1: pick a genre. Step 2: that genre's single community
+   feed opens (no switcher inside — go back to change genres).
+
+   This is a discussion hub, not just a story-promotion feed:
+   posts can be normal discussions, questions, or recommendations
+   with NO story attached — a story reference is optional, not
+   required. The "Featured Releases" carousel is not shown up
+   front; it's spliced into the feed itself, appearing only once
+   a reader has scrolled past ~10 posts (or after all posts, in
+   hubs that don't have 10 yet), so it never competes with the
+   actual discussion for first-scroll attention.
+
+   Avatars with an accent ring have an active status — tap to
+   view it via the existing openStatusViewer() component.
+   ════════════════════════════════════════════════════════ */
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2300);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+const COVERS={
+  wife3:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', wife2:'https://i.postimg.cc/vDn9YLx5/wife2.jpg', wife:'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+  img2:'https://i.postimg.cc/23WvkFLH/images-(2).jpg', img8:'https://i.postimg.cc/cgLZJNmC/8.jpg', img7:'https://i.postimg.cc/0MyxNqfz/7.jpg',
+  n6:'https://i.postimg.cc/WF1j4Pnh/6.jpg', n5:'https://i.postimg.cc/N9jY0w4m/5.jpg', n4:'https://i.postimg.cc/DJwFzKgd/4.jpg',
+  n3:'https://i.postimg.cc/ftRZbhKx/3.jpg', n2:'https://i.postimg.cc/JDzmhWqj/2.jpg', n1:'https://i.postimg.cc/YGCkSw-33/1.jpg',
+  wolf3:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', wolf2:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg', wolf:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',
+  imgt:'https://i.postimg.cc/tY7KnJyr/images.jpg',
+};
+const AV=n=>`https://i.pravatar.cc/100?img=${n}`;
+
+/* Writers who currently have an active status. Rendered with an accent
+   ring on their avatar anywhere they post; tapping it opens the viewer. */
+function statusEntry(id,name,avatar,bg,quote,caption,time,likes,threads){
+  return {id,name,avatar,ring:'ring-has',likes,threads,statuses:[{bg,quote,caption,time}]};
+}
+
+const HUBS={
+  romance:{
+    emoji:'❤️',name:'Romance',
+    tagline:'Every heartbreak, reunion and "finally" moment — discussed here.',
+    stats:{members:'128k',trend:'+18%',postsToday:412},
+    stories:[
+      {id:'r1',cover:COVERS.wife2,title:"I came home early and caught my husband kissing my late sister's photograph",writer:'Ada_Writes'},
+      {id:'r2',cover:COVERS.wife3,title:"The runaway bride — I left at the altar in my socked feet",writer:'Ifeanyi_Story'},
+      {id:'r3',cover:COVERS.img2,title:"The letter he never sent, folded in his jacket pocket",writer:'Efe_O'},
+      {id:'r4',cover:COVERS.wife,title:"My grandmother's will revealed I wasn't her blood",writer:'Chiamaka_N'},
+      {id:'r5',cover:COVERS.n1,title:"She rejected me 3 times, now we share a mortgage",writer:'Dami_Cole'},
+      {id:'r6',cover:COVERS.n2,title:"He proposed with my best friend's ring",writer:'Kemi_A'},
+    ],
+    promoted:[
+      {img:COVERS.n1,title:"She rejected me 3 times, now we share a mortgage",author:'Dami_Cole',tag:'promoted'},
+      {img:COVERS.wife3,title:'The runaway bride',author:'Ifeanyi_Story',tag:'trending'},
+      {img:COVERS.n2,title:"He proposed with my best friend's ring",author:'Kemi_A',tag:'new'},
+      {img:COVERS.wife,title:"My grandmother's will",author:'Chiamaka_N',tag:'trending'},
+    ],
+    statuses:[
+      statusEntry('ada_writes','Ada_Writes',AV(32),COVERS.wife2,'"Some truths take three years to say out loud."','New chapter posting tonight',' 2h ago',1240,58),
+      statusEntry('efe_o','Efe_O',AV(22),COVERS.img2,'"He never sent it. He just kept writing it."','Behind the scenes of ch. 6','5h ago',2310,41),
+      statusEntry('ifeanyi_story','Ifeanyi_Story',AV(53),COVERS.wife3,'"Socked feet, no ring, no regrets."','Runaway Bride hits 300k reads 🎉','9h ago',980,29),
+    ],
+    posts:[
+      {type:'discussion',author:'Segun_A',avatar:AV(52),time:'1h ago',timeH:1,title:'Is Ada\'s husband more sympathetic than we\'re giving him credit for?',body:"I know everyone's dragging him in the comments but grief does strange things to people. Still wrong to hide it for three years — but I get why he couldn't say it out loud. Curious if I'm alone here.",storyIds:['r1'],score:214,comments:87},
+      {type:'question',author:'Ijeoma_K',avatar:AV(63),time:'1h ago',timeH:1,title:'How do you deal with a fictional character living rent-free in your head?',body:"Genuinely not about any one story. I finished a romance three days ago and I'm still thinking about the ending during meetings. Does this pass for anyone else, or should I just accept this is my life now?",storyIds:[],score:98,comments:45},
+      {type:'discussion',author:'Chidera_M',avatar:AV(56),time:'2h ago',timeH:2,title:'Rank the top 3 endings in this hub right now',body:"Genuinely curious what the hub's consensus is. My personal top 3: the bakery epilogue in Runaway Bride, the postscript in The Letter, and whatever is about to happen in Grandmother's Will (still reading).",storyIds:['r2','r3','r4'],score:187,comments:64},
+      {type:'review',author:'Chioma_R',avatar:AV(47),time:'3h ago',timeH:3,title:'"The Letter He Never Sent" ruined my whole week (affectionately)',body:"Efe_O writes grief the way it actually feels — slow, then all at once. The postscript in the final scene undid me completely. Five stars, bring tissues, clear your evening before you start chapter 6.",rating:5,storyIds:['r3'],score:412,comments:58},
+      {type:'poll',author:'Droboard Romance',avatar:null,time:'5h ago',timeH:5,title:'Should Season 2 of "I Came Home Early" continue past the therapy arc?',body:'',storyIds:['r1'],poll:{opts:[{t:'Yes — I need resolution',v:4210},{t:'No — end it there, it\'s perfect',v:1560}]},score:892,comments:203},
+      {type:'discussion',author:'Efe_O',avatar:AV(22),time:'6h ago',timeH:6,title:'Writer here — how much of the postscript reaction did you see coming?',body:"Genuinely didn't expect that many readers to catch the timeline clue in chapter 3. Curious how many of you reread once you hit the ending versus how many were fully blindsided.",storyIds:['r3'],score:301,comments:112},
+      {type:'recommendation',author:'Tobenna_K',avatar:AV(19),time:'8h ago',timeH:8,title:'If Runaway Bride broke you, these two hit the same nerve',body:"Just finished Runaway Bride for the third time and went looking for something with the same 'walked away and never looked back' energy. Found two that scratch the same itch without feeling like a copy.",storyIds:['r5','r6'],score:298,comments:41},
+      {type:'discussion',author:'Faith_Ude',avatar:AV(38),time:'9h ago',timeH:9,title:'Do you prefer slow burn or instant chemistry? Using Grandmother\'s Will as the example',body:"This story takes almost 4 chapters before the romantic subplot even starts and I was NOT mad about it. Curious what the hub thinks makes a slow build feel earned vs. just slow.",storyIds:['r4'],score:167,comments:92},
+      {type:'discussion',author:'Ada_Writes',avatar:AV(32),time:'10h ago',timeH:10,title:'Should I let the husband explain himself, or leave it ambiguous forever?',body:"Writer here, genuinely torn on the next arc. Some readers want closure, some want the mystery to stay a wound that never fully heals. What actually makes for a better ending, in your experience reading this genre?",storyIds:['r1'],score:356,comments:178},
+      {type:'reader-post',author:'Anonymous',avatar:null,anon:true,time:'11h ago',timeH:11,title:'',body:"I've read The Letter He Never Sent twice now. My situationship of 8 months just ended and honestly this story explained my own feelings back to me better than I could. Thank you Efe_O, wherever you are.",storyIds:['r3'],score:892,comments:134},
+      {type:'question',author:'Blessing_O',avatar:AV(61),time:'12h ago',timeH:12,title:'General question: how do you all keep track of which writers you follow?',body:"Not story-specific — just curious if people use a saved list, a notes app, or just memory. I keep losing track of who I meant to check back in on.",storyIds:[],score:64,comments:38},
+      {type:'discussion',author:'Precious_A',avatar:AV(29),time:'13h ago',timeH:13,title:'Do side characters need their own arcs, or should they stay in the background?',body:"The best friend in She Rejected Me 3 Times is barely in the story and I kind of want more of her. Does anyone else notice themselves getting attached to characters who are clearly not the point?",storyIds:['r5'],score:143,comments:58},
+      {type:'review',author:'Blessing_O',avatar:AV(61),time:'1d ago',timeH:24,title:"Grandmother's Will started slow but the payoff is worth it",body:"First two chapters felt heavy on backstory, but once the will is read the story doesn't let go. The journal excerpts are the best part — genuinely emotional writing.",rating:4,storyIds:['r4'],score:156,comments:23},
+      {type:'discussion',author:'Nkem_Reads',avatar:AV(41),time:'1d ago',timeH:26,title:'Best romance writer on Droboard right now — make your case',body:"Ada_Writes, Ifeanyi_Story, or Efe_O? I need this argued properly in the comments, no cop-outs, pick one and defend it with an actual story example.",storyIds:['r1','r2','r3'],score:445,comments:145},
+      {type:'discussion',author:'Ifeanyi_Story',avatar:AV(53),time:'1d ago',timeH:28,title:'Writer AMA-style thread: ask me anything about the Runaway Bride ending',body:"A lot of you had strong feelings about the no-reconciliation ending. Happy to explain the reasoning behind any specific choice, drop your questions below.",storyIds:['r2'],score:512,comments:264},
+      {type:'recommendation',author:'Precious_A',avatar:AV(29),time:'2d ago',timeH:48,title:'Underrated: "She Rejected Me 3 Times" deserves way more reads',body:"Only has 96k reads compared to the top stories but the slow build over 8 chapters is honestly better paced than half the trending stuff. Dami_Cole doesn't get enough credit.",storyIds:['r5'],score:203,comments:34},
+    ],
+  },
+  werewolf:{
+    emoji:'🔥',name:'Werewolf',
+    tagline:'Fated mates, pack politics, and the debates only shifter readers understand.',
+    stats:{members:'71k',trend:'+11%',postsToday:203},
+    stories:[
+      {id:'w1',cover:COVERS.wolf,title:'Rejected by my fated mate, chosen by his rival alpha',writer:'Nneka_Moon'},
+      {id:'w2',cover:COVERS.wolf2,title:'The Luna trials: three packs, one crown',writer:'Yusuf_Howl'},
+      {id:'w3',cover:COVERS.wolf3,title:'He marked me before he ever said my name',writer:'Nneka_Moon'},
+      {id:'w4',cover:COVERS.n6,title:'Human girl, rogue pack, one very bad full moon',writer:'Ryan_Fang'},
+    ],
+    promoted:[
+      {img:COVERS.wolf2,title:'The Luna trials',author:'Yusuf_Howl',tag:'promoted'},
+      {img:COVERS.wolf,title:'Rejected by my fated mate',author:'Nneka_Moon',tag:'trending'},
+      {img:COVERS.n6,title:'Human girl, rogue pack',author:'Ryan_Fang',tag:'new'},
+    ],
+    statuses:[
+      statusEntry('yusuf_howl','Yusuf_Howl',AV(14),COVERS.wolf2,'"Three packs. One crown. No mercy."','Luna Trials finale drops Friday','3h ago',1560,73),
+      statusEntry('nneka_moon','Nneka_Moon',AV(50),COVERS.wolf,'"He rejected me. His rival didn\'t hesitate."','Writing the sequel now','7h ago',890,34),
+    ],
+    posts:[
+      {type:'discussion',author:'Ryan_Fang',avatar:AV(8),time:'2h ago',timeH:2,title:'Are mate-rejection arcs overused? Using "Rejected By My Fated Mate" as the test case',body:"As a writer in this hub I want honest reader feedback: does the rejection-then-redemption structure in Nneka's story still feel fresh to you, or is the trope exhausted at this point?",storyIds:['w1'],score:312,comments:167},
+      {type:'question',author:'Tunde_Reads',avatar:AV(58),time:'3h ago',timeH:3,title:'Is anyone else just here for pack politics and not the romance?',body:"Not about a specific story — I keep noticing I skim the mate-bond scenes and slow down for anything about pack hierarchy or territory disputes. Am I reading the wrong genre or is this normal here?",storyIds:[],score:87,comments:52},
+      {type:'discussion',author:'Amara_Wolf',avatar:AV(44),time:'4h ago',timeH:4,title:'Alpha vs Luna — who actually runs the pack in "He Marked Me Before My Name"?',body:"Genuinely curious which power dynamic readers here prefer. I've seen both done well but this story keeps it ambiguous longer than most.",storyIds:['w3'],score:145,comments:88},
+      {type:'review',author:'Blessing_O',avatar:AV(61),time:'5h ago',timeH:5,title:'The Luna Trials has the best pack politics I\'ve read on here',body:"Yusuf actually thought through the power structure instead of just throwing 'alpha' around. The trial arc genuinely had me anxious for the Luna the whole way through.",rating:5,storyIds:['w2'],score:203,comments:34},
+      {type:'poll',author:'Droboard Werewolf',avatar:null,time:'7h ago',timeH:7,title:'Alpha vs Luna — who actually runs the pack in "He Marked Me Before My Name"?',body:'',storyIds:['w3'],poll:{opts:[{t:'The Alpha, obviously',v:1680},{t:'The Luna, and the story proves it',v:2020}]},score:340,comments:88},
+      {type:'discussion',author:'Yusuf_Howl',avatar:AV(14),time:'8h ago',timeH:8,title:'Writer here — should the rival alpha survive the trials?',body:"No spoilers on what I've already written, but I'm genuinely undecided on the ending. Curious what the hub wants to see happen to him.",storyIds:['w2'],score:401,comments:196},
+      {type:'recommendation',author:'Amara_Wolf',avatar:AV(44),time:'10h ago',timeH:10,title:'New to werewolf romance? These two cover every major trope done right',body:"Mate bonds, pack rivalry, and a rogue redemption arc — between these two stories you get the full range of what this genre does best, no filler.",storyIds:['w1','w4'],score:178,comments:29},
+      {type:'discussion',author:'Chidera_M',avatar:AV(56),time:'13h ago',timeH:13,title:'Do you actually like when the human love interest gets turned into a wolf?',body:"Human Girl, Rogue Pack hasn't done this yet and I'm hoping it doesn't. Feels like it removes the whole point of the outsider perspective. Anyone else on this side?",storyIds:['w4'],score:122,comments:47},
+      {type:'reader-post',author:'Chidera_M',avatar:AV(56),time:'14h ago',timeH:14,title:'',body:"Not me setting an alarm for midnight every Friday because Yusuf drops Luna Trials chapters exactly then. This story has consumed my entire week. No regrets whatsoever.",storyIds:['w2'],score:401,comments:52},
+    ],
+  },
+  billionaire:{
+    emoji:'👑',name:'Billionaire',
+    tagline:'Boardrooms, arranged marriages, and who actually deserved the girl.',
+    stats:{members:'94k',trend:'+9%',postsToday:288},
+    stories:[
+      {id:'b1',cover:COVERS.n1,title:'I became his assistant. He didn\'t know I owned his rival company',writer:'Vivian_Cross'},
+      {id:'b2',cover:COVERS.n4,title:'Married for the merger, falling for the man behind the contract',writer:'Bode_Sterling'},
+      {id:'b3',cover:COVERS.n3,title:'The heir gave up the company. He kept the girl instead',writer:'Vivian_Cross'},
+      {id:'b4',cover:COVERS.img8,title:'My billionaire boss proposed in front of the board — as a business move',writer:'Sade_Vaughn'},
+    ],
+    promoted:[
+      {img:COVERS.n4,title:'Married for the merger',author:'Bode_Sterling',tag:'promoted'},
+      {img:COVERS.n1,title:'I became his assistant',author:'Vivian_Cross',tag:'trending'},
+      {img:COVERS.img8,title:'Proposed as a business move',author:'Sade_Vaughn',tag:'new'},
+    ],
+    statuses:[
+      statusEntry('vivian_cross','Vivian_Cross',AV(35),COVERS.n1,'"He never knew whose company he was really up against."','Chapter 9 out now','4h ago',1120,44),
+      statusEntry('bode_sterling','Bode_Sterling',AV(4),COVERS.n4,'"The prenup was never really about money."','Merger arc concludes this week','6h ago',870,31),
+    ],
+    posts:[
+      {type:'discussion',author:'Emeka_Reads',avatar:AV(15),time:'3h ago',timeH:3,title:'Do billionaire romances need the power imbalance to work? Case study: "I Became His Assistant"',body:"Every time this story gives the heroine equal or more leverage it somehow gets MORE tension, not less. Are the old power-imbalance tropes getting tired for anyone else?",storyIds:['b1'],score:278,comments:121},
+      {type:'question',author:'Zainab_K',avatar:AV(31),time:'4h ago',timeH:4,title:'Does anyone else only read billionaire romance for the workplace scenes?',body:"General question, not tied to one story — the boardroom scenes get me way more invested than the actual dates. Is that a common way to read this genre or am I just built different?",storyIds:[],score:71,comments:29},
+      {type:'discussion',author:'Vivian_Cross',avatar:AV(35),time:'4h ago',timeH:4,title:'Writer here — was the rival-company reveal too early or too late?',body:"Some readers wanted it in chapter 1, some wanted it held until the finale. I split it down the middle at chapter 9. Curious how the timing landed for you.",storyIds:['b1'],score:267,comments:132},
+      {type:'review',author:'Segun_A',avatar:AV(52),time:'6h ago',timeH:6,title:'Married For The Merger has the sharpest dialogue in this hub',body:"Bode writes boardroom tension like actual thriller pacing. The scene where she renegotiates the prenup herself is the best chapter posted this month, hands down.",rating:5,storyIds:['b2'],score:267,comments:39},
+      {type:'recommendation',author:'Sade_Vaughn',avatar:AV(24),time:'9h ago',timeH:9,title:'Power, contracts, and the people brave enough to renegotiate them',body:"If you liked the assistant reveal in Vivian's story, the merger contract renegotiation in Bode's story hits the exact same satisfying beat. Read them back to back.",storyIds:['b1','b2'],score:190,comments:22},
+      {type:'discussion',author:'Zainab_K',avatar:AV(31),time:'11h ago',timeH:11,title:'Arranged marriage vs slow-burn office romance — which do you prefer?',body:"Curious what the hub gravitates toward. Arranged marriage plots move faster but office slow-burns hit harder when they're done well, like Married For The Merger.",storyIds:['b2'],score:190,comments:76},
+      {type:'poll',author:'Droboard Billionaire',avatar:null,time:'1d ago',timeH:26,title:'"The Heir Gave Up The Company" — right call or wasted potential?',body:'',storyIds:['b3'],poll:{opts:[{t:'Right call — love over legacy',v:2870},{t:'Wasted potential, wanted the empire arc',v:1420}]},score:255,comments:64},
+      {type:'discussion',author:'Emeka_Reads',avatar:AV(15),time:'1d ago',timeH:30,title:'Was the board proposal in Sade\'s story romantic or manipulative?',body:"It's framed as sweeping and romantic but structurally he still used a business meeting to corner her into a yes in front of an audience. Anyone else conflicted about this one?",storyIds:['b4'],score:214,comments:97},
+    ],
+  },
+  fantasy:{
+    emoji:'🧙',name:'Fantasy',
+    tagline:'Magic systems, hidden kingdoms, and readers who will fact-check your worldbuilding.',
+    stats:{members:'52k',trend:'+14%',postsToday:154},
+    stories:[
+      {id:'f1',cover:COVERS.n5,title:'The last flamebearer of Ashenreach',writer:'Obi_Runeforge'},
+      {id:'f2',cover:COVERS.n2,title:'I failed the academy trials — the curse chose me anyway',writer:'Layla_Thorn'},
+      {id:'f3',cover:COVERS.wolf3,title:'Second son, forgotten prince, first to break the seal',writer:'Femi_Aldric'},
+    ],
+    promoted:[
+      {img:COVERS.n5,title:'The last flamebearer of Ashenreach',author:'Obi_Runeforge',tag:'promoted'},
+      {img:COVERS.n2,title:'I failed the academy trials',author:'Layla_Thorn',tag:'trending'},
+      {img:COVERS.wolf3,title:'Second son, forgotten prince',author:'Femi_Aldric',tag:'new'},
+    ],
+    statuses:[
+      statusEntry('obi_runeforge','Obi_Runeforge',AV(6),COVERS.n5,'"Every spell costs something. That\'s the whole point."','Map of Ashenreach posted in comments','5h ago',760,26),
+    ],
+    posts:[
+      {type:'review',author:'Nkem_Reads',avatar:AV(41),time:'5h ago',timeH:5,title:'Ashenreach has the most consistent magic system on the platform',body:"Obi actually respects the rules he set in chapter one. No convenient power-ups. The flame-cost mechanic makes every spell feel like it costs something real, every single time.",rating:5,storyIds:['f1'],score:221,comments:33},
+      {type:'question',author:'Kene_A',avatar:AV(37),time:'6h ago',timeH:6,title:'What actually makes a magic system "good" to you, generally speaking?',body:"Not about any single story — genuinely curious what the hub values most: internal consistency, cool visuals, clear costs, or something else entirely. Trying to figure out my own taste here.",storyIds:[],score:76,comments:41},
+      {type:'discussion',author:'Femi_Aldric',avatar:AV(9),time:'8h ago',timeH:8,title:'How much magic-system explanation is too much? Comparing Ashenreach and my own draft',body:"Writer here — genuinely asking readers. I love worldbuilding but don't want info-dumps killing pacing the way some early chapters of my own draft do. Where's the line for you?",storyIds:['f1'],score:198,comments:104},
+      {type:'discussion',author:'Layla_Thorn',avatar:AV(48),time:'10h ago',timeH:10,title:'Should the academy trials actually be survivable, or is the stakes-drop coming?',body:"I've had readers assume nobody dies because it's a romance-adjacent fantasy. I never confirmed that. Curious how much readers are relying on genre convention versus the text itself.",storyIds:['f2'],score:245,comments:139},
+      {type:'recommendation',author:'Layla_Thorn',avatar:AV(48),time:'1d ago',timeH:26,title:'If you want worldbuilding that actually holds together, start here',body:"No convenient plot-armor magic in this one. The academy trial structure is genuinely tense because failure has real consequences the whole way through.",storyIds:['f2'],score:167,comments:22},
+      {type:'poll',author:'Droboard Fantasy',avatar:null,time:'1d ago',timeH:30,title:'Hard magic systems vs soft magic — which do you actually prefer reading?',body:'',storyIds:['f1','f2'],poll:{opts:[{t:'Hard rules, Sanderson-style',v:1980},{t:'Soft, mystery-first magic',v:1420}]},score:245,comments:132},
+      {type:'discussion',author:'Obi_Runeforge',avatar:AV(6),time:'1d ago',timeH:32,title:'Writer AMA: ask me anything about the flame-cost mechanic',body:"A few of you have built theories about how the cost scales that are honestly more detailed than my own notes. Ask away, I'll confirm or deny without full spoilers.",storyIds:['f1'],score:289,comments:151},
+    ],
+  },
+  mystery:{
+    emoji:'🔍',name:'Mystery',
+    tagline:'Cold cases, unreliable narrators, and theory threads longer than the story itself.',
+    stats:{members:'46k',trend:'+7%',postsToday:171},
+    stories:[
+      {id:'m1',cover:COVERS.n3,title:'The neighbour who reported the fire also lit it',writer:'Doris_Vance'},
+      {id:'m2',cover:COVERS.imgt,title:'Every witness remembers a different killer',writer:'Ken_Osei'},
+    ],
+    promoted:[
+      {img:COVERS.imgt,title:'Every witness remembers a different killer',author:'Ken_Osei',tag:'trending'},
+      {img:COVERS.n3,title:'The neighbour who lit it',author:'Doris_Vance',tag:'promoted'},
+    ],
+    statuses:[
+      statusEntry('ken_osei','Ken_Osei',AV(11),COVERS.imgt,'"Five witnesses. Five different killers. One truth."','Theory thread is wild right now','2h ago',990,112),
+      statusEntry('doris_vance','Doris_Vance',AV(27),COVERS.n3,'"She reported the fire. She also lit it."','Studying your reactions for ch.10','6h ago',540,58),
+    ],
+    posts:[
+      {type:'review',author:'Tobenna_K',avatar:AV(19),time:'6h ago',timeH:6,title:'"Every Witness" has the cleanest twist reveal I\'ve read here',body:"Ken plants the clue in chapter two and I did NOT catch it until the reveal. Reread the whole thing immediately after finishing — everything holds up perfectly.",rating:5,storyIds:['m2'],score:301,comments:56},
+      {type:'question',author:'Rita_Obi',avatar:AV(54),time:'6h ago',timeH:6,title:'General question: do you try to solve mysteries as you read, or just enjoy the ride?',body:"Not about a specific story. Curious what the split looks like in this hub — active theorists vs. people who prefer to be surprised.",storyIds:[],score:59,comments:33},
+      {type:'discussion',author:'Doris_Vance',avatar:AV(27),time:'5h ago',timeH:5,title:'Unreliable narrator done right vs done as a cheap trick — using my own story as the example',body:"I want to know what separates a satisfying unreliable-narrator twist from one that feels like the writer just withheld info unfairly. Genuinely studying reader reactions to mine.",storyIds:['m1'],score:267,comments:139},
+      {type:'discussion',author:'Ken_Osei',avatar:AV(11),time:'9h ago',timeH:9,title:'How many of you actually solved it before chapter 9?',body:"Curious for real numbers — drop your guess and the chapter you locked it in at. No judgment either way, some of the best mysteries are meant to be solvable and some aren't.",storyIds:['m2'],score:334,comments:201},
+      {type:'poll',author:'Droboard Mystery',avatar:null,time:'1d ago',timeH:24,title:'Who actually lit the fire in "The Neighbour Who Reported It"? Vote before chapter 9',body:'',storyIds:['m1'],poll:{opts:[{t:'The neighbour, it was always them',v:1210},{t:'Someone else entirely — red herring',v:980}]},score:412,comments:288},
+      {type:'discussion',author:'Tobenna_K',avatar:AV(19),time:'1d ago',timeH:27,title:'Fair-play clues vs pure misdirection — where\'s the line for you?',body:"A fair-play mystery gives you everything you need to solve it if you're paying attention. Misdirection can feel like the writer is just hiding the ball. Both stories here do a mix — which do you prefer?",storyIds:['m1','m2'],score:178,comments:63},
+    ],
+  },
+  horror:{
+    emoji:'😱',name:'Horror',
+    tagline:'Slow-dread and folk horror, discussed with every light in the apartment on.',
+    stats:{members:'39k',trend:'+6%',postsToday:139},
+    stories:[
+      {id:'h1',cover:COVERS.n4,title:'The house remembers every tenant who almost left',writer:'Uju_Blackwood'},
+      {id:'h2',cover:COVERS.wolf2,title:'It only comes when you say thank you',writer:'Marcus_Grey'},
+    ],
+    promoted:[
+      {img:COVERS.wolf2,title:'It only comes when you say thank you',author:'Marcus_Grey',tag:'trending'},
+      {img:COVERS.n4,title:'The house remembers',author:'Uju_Blackwood',tag:'promoted'},
+    ],
+    statuses:[
+      statusEntry('marcus_grey','Marcus_Grey',AV(20),COVERS.wolf2,'"Don\'t say it. Not even to be polite."','Reading with the lights on club — Friday','3h ago',1310,88),
+    ],
+    posts:[
+      {type:'review',author:'Amara_Wolf',avatar:AV(44),time:'3h ago',timeH:3,title:'"It Only Comes When You Say Thank You" is the scariest thing on this platform',body:"Marcus understood that the dread is scarier than the reveal. Had to read the last chapter with every light in my apartment on. Genuinely well-paced horror writing.",rating:5,storyIds:['h2'],score:356,comments:71},
+      {type:'question',author:'David_N',avatar:AV(46),time:'4h ago',timeH:4,title:'How do you all recover after a genuinely disturbing chapter?',body:"General question, not about one specific story — some horror hits so hard I need a palate cleanser before bed. Curious what people actually do after a rough chapter.",storyIds:[],score:82,comments:36},
+      {type:'discussion',author:'Marcus_Grey',avatar:AV(20),time:'7h ago',timeH:7,title:'Slow-dread vs jump-scare pacing — what actually works in written horror?',body:"You can't jump-scare someone through text. Curious what techniques have genuinely unsettled readers here versus what falls flat, using my own story as a reference point.",storyIds:['h2'],score:289,comments:118},
+      {type:'discussion',author:'Uju_Blackwood',avatar:AV(17),time:'9h ago',timeH:9,title:'Folk horror rooted in real places hits different — agree?',body:"Something about horror tied to an actual family history feels scarier than pure supernatural randomness. If you've read The House, does the specificity make it worse for you too?",storyIds:['h1'],score:201,comments:74},
+      {type:'reader-post',author:'Anonymous',avatar:null,anon:true,time:'5h ago',timeH:5,title:'',body:"Read 'It Only Comes When You Say Thank You' at 1am like an idiot. Said 'thank you' to the delivery guy the next morning and immediately regretted my word choice. 10/10 story, 0/10 decision on timing.",storyIds:['h2'],score:445,comments:89},
+      {type:'discussion',author:'Amara_Wolf',avatar:AV(44),time:'1d ago',timeH:26,title:'Does knowing the "rule" in a horror story ruin the fear, or heighten it?',body:"Once you know you can't say thank you, every scene becomes a countdown to someone forgetting. Curious if the hub finds dramatic irony scarier or if it defuses the tension for you.",storyIds:['h2'],score:198,comments:66},
+      {type:'recommendation',author:'Uju_Blackwood',avatar:AV(17),time:'1d ago',timeH:28,title:'Folk horror rooted in real places hits different — read this next',body:"Something about horror tied to an actual family history feels scarier than pure supernatural randomness. If Say Thank You got you, The House will finish the job.",storyIds:['h1','h2'],score:201,comments:74},
+    ],
+  },
+};
+
+const HUB_ORDER=['romance','werewolf','billionaire','fantasy','mystery','horror'];
+const PROMO_INSERT_AFTER=10; // carousel never shows before this many posts have scrolled by
+let curHub=null;
+let curSort='hot';
+let curFilter='all';
+let followState={};
+let voteState={};   // key -> 1 | -1 | 0
+let scoreDelta={};  // key -> extra applied on top of base score
+let pollVoteState={};
+let savedState={};
+
+const SORTS=[
+  {id:'hot',label:'Hot',icon:'fa-fire'},
+  {id:'new',label:'New',icon:'fa-clock'},
+  {id:'top',label:'Top',icon:'fa-arrow-trend-up'},
+];
+const FILTERS=[
+  {id:'all',label:'All Posts'},
+  {id:'discussion',label:'💬 Discussions'},
+  {id:'question',label:'❓ Questions'},
+  {id:'review',label:'⭐ Reviews'},
+  {id:'recommendation',label:'📌 Recs'},
+  {id:'poll',label:'📊 Polls'},
+  {id:'reader-post',label:'🖊 Reader Posts'},
+];
+
+/* ══ STEP 1: GENRE GRID ══ */
+function renderGenreGrid(){
+  document.getElementById('genreGrid').innerHTML=HUB_ORDER.map(id=>{
+    const h=HUBS[id];
+    return `<div class="genre-card" data-hub="${id}">
+      <div class="genre-card-bg">
+        <div style="background-image:url('${h.stories[0].cover}')"></div>
+        <div style="background-image:url('${(h.stories[1]||h.stories[0]).cover}')"></div>
+      </div>
+      <div class="genre-card-scrim"></div>
+      <div class="genre-card-top"><div class="genre-card-emoji">${h.emoji}</div></div>
+      <div class="genre-card-body">
+        <div class="genre-card-name">${h.name}</div>
+        <div class="genre-card-tag">${h.tagline}</div>
+        <div class="genre-card-stats">
+          <span class="genre-card-stat"><i class="fas fa-users"></i>${h.stats.members}</span>
+          <span class="genre-card-stat"><i class="fas fa-arrow-trend-up"></i>${h.stats.trend} this week</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.genre-card').forEach(c=>{
+    c.addEventListener('click',()=>openHub(c.dataset.hub));
+  });
+}
+
+/* ══ TRANSITIONS ══ */
+function openHub(id){
+  curHub=id;
+  document.getElementById('screenSelect').style.display='none';
+  document.getElementById('screenHub').style.display='block';
+  document.getElementById('backBtn').classList.remove('hidden');
+  document.getElementById('fabBtn').classList.remove('hidden');
+  curSort='hot';curFilter='all';
+  renderHeader();renderControls();renderFeed();
+  window.scrollTo({top:0});
+}
+function closeHub(){
+  curHub=null;
+  document.getElementById('screenHub').style.display='none';
+  document.getElementById('screenSelect').style.display='block';
+  document.getElementById('backBtn').classList.add('hidden');
+  document.getElementById('fabBtn').classList.add('hidden');
+  document.getElementById('tbTitle').textContent='Genre Communities';
+  window.scrollTo({top:0});
+}
+document.getElementById('backBtn').addEventListener('click',closeHub);
+
+/* ══ HEADER ══ */
+function renderHeader(){
+  const h=HUBS[curHub];
+  document.getElementById('tbTitle').textContent=`${h.emoji} ${h.name} Community`;
+  const followed=!!followState[curHub];
+  document.getElementById('commHeader').innerHTML=`
+    <div class="comm-top">
+      <div class="comm-icon">${h.emoji}</div>
+      <div class="comm-name-block">
+        <div class="comm-name">${h.name} Community <span class="comm-official">Official · System Hub</span></div>
+        <div class="comm-sub">One hub per genre — every ${h.name.toLowerCase()} discussion, one place to have it</div>
+      </div>
+    </div>
+    <div class="comm-desc">${h.tagline}</div>
+    <div class="comm-stats">
+      <div class="comm-stat"><b>${h.stats.members}</b><span>Members</span></div>
+      <div class="comm-stat trend"><b><i class="fas fa-arrow-trend-up"></i>${h.stats.trend}</b><span>Growth this week</span></div>
+      <div class="comm-stat"><b>${h.stats.postsToday}</b><span>Posts today</span></div>
+      <div class="comm-stat"><b>${h.stories.length}</b><span>Stories tagged</span></div>
+    </div>
+    <div class="comm-acts">
+      <button class="comm-follow-btn${followed?' on':''}" id="followBtn"><i class="fas ${followed?'fa-check':'fa-plus'}"></i> ${followed?'Joined':'Join Community'}</button>
+      <button class="comm-post-btn" id="postBtn"><i class="fas fa-pen"></i> Post</button>
+    </div>
+  `;
+  document.getElementById('followBtn').addEventListener('click',()=>{
+    followState[curHub]=!followState[curHub];
+    renderHeader();
+    toast(followState[curHub]?`✅ Joined ${h.name} Community`:`Left ${h.name} Community`);
+  });
+  document.getElementById('postBtn').addEventListener('click',()=>openComposer());
+}
+
+/* ══ SORT + FILTER ══ */
+function renderControls(){
+  document.getElementById('sortRow').innerHTML=SORTS.map(s=>`<div class="sort-btn${s.id===curSort?' on':''}" data-sort="${s.id}"><i class="fas ${s.icon}"></i>${s.label}</div>`).join('');
+  document.getElementById('filterRow').innerHTML=FILTERS.map(f=>`<div class="filter-chip${f.id===curFilter?' on':''}" data-filter="${f.id}">${f.label}</div>`).join('');
+  document.querySelectorAll('.sort-btn').forEach(b=>b.addEventListener('click',()=>{curSort=b.dataset.sort;renderFeed();document.querySelectorAll('.sort-btn').forEach(x=>x.classList.toggle('on',x===b));}));
+  document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{curFilter=b.dataset.filter;renderFeed();document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('on',x===b));}));
+}
+
+/* ══ PROMOTED / FEATURED CAROUSEL — HTML only, caller decides WHERE it goes ══ */
+function promoHtml(h){
+  if(!h.promoted||!h.promoted.length) return '';
+  const tagLbl={promoted:'Promoted',trending:'Trending',new:'New'};
+  return `
+    <div class="promo-wrap">
+      <div class="promo-head">
+        <div><div class="promo-title"><i class="fas fa-bolt"></i>Featured Releases</div><div class="promo-sub">New, trending & promoted in ${h.name}</div></div>
+      </div>
+      <div class="promo-scroll">
+        ${h.promoted.map(p=>`
+          <div class="promo-card" onclick="toast('📖 Opening story…')">
+            <div class="promo-cover"><img src="${p.img}" loading="lazy"/><div class="promo-cover-scrim"></div><div class="promo-tag ptag-${p.tag}">${tagLbl[p.tag]}</div></div>
+            <div class="promo-title-txt">${p.title}</div>
+            <div class="promo-author">by @${p.author}</div>
+            ${p.tag==='promoted'?`<div class="promo-sponsor"><i class="fas fa-circle-check" style="font-size:7px"></i>Sponsored placement</div>`:''}
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* ══ FEED ══ */
+function getStory(h,id){return h.stories.find(s=>s.id===id);}
+function getStatus(h,authorName){return (h.statuses||[]).find(s=>s.name===authorName);}
+
+function sortedPosts(h){
+  let posts=h.posts.filter(p=>curFilter==='all'||p.type===curFilter);
+  if(curSort==='new')posts=[...posts].sort((a,b)=>a.timeH-b.timeH);
+  else if(curSort==='top')posts=[...posts].sort((a,b)=>curScore(b)-curScore(a));
+  else posts=[...posts].sort((a,b)=>(curScore(b)/(b.timeH+2))-(curScore(a)/(a.timeH+2)));
+  return posts;
+}
+function postKey(h,p){return curHub+'_'+p.author+'_'+p.time+'_'+(p.title||p.body).slice(0,12);}
+function curScore(p){const k=postKey(HUBS[curHub],p);return p.score+(scoreDelta[k]||0);}
+
+function renderFeed(){
+  const h=HUBS[curHub];
+  const posts=sortedPosts(h);
+  const list=document.getElementById('feedList');
+  if(!posts.length){list.innerHTML=`<div class="empty-state"><i class="fas fa-comment-slash"></i><p><strong style="color:var(--tx-body)">No posts yet</strong><br>Be the first to post in this filter.</p></div>`;return;}
+
+  const cards=posts.map(p=>postCard(h,p));
+  // Carousel is spliced INTO the feed after PROMO_INSERT_AFTER posts have
+  // been scrolled past — never shown before that, regardless of hub size.
+  const insertAt=Math.min(PROMO_INSERT_AFTER,cards.length);
+  cards.splice(insertAt,0,promoHtml(h));
+
+  list.innerHTML=cards.join('');
+  attachFeedEvents();
+}
+
+function avatarBlock(h,p){
+  const status=!p.anon?getStatus(h,p.author):null;
+  if(p.anon){
+    return `<div class="post-av-wrap"><div class="post-av-init">?</div></div>`;
+  }
+  const ringClass=status?' has-status':'';
+  const onclick=status?`onclick="event.stopPropagation();openStatusViewer(HUBS[curHub].statuses,'${status.id}')"`:`onclick="event.stopPropagation();toast('👤 Opening profile…')"`;
+  return `<div class="post-av-wrap${ringClass}"><img class="post-av" src="${p.avatar}" loading="lazy" ${onclick}/></div>`;
+}
+
+function postCard(h,p){
+  const key=postKey(h,p);
+  const vote=voteState[key]||0;
+  const score=curScore(p);
+  const typeLbl={discussion:'Discussion',question:'Question',review:'Review',recommendation:'Recommendation',poll:'Poll',['reader-post']:'Reader Post'}[p.type];
+
+  const nameHtml=p.anon?`<b>Anonymous</b><span class="anon-badge">Anon</span>`:`<b onclick="event.stopPropagation();toast('👤 Opening profile…')">@${p.author}</b>`;
+
+  // A post only gets a story chip if it actually references one — plenty
+  // of discussions/questions in this hub are general, with no storyIds.
+  const storyRefs=(p.storyIds||[]).map(id=>getStory(h,id)).filter(Boolean);
+  let storyHtml='';
+  if(storyRefs.length===1){
+    const s=storyRefs[0];
+    storyHtml=`<div class="storyref-row"><div class="storyref-lbl"><i class="fas fa-book" style="font-size:7px"></i>${p.type==='recommendation'?'Recommending':'Discussing'}</div>
+      <div class="storyref-chip" onclick="toast('📖 Opening story…')">
+        <div class="storyref-thumb" style="background-image:url('${s.cover}')"></div>
+        <div class="storyref-body"><div class="storyref-title">${s.title}</div><div class="storyref-writer">by @${s.writer}</div></div>
+        <i class="fas fa-arrow-right storyref-arrow"></i>
+      </div></div>`;
+  } else if(storyRefs.length>1){
+    storyHtml=`<div class="storyref-row"><div class="storyref-lbl"><i class="fas fa-book" style="font-size:7px"></i>${p.type==='recommendation'?'Recommending':'Referencing'} ${storyRefs.length} stories</div>
+      <div class="storyref-multi">${storyRefs.map(s=>`
+        <div class="storyref-chip" onclick="toast('📖 Opening story…')">
+          <div class="storyref-thumb" style="background-image:url('${s.cover}')"></div>
+          <div class="storyref-body"><div class="storyref-title">${s.title}</div><div class="storyref-writer">by @${s.writer}</div></div>
+        </div>`).join('')}</div></div>`;
+  }
+
+  let extraHtml='';
+  if(p.type==='review'){
+    const stars=Array.from({length:5},(_,i)=>`<i class="fas fa-star${i<p.rating?' on':''}"></i>`).join('');
+    extraHtml=`<div class="rating-row">${stars}<span>${p.rating}.0</span></div>`;
+  }
+
+  let pollHtml='';
+  if(p.type==='poll'){
+    const pollKey=key+'_poll';
+    const voted=pollVoteState[pollKey];
+    const opts=p.poll.opts.map((o,i)=>voted===i?{...o,v:o.v+1}:o);
+    const tot=opts.reduce((s,o)=>s+o.v,0)||1;
+    pollHtml=`<div class="post-poll">${opts.map((o,i)=>{const pct=Math.round(o.v/tot*100);return `<div class="poll-opt${voted===i?' voted':''}" data-pollkey="${pollKey}" data-oi="${i}"><div class="poll-bar" style="width:${voted!==undefined?pct:0}%"></div><div class="poll-row"><span class="poll-txt">${o.t}</span><span class="poll-pct">${voted!==undefined?pct+'%':''}</span></div></div>`;}).join('')}<div class="poll-meta">${fmtN(tot)} votes</div></div>`;
+  }
+
+  const saved=!!savedState[key];
+  const shareTitle=(p.title||p.body||'').slice(0,80);
+  const shareImg=storyRefs[0]?storyRefs[0].cover:'';
+  const shareSub=storyRefs[0]?('from '+storyRefs[0].title):(h.name+' Community');
+  const shareData=`{title:${JSON.stringify(shareTitle)},sub:${JSON.stringify(shareSub)},img:${JSON.stringify(shareImg)},url:'https://droboard.app'}`;
+
+  return `<div class="rpost">
+    <div class="vote-col">
+      <div class="vote-btn up${vote===1?' on':''}" data-key="${encodeURIComponent(key)}" data-dir="1"><i class="fas fa-caret-up" style="font-size:18px"></i></div>
+      <div class="vote-score">${fmtN(score)}</div>
+      <div class="vote-btn down${vote===-1?' on':''}" data-key="${encodeURIComponent(key)}" data-dir="-1"><i class="fas fa-caret-down" style="font-size:18px"></i></div>
+    </div>
+    <div class="post-col">
+      <div class="post-meta-row">
+        ${avatarBlock(h,p)}
+        <span class="post-type-tag tag-${p.type}">${typeLbl}</span>
+        <span class="post-author-row">${nameHtml} · ${p.time}</span>
+      </div>
+      ${p.title?`<div class="post-title">${p.title}</div>`:''}
+      ${p.body?`<div class="post-body${p.type!=='reader-post'&&p.type!=='discussion'&&p.type!=='question'?' trunc':''}">${p.body}</div>`:''}
+      ${extraHtml}
+      ${storyHtml}
+      ${pollHtml}
+      <div class="post-footer">
+        <div class="pf-act" data-cmt="1"><i class="far fa-comment"></i>${fmtN(p.comments)} comments</div>
+        <div class="pf-act" onclick='openShareModal(${shareData})'><i class="fas fa-share-nodes"></i>Share</div>
+        <div class="pf-act${saved?' saved':''}" data-save="${encodeURIComponent(key)}"><i class="${saved?'fas':'far'} fa-bookmark"></i>${saved?'Saved':'Save'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function attachFeedEvents(){
+  document.querySelectorAll('.vote-btn').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=decodeURIComponent(el.dataset.key);
+      const dir=+el.dataset.dir;
+      const cur=voteState[key]||0;
+      const next=cur===dir?0:dir;
+      scoreDelta[key]=(scoreDelta[key]||0)+(next-cur);
+      voteState[key]=next;
+      renderFeed();
+    });
+  });
+  document.querySelectorAll('.poll-opt').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=el.dataset.pollkey;
+      if(pollVoteState[key]!==undefined)return;
+      pollVoteState[key]=+el.dataset.oi;
+      renderFeed();
+      toast('✅ Vote recorded!');
+    });
+  });
+  document.querySelectorAll('[data-cmt]').forEach(el=>el.addEventListener('click',()=>toast('💬 Opening comments…')));
+  document.querySelectorAll('[data-save]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=decodeURIComponent(el.dataset.save);
+      savedState[key]=!savedState[key];
+      renderFeed();
+      toast(savedState[key]?'🔖 Saved to your list':'Removed from saved');
+    });
+  });
+}
+
+/* ══ COMPOSER ══ */
+const CMP_TYPES=[
+  {id:'discussion',label:'💬 Discussion'},{id:'question',label:'❓ Question'},{id:'review',label:'⭐ Review'},
+  {id:'recommendation',label:'📌 Recommendation'},{id:'reader-post',label:'🖊 Reader Post'},{id:'poll',label:'📊 Poll'},
+];
+let cmpType='discussion';
+let cmpSelectedStories=[];
+
+function openComposer(){
+  const h=HUBS[curHub];
+  cmpSelectedStories=[];
+  document.getElementById('cmpHdrTitle').textContent=`Post to ${h.name} Community`;
+  document.getElementById('cmpTypeRow').innerHTML=CMP_TYPES.map(t=>`<div class="cmp-type-btn${t.id===cmpType?' on':''}" data-type="${t.id}">${t.label}</div>`).join('');
+  document.querySelectorAll('.cmp-type-btn').forEach(b=>b.addEventListener('click',()=>{cmpType=b.dataset.type;document.querySelectorAll('.cmp-type-btn').forEach(x=>x.classList.toggle('on',x===b));}));
+  document.getElementById('cmpStorySearch').value='';
+  document.getElementById('cmpStoryResults').innerHTML='';
+  document.getElementById('cmpSelectedStory').style.display='none';
+  document.getElementById('cmpText').value='';
+  document.getElementById('cmpBg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeComposer(){document.getElementById('cmpBg').classList.remove('open');document.body.style.overflow='';}
+
+document.getElementById('cmpStorySearch').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  const h=HUBS[curHub];
+  const res=document.getElementById('cmpStoryResults');
+  if(!q){res.innerHTML='';return;}
+  const matches=h.stories.filter(s=>s.title.toLowerCase().includes(q)||s.writer.toLowerCase().includes(q)).slice(0,5);
+  res.innerHTML=matches.map(s=>`<div class="cmp-story-result-item" data-sid="${s.id}"><img src="${s.cover}" loading="lazy"/><span>${s.title}</span></div>`).join('');
+  res.querySelectorAll('.cmp-story-result-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const s=h.stories.find(x=>x.id===el.dataset.sid);
+      cmpSelectedStories=[s];
+      const sel=document.getElementById('cmpSelectedStory');
+      sel.style.display='flex';
+      sel.innerHTML=`<img src="${s.cover}"/><span>${s.title}</span><span class="rm" onclick="clearSelectedStory()">✕</span>`;
+      document.getElementById('cmpStorySearch').value='';
+      res.innerHTML='';
+    });
+  });
+});
+function clearSelectedStory(){cmpSelectedStories=[];document.getElementById('cmpSelectedStory').style.display='none';}
+
+function submitComposer(){
+  const text=document.getElementById('cmpText').value.trim();
+  if(!text){toast('✍️ Write something first!');return;}
+  // A story attachment is optional — plenty of valid posts (general
+  // discussions, questions) have nothing to attach.
+  closeComposer();
+  toast(`✅ Posted to ${HUBS[curHub].name} Community!`);
+}
+document.getElementById('cmpBg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeComposer();});
+document.getElementById('fabBtn').addEventListener('click',()=>openComposer());
+
+/* ══ INIT ══ */
+renderGenreGrid();
+</script>
+</body>
+</html>

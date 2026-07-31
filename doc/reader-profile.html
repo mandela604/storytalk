@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · @Chioma_R</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e0e0e0;--tx-body:#c0c0c0;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --tx-title:#e0e0e0;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --post-sep:#1a1b22;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.top-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;cursor:pointer}
+.top-right{display:flex;align-items:center;gap:8px}
+.top-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#ccc;transition:.15s;position:relative;flex-shrink:0}
+.top-icon-btn:active{transform:scale(.9)}
+.notif-count{position:absolute;top:4px;right:4px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid #000}
+
+/* HERO */
+.profile-hero{position:relative;width:100%;height:180px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900&q=80');background-size:cover;background-position:center 30%}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,#000 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.15) 100%)}
+.hero-edit-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+
+/* PROFILE INFO */
+.profile-info{padding:0 14px;margin-top:-8px;position:relative;z-index:5}
+.av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+.av-outer{position:relative;flex-shrink:0}
+.av-ring{width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--acc));padding:3px;box-shadow:0 0 24px rgba(56,189,248,.25)}
+.av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000}
+.av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.verified-badge-av{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--blue);border:2.5px solid #000;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:800}
+.action-row{display:flex;gap:7px;align-items:center}
+.pact{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.pact:active{transform:scale(.96)}
+.pact.edit{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+.pact.follow{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
+.pact.follow.ing{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc;box-shadow:none}
+.pact.msg{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);color:#ccc;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+
+.profile-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:2px;display:flex;align-items:center;gap:7px;color:var(--tx-high)}
+.reader-tag{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--blue);font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.05em;font-family:'DM Sans',sans-serif}
+.profile-handle{font-size:12px;color:var(--tx-muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.verified-inline{font-size:9px;font-weight:700;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);padding:1px 7px;border-radius:8px}
+.profile-bio{font-size:13px;color:var(--tx-body);line-height:1.55;margin-bottom:8px;max-width:340px}
+.profile-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.genre-pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3);cursor:pointer}
+.genre-pill.inactive{background:rgba(255,255,255,.04);border-color:var(--bd);color:#555}
+
+/* STATS ROW */
+.stats-row{display:flex;border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:14px;background:var(--l1)}
+.stat-item{flex:1;text-align:center;padding:11px 4px;border-right:1px solid var(--bd);cursor:pointer;transition:.15s}
+.stat-item:last-child{border-right:none}
+.stat-item:active{background:rgba(255,255,255,.03)}
+.stat-num{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high);line-height:1}
+.stat-num.r{color:var(--acc)}
+.stat-num.b{color:var(--blue)}
+.stat-num.g{color:var(--green)}
+.stat-label{font-size:8px;color:var(--tx-muted);margin-top:2px;font-weight:600}
+
+/* ACHIEVEMENT CHIPS */
+.ach-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.ach-row::-webkit-scrollbar{display:none}
+.ach-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap;border:1px solid;flex-shrink:0;cursor:pointer}
+.ach-chip.gold{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:var(--gold)}
+.ach-chip.blue{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2);color:var(--blue)}
+.ach-chip.red{background:rgba(255,0,80,.07);border-color:var(--bd-acc);color:var(--acc3)}
+.ach-chip.purple{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);color:var(--purple)}
+.ach-chip.green{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:var(--green)}
+
+/* AD MOUNT — rendered via DroboardAdCard.renderBanner */
+#profileAdMount{margin:0 0 14px}
+
+/* TABS */
+.profile-tabs{display:flex;border-bottom:1px solid var(--bd);position:sticky;top:57px;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(12px);overflow-x:auto;scrollbar-width:none}
+.profile-tabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.ptab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
+.ptab-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,0,80,.15);color:var(--acc3);font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;vertical-align:middle}
+.ptab-badge.b{background:rgba(56,189,248,.15);color:var(--blue)}
+.ptab-badge.g{background:rgba(52,211,153,.15);color:var(--green)}
+
+/* PANELS */
+.tab-panel{display:none;padding:14px}
+.tab-panel.active{display:block}
+.sdiv{height:1px;background:var(--bd);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc3);cursor:pointer;white-space:nowrap;padding:3px 8px;border-radius:10px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)}
+
+/* ═══════════════════════════════
+   CHAPTERS GRID — same card layout as the writer profile's chapters tab
+═══════════════════════════════ */
+.chapters-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ch-card{cursor:pointer;transition:.18s}
+.ch-card:active{transform:scale(.97)}
+.ch-cover{position:relative;border-radius:10px;overflow:hidden;background:var(--l1);aspect-ratio:3/4;box-shadow:0 4px 14px rgba(0,0,0,.5);border:1px solid var(--bd)}
+.ch-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.ch-scrim{position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,rgba(0,0,0,.92),transparent)}
+.ch-badge{position:absolute;top:6px;left:0;font-size:7px;font-weight:800;padding:2px 7px 2px 5px;border-radius:0 6px 6px 0;letter-spacing:.03em;text-transform:uppercase}
+.badge-hot{background:var(--acc);color:#fff}
+.badge-new{background:#3b0764;color:#d8b4fe}
+.ch-stats{position:absolute;bottom:6px;left:7px;right:7px;display:flex;align-items:center;gap:5px;flex-wrap:nowrap}
+.ch-stat{font-size:8px;font-weight:700;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:2px}
+.ch-tag{background:rgba(0,0,0,.55);padding:2px 6px;border-radius:8px;font-size:7px;font-weight:800;color:var(--acc3);white-space:nowrap}
+.ch-title{font-size:11px;font-weight:700;line-height:1.35;margin-top:7px;color:var(--tx-high);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ch-meta-row{display:flex;align-items:center;gap:5px;margin-top:3px}
+.ch-av{width:14px;height:14px;border-radius:50%;object-fit:cover;border:1px solid var(--bd);flex-shrink:0}
+.ch-sub{font-size:9px;color:var(--tx-muted);font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-actions{display:flex;gap:4px;margin-top:5px}
+.cha{display:flex;align-items:center;gap:3px;font-size:8.5px;font-weight:700;color:var(--tx-muted);cursor:pointer;padding:3px 5px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--bd);transition:.15s;flex:1;justify-content:center}
+.cha.liked{color:var(--acc);background:rgba(255,0,80,.06);border-color:var(--bd-acc)}
+.cha i{font-size:9px}
+
+/* ═══════════════════════════════
+   COLLECTIONS TAB — grid populated by DroboardCollectionCard
+═══════════════════════════════ */
+.new-coll-btn{width:100%;padding:10px;border-radius:13px;background:rgba(255,255,255,.02);border:1px dashed var(--bd);color:var(--tx-faint);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.new-coll-btn:hover{background:rgba(255,0,80,.04);border-color:var(--bd-acc);color:var(--acc3)}
+
+/* ═══════════════════════════════
+   SERIES CARD
+═══════════════════════════════ */
+.series-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.series-card:active{border-color:var(--bd-acc)}
+.series-header{display:flex;gap:10px;padding:11px 12px}
+.series-img{width:56px;height:64px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0}
+.series-info{flex:1;min-width:0}
+.series-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:2px}
+.series-title{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;line-height:1.3;color:var(--tx-high);margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.series-writer{font-size:9px;color:var(--tx-muted)}
+.series-status{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.series-badge{font-size:7px;font-weight:800;padding:2px 7px;border-radius:7px}
+.sb-new{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.sb-complete{background:rgba(255,255,255,.05);color:#555;border:1px solid var(--bd)}
+.new-ch-banner{background:rgba(52,211,153,.06);border-top:1px solid rgba(52,211,153,.12);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.new-ch-label{font-size:9px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:4px}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pdot 1.4s ease-in-out infinite}
+@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.new-ch-btn{font-size:9px;font-weight:800;color:var(--green);cursor:pointer;padding:3px 9px;border-radius:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)}
+.series-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.01);border-top:1px solid var(--bd2)}
+.ntog{width:34px;height:18px;border-radius:10px;background:var(--green);border:none;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
+.ntog::after{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.ntog.off{background:var(--l4)}
+.ntog.off::after{right:auto;left:2px}
+
+/* FOLLOWING */
+.follow-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd2)}
+.follow-item:last-child{border-bottom:none}
+.follow-av{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--l2)}
+.follow-av img{width:100%;height:100%;object-fit:cover;display:block}
+.follow-info{flex:1;min-width:0}
+.follow-name{font-size:12px;font-weight:700;color:var(--tx-high)}
+.follow-meta{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.follow-btn{background:rgba(255,255,255,.05);border:1.5px solid var(--bd);color:#ccc;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;font-family:'DM Sans',sans-serif}
+.follow-btn.ing{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* ABOUT */
+.about-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)}
+.about-item:last-child{border-bottom:none}
+.about-icon{width:32px;height:32px;border-radius:9px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px}
+.about-label{font-size:10px;font-weight:600;color:var(--tx-muted)}
+.about-val{font-size:12px;font-weight:600;color:var(--tx-high);margin-top:1px;line-height:1.4}
+
+/* OVERLAYS */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.overlay-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.overlay-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:7px}
+.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Post composer */
+.composer-body{padding:0 16px 14px}
+.composer-types{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.composer-types::-webkit-scrollbar{display:none}
+.ctype{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s}
+.ctype.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.composer-textarea{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.55;min-height:80px;margin-bottom:10px}
+.composer-textarea::placeholder{color:#333}
+.composer-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.composer-media-row{display:flex;gap:7px}
+.cmedia-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#666}
+.composer-right{display:flex;gap:8px;align-items:center}
+.composer-audience{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 10px;cursor:pointer;font-size:9px;font-weight:700;color:#aaa}
+.composer-post-btn{background:var(--acc);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Status composer */
+.scs-types{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.scs-types::-webkit-scrollbar{display:none}
+.scs-type{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s}
+.scs-type.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.scs-preview{margin:0 16px 12px;border-radius:14px;height:130px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--bd)}
+.scs-preview-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent)}
+.scs-preview-change{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 9px;border-radius:10px;font-size:9px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.scs-text-area{margin:0 16px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px}
+.scs-textarea{width:100%;background:transparent;border:none;color:var(--tx-high);font-family:'Playfair Display',serif;font-size:14px;font-weight:700;outline:none;resize:none;padding:12px 13px;line-height:1.5;min-height:60px}
+.scs-textarea::placeholder{color:#333;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400}
+.scs-caption{width:100%;background:transparent;border:none;border-top:1px solid var(--bd);color:#ccc;font-family:'DM Sans',sans-serif;font-size:11px;outline:none;resize:none;padding:8px 13px;min-height:36px}
+.scs-caption::placeholder{color:#333}
+.scs-bottom{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px}
+.scs-audience{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:10px;font-weight:700;color:#aaa}
+.scs-post-btn{background:var(--acc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Repost sheet */
+.rsp-img-sm{width:44px;height:50px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0}
+
+/* New collection */
+.nc-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px}
+.nc-input::placeholder{color:#333}
+.nc-privacy-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.nc-privacy-btn{flex:1;min-width:70px;padding:8px 4px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:transparent;color:#555;font-family:'DM Sans',sans-serif;transition:.2s;text-align:center}
+.nc-privacy-btn.active{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc3)}
+.nc-create-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Genre edit */
+.genre-tog-grid{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 14px}
+.genre-tog{font-size:10px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(255,255,255,.03);color:#777;transition:.2s;user-select:none;display:flex;align-items:center;gap:5px}
+.genre-tog.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.genre-tog.on::before{content:'✓';font-size:9px;font-weight:900}
+.genre-save-btn{width:calc(100% - 32px);margin:0 16px 14px;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Menu sheet */
+.menu-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.menu-overlay.open{display:flex}
+.menu-sheet{width:100%;background:var(--l1);border-radius:24px 24px 0 0;animation:slideUp .28s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.menu-sheet::-webkit-scrollbar{display:none}
+.menu-profile-mini{display:flex;align-items:center;gap:11px;padding:12px 18px 14px;border-bottom:1px solid var(--bd)}
+.menu-mini-av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--blue)}
+.menu-mini-av img{width:100%;height:100%;object-fit:cover;display:block}
+.menu-mini-name{font-size:13px;font-weight:800;color:var(--tx-high)}
+.menu-mini-handle{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.menu-mini-badge{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--blue);margin-top:3px;display:inline-block}
+.menu-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa}
+.menu-section{padding:8px 0 4px}
+.menu-section-label{font-size:9px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.12em;padding:0 18px 6px}
+.menu-item{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
+.menu-item:active{background:rgba(255,255,255,.02)}
+.menu-item-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.menu-item-title{font-size:13px;font-weight:700;color:var(--tx-high)}
+.menu-item-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.menu-item-right{font-size:10px;font-weight:700;color:var(--tx-muted);margin-left:auto}
+.menu-badge-sm{background:var(--acc);color:#fff;font-size:8px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
+.menu-badge-sm.b{background:var(--blue)}
+.menu-badge-sm.g{background:var(--green)}
+.menu-divider{height:1px;background:var(--bd);margin:4px 18px}
+
+/* Wallet strip — same layout as the writer profile's earnings strip */
+.menu-wallet-strip{margin:4px 18px 8px;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,0,80,.04));border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
+.mws-info{display:flex;flex-direction:column;gap:1px}
+.mws-label{font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.mws-amount-row{display:flex;align-items:center;gap:7px}
+.mws-amount{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff}
+.mws-change{font-size:9px;font-weight:700;color:var(--green)}
+.mws-fund{background:var(--gold);color:#07070b;border:none;padding:6px 13px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-logo" onclick="location.href='index.html'">D</div>
+  <div class="top-right">
+    <div class="top-icon-btn" onclick="location.href='store.html'" title="Store"><i class="fas fa-store"></i></div>
+    <div class="top-icon-btn" onclick="location.href='alerts.html'">
+      <i class="fas fa-bell"></i>
+      <div class="notif-count">7</div>
+    </div>
+    <div class="top-icon-btn" onclick="openMenu()"><i class="fas fa-bars"></i></div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="profile-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grad"></div>
+  <button class="hero-edit-btn"><i class="fas fa-camera"></i> Edit Cover</button>
+</div>
+
+<!-- PROFILE INFO -->
+<div class="profile-info">
+  <div class="av-row">
+    <div class="av-outer">
+      <div class="av-ring">
+        <div class="av-inner"><img src="https://i.pravatar.cc/100?img=47" alt="Chioma_R"/></div>
+      </div>
+      <div class="verified-badge-av"><i class="fas fa-check" style="font-size:7px"></i></div>
+    </div>
+    <div class="action-row">
+      <button class="pact edit" id="profileActionBtn" onclick="toggleOwnerAction()">Edit Profile</button>
+      <button class="pact msg" onclick="toast('💬 Opening DM…')"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <div class="profile-name">
+    Chioma_R
+    <span class="reader-tag">📖 Reader</span>
+  </div>
+  <div class="profile-handle">
+    @chioma_r
+    <span class="verified-inline">✓ Verified</span>
+  </div>
+  <div class="profile-bio">I read so I don't have to deal with real people. 💔 Betrayal, family drama and plot twists that wreck me. Proud Lagos girl 🌆</div>
+
+  <div class="profile-genres" id="genrePillsDisplay">
+    <div class="genre-pill">💔 Betrayal</div>
+    <div class="genre-pill">👑 Family</div>
+    <div class="genre-pill">✨ Twist</div>
+    <div class="genre-pill">🎓 Campus</div>
+    <div class="genre-pill">🔥 Revenge</div>
+    <div class="genre-pill inactive" onclick="openGenreEdit()">+ Edit</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-item" onclick="switchTab('following')">
+      <div class="stat-num r">47</div><div class="stat-label">Following</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">312</div><div class="stat-label">Followers</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('library')">
+      <div class="stat-num b">94</div><div class="stat-label">Saved</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('series')">
+      <div class="stat-num r">12</div><div class="stat-label">Series</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num g">8.4k</div><div class="stat-label">Reactions</div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="ach-row">
+    <div class="ach-chip blue"><i class="fas fa-book-open"></i> Top Reader (10hr+)</div>
+    <div class="ach-chip gold"><i class="fas fa-fire"></i> 50-Story Streak</div>
+    <div class="ach-chip red"><i class="fas fa-heart"></i> 8.4k Reactions</div>
+    <div class="ach-chip purple"><i class="fas fa-gavel"></i> Debate Champ</div>
+    <div class="ach-chip green"><i class="fas fa-comments"></i> 250+ Comments</div>
+    <div class="ach-chip gold"><i class="fas fa-clock"></i> Night Owl (2am+)</div>
+    <div class="ach-chip blue"><i class="fas fa-star"></i> Editor's Pick Fan</div>
+  </div>
+
+  <!-- Ad — rendered via DroboardAdCard.renderBanner -->
+  <div id="profileAdMount"></div>
+</div>
+
+<!-- TABS -->
+<div class="profile-tabs" id="profileTabs">
+  <div class="ptab active" data-tab="feed" onclick="switchTab('feed')">🏠 Feed</div>
+  <div class="ptab" data-tab="library" onclick="switchTab('library')">📚 Library <span class="ptab-badge b">94</span></div>
+  <div class="ptab" data-tab="collections" onclick="switchTab('collections')">📂 Collections <span class="ptab-badge g">6</span></div>
+  <div class="ptab" data-tab="series" onclick="switchTab('series')">📺 Series <span class="ptab-badge">12</span></div>
+  <div class="ptab" data-tab="following" onclick="switchTab('following')">👥 Following</div>
+  <div class="ptab" data-tab="about" onclick="switchTab('about')">✦ About</div>
+</div>
+
+<!-- ════ FEED TAB — posts rendered via DroboardPostCard ════ -->
+<div class="tab-panel active" id="panel-feed">
+  <div style="display:flex;align-items:center;gap:9px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:10px 13px;margin-bottom:12px;cursor:pointer" onclick="openPostComposer('text')">
+    <img src="https://i.pravatar.cc/100?img=47" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--blue);object-fit:cover;flex-shrink:0"/>
+    <span style="font-size:12px;color:#333;flex:1">What are you reading? Share a post, quote or reaction…</span>
+    <div style="display:flex;gap:8px">
+      <i class="fas fa-image" style="font-size:14px;color:#333;cursor:pointer" onclick="event.stopPropagation();openPostComposer('photo')"></i>
+      <i class="fas fa-retweet" style="font-size:14px;color:var(--blue);cursor:pointer" onclick="event.stopPropagation();openRepost(null)"></i>
+    </div>
+  </div>
+  <div id="feedList"></div>
+</div>
+
+<!-- ════ LIBRARY TAB — same chapters-grid layout as the writer profile ════ -->
+<div class="tab-panel" id="panel-library">
+  <div class="sh" style="margin-bottom:10px">
+    <div class="sh-title" style="flex:1">Saved Stories (94)</div>
+  </div>
+  <div class="chapters-grid" id="chaptersGrid"></div>
+</div>
+
+<!-- ════ COLLECTIONS TAB — rendered via DroboardCollectionCard ════ -->
+<div class="tab-panel" id="panel-collections">
+  <div class="sh" style="margin-bottom:10px">
+    <div class="sh-title" style="flex:1">My Collections</div>
+    <div class="sh-more" onclick="openNewCollection()">+ New</div>
+  </div>
+  <div id="collectionsGrid"></div>
+  <button class="new-coll-btn" onclick="openNewCollection()"><i class="fas fa-plus-circle"></i> Create New Collection</button>
+</div>
+
+<!-- ════ SERIES TAB ════ -->
+<div class="tab-panel" id="panel-series">
+  <div class="sh" style="margin-bottom:8px">
+    <div class="sh-title">Following 12 Series</div>
+  </div>
+  <div id="seriesList"></div>
+</div>
+
+<!-- ════ FOLLOWING TAB ════ -->
+<div class="tab-panel" id="panel-following">
+  <div style="margin-bottom:10px;font-size:11px;color:var(--tx-muted)">Following <strong style="color:var(--tx-high)">47</strong> writers &amp; readers</div>
+  <div id="followingList"></div>
+</div>
+
+<!-- ════ ABOUT TAB ════ -->
+<div class="tab-panel" id="panel-about">
+  <div style="font-size:13px;color:var(--tx-body);line-height:1.65;padding:2px 0 14px">
+    Lagos-based reader who prefers fictional heartbreak to real life. Discovered Droboard in 2022 and hasn't left. She once stayed up until 4am reading "The Runaway Bride" and cried into cold jollof rice.
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-map-marker-alt" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Location</div><div class="about-val">Lagos, Nigeria 🇳🇬</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-calendar-alt" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Joined Droboard</div><div class="about-val">January 2022 · 3 years reading</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-book" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Favourite Genres</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+        <div class="genre-pill">💔 Betrayal</div>
+        <div class="genre-pill">👑 Family</div>
+        <div class="genre-pill">✨ Twist</div>
+        <div class="genre-pill">🎓 Campus</div>
+      </div>
+      <div style="font-size:9px;color:var(--acc3);cursor:pointer;margin-top:5px;font-weight:600" onclick="openGenreEdit()"><i class="fas fa-pen" style="font-size:8px"></i> Edit genres</div>
+    </div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-fire" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Reading Streak</div><div class="about-val">🔥 50 stories · 6-week streak</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-heart" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Top Reaction Given</div><div class="about-val">😭 Crying · 3,412 times</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-coins" style="color:var(--gold)"></i></div>
+    <div><div class="about-label">Tips Given to Writers</div><div class="about-val">₦12,500 across 18 writers</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fab fa-instagram" style="color:var(--blue)"></i></div>
+    <div><div class="about-label">Links</div>
+      <div class="about-val" style="display:flex;gap:10px;margin-top:5px">
+        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-instagram"></i> @chioma_reads</span>
+        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-x-twitter"></i> @chioma_r</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item active" href="reader-profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- ════ POST COMPOSER ════ -->
+<div class="overlay-bg" id="postComposerOv" onclick="if(event.target===this)closePostComposer()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-plus-circle" style="color:var(--acc);font-size:13px"></i> Create Post</h3>
+      <button class="overlay-close" onclick="closePostComposer()">✕</button>
+    </div>
+    <div class="composer-body">
+      <div class="composer-types">
+        <div class="ctype active" data-ct="text">📝 Text</div>
+        <div class="ctype" data-ct="photo">📸 Photo</div>
+        <div class="ctype" data-ct="quote">💬 Quote</div>
+        <div class="ctype" data-ct="reaction">🔥 Reaction</div>
+        <div class="ctype" data-ct="repost">🔄 Repost</div>
+      </div>
+      <textarea class="composer-textarea" id="composerText" placeholder="What are you reading? Share a quote, reaction, or thought…"></textarea>
+      <div class="composer-actions">
+        <div class="composer-media-row">
+          <div class="cmedia-btn"><i class="fas fa-image"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-at"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-hashtag"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-laugh"></i></div>
+        </div>
+        <div class="composer-right">
+          <div class="composer-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
+          <button class="composer-post-btn" onclick="submitPost()">Post →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STATUS COMPOSER ════ -->
+<div class="overlay-bg" id="statusComposerOv" onclick="if(event.target===this)closeStatusComposer()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-circle-notch" style="color:var(--acc);font-size:13px"></i> Post Status</h3>
+      <button class="overlay-close" onclick="closeStatusComposer()">✕</button>
+    </div>
+    <div class="scs-types">
+      <div class="scs-type active" data-type="reading">📖 Reading Update</div>
+      <div class="scs-type" data-type="quote">💬 Quote</div>
+      <div class="scs-type" data-type="reaction">🔥 Reaction</div>
+      <div class="scs-type" data-type="thought">🖊️ Thought</div>
+    </div>
+    <div class="scs-preview" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80')">
+      <div class="scs-preview-grad"></div>
+      <div class="scs-preview-change" onclick="toast('🖼️ Choose background…')">Change BG</div>
+    </div>
+    <div class="scs-text-area">
+      <textarea class="scs-textarea" rows="3" placeholder="Write your quote or thought…">"Sometimes love is just grief wearing a familiar face."</textarea>
+      <textarea class="scs-caption" rows="2" placeholder="Add a caption…"></textarea>
+    </div>
+    <div class="scs-bottom">
+      <div class="scs-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
+      <button class="scs-post-btn" onclick="toast('✅ Status posted!');closeStatusComposer()">Post ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ REPOST COMPOSER ════ -->
+<div class="overlay-bg" id="repostOv" onclick="if(event.target===this)closeRepost()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-retweet" style="color:var(--blue);font-size:13px"></i> Repost to Your Profile</h3>
+      <button class="overlay-close" onclick="closeRepost()">✕</button>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:flex;gap:9px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:12px">
+        <div class="rsp-img-sm" id="repostPreviewImg" style="background-image:url('https://i.postimg.cc/WF1j4Pnh/6.jpg')"></div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--tx-high);margin-bottom:2px;line-height:1.3" id="repostPreviewTitle">A story or post to share</div><div style="font-size:9px;color:var(--tx-muted)" id="repostPreviewWriter">on Droboard</div></div>
+      </div>
+      <textarea style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;line-height:1.5;min-height:70px;margin-bottom:10px" placeholder="Add your reaction or note… (optional)"></textarea>
+      <select style="background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:20px;color:#ccc;font-family:'DM Sans',sans-serif;font-size:10px;padding:5px 12px;outline:none;cursor:pointer;margin-bottom:10px">
+        <option value="followers">👥 My Followers</option>
+        <option value="public">🌍 Public</option>
+        <option value="private">🔒 Only Me</option>
+      </select>
+      <button style="width:100%;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="toast('🔄 Reposted!');closeRepost()">Repost to Profile ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ NEW COLLECTION ════ -->
+<div class="overlay-bg" id="newCollOv" onclick="if(event.target===this)closeNewColl()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-folder-plus" style="color:var(--acc3);font-size:13px"></i> New Collection</h3>
+      <button class="overlay-close" onclick="closeNewColl()">✕</button>
+    </div>
+    <div style="padding:0 16px 14px">
+      <input class="nc-input" id="newCollName" placeholder="Collection name…"/>
+      <textarea class="nc-input" rows="2" style="resize:none;min-height:48px;font-size:12px" placeholder="Description (optional)"></textarea>
+      <div style="font-size:10px;color:var(--tx-muted);margin-bottom:6px;font-weight:600">Privacy</div>
+      <div class="nc-privacy-row">
+        <button class="nc-privacy-btn active" onclick="setNcPrivacy('private',this)"><i class="fas fa-lock" style="color:var(--acc)"></i> Private</button>
+        <button class="nc-privacy-btn" onclick="setNcPrivacy('public',this)"><i class="fas fa-globe-africa" style="color:var(--green)"></i> Public</button>
+        <button class="nc-privacy-btn" onclick="setNcPrivacy('followers',this)"><i class="fas fa-user-friends" style="color:var(--blue)"></i> Followers</button>
+      </div>
+      <button class="nc-create-btn" onclick="createCollection()">Create Collection ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GENRE EDIT ════ -->
+<div class="overlay-bg" id="genreEditOv" onclick="if(event.target===this)closeGenreEdit()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-book" style="color:var(--acc3);font-size:13px"></i> My Reading Interests</h3>
+      <button class="overlay-close" onclick="closeGenreEdit()">✕</button>
+    </div>
+    <div style="font-size:11px;color:#666;padding:0 16px 12px;line-height:1.5">Select genres you love. These shape your story feed.</div>
+    <div class="genre-tog-grid" id="genreTogGrid"></div>
+    <button class="genre-save-btn" onclick="saveGenres()">Save Interests ✓</button>
+  </div>
+</div>
+
+<!-- ════ MENU ════ -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()">
+  <div class="menu-sheet" onclick="event.stopPropagation()">
+    <div class="overlay-handle"></div>
+    <div class="menu-profile-mini">
+      <div class="menu-mini-av"><img src="https://i.pravatar.cc/100?img=47" alt=""/></div>
+      <div style="flex:1">
+        <div class="menu-mini-name">Chioma_R</div>
+        <div class="menu-mini-handle">@chioma_r · 312 followers</div>
+        <div class="menu-mini-badge">📖 Verified Reader</div>
+      </div>
+      <div class="menu-close" onclick="closeMenu()">✕</div>
+    </div>
+
+    <div class="menu-wallet-strip">
+      <div class="mws-info">
+        <div class="mws-label">My Wallet</div>
+        <div class="mws-amount-row">
+          <div class="mws-amount">🪙 240</div>
+          <div class="mws-change">↑ +18 this week</div>
+        </div>
+      </div>
+      <button class="mws-fund" onclick="toast('💰 Opening wallet…');closeMenu()">Add Funds</button>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Reading</div>
+      <div class="menu-item" onclick="switchTabFromMenu('library')">
+        <div class="menu-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.12)"><i class="fas fa-book-open" style="color:var(--blue)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">My Library</div><div class="menu-item-sub">94 saved stories</div></div>
+        <div class="menu-item-right"><span class="menu-badge-sm b">94</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('collections')">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)"><i class="fas fa-folder" style="color:var(--acc)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Collections</div><div class="menu-item-sub">6 curated lists</div></div>
+        <div class="menu-item-right"><span class="menu-badge-sm">6</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('series')">
+        <div class="menu-item-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.12)"><i class="fas fa-tv" style="color:var(--green)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Following Series</div><div class="menu-item-sub">12 series</div></div>
+        <div class="menu-item-right"><span class="menu-badge-sm g">3</span></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Create</div>
+      <div class="menu-item" onclick="openPostComposer('text');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.07);border:1px solid var(--bd-acc)"><i class="fas fa-pen" style="color:var(--acc)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">New Post</div><div class="menu-item-sub">Text, photo, quote or reaction</div></div>
+      </div>
+      <div class="menu-item" onclick="openStatusComposer();closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.12)"><i class="fas fa-circle-notch" style="color:var(--blue)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Post Status</div><div class="menu-item-sub">Reading update or quote</div></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Account</div>
+      <div class="menu-item" onclick="toast('✏️ Edit profile…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--bd)"><i class="fas fa-user-edit" style="color:#888"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Edit Profile</div><div class="menu-item-sub">Name, bio, avatar, genres</div></div>
+      </div>
+      <div class="menu-item" onclick="location.href='writer-dashboard.html';closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.12)"><i class="fas fa-gauge-high" style="color:var(--purple)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Dashboard</div><div class="menu-item-sub">Reading stats & activity</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('⚙️ Settings…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--bd)"><i class="fas fa-cog" style="color:#888"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Settings</div><div class="menu-item-sub">Privacy, notifications</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('🤝 Refer a friend…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.1)"><i class="fas fa-share-alt" style="color:var(--gold)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Refer a Friend</div><div class="menu-item-sub">Earn ₦500 per referral</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('👋 Signed out!');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.1)"><i class="fas fa-sign-out-alt" style="color:#f87171"></i></div>
+        <div style="flex:1"><div class="menu-item-title" style="color:#f87171">Sign Out</div></div>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/promo-popup.js"></script>
+
+<!-- ══ SHARED COMPONENTS ══ -->
+<script src="component/save-modal.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/status-viewer.js"></script>
+<script src="component/ad-card.js"></script>
+<script src="component/post-card.js"></script>
+<script src="component/collection-card.js"></script>
+
+<!-- ══ SHARED DATA ══ -->
+<script src="data/ad-data.js"></script>
+
+<script>
+/* ── DATA ── */
+const READER_AV = 'https://i.pravatar.cc/100?img=47';
+const READER_NAME = 'Chioma_R';
+
+const GENRES_ALL = [
+  {id:'betrayal',label:'💔 Betrayal'},{id:'family',label:'👑 Family'},
+  {id:'twist',label:'✨ Twist'},{id:'campus',label:'🎓 Campus'},
+  {id:'revenge',label:'🔥 Revenge'},{id:'urban',label:'🏙️ Urban Love'},
+  {id:'elegy',label:'🌙 Elegy'},{id:'heartbreak',label:'💔 Heartbreak'},
+  {id:'comedy',label:'😂 Comedy'},{id:'thriller',label:'😱 Thriller'},
+  {id:'friendship',label:'🤝 Friendship'},{id:'marriage',label:'💍 Marriage'},
+  {id:'mystery',label:'🔍 Mystery'},{id:'inspirational',label:'✨ Inspirational'},
+  {id:'faith',label:'🙏 Faith'},
+];
+let activeGenres = new Set(['betrayal','family','twist','campus','revenge']);
+
+/* ══════════════════════════════
+   FEED POSTS — shaped for DroboardPostCard (same pattern as the writer profile)
+══════════════════════════════ */
+let FEED_POSTS = [
+  {
+    id:'rp1', type:'repost', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'2h ago', mine:true,
+    note:'This one hit different. I cried for 20 minutes straight. @Ada_Writes is not human.',
+    storyRef:{ cat:'💔 Betrayal', title:"I came home early and caught my husband kissing my late sister's photograph", cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', writer:'Ada_Writes' },
+    likes:34, liked:false, comments:12,
+  },
+  {
+    id:'rp2', type:'quote', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'5h ago', mine:true,
+    quote:'"She didn\'t ask for an explanation. She just picked up her bag and walked out like she had planned it for years."',
+    caption:'— Chapter 3, The Runaway Bride · @Ifeanyi_Story',
+    likes:89, liked:true, comments:23,
+  },
+  {
+    id:'rp3', type:'post', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'1d ago', mine:true,
+    text:"Okay I need everyone to stop what they are doing and go read @Chiamaka_N's latest chapter. I cannot explain. I cannot breathe. I am not okay. That is all.",
+    likes:112, liked:false, comments:44,
+  },
+  {
+    id:'rp4', type:'post', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'1d ago', mine:true,
+    text:"Reading at 1am with cold jollof rice and no regrets 😭📖 Currently on Chapter 8 of the inheritance saga",
+    image:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900&q=80',
+    likes:67, liked:false, comments:18,
+  },
+  {
+    id:'rp5', type:'post', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'2d ago', mine:true,
+    text:"The betrayal in Chapter 5 of @Ada_Writes new series literally made me put my phone down and stare at the ceiling for 5 minutes. That's good writing. That's very good writing.",
+    likes:201, liked:false, comments:67,
+  },
+  {
+    id:'rp6', type:'repost', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none',
+    verified:true, time:'3d ago', mine:true,
+    note:'If you have not read this you are missing out. No cap.',
+    storyRef:{ cat:'🌙 Elegy', title:"The letter folded inside his jacket pocket — he died before he could send it", cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg', writer:'Efe_O' },
+    likes:28, liked:false, comments:8,
+  },
+];
+
+/* ══════════════════════════════
+   SAVED STORIES — same fields as the writer profile's chapters grid
+══════════════════════════════ */
+const SAVED_STORIES = [
+  {id:1,cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",writer:'Ada_Writes',ch:'S2·Ch4',reads:'171k',likes:'24.3k',badge:'',saved:true,liked:false},
+  {id:2,cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',writer:'Ifeanyi_Story',ch:'Complete',reads:'312k',likes:'45k',badge:'hot',saved:true,liked:false},
+  {id:3,cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",writer:'Chiamaka_N',ch:'S3·Ch12',reads:'204k',likes:'31k',badge:'new',saved:true,liked:false},
+  {id:4,cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I quietly uncovered her entire secret life',writer:'Zara_M',ch:'S1·Ch5',reads:'192k',likes:'28k',badge:'new',saved:true,liked:false},
+  {id:5,cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'🌙 Elegy',title:'The letter folded inside his jacket pocket — he died before he could send it',writer:'Efe_O',ch:'Complete',reads:'218k',likes:'36.5k',badge:'',saved:true,liked:false},
+  {id:6,cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring — and she giggled before he even knelt",writer:'Kemi_A',ch:'S1·Ch3',reads:'96k',likes:'19.2k',badge:'',saved:true,liked:false},
+];
+
+let COLLECTIONS_DATA = [
+  {id:'c1',name:'Stories That Wrecked Me',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/N9jY0w4m/5.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/23WvkFLH/images-(2).jpg'],count:14,privacy:'private'},
+  {id:'c2',name:'Best Plot Twists',covers:['https://i.postimg.cc/WF1j4Pnh/6.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg'],count:8,privacy:'public'},
+  {id:'c3',name:'My Campus Reads',covers:['https://i.postimg.cc/cgLZJNmC/8.jpg'],count:6,privacy:'public'},
+  {id:'c4',name:'2am Crying Material',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/cgLZJNmC/8.jpg'],count:11,privacy:'private'},
+  {id:'c5',name:'Ada Writes Masterclass',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg'],count:3,privacy:'public'},
+  {id:'c6',name:'Recommend to Friends',covers:['https://i.postimg.cc/N9jY0w4m/5.jpg','https://i.postimg.cc/cgLZJNmC/8.jpg'],count:7,privacy:'public'},
+];
+
+const SERIES_DATA = [
+  {id:'s1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",writer:'Ada_Writes',progress:'S2·Ch4',hasNew:true,newChLabel:'Season 2 · Chapter 5 just dropped',notifOn:true,complete:false},
+  {id:'s2',cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',writer:'Ifeanyi_Story',progress:'Complete',hasNew:false,notifOn:false,complete:true},
+  {id:'s3',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",writer:'Chiamaka_N',progress:'S3·Ch8',hasNew:true,newChLabel:'Season 3 · Chapter 9 just dropped',notifOn:true,complete:false},
+  {id:'s4',cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'🔥 Revenge',title:"My stepmother stole my university fund",writer:'Zara_M',progress:'S1·Ch5',hasNew:false,notifOn:true,complete:false},
+  {id:'s5',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",writer:'Kemi_A',progress:'S1·Ch3',hasNew:false,notifOn:false,complete:false},
+];
+
+const FOLLOWING_DATA = [
+  {name:'Ada_Writes',meta:'Writer · 12.4k followers · 💔 Betrayal',av:'https://i.pravatar.cc/100?img=32',following:true},
+  {name:'Ifeanyi_Story',meta:'Writer · 31.7k followers · ✨ Twist',av:'https://i.pravatar.cc/100?img=53',following:true},
+  {name:'Chiamaka_N',meta:'Writer · 19.2k followers · 👑 Family',av:'https://i.pravatar.cc/100?img=43',following:true},
+  {name:'Efe_O',meta:'Writer · 22.3k followers · 🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',following:true},
+  {name:'Zara_M',meta:'Writer · 14.8k followers · 🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',following:true},
+  {name:'Kemi_A',meta:'Writer · 6.5k followers · 💔 Heartbreak',av:'https://i.pravatar.cc/100?img=28',following:true},
+  {name:'CampusQueen',meta:'Writer · 8.1k followers · 🎓 Campus',av:'https://i.pravatar.cc/100?img=12',following:true},
+];
+
+/* ── UTILS ── */
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function fmtN(n) { if(typeof n==='string') return n; return n>=1000?(n/1000).toFixed(1)+'k':String(n); }
+
+/* ── OWNER / FOLLOW ── */
+let IS_OWNER = true;
+let isFollowing = false;
+
+function toggleOwnerAction() {
+  if (IS_OWNER) { toast('✏️ Edit profile…'); return; }
+  isFollowing = !isFollowing;
+  const btn = document.getElementById('profileActionBtn');
+  btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+  btn.className = 'pact follow' + (isFollowing ? ' ing' : '');
+  toast(isFollowing ? '✅ Following @Chioma_R!' : 'Unfollowed @Chioma_R');
+}
+(function initBtn() {
+  const btn = document.getElementById('profileActionBtn');
+  if (IS_OWNER) { btn.textContent = 'Edit Profile'; btn.className = 'pact edit'; }
+  else { btn.textContent = '+ Follow'; btn.className = 'pact follow'; }
+})();
+
+/* ── TAB SWITCHING ── */
+function switchTab(tab) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
+  const active = document.querySelector('.ptab.active');
+  if (active) active.scrollIntoView({ inline:'center', behavior:'smooth' });
+}
+function switchTabFromMenu(tab) { closeMenu(); setTimeout(() => switchTab(tab), 180); }
+
+/* ── MENU ── */
+function openMenu() { document.getElementById('menuOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeMenu() { document.getElementById('menuOverlay').classList.remove('open'); document.body.style.overflow=''; }
+
+/* ── AD — DroboardAdCard.renderBanner ── */
+function initAdBanner(){
+  const ad = BANNER_ADS[0];
+  const mount = document.getElementById('profileAdMount');
+  mount.innerHTML = DroboardAdCard.renderBanner(ad);
+  DroboardAdCard.attach(mount, {
+    getAds: () => BANNER_ADS,
+    onOpen(adItem){ toast('Opening ' + adItem.brand + '…'); },
+    onCta(adItem){ toast('Opening ' + adItem.brand + '…'); },
+  });
+}
+
+/* ── FEED — DroboardPostCard ── */
+function renderFeedPosts(){ DroboardPostCard.setPosts(FEED_POSTS); }
+function doShare(post){
+  window.openShareModal({
+    title: post.title || post.quote || (post.text ? post.text.substring(0,60) : ('Post by @'+READER_NAME)),
+    sub: '@' + READER_NAME,
+    img: post.image || (post.storyRef && post.storyRef.cover) || '',
+    url: 'https://droboard.app/post/' + post.id,
+  });
+}
+function doSave(post){
+  window.openSaveModal({
+    title: post.title || post.quote || 'Droboard Post',
+    sub: '@' + READER_NAME,
+    img: post.image || (post.storyRef && post.storyRef.cover) || '',
+    storyId: post.id,
+  });
+}
+function initFeedPosts(){
+  DroboardPostCard.attach(document.getElementById('feedList'), {
+    onLike(post){
+      post.liked = !post.liked;
+      post.likes += post.liked ? 1 : -1;
+      DroboardPostCard.update(post);
+    },
+    onReact(post){ toast('Reacted!'); },
+    onComment(post){ location.href = 'post.html?pid=' + post.id; },
+    onShare(post){ doShare(post); },
+    onDotsAction(action, post){
+      if (action === 'edit') { toast('✏️ Editing post…'); return; }
+      if (action === 'delete') {
+        const idx = FEED_POSTS.findIndex(p => p.id === post.id);
+        if (idx > -1) FEED_POSTS.splice(idx, 1);
+        renderFeedPosts();
+        toast('🗑️ Post deleted.');
+        return;
+      }
+      if (action === 'report') { toast('🚩 Reported.'); return; }
+      if (action === 'less') { toast("👁️ You'll see less of this."); return; }
+      if (action === 'follow') { toast(`✅ Following @${post.name}!`); return; }
+      if (action === 'share') { doShare(post); return; }
+      if (action === 'save') { doSave(post); return; }
+    },
+    onAvatarClick(){ /* no statuses on the reader's own posts */ },
+    onReplySend(post, text){
+      post.comments++;
+      DroboardPostCard.update(post);
+      toast('💬 Reply posted!');
+    },
+  });
+  renderFeedPosts();
+}
+
+/* ── LIBRARY — same chapters-grid card layout as the writer profile ── */
+function getBadgeClass(b) { return b==='hot'?'badge-hot':b==='new'?'badge-new':''; }
+function getBadgeLabel(b) { return b==='hot'?'HOT':b==='new'?'NEW':''; }
+function renderLibrary() {
+  document.getElementById('chaptersGrid').innerHTML = SAVED_STORIES.map(s => {
+    const bc = getBadgeClass(s.badge);
+    const bl = getBadgeLabel(s.badge);
+    const safeTitle = s.title.replace(/'/g, "\\'");
+    return `<div class="ch-card">
+      <div class="ch-cover">
+        <img src="${s.cover}" loading="lazy" onclick="toast('📖 Opening story…')"/>
+        <div class="ch-scrim"></div>
+        ${bc ? `<div class="ch-badge ${bc}">${bl}</div>` : ''}
+        <div class="ch-stats">
+          <span class="ch-stat"><i class="far fa-eye" style="font-size:7px"></i>${s.reads}</span>
+          <span class="ch-stat"><i class="far fa-heart" style="font-size:7px"></i>${s.likes}</span>
+          <span class="ch-tag">${s.ch}</span>
+        </div>
+      </div>
+      <div class="ch-title">${s.title}</div>
+      <div class="ch-meta-row">
+        <img class="ch-av" src="https://i.pravatar.cc/100?img=1" loading="lazy"/>
+        <span class="ch-sub">@${s.writer} · ${s.cat}</span>
+      </div>
+      <div class="ch-actions">
+        <div class="cha${s.liked?' liked':''}" onclick="toggleSavedLike(${s.id},this)">
+          <i class="${s.liked?'fas':'far'} fa-heart"></i> ${s.likes}
+        </div>
+        <div class="cha" onclick="window.openShareModal({title:'${safeTitle}',sub:'by @${s.writer}',img:'${s.cover}',url:'https://droboard.app/story/${s.id}'})">
+          <i class="fas fa-share-alt"></i> Share
+        </div>
+        <div class="cha${s.saved?' liked':''}" onclick="toggleSavedBookmark(${s.id},this)">
+          <i class="${s.saved?'fas':'far'} fa-bookmark"></i> ${s.saved?'Saved':'Save'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleSavedLike(id, el) {
+  const s = SAVED_STORIES.find(x => x.id === id); if(!s) return;
+  s.liked = !s.liked;
+  el.classList.toggle('liked', s.liked);
+  el.innerHTML = `<i class="${s.liked?'fas':'far'} fa-heart"></i> ${s.likes}`;
+}
+function toggleSavedBookmark(id, el) {
+  const s = SAVED_STORIES.find(x => x.id === id); if(!s) return;
+  s.saved = !s.saved;
+  el.classList.toggle('liked', s.saved);
+  el.innerHTML = `<i class="${s.saved?'fas':'far'} fa-bookmark"></i> ${s.saved?'Saved':'Save'}`;
+  toast(s.saved ? '📌 Saved to library' : 'Removed from library');
+}
+
+/* ── COLLECTIONS — DroboardCollectionCard ── */
+function initCollections() {
+  DroboardCollectionCard.attach(document.getElementById('collectionsGrid'), {
+    onOpen(coll) { toast('📂 Opening "' + coll.name + '"…'); },
+    onShare(coll) {
+      window.openShareModal({
+        title: coll.name,
+        sub: (coll.count || 0) + ' stories · @' + READER_NAME,
+        img: (coll.covers && coll.covers[0]) || '',
+        url: 'https://droboard.app/collection/' + coll.id,
+      });
+    },
+    onCreateNew() { openNewCollection(); },
+    createButtonEl: document.querySelector('.new-coll-btn'),
+  });
+  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
+}
+
+/* ── SERIES ── */
+function renderSeries() {
+  document.getElementById('seriesList').innerHTML = SERIES_DATA.map((s, i) => `
+    <div class="series-card" onclick="toast('📖 Reading series…')">
+      <div class="series-header">
+        <div class="series-img" style="background-image:url('${s.cover}')"></div>
+        <div class="series-info">
+          <div class="series-cat">${s.cat}</div>
+          <div class="series-title">${s.title}</div>
+          <div class="series-writer">by @${s.writer}</div>
+          <div class="series-status">
+            ${s.complete ? '<span class="series-badge sb-complete">Complete</span>' : '<span class="series-badge sb-new">Ongoing</span>'}
+            <span style="font-size:9px;color:var(--tx-muted)">${s.progress}</span>
+          </div>
+        </div>
+      </div>
+      ${s.hasNew ? `<div class="new-ch-banner" onclick="event.stopPropagation();toast('📖 Reading new chapter…')">
+        <div class="new-ch-label"><span class="ndot"></span>${s.newChLabel}</div>
+        <div class="new-ch-btn">Read Now</div>
+      </div>` : ''}
+      <div class="series-footer" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="ntog${s.notifOn?'':' off'}" id="ntog-${i}" onclick="toggleNotif(${i},this)"></button>
+          <span style="font-size:9px;color:var(--tx-muted)" id="ntog-lbl-${i}">${s.notifOn?'🔔 Notified':'🔕 Muted'}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div class="sh-more" onclick="toast('📖 Continue…')">Read</div>
+          <div style="font-size:9px;font-weight:700;color:#444;cursor:pointer;padding:3px 9px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--bd)" onclick="toast('✅ Unfollowed')">Unfollow</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function toggleNotif(i, btn) {
+  SERIES_DATA[i].notifOn = !SERIES_DATA[i].notifOn;
+  btn.classList.toggle('off', !SERIES_DATA[i].notifOn);
+  document.getElementById('ntog-lbl-'+i).textContent = SERIES_DATA[i].notifOn ? '🔔 Notified' : '🔕 Muted';
+  toast(SERIES_DATA[i].notifOn ? '🔔 Notifications ON' : '🔕 Notifications OFF');
+}
+
+/* ── FOLLOWING ── */
+function renderFollowing() {
+  document.getElementById('followingList').innerHTML = FOLLOWING_DATA.map((f,i) =>
+    `<div class="follow-item">
+      <div class="follow-av"><img src="${f.av}" loading="lazy"/></div>
+      <div class="follow-info">
+        <div class="follow-name">@${f.name}</div>
+        <div class="follow-meta">${f.meta}</div>
+      </div>
+      <button class="follow-btn${f.following?' ing':''}" onclick="toggleFollow(${i},this)">${f.following?'✓ Following':'+ Follow'}</button>
+    </div>`).join('');
+}
+function toggleFollow(i, btn) {
+  FOLLOWING_DATA[i].following = !FOLLOWING_DATA[i].following;
+  btn.textContent = FOLLOWING_DATA[i].following ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', FOLLOWING_DATA[i].following);
+  toast(FOLLOWING_DATA[i].following ? `✅ Following @${FOLLOWING_DATA[i].name}` : `Unfollowed @${FOLLOWING_DATA[i].name}`);
+}
+
+/* ── POST COMPOSER ── */
+function openPostComposer(type) {
+  document.getElementById('postComposerOv').classList.add('open');
+  document.body.style.overflow='hidden';
+  if(type) document.querySelectorAll('.ctype').forEach(t => t.classList.toggle('active', t.dataset.ct===type));
+}
+function closePostComposer() { document.getElementById('postComposerOv').classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.ctype').forEach(btn => {
+  btn.addEventListener('click', () => { document.querySelectorAll('.ctype').forEach(b => b.classList.remove('active')); btn.classList.add('active'); });
+});
+function submitPost() {
+  const text = document.getElementById('composerText').value.trim();
+  if (!text) { toast('✍️ Write something first!'); return; }
+  FEED_POSTS.unshift({ id:'rp_'+Date.now(), type:'post', name:READER_NAME, avatar:READER_AV, avatarRing:'ring-none', verified:true, time:'Just now', mine:true, text, likes:0, liked:false, comments:0 });
+  closePostComposer();
+  document.getElementById('composerText').value = '';
+  renderFeedPosts();
+  toast('✅ Post published!');
+}
+
+/* ── STATUS COMPOSER ── */
+function openStatusComposer() { document.getElementById('statusComposerOv').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeStatusComposer() { document.getElementById('statusComposerOv').classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.scs-type').forEach(btn => {
+  btn.addEventListener('click', () => { document.querySelectorAll('.scs-type').forEach(b => b.classList.remove('active')); btn.classList.add('active'); });
+});
+
+/* ── REPOST ── */
+function openRepost(story) {
+  if (story) {
+    document.getElementById('repostPreviewImg').style.backgroundImage = `url('${story.cover||''}')`;
+    document.getElementById('repostPreviewTitle').textContent = story.title || 'Post';
+    document.getElementById('repostPreviewWriter').textContent = 'by @' + (story.writer||READER_NAME);
+  }
+  document.getElementById('repostOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeRepost() { document.getElementById('repostOv').classList.remove('open'); document.body.style.overflow=''; }
+
+/* ── NEW COLLECTION ── */
+function openNewCollection() { document.getElementById('newCollOv').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeNewColl() { document.getElementById('newCollOv').classList.remove('open'); document.body.style.overflow=''; }
+let _ncPrivacy = 'private';
+function setNcPrivacy(val, btn) { _ncPrivacy=val; document.querySelectorAll('.nc-privacy-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+function createCollection() {
+  const name = document.getElementById('newCollName').value.trim();
+  if(!name){ toast('📂 Give your collection a name!'); return; }
+  COLLECTIONS_DATA.push({id:'c_'+Date.now(),name,covers:[],count:0,privacy:_ncPrivacy});
+  closeNewColl();
+  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
+  toast(`📂 "${name}" created!`);
+}
+
+/* ── GENRE EDIT ── */
+function openGenreEdit() {
+  document.getElementById('genreTogGrid').innerHTML = GENRES_ALL.map(g =>
+    `<div class="genre-tog${activeGenres.has(g.id)?' on':''}" data-gid="${g.id}" onclick="this.classList.toggle('on')">${g.label}</div>`
+  ).join('');
+  document.getElementById('genreEditOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeGenreEdit() { document.getElementById('genreEditOv').classList.remove('open'); document.body.style.overflow=''; }
+function saveGenres() {
+  activeGenres = new Set([...document.querySelectorAll('#genreTogGrid .genre-tog.on')].map(el => el.dataset.gid));
+  const shown = [...activeGenres].slice(0,6);
+  document.getElementById('genrePillsDisplay').innerHTML = shown.map(id => {
+    const g = GENRES_ALL.find(x=>x.id===id);
+    return g ? `<div class="genre-pill">${g.label}</div>` : '';
+  }).join('') + `<div class="genre-pill inactive" onclick="openGenreEdit()">+ Edit</div>`;
+  closeGenreEdit();
+  toast('✅ Interests saved!');
+}
+
+/* ── INIT ── */
+initAdBanner();
+initFeedPosts();
+renderLibrary();
+initCollections();
+renderSeries();
+renderFollowing();
+</script>
+</body>
+</html>

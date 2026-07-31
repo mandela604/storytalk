@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · @Ada_Writes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --card:#000000;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e0e0e0;--tx-body:#c0c0c0;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --tx-title:#e0e0e0;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --post-sep:#1a1b22;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+
+/* ═══════════════════════════════
+   LIGHT MODE — platform-wide toggle, tokens inspired by discover.html
+═══════════════════════════════ */
+[data-theme="light"]{
+  --bg:#f5f5f5;--l1:#ffffff;--l2:#f1f1f1;--l3:#ffffff;--l4:#e8e8e8;
+  --card:#ffffff;
+  --bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.05);--bd-acc:rgba(255,0,80,.25);
+  --tx-high:#161616;--tx-body:#3a3a3a;--tx-muted:#666666;--tx-faint:#8a8a8a;
+  --tx-title:#161616;
+  --post-sep:#e5e5e5;
+}
+[data-theme="light"] body{background:var(--bg);color:var(--tx-body)}
+[data-theme="light"] .top-bar,
+[data-theme="light"] .profile-tabs,
+[data-theme="light"] .bottom-nav{background:rgba(255,255,255,.97);border-color:var(--bd)}
+[data-theme="light"] .top-icon-btn{background:var(--l2);color:#555;border-color:var(--bd)}
+[data-theme="light"] .coin-balance{background:var(--l2);border-color:var(--bd-acc)}
+[data-theme="light"] .menu-close,
+[data-theme="light"] .menu-theme-toggle,
+[data-theme="light"] .overlay-close,
+[data-theme="light"] .dsv-close{background:rgba(0,0,0,.05);color:#555;border-color:var(--bd)}
+[data-theme="light"] .pact.edit,
+[data-theme="light"] .pact.msg{background:rgba(0,0,0,.05);color:#333;border-color:var(--bd)}
+[data-theme="light"] .genre-pill.inactive{background:rgba(0,0,0,.04);color:#888}
+[data-theme="light"] .anlyt-period{color:#888}
+[data-theme="light"] .follow-btn{background:rgba(0,0,0,.05);color:#333;border-color:var(--bd)}
+[data-theme="light"] .composer-launch span{color:#999}
+[data-theme="light"] .menu-item:active{background:rgba(0,0,0,.03)}
+[data-theme="light"] .stat-item:active{background:rgba(0,0,0,.03)}
+[data-theme="light"] .cmedia-btn,
+[data-theme="light"] .composer-audience,
+[data-theme="light"] .scs-audience{background:rgba(0,0,0,.04);border-color:var(--bd);color:#555}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden;transition:background .25s,color .25s}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+
+/* ── TOP BAR ── */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.top-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;cursor:pointer}
+.top-right{display:flex;align-items:center;gap:8px}
+.coin-balance{display:flex;align-items:center;gap:5px;background:var(--l2);border:1px solid var(--bd-acc);color:var(--gold);font-size:11px;font-weight:800;padding:6px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:.15s}
+.coin-balance:active{transform:scale(.94)}
+.coin-balance i{font-size:11px}
+.top-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#ccc;transition:.15s;position:relative;flex-shrink:0}
+.top-icon-btn:active{transform:scale(.9)}
+.notif-count{position:absolute;top:4px;right:4px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid #000}
+
+/* ── HERO ── */
+.profile-hero{position:relative;width:100%;height:180px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80');background-size:cover;background-position:center 30%}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,#000 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.15) 100%)}
+.hero-edit-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+
+/* ── PROFILE INFO ── */
+.profile-info{padding:0 14px;margin-top:-8px;position:relative;z-index:5}
+.av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+.av-outer{position:relative;flex-shrink:0}
+.av-ring{width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:3px;box-shadow:0 0 24px var(--glow)}
+.av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000}
+.av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.verified-badge-av{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--blue);border:2.5px solid #000;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:800}
+.action-row{display:flex;gap:7px;align-items:center}
+.pact{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.pact:active{transform:scale(.96)}
+.pact.edit{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+.pact.follow{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
+.pact.follow.ing{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc;box-shadow:none}
+.pact.msg{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);color:#ccc;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+
+.profile-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:2px;display:flex;align-items:center;gap:7px;color:var(--tx-high)}
+.writer-tag{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc3);font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.05em;font-family:'DM Sans',sans-serif}
+.profile-handle{font-size:12px;color:var(--tx-muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.verified-inline{font-size:9px;font-weight:700;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);padding:1px 7px;border-radius:8px}
+.profile-bio{font-size:13px;color:var(--tx-body);line-height:1.55;margin-bottom:8px;max-width:340px}
+.profile-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.genre-pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3);cursor:pointer}
+.genre-pill.inactive{background:rgba(255,255,255,.04);border-color:var(--bd);color:#555}
+
+/* ── STATS ROW ── */
+.stats-row{display:flex;border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:14px;background:var(--l1)}
+.stat-item{flex:1;text-align:center;padding:11px 4px;border-right:1px solid var(--bd);cursor:pointer;transition:.15s}
+.stat-item:last-child{border-right:none}
+.stat-item:active{background:rgba(255,255,255,.03)}
+.stat-num{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high);line-height:1}
+.stat-num.r{color:var(--acc)}
+.stat-num.b{color:var(--blue)}
+.stat-num.g{color:var(--green)}
+.stat-label{font-size:8px;color:var(--tx-muted);margin-top:2px;font-weight:600}
+
+/* ── ACHIEVEMENT CHIPS ── */
+.ach-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.ach-row::-webkit-scrollbar{display:none}
+.ach-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap;border:1px solid;flex-shrink:0;cursor:pointer}
+.ach-chip.gold{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:var(--gold)}
+.ach-chip.blue{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2);color:var(--blue)}
+.ach-chip.red{background:rgba(255,0,80,.07);border-color:var(--bd-acc);color:var(--acc3)}
+.ach-chip.purple{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);color:var(--purple)}
+.ach-chip.green{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:var(--green)}
+
+/* ── AD MOUNT (rendered via DroboardAdCard.renderBanner) ── */
+#profileAdMount{margin:0 0 14px}
+
+/* ── TABS ── */
+.profile-tabs{display:flex;border-bottom:1px solid var(--bd);position:sticky;top:57px;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(12px);overflow-x:auto;scrollbar-width:none}
+.profile-tabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.ptab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
+.ptab-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,0,80,.15);color:var(--acc3);font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;vertical-align:middle}
+.ptab-badge.b{background:rgba(56,189,248,.15);color:var(--blue)}
+.ptab-badge.g{background:rgba(52,211,153,.15);color:var(--green)}
+
+/* ── PANELS ── */
+.tab-panel{display:none;padding:14px}
+.tab-panel.active{display:block}
+.sdiv{height:1px;background:var(--bd);margin:14px 0}
+
+/* ── SECTION HEADERS ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc3);cursor:pointer;white-space:nowrap;padding:3px 8px;border-radius:10px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)}
+
+/* ── Composer bar (feed tab) ── */
+.composer-launch{display:flex;align-items:center;gap:9px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:10px 13px;margin-bottom:12px;cursor:pointer}
+.composer-launch img{width:32px;height:32px;border-radius:50%;border:2px solid var(--acc);object-fit:cover;flex-shrink:0}
+.composer-launch span{font-size:12px;color:#333;flex:1}
+.composer-launch .cl-icons{display:flex;gap:8px}
+.composer-launch .cl-icons i{font-size:14px;color:#333;cursor:pointer}
+
+#ptfMount{margin-bottom:6px}
+#ptfMount:empty{margin-bottom:0}
+
+/* ═══════════════════════════════
+   LIBRARY TAB — filter pills (grid itself is rendered by
+   component/library.js -> DroboardLibrary, mounted at #libraryMount)
+═══════════════════════════════ */
+#libraryMount{margin-top:2px}
+
+/* ═══════════════════════════════
+   SERIES CARD (used on Stories tab)
+═══════════════════════════════ */
+.series-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.series-card:active{border-color:var(--bd-acc)}
+.series-header{display:flex;gap:10px;padding:11px 12px}
+.series-img{width:56px;height:64px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0}
+.series-info{flex:1;min-width:0}
+.series-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:2px}
+.series-title{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;line-height:1.3;color:var(--tx-high);margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.series-writer{font-size:9px;color:var(--tx-muted)}
+.series-status{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.series-badge{font-size:7px;font-weight:800;padding:2px 7px;border-radius:7px}
+.sb-ongoing{background:rgba(255,0,80,.1);color:var(--acc3);border:1px solid var(--bd-acc)}
+.sb-complete{background:rgba(255,255,255,.05);color:#555;border:1px solid var(--bd)}
+.new-ch-banner{background:rgba(52,211,153,.06);border-top:1px solid rgba(52,211,153,.12);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.new-ch-label{font-size:9px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:4px}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pdot 1.4s ease-in-out infinite}
+@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.new-ch-btn{font-size:9px;font-weight:800;color:var(--green);cursor:pointer;padding:3px 9px;border-radius:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)}
+.series-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.01);border-top:1px solid var(--bd2)}
+.series-stats{display:flex;gap:10px}
+.series-stat{font-size:9px;color:var(--tx-muted);display:flex;align-items:center;gap:3px;font-weight:600}
+.series-stat strong{color:#ccc}
+
+/* ═══════════════════════════════
+   COLLECTIONS TAB — grid populated by DroboardCollectionCard
+═══════════════════════════════ */
+.new-coll-btn{width:100%;padding:10px;border-radius:13px;background:rgba(255,255,255,.02);border:1px dashed var(--bd);color:var(--tx-faint);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.new-coll-btn:hover{background:rgba(255,0,80,.04);border-color:var(--bd-acc);color:var(--acc3)}
+
+/* ═══════════════════════════════
+   ANALYTICS CARDS
+═══════════════════════════════ */
+.analytics-period-btns{display:flex;gap:6px;margin-bottom:14px}
+.anlyt-period{padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:transparent;color:#555;transition:.2s;font-family:'DM Sans',sans-serif}
+.anlyt-period.active{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.anlyt-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;padding:13px 12px}
+.anlyt-label{font-size:9px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.anlyt-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--tx-high);line-height:1}
+.anlyt-sub{font-size:9px;color:var(--acc3);margin-top:3px;font-weight:600}
+.anlyt-bar{height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:7px}
+.anlyt-bar-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px;transition:.4s}
+
+.top-series-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2);cursor:pointer}
+.top-series-item:last-child{border-bottom:none}
+.top-series-rank{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;width:22px;text-align:center;flex-shrink:0}
+.top-series-img{width:38px;height:44px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0;border:1px solid var(--bd)}
+.top-series-body{flex:1;min-width:0}
+.top-series-title{font-size:11px;font-weight:700;color:var(--tx-high);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.top-series-cat{font-size:9px;color:var(--tx-muted);margin-top:2px}
+.top-series-reads{text-align:right;flex-shrink:0}
+.top-series-reads strong{display:block;font-size:11px;font-weight:800;color:var(--acc)}
+.top-series-reads span{font-size:8px;color:var(--tx-muted)}
+
+/* ═══════════════════════════════
+   GENRE EDIT
+═══════════════════════════════ */
+.genre-tog-grid{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 14px}
+.genre-tog{font-size:10px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(255,255,255,.03);color:#777;transition:.2s;user-select:none;display:flex;align-items:center;gap:5px}
+.genre-tog.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.genre-tog.on::before{content:'✓';font-size:9px;font-weight:900}
+.genre-save-btn{width:calc(100% - 32px);margin:0 16px 14px;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 18px var(--glow-sm)}
+
+/* ═══════════════════════════════
+   FOLLOWING LIST
+═══════════════════════════════ */
+.follow-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd2)}
+.follow-item:last-child{border-bottom:none}
+.follow-av{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--l2)}
+.follow-av img{width:100%;height:100%;object-fit:cover;display:block}
+.follow-info{flex:1;min-width:0}
+.follow-name{font-size:12px;font-weight:700;color:var(--tx-high)}
+.follow-meta{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.follow-btn{background:rgba(255,255,255,.05);border:1.5px solid var(--bd);color:#ccc;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;font-family:'DM Sans',sans-serif}
+.follow-btn.ing{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* ═══════════════════════════════
+   ABOUT
+═══════════════════════════════ */
+.about-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)}
+.about-item:last-child{border-bottom:none}
+.about-icon{width:32px;height:32px;border-radius:9px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px}
+.about-label{font-size:10px;font-weight:600;color:var(--tx-muted)}
+.about-val{font-size:12px;font-weight:600;color:var(--tx-high);margin-top:1px;line-height:1.4}
+
+/* ═══════════════════════════════
+   OVERLAYS / SHEETS  (composer, status composer, new collection, genre edit)
+═══════════════════════════════ */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.overlay-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.overlay-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:7px}
+.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Status composer */
+.scs-types{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.scs-types::-webkit-scrollbar{display:none}
+.scs-type{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s}
+.scs-type.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.scs-preview{margin:0 16px 12px;border-radius:14px;height:130px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--bd)}
+.scs-preview-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent)}
+.scs-preview-change{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 9px;border-radius:10px;font-size:9px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.scs-text-area{margin:0 16px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px}
+.scs-textarea{width:100%;background:transparent;border:none;color:var(--tx-high);font-family:'Playfair Display',serif;font-size:14px;font-weight:700;outline:none;resize:none;padding:12px 13px;line-height:1.5;min-height:60px}
+.scs-textarea::placeholder{color:#333;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400}
+.scs-caption{width:100%;background:transparent;border:none;border-top:1px solid var(--bd);color:#ccc;font-family:'DM Sans',sans-serif;font-size:11px;outline:none;resize:none;padding:8px 13px;min-height:36px}
+.scs-caption::placeholder{color:#333}
+.scs-bottom{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px}
+.scs-audience{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:10px;font-weight:700;color:#aaa}
+.scs-post-btn{background:var(--acc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 16px var(--glow-sm)}
+
+/* Post composer */
+.composer-body{padding:0 16px 14px}
+.composer-types{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.composer-types::-webkit-scrollbar{display:none}
+.ctype{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s}
+.ctype.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.composer-textarea{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.55;min-height:80px;margin-bottom:10px}
+.composer-textarea::placeholder{color:#333}
+.composer-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.composer-media-row{display:flex;gap:7px}
+.cmedia-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#666}
+.composer-right{display:flex;gap:8px;align-items:center}
+.composer-audience{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 10px;cursor:pointer;font-size:9px;font-weight:700;color:#aaa}
+.composer-post-btn{background:var(--acc);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 14px var(--glow-sm)}
+
+/* New collection — private, public, followers */
+.new-coll-body{padding:0 16px 14px}
+.nc-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px}
+.nc-input::placeholder{color:#333}
+.nc-privacy-row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.nc-privacy-btn{flex:1;min-width:80px;padding:8px 4px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:transparent;color:#555;font-family:'DM Sans',sans-serif;transition:.2s;text-align:center}
+.nc-privacy-btn.active{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc3)}
+.nc-create-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Menu sheet (hamburger account menu) */
+.menu-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.menu-overlay.open{display:flex}
+.menu-sheet{width:100%;background:var(--l1);border-radius:24px 24px 0 0;animation:slideUp .28s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.menu-sheet::-webkit-scrollbar{display:none}
+.menu-profile-mini{display:flex;align-items:center;gap:11px;padding:12px 18px 14px;border-bottom:1px solid var(--bd)}
+.menu-mini-av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--acc)}
+.menu-mini-av img{width:100%;height:100%;object-fit:cover;display:block}
+.menu-mini-name{font-size:13px;font-weight:800;color:var(--tx-high)}
+.menu-mini-handle{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.menu-mini-badge{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px;background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc3);margin-top:3px;display:inline-block}
+.menu-theme-toggle{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa;flex-shrink:0;transition:.15s}
+.menu-theme-toggle:active{transform:scale(.9)}
+.menu-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#aaa;flex-shrink:0}
+.menu-section{padding:8px 0 4px}
+.menu-section-label{font-size:9px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.12em;padding:0 18px 6px}
+.menu-item{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
+.menu-item:active{background:rgba(255,255,255,.02)}
+.menu-item-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.menu-item-title{font-size:13px;font-weight:700;color:var(--tx-high)}
+.menu-item-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.menu-item-right{font-size:10px;font-weight:700;color:var(--tx-muted);margin-left:auto}
+.menu-badge-sm{background:var(--acc);color:#fff;font-size:8px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
+.menu-badge-sm.b{background:var(--blue)}
+.menu-badge-sm.g{background:var(--green)}
+.menu-divider{height:1px;background:var(--bd);margin:4px 18px}
+.menu-wallet-strip{margin:4px 18px 8px;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,0,80,.04));border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
+.mws-info{display:flex;flex-direction:column;gap:1px}
+.mws-label{font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.mws-amount-row{display:flex;align-items:center;gap:7px}
+.mws-amount{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff}
+[data-theme="light"] .mws-amount{color:var(--tx-high)}
+.mws-fund{background:var(--gold);color:#07070b;border:none;padding:6px 13px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-logo" onclick="location.href='index.html'">D</div>
+  <div class="top-right">
+    <div class="coin-balance" onclick="location.href='wallet.html'" title="Coin balance">
+      <i class="fas fa-coins"></i> <span id="coinBalance">8,750</span>
+    </div>
+    <div class="top-icon-btn" id="bellBtn" onclick="location.href='alerts.html'">
+      <i class="fas fa-bell"></i>
+      <div class="notif-count" id="notifCount" style="display:none">0</div>
+    </div>
+    <div class="top-icon-btn" onclick="openMenu()"><i class="fas fa-bars"></i></div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="profile-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grad"></div>
+  <button class="hero-edit-btn"><i class="fas fa-camera"></i> Edit Cover</button>
+</div>
+
+<!-- PROFILE INFO -->
+<div class="profile-info">
+  <div class="av-row">
+    <div class="av-outer">
+      <div class="av-ring">
+        <div class="av-inner"><img src="https://i.pravatar.cc/100?img=32" alt="Ada_Writes"/></div>
+      </div>
+      <div class="verified-badge-av"><i class="fas fa-check" style="font-size:7px"></i></div>
+    </div>
+    <div class="action-row">
+      <button class="pact edit" id="profileActionBtn" onclick="toggleOwnerAction()">Edit Profile</button>
+      <button class="pact msg" onclick="toast('💬 Opening DM…')"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <div class="profile-name">
+    Ada_Writes
+    <span class="writer-tag">✍️ Writer</span>
+  </div>
+  <div class="profile-handle">
+    @ada_writes
+    <span class="verified-inline">✓ Verified</span>
+  </div>
+  <div class="profile-bio">The writer who makes Lagos cry on their commute. Betrayal, family and the love you didn't see coming. 5 ongoing series. Write at 2am, publish at 5am. 🖊️</div>
+
+  <div class="profile-genres" id="genrePillsDisplay">
+    <div class="genre-pill">💔 Betrayal</div>
+    <div class="genre-pill">👑 Family</div>
+    <div class="genre-pill">✨ Twist</div>
+    <div class="genre-pill">🏙️ Urban</div>
+    <div class="genre-pill">💍 Marriage</div>
+    <div class="genre-pill inactive" onclick="openGenreEdit()" style="cursor:pointer">+ Edit</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-item" onclick="switchTab('following')">
+      <div class="stat-num">89</div><div class="stat-label">Following</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num r">12.4k</div><div class="stat-label">Followers</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('stories')">
+      <div class="stat-num b">48</div><div class="stat-label">Library</div>
+    </div>
+    <div class="stat-item" onclick="switchTab('analytics')">
+      <div class="stat-num r">1.1M</div><div class="stat-label">Reads</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num g">24.3k</div><div class="stat-label">Likes</div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="ach-row">
+    <div class="ach-chip gold"><i class="fas fa-trophy"></i> Top Writer '25</div>
+    <div class="ach-chip red"><i class="fas fa-fire"></i> 1M Reads</div>
+    <div class="ach-chip blue"><i class="fas fa-star"></i> Editor's Pick</div>
+    <div class="ach-chip purple"><i class="fas fa-gavel"></i> Debate Legend</div>
+    <div class="ach-chip green"><i class="fas fa-book"></i> 48 Stories</div>
+  </div>
+
+  <!-- Ad — rendered via DroboardAdCard.renderBanner (small banner ad type) -->
+  <div id="profileAdMount"></div>
+</div>
+
+<!-- TABS -->
+<div class="profile-tabs" id="profileTabs">
+  <div class="ptab active" data-tab="feed" onclick="switchTab('feed')">🏠 Feed</div>
+  <div class="ptab" data-tab="stories" onclick="switchTab('stories')">📖 Library <span class="ptab-badge b" id="storiesBadge">48</span></div>
+  <div class="ptab" data-tab="series" onclick="switchTab('series')">📺 Stories <span class="ptab-badge" id="seriesTabBadge">5</span></div>
+  <div class="ptab" data-tab="collections" onclick="switchTab('collections')">📂 Collections <span class="ptab-badge g">4</span></div>
+  <div class="ptab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</div>
+  <div class="ptab" data-tab="following" onclick="switchTab('following')">👥 Following</div>
+  <div class="ptab" data-tab="about" onclick="switchTab('about')">✦ About</div>
+</div>
+
+<!-- ════ FEED TAB — posts rendered via DroboardPostCard, suggestions via DroboardPeopleToFollow ════ -->
+<div class="tab-panel active" id="panel-feed">
+  <div class="composer-launch" onclick="openPostComposer('text')">
+    <img src="https://i.pravatar.cc/100?img=32" alt=""/>
+    <span>What's on your mind? Share a post, update or chapter teaser…</span>
+    <div class="cl-icons">
+      <i class="fas fa-image" onclick="event.stopPropagation();openPostComposer('photo')"></i>
+      <i class="fas fa-book-open" style="color:var(--acc)" onclick="event.stopPropagation();openPostComposer('chapter')"></i>
+    </div>
+  </div>
+  <div id="ptfMount"></div>
+  <div id="feedList"></div>
+</div>
+
+<!-- ════ LIBRARY TAB — rendered via DroboardLibrary (component/library.js) ════ -->
+<div class="tab-panel" id="panel-stories">
+  <div class="sh" style="margin-bottom:12px">
+    <div class="sh-title" style="flex:1">My Library</div>
+    <div style="display:flex;gap:6px">
+      <div style="font-size:10px;font-weight:700;color:#555;padding:4px 9px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--bd);cursor:pointer" onclick="toast('🔽 Filter options')">Filter</div>
+      <div class="sh-more" onclick="toast('📖 + New Story')">+ New</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:2px" id="storyFilterPills"></div>
+  <div id="libraryMount"></div>
+</div>
+
+<!-- ════ STORIES TAB ════ -->
+<div class="tab-panel" id="panel-series">
+  <div class="sh" style="margin-bottom:8px">
+    <div class="sh-title" style="flex:1" id="storiesCountTitle">5 Stories</div>
+    <div style="display:flex;gap:6px">
+      <div class="sh-more" onclick="location.href='story-management.html'">View</div>
+      <div class="sh-more" onclick="toast('📝 + New Story')">+ Story</div>
+    </div>
+  </div>
+  <div id="seriesList"></div>
+</div>
+
+<!-- ════ COLLECTIONS TAB — rendered via DroboardCollectionCard, cards open collection.html ════ -->
+<div class="tab-panel" id="panel-collections">
+  <div class="sh" style="margin-bottom:10px">
+    <div class="sh-title" style="flex:1">My Collections</div>
+    <div class="sh-more" onclick="openNewCollection()">+ New</div>
+  </div>
+  <div id="collectionsGrid"></div>
+  <button class="new-coll-btn" onclick="openNewCollection()"><i class="fas fa-plus-circle"></i> Create New Collection</button>
+</div>
+
+<!-- ════ ANALYTICS TAB ════ -->
+<div class="tab-panel" id="panel-analytics">
+  <div class="sh" style="margin-bottom:8px">
+    <div class="sh-title">Writer Dashboard</div>
+  </div>
+  <div class="analytics-period-btns">
+    <button class="anlyt-period active" onclick="switchAnalyticsPeriod('today',this)">Today</button>
+    <button class="anlyt-period" onclick="switchAnalyticsPeriod('week',this)">This Week</button>
+    <button class="anlyt-period" onclick="switchAnalyticsPeriod('month',this)">This Month</button>
+  </div>
+  <div class="analytics-grid" id="analyticsGrid"></div>
+  <div class="sdiv"></div>
+  <div class="sh" style="margin-bottom:10px"><div class="sh-title">Top Performing Series</div></div>
+  <div id="topSeriesList"></div>
+</div>
+
+<!-- ════ FOLLOWING TAB ════ -->
+<div class="tab-panel" id="panel-following">
+  <div style="margin-bottom:10px;font-size:11px;color:var(--tx-muted)">Following <strong style="color:var(--tx-high)">89</strong> writers, readers &amp; creators</div>
+  <div id="followingList"></div>
+</div>
+
+<!-- ════ ABOUT TAB ════ -->
+<div class="tab-panel" id="panel-about">
+  <div style="font-size:13px;color:var(--tx-body);line-height:1.65;padding:2px 0 14px">
+    Lagos-based fiction writer. Started writing at 19, published first story on Droboard in 2021 and never stopped. Known for the kind of betrayal plots that make readers delete their own DMs out of suspicion. Writes at 2am, proof-reads at 5am, publishes at 6am.
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-map-marker-alt" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Location</div><div class="about-val">Lagos, Nigeria 🇳🇬</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-calendar-alt" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Joined Droboard</div><div class="about-val">March 2021 · 4 years writing</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-book" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Writing Genres</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px" id="aboutGenreDisplay"></div>
+      <div style="font-size:9px;color:var(--acc3);cursor:pointer;margin-top:5px;font-weight:600;display:inline-flex;align-items:center;gap:3px" onclick="openGenreEdit()"><i class="fas fa-pen" style="font-size:8px"></i> Edit genres</div>
+    </div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-fire" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Current Series</div><div class="about-val">5 active · 2 completed · 1 paused</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-heart" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Most-Liked Story</div><div class="about-val">"I came home early and caught my husband kissing my late sister's photograph" — 24.3k likes</div></div>
+  </div>
+  <div class="about-item">
+    <div class="about-icon"><i class="fas fa-link" style="color:var(--acc)"></i></div>
+    <div><div class="about-label">Links</div>
+      <div class="about-val" style="display:flex;gap:10px;margin-top:5px">
+        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-instagram"></i> @ada_writes_ng</span>
+        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-x-twitter"></i> @ada_writes</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item active" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- ════ POST COMPOSER ════ -->
+<div class="overlay-bg" id="postComposerOv" onclick="if(event.target===this)closePostComposer()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-plus-circle" style="color:var(--acc);font-size:13px"></i> Create Post</h3>
+      <button class="overlay-close" onclick="closePostComposer()">✕</button>
+    </div>
+    <div class="composer-body">
+      <div class="composer-types">
+        <div class="ctype active" data-ct="text">📝 Text</div>
+        <div class="ctype" data-ct="photo">📸 Photo</div>
+        <div class="ctype" data-ct="chapter">📖 Chapter Drop</div>
+        <div class="ctype" data-ct="ama">🎙️ AMA</div>
+        <div class="ctype" data-ct="poll">📊 Poll</div>
+        <div class="ctype" data-ct="quote">💬 Quote</div>
+      </div>
+      <textarea class="composer-textarea" id="composerText" placeholder="What do you want to share? A teaser, update, thoughts…"></textarea>
+      <div class="composer-actions">
+        <div class="composer-media-row">
+          <div class="cmedia-btn"><i class="fas fa-image"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-at"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-hashtag"></i></div>
+          <div class="cmedia-btn"><i class="fas fa-laugh"></i></div>
+        </div>
+        <div class="composer-right">
+          <div class="composer-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
+          <button class="composer-post-btn" onclick="submitPost()">Post →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STATUS COMPOSER ════ -->
+<div class="overlay-bg" id="statusComposerOv" onclick="if(event.target===this)closeStatusComposer()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-circle-notch" style="color:var(--acc);font-size:13px"></i> Post Status</h3>
+      <button class="overlay-close" onclick="closeStatusComposer()">✕</button>
+    </div>
+    <div class="scs-types">
+      <div class="scs-type active" data-type="reading">📖 Reading Update</div>
+      <div class="scs-type" data-type="quote">💬 Quote</div>
+      <div class="scs-type" data-type="teaser">🔥 Chapter Teaser</div>
+      <div class="scs-type" data-type="thought">🖊️ Thought</div>
+    </div>
+    <div class="scs-preview" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80')">
+      <div class="scs-preview-grad"></div>
+      <div class="scs-preview-change" onclick="toast('🖼️ Choose background…')">Change BG</div>
+    </div>
+    <div class="scs-text-area">
+      <textarea class="scs-textarea" rows="3" placeholder="Write your quote or thought…">"Sometimes love is just grief wearing a familiar face."</textarea>
+      <textarea class="scs-caption" rows="2" placeholder="Add a caption…"></textarea>
+    </div>
+    <div class="scs-bottom">
+      <div class="scs-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
+      <button class="scs-post-btn" onclick="toast('✅ Status posted!');closeStatusComposer()">Post ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ NEW COLLECTION — private, public, followers ════ -->
+<div class="overlay-bg" id="newCollOv" onclick="if(event.target===this)closeNewColl()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-folder-plus" style="color:var(--acc3);font-size:13px"></i> New Collection</h3>
+      <button class="overlay-close" onclick="closeNewColl()">✕</button>
+    </div>
+    <div class="new-coll-body">
+      <input class="nc-input" id="newCollName" placeholder="Collection name…"/>
+      <textarea class="nc-input" rows="2" style="resize:none;min-height:48px;font-size:12px" placeholder="Description (optional)"></textarea>
+      <div style="font-size:10px;color:var(--tx-muted);margin-bottom:6px;font-weight:600">Privacy</div>
+      <div class="nc-privacy-row">
+        <button class="nc-privacy-btn active" onclick="setNcPrivacy('private',this)"><i class="fas fa-lock" style="color:var(--acc)"></i> Private</button>
+        <button class="nc-privacy-btn" onclick="setNcPrivacy('public',this)"><i class="fas fa-globe-africa" style="color:var(--green)"></i> Public</button>
+        <button class="nc-privacy-btn" onclick="setNcPrivacy('followers',this)"><i class="fas fa-user-friends" style="color:var(--blue)"></i> Followers</button>
+      </div>
+      <button class="nc-create-btn" onclick="createCollection()">Create Collection ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GENRE EDIT ════ -->
+<div class="overlay-bg" id="genreEditOv" onclick="if(event.target===this)closeGenreEdit()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-book" style="color:var(--acc3);font-size:13px"></i> My Writing Genres</h3>
+      <button class="overlay-close" onclick="closeGenreEdit()">✕</button>
+    </div>
+    <div style="font-size:11px;color:#666;padding:0 16px 12px;line-height:1.5">Select genres that describe your writing. These appear on your profile.</div>
+    <div class="genre-tog-grid" id="genreTogGrid"></div>
+    <button class="genre-save-btn" onclick="saveGenres()">Save Genres ✓</button>
+  </div>
+</div>
+
+<!-- ════ ACCOUNT MENU ════ -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()">
+  <div class="menu-sheet" onclick="event.stopPropagation()">
+    <div class="overlay-handle"></div>
+    <div class="menu-profile-mini">
+      <div class="menu-mini-av"><img src="https://i.pravatar.cc/100?img=32" alt=""/></div>
+      <div style="flex:1">
+        <div class="menu-mini-name">Ada_Writes</div>
+        <div class="menu-mini-handle">@ada_writes · 12.4k followers</div>
+        <div class="menu-mini-badge">✍️ Verified Writer</div>
+      </div>
+      <div class="menu-theme-toggle" id="menuThemeBtn" title="Toggle light / dark mode"><i class="fas fa-moon" id="menuThemeIcon"></i></div>
+      <div class="menu-close" onclick="closeMenu()">✕</div>
+    </div>
+
+    <div class="menu-wallet-strip">
+      <div class="mws-info">
+        <div class="mws-label">Wallet Balance</div>
+        <div class="mws-amount-row">
+          <div class="mws-amount" id="walletAmount">🪙 8,750</div>
+        </div>
+      </div>
+      <button class="mws-fund" onclick="toast('💰 Withdraw earnings…');closeMenu()">Withdraw</button>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Create</div>
+      <div class="menu-item" onclick="openPostComposer('text');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)"><i class="fas fa-pen" style="color:var(--acc)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">New Post</div><div class="menu-item-sub">Text, photo, update or AMA</div></div>
+      </div>
+      <div class="menu-item" onclick="openPostComposer('chapter');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.12)"><i class="fas fa-book-open" style="color:var(--green)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">New Chapter Drop</div><div class="menu-item-sub">Announce or tease a new chapter</div></div>
+      </div>
+      <div class="menu-item" onclick="openStatusComposer();closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.12)"><i class="fas fa-circle-notch" style="color:var(--blue)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Post Status</div><div class="menu-item-sub">Quote, update or chapter teaser</div></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">My Content</div>
+      <div class="menu-item" onclick="switchTabFromMenu('stories')">
+        <div class="menu-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.1)"><i class="fas fa-book" style="color:var(--blue)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Library</div><div class="menu-item-sub">48 published chapters</div></div>
+        <div class="menu-item-right"><span class="menu-badge-sm b">48</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('series')">
+        <div class="menu-item-icon" style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)"><i class="fas fa-tv" style="color:var(--acc)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Stories</div><div class="menu-item-sub">5 published stories</div></div>
+        <div class="menu-item-right"><span class="menu-badge-sm">5</span></div>
+      </div>
+      <div class="menu-item" onclick="switchTabFromMenu('analytics')">
+        <div class="menu-item-icon" style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.1)"><i class="fas fa-chart-line" style="color:var(--gold)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Analytics</div><div class="menu-item-sub">1.1M total reads this month</div></div>
+        <div class="menu-item-right" style="color:var(--gold);font-weight:800">↑ 24%</div>
+      </div>
+      <div class="menu-item" onclick="location.href='writer-dashboard.html';closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.12)"><i class="fas fa-gauge-high" style="color:var(--purple)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Dashboard</div><div class="menu-item-sub">Full writer dashboard</div></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Account</div>
+      <div class="menu-item" onclick="toast('✏️ Edit profile…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--bd)"><i class="fas fa-user-edit" style="color:#888"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Edit Profile</div><div class="menu-item-sub">Name, bio, avatar, genres</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('⚙️ Settings…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--bd)"><i class="fas fa-cog" style="color:#888"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Settings</div><div class="menu-item-sub">Privacy, notifications, payout</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('🤝 Refer a friend…');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.1)"><i class="fas fa-share-alt" style="color:var(--gold)"></i></div>
+        <div style="flex:1"><div class="menu-item-title">Refer a Friend</div><div class="menu-item-sub">Earn ₦500 per referral</div></div>
+      </div>
+      <div class="menu-item" onclick="toast('👋 Signed out!');closeMenu()">
+        <div class="menu-item-icon" style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.1)"><i class="fas fa-sign-out-alt" style="color:#f87171"></i></div>
+        <div style="flex:1"><div class="menu-item-title" style="color:#f87171">Sign Out</div></div>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ SHARED COMPONENTS ══ -->
+<script src="component/save-modal.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/status-viewer.js"></script>
+<script src="component/ad-card.js"></script>
+<script src="component/post-card.js"></script>
+<script src="component/people-to-follow.js"></script>
+<script src="component/collection-card.js"></script>
+<script src="component/library.js"></script>
+
+<!-- ══ SHARED DATA ══ -->
+<script src="data/post-data.js"></script>
+<script src="data/ad-data.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   BACKEND API — real calls with demo data fallback
+═══════════════════════════════════════════════════════ */
+const API_BASE = 'https://api.droboard.app';
+
+async function apiFetch(endpoint, demoData) {
+  try {
+    const res = await fetch(API_BASE + endpoint, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('non-2xx');
+    return await res.json();
+  } catch (_) {
+    return demoData;
+  }
+}
+
+async function loadNotifCount() {
+  const data = await apiFetch('/v1/notifications/unread-count', { count: 5 });
+  const count = data?.count ?? 5;
+  const badge = document.getElementById('notifCount');
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+loadNotifCount();
+
+async function loadCoinBalance() {
+  const data = await apiFetch('/v1/wallet/balance', { coins: 8750 });
+  const coins = data?.coins ?? 8750;
+  const fmtCoins = coins.toLocaleString();
+  const topEl = document.getElementById('coinBalance');
+  if (topEl) topEl.textContent = fmtCoins;
+  const walletEl = document.getElementById('walletAmount');
+  if (walletEl) walletEl.innerHTML = '🪙 ' + fmtCoins;
+}
+loadCoinBalance();
+
+/* ═══════════════════════════════════════════════════════
+   THEME — light / dark toggle (platform-wide, persisted)
+═══════════════════════════════════════════════════════ */
+(function initTheme(){
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('menuThemeBtn');
+  const icon = document.getElementById('menuThemeIcon');
+  function paint(theme){ if (icon) icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun'; }
+  paint(saved);
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      paint(next);
+      toast(next === 'light' ? '☀️ Light mode' : '🌙 Dark mode');
+    });
+  }
+})();
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════ */
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function fmtN(n) {
+  if(typeof n==='string') return n;
+  return n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n);
+}
+
+const WRITER_AV = 'https://i.pravatar.cc/100?img=32';
+const WRITER_NAME = 'Ada_Writes';
+const WRITER_WID = 'w1'; // matches WRITER_STATUSES entry from data/post-data.js
+
+/* ══════════════════════════════
+   GENRES
+══════════════════════════════ */
+const GENRES_ALL = [
+  {id:'betrayal',label:'💔 Betrayal'},{id:'family',label:'👑 Family'},
+  {id:'twist',label:'✨ Twist'},{id:'urban',label:'🏙️ Urban Love'},
+  {id:'marriage',label:'💍 Marriage'},{id:'campus',label:'🎓 Campus'},
+  {id:'revenge',label:'🔥 Revenge'},{id:'heartbreak',label:'💔 Heartbreak'},
+  {id:'comedy',label:'😂 Comedy'},{id:'thriller',label:'😱 Thriller'},
+  {id:'friendship',label:'🤝 Friendship'},{id:'mystery',label:'🔍 Mystery'},
+  {id:'inspirational',label:'✨ Inspirational'},{id:'faith',label:'🙏 Faith'},
+  {id:'elegy',label:'🌙 Elegy'},
+];
+let activeGenres = new Set(['betrayal','family','twist','urban','marriage']);
+
+/* ══════════════════════════════
+   CHAPTERS / LIBRARY DATA (feeds the Library tab via DroboardLibrary)
+══════════════════════════════ */
+const ALL_CHAPTERS = [
+  {id:1,cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",ch:'S2·Ch4',reads:'171k',likes:'24.3k',badge:'hot',type:'chapter'},
+  {id:2,cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',ch:'Complete',reads:'312k',likes:'45k',badge:'hot',type:'story'},
+  {id:3,cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'🏙️ Urban Love',title:'She rejected me 3 times. Now we share a mortgage and a dog named "Finally"',ch:'S2·Ch9',reads:'22k',likes:'3.4k',badge:'new',type:'chapter'},
+  {id:4,cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring — and she giggled before he even knelt",ch:'S1·Ch3',reads:'96k',likes:'19.2k',badge:'',type:'story'},
+  {id:5,cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",ch:'S3·Ch7',reads:'138k',likes:'21k',badge:'',type:'chapter'},
+  {id:6,cover:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'💍 Marriage',title:'My husband deleted our anniversary photos from every device before I came home',ch:'S1·Ch2',reads:'54k',likes:'9.8k',badge:'new',type:'poem'},
+  {id:7,cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'✨ Twist',title:'The letter folded inside his jacket pocket — he died before he could send it',ch:'Complete',reads:'218k',likes:'36.5k',badge:'',type:'short'},
+  {id:8,cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',ch:'S2·Ch6',reads:'88k',likes:'14k',badge:'hot',type:'chapter'},
+  {id:9,cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'👑 Family',title:'Grandma kept a secret room and I only found it at her funeral',ch:'S1·Ch4',reads:'44k',likes:'8.1k',badge:'new',type:'chapter'},
+  {id:10,cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'💔 Betrayal',title:'The business partner I trusted sold my idea to the highest bidder',ch:'S1·Ch1',reads:'29k',likes:'5.3k',badge:'',type:'short'},
+  {id:11,cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'A poem for the love that arrived five years too late',ch:'Poem',reads:'61k',likes:'11.2k',badge:'',type:'poem'},
+  {id:12,cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'🏙️ Urban Love',title:'He said goodbye at the bus stop and I never saw him again — until yesterday',ch:'S3·Ch1',reads:'77k',likes:'13.4k',badge:'hot',type:'chapter'},
+  {id:13,cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💍 Marriage',title:'She married him anyway, knowing what I knew. That was her choice.',ch:'S2·Ch2',reads:'33k',likes:'6.7k',badge:'',type:'chapter'},
+  {id:14,cover:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'💔 Heartbreak',title:'A short story: The last text she sent was an emoji. Just a red heart.',ch:'Short Story',reads:'42k',likes:'9k',badge:'new',type:'short'},
+  {id:15,cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'👑 Family',title:'My father came back after 20 years and called it a surprise visit',ch:'S1·Ch3',reads:'55k',likes:'10.8k',badge:'',type:'chapter'},
+  {id:16,cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'The maid saw everything. She never said a word — until today.',ch:'S4·Ch1',reads:'91k',likes:'18.3k',badge:'hot',type:'chapter'},
+  {id:17,cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'✨ Twist',title:'I wrote this poem the night I found out. It still makes me cry.',ch:'Poem',reads:'38k',likes:'7.2k',badge:'',type:'poem'},
+  {id:18,cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'🏙️ Urban Love',title:'Lagos at 3am is loud and honest. This story starts there.',ch:'S1·Ch1',reads:'17k',likes:'3.9k',badge:'new',type:'chapter'},
+];
+
+const SERIES_DATA = [
+  {id:'s1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",seasons:2,chapters:14,latestCh:'Season 2 · Chapter 5 just dropped',hasNew:true,reads:'171k',likes:'24.3k',complete:false},
+  {id:'s2',cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",seasons:1,chapters:3,latestCh:'New chapter dropping soon',hasNew:false,reads:'96k',likes:'19.2k',complete:false},
+  {id:'s3',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",seasons:3,chapters:21,latestCh:'Season 3 · Chapter 8 just dropped',hasNew:true,reads:'138k',likes:'21k',complete:false},
+  {id:'s4',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',seasons:2,chapters:12,latestCh:'',hasNew:false,reads:'88k',likes:'14k',complete:false},
+  {id:'s5',cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',seasons:1,chapters:8,latestCh:'',hasNew:false,reads:'312k',likes:'45k',complete:true},
+];
+
+/* Matches the shape DroboardCollectionCard expects: {id,name,count,covers,privacy} */
+const COLLECTIONS_DATA = [
+  {id:'c1',name:'Best Betrayal Arcs',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/N9jY0w4m/5.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/23WvkFLH/images-(2).jpg'],count:12,privacy:'public'},
+  {id:'c2',name:'Plot Twists That Wrecked Me',covers:['https://i.postimg.cc/WF1j4Pnh/6.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg'],count:8,privacy:'public'},
+  {id:'c3',name:'My Reading Drafts',covers:['https://i.postimg.cc/cgLZJNmC/8.jpg'],count:4,privacy:'private'},
+  {id:'c4',name:'Must-Reads for Lagos Readers',covers:['https://i.postimg.cc/fkdXzjSj/wife.jpg','https://i.postimg.cc/0MyxNqfz/7.jpg','https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/N9jY0w4m/5.jpg'],count:9,privacy:'followers'},
+];
+
+const FOLLOWING_DATA = [
+  {name:'Chiamaka_N',meta:'Writer · 19.2k followers · 👑 Family',av:'https://i.pravatar.cc/100?img=47',following:true},
+  {name:'Ifeanyi_Story',meta:'Writer · 31.7k followers · ✨ Twist',av:'https://i.pravatar.cc/100?img=53',following:true},
+  {name:'Efe_O',meta:'Writer · 22.3k followers · 🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',following:true},
+  {name:'CampusQueen',meta:'Writer · 8.1k followers · 🎓 Campus',av:'https://i.pravatar.cc/100?img=12',following:true},
+  {name:'Zara_M',meta:'Writer · 14.8k followers · 🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',following:true},
+  {name:'Kemi_A',meta:'Writer · 6.5k followers · 💔 Heartbreak',av:'https://i.pravatar.cc/100?img=28',following:true},
+  {name:'Dami_Cole',meta:'Writer · 9.4k followers · 🏙️ Urban Love',av:'https://i.pravatar.cc/100?img=64',following:true},
+];
+
+const ANALYTICS_DATA = {
+  today: [
+    {label:'Today\'s Reads',num:'4.2k',sub:'↑ 18% vs yesterday',bar:42},
+    {label:'Likes Today',num:'312',sub:'↑ 9% vs yesterday',bar:31},
+    {label:'Comments',num:'87',sub:'↑ 22% vs yesterday',bar:28},
+    {label:'New Followers',num:'+34',sub:'Today',bar:34},
+    {label:'Tip Income',num:'₦1,200',sub:'Today',bar:24},
+    {label:'Story Saves',num:'148',sub:'Today',bar:38},
+  ],
+  week: [
+    {label:'Weekly Reads',num:'31k',sub:'↑ 24% vs last week',bar:78},
+    {label:'Weekly Likes',num:'2.1k',sub:'↑ 12% vs last week',bar:62},
+    {label:'Comments',num:'480',sub:'↑ 31% vs last week',bar:45},
+    {label:'New Followers',num:'+217',sub:'This week',bar:55},
+    {label:'Tip Income',num:'₦4,800',sub:'This week',bar:55},
+    {label:'Story Saves',num:'1.4k',sub:'This week',bar:70},
+  ],
+  month: [
+    {label:'Monthly Reads',num:'1.1M',sub:'↑ 38% vs last month',bar:88},
+    {label:'Monthly Likes',num:'24.3k',sub:'↑ 15% vs last month',bar:72},
+    {label:'Comments',num:'4.1k',sub:'↑ 28% vs last month',bar:55},
+    {label:'New Followers',num:'+847',sub:'This month',bar:78},
+    {label:'Tip Income',num:'₦12,500',sub:'This month',bar:68},
+    {label:'Story Saves',num:'6.2k',sub:'This month',bar:82},
+  ]
+};
+let currentAnalyticsPeriod = 'week';
+
+const TOP_SERIES = [
+  {id:'s5',cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',reads:'312k',trend:'↑ 8%'},
+  {id:'s1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",reads:'171k',trend:'↑ 24%'},
+  {id:'s3',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",reads:'138k',trend:'↑ 11%'},
+  {id:'s4',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',reads:'88k',trend:'↑ 6%'},
+  {id:'s2',cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",reads:'96k',trend:'↑ 19%'},
+];
+
+/* ══════════════════════════════
+   FEED POSTS — shaped for DroboardPostCard
+══════════════════════════════ */
+let FEED_POSTS = [
+  {
+    id:'p1', type:'ama', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'2h ago', mine:true,
+    amaData:{ isLive:true, viewers:847, title:'Ask Ada_Writes Anything 🎙',
+      meta:'Writing process · Betrayal series secrets · Where Season 3 is going — bring your questions' },
+    likes:842, liked:false, comments:134,
+  },
+  {
+    id:'p2', type:'chapter-drop', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'5h ago', mine:true,
+    statusUpdate:'Just finished Chapter 5 draft 🖊️ Posting at midnight!',
+    text:"Chapter 5 of Season 2 just dropped 🔥 I cried writing the last scene. You will cry reading it. No spoilers but... Ada is done being patient.",
+    chapterRef:{ cat:'💔 Betrayal', title:"I came home early and caught my husband kissing my late sister's photograph", ch:'S2 · Chapter 5', cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg' },
+    likes:1240, liked:false, comments:287,
+  },
+  {
+    id:'p3', type:'post', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'1d ago', mine:true,
+    text:"Writing at 2am has a different energy. The city is quiet. The grief is louder. That's where the best chapters come from. 🌙",
+    image:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80',
+    likes:612, liked:false, comments:89,
+  },
+  {
+    id:'p4', type:'quote', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'1d ago', mine:true,
+    quote:'"She didn\'t ask for an explanation. She just picked up her bag, pressed her lips together so her voice wouldn\'t shake, and walked out like she had planned it for years. She hadn\'t. But some exits become perfect the moment you commit to them."',
+    caption:'— Chapter 3, Season 2 of The Runaway Bride',
+    likes:3200, liked:true, comments:412,
+  },
+  {
+    id:'p5', type:'repost', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'2d ago', mine:true,
+    note:'This is why I write. This story by @Chiamaka_N broke me at 3am. Read it.',
+    storyRef:{ cat:'👑 Family', title:"My grandmother's will revealed I wasn't her blood — but she left everything to me", cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', writer:'Chiamaka_N' },
+    likes:289, liked:false, comments:44,
+  },
+  {
+    id:'p6', type:'post', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'3d ago', mine:true, pinned:true,
+    text:"For everyone asking: yes, Season 3 of the Betrayal series is coming. The wait was because I needed it to be right. It is right now. 🫀\n\nDropping next Friday. Midnight. Set your alarms.",
+    likes:2100, liked:false, comments:567,
+  },
+];
+
+/* ══════════════════════════════
+   TAB SWITCHING
+══════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
+  const active = document.querySelector('.ptab.active');
+  if (active) active.scrollIntoView({ inline:'center', behavior:'smooth' });
+}
+function switchTabFromMenu(tab) { closeMenu(); setTimeout(() => switchTab(tab), 180); }
+
+/* ══════════════════════════════
+   ACCOUNT MENU
+══════════════════════════════ */
+function openMenu() { document.getElementById('menuOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeMenu() { document.getElementById('menuOverlay').classList.remove('open'); document.body.style.overflow=''; }
+
+/* ══════════════════════════════
+   IS_OWNER toggle
+══════════════════════════════ */
+let IS_OWNER = true;
+let isFollowing = false;
+
+function toggleOwnerAction() {
+  if (IS_OWNER) { toast('✏️ Edit profile…'); }
+  else {
+    isFollowing = !isFollowing;
+    const btn = document.getElementById('profileActionBtn');
+    btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+    btn.className = 'pact follow' + (isFollowing ? ' ing' : '');
+    toast(isFollowing ? '✅ Following @Ada_Writes!' : 'Unfollowed @Ada_Writes');
+  }
+}
+(function initProfileBtn(){
+  const btn = document.getElementById('profileActionBtn');
+  if (IS_OWNER) { btn.textContent = 'Edit Profile'; btn.className = 'pact edit'; }
+  else { btn.textContent = '+ Follow'; btn.className = 'pact follow'; }
+})();
+
+/* ══════════════════════════════
+   AD — DroboardAdCard.renderBanner (small banner ad type)
+══════════════════════════════ */
+function initAdBanner(){
+  const ad = BANNER_ADS[0];
+  const mount = document.getElementById('profileAdMount');
+  mount.innerHTML = DroboardAdCard.renderBanner(ad);
+  DroboardAdCard.attach(mount, {
+    getAds: () => BANNER_ADS,
+    onOpen(adItem){ toast('Opening ' + adItem.brand + '…'); },
+    onCta(adItem){ toast('Opening ' + adItem.brand + '…'); },
+  });
+}
+
+/* ══════════════════════════════
+   PEOPLE TO FOLLOW — DroboardPeopleToFollow (feed tab)
+══════════════════════════════ */
+function initPeopleToFollow(){
+  const people = (typeof WRITER_STATUSES !== 'undefined' ? WRITER_STATUSES : [])
+    .filter(w => !w.isYou && w.id !== WRITER_WID)
+    .map(w => ({
+      id: w.id,
+      name: w.name,
+      av: w.avatar,
+      ring: w.ring,
+      isLive: w.isLive || false,
+      statuses: w.statuses,
+      verified: false,
+      rank: w.isLive ? '🔴 Live now' : null,
+      following: false,
+      profileUrl: 'profile.html',
+    }));
+  if (!people.length) return;
+  DroboardPeopleToFollow.render('#ptfMount', {
+    people,
+    title: 'Suggested Writers',
+    maxVisible: 6,
+    onFollow({ name, following }) {
+      toast(following ? `✅ Following @${name}` : `Unfollowed @${name}`);
+    },
+  });
+}
+
+/* ══════════════════════════════
+   FEED — DroboardPostCard
+══════════════════════════════ */
+function renderFeedPosts(){
+  DroboardPostCard.setPosts(FEED_POSTS);
+}
+
+function initFeedPosts(){
+  DroboardPostCard.attach(document.getElementById('feedList'), {
+    onLike(post){
+      post.liked = !post.liked;
+      post.likes += post.liked ? 1 : -1;
+      DroboardPostCard.update(post);
+    },
+    onReact(post, reactionId){
+      toast('Reacted!');
+    },
+    onComment(post){
+      location.href = 'post.html?pid=' + post.id;
+    },
+    onShare(post){
+      window.openShareModal({
+        title: post.title || post.quote || (post.text ? post.text.substring(0,60) : ('Post by @'+WRITER_NAME)),
+        sub: 'by @' + WRITER_NAME,
+        img: post.image || (post.chapterRef && post.chapterRef.cover) || (post.storyRef && post.storyRef.cover) || '',
+        url: 'https://droboard.app/post/' + post.id,
+      });
+    },
+    onDotsAction(action, post){
+      if (action === 'edit') { toast('✏️ Editing post…'); return; }
+      if (action === 'delete') {
+        const idx = FEED_POSTS.findIndex(p => p.id === post.id);
+        if (idx > -1) FEED_POSTS.splice(idx, 1);
+        renderFeedPosts();
+        toast('🗑️ Post deleted.');
+        return;
+      }
+      if (action === 'report') { toast('🚩 Reported.'); return; }
+      if (action === 'less') { toast("👁️ You'll see less of this."); return; }
+      if (action === 'follow') { toast(`✅ Following @${post.name}!`); return; }
+      if (action === 'share') {
+        window.openShareModal({
+          title: post.title || post.quote || 'Droboard Post',
+          sub: 'by @' + WRITER_NAME,
+          img: post.image || (post.chapterRef && post.chapterRef.cover) || (post.storyRef && post.storyRef.cover) || '',
+          url: 'https://droboard.app/post/' + post.id,
+        });
+        return;
+      }
+      if (action === 'save') {
+        window.openSaveModal({
+          title: post.title || post.quote || 'Droboard Post',
+          sub: 'by @' + WRITER_NAME,
+          img: post.image || (post.chapterRef && post.chapterRef.cover) || (post.storyRef && post.storyRef.cover) || '',
+          storyId: post.id,
+        });
+        return;
+      }
+    },
+    onPollVote(post, oi){
+      if (!post.poll || post.poll.voted >= 0) { toast('✅ Already voted!'); return; }
+      post.poll.opts[oi].v++;
+      post.poll.voted = oi;
+      post.poll.total = (post.poll.total || 0) + 1;
+      DroboardPostCard.update(post);
+      toast('✅ Vote cast!');
+    },
+    onDebateVote(post, side){
+      if (!post.debateData || post.debateData.userVote) { toast('✅ Already voted!'); return; }
+      post.debateData.userVote = side;
+      if (side === 'for') post.debateData.forV++; else post.debateData.agV++;
+      DroboardPostCard.update(post);
+      toast(side === 'for' ? '✅ Voted FOR!' : '❌ Voted AGAINST!');
+    },
+    onAvatarClick(post){
+      const ws = (typeof WRITER_STATUSES !== 'undefined') ? WRITER_STATUSES.find(w => w.id === post.wid) : null;
+      if (ws && ws.statuses && ws.statuses.length && typeof window.openStatusViewer === 'function') {
+        window.openStatusViewer(WRITER_STATUSES, ws.id);
+      }
+    },
+    onReplySend(post, text){
+      post.comments++;
+      DroboardPostCard.update(post);
+      toast('💬 Reply posted!');
+    },
+  });
+  renderFeedPosts();
+}
+
+/* ══════════════════════════════
+   POST COMPOSER
+══════════════════════════════ */
+function openPostComposer(type) {
+  document.getElementById('postComposerOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if(type) document.querySelectorAll('.ctype').forEach(t => t.classList.toggle('active', t.dataset.ct===type));
+}
+function closePostComposer() { document.getElementById('postComposerOv').classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.ctype').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ctype').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+function submitPost() {
+  const text = document.getElementById('composerText').value.trim();
+  if (!text) { toast('✍️ Write something first!'); return; }
+  FEED_POSTS.unshift({
+    id: 'p_' + Date.now(), type:'post', name: WRITER_NAME, wid: WRITER_WID, avatar: WRITER_AV, avatarRing:'ring-live',
+    verified:true, badge:'writer', rank:'#1 This Week', time:'Just now', mine:true,
+    text, likes:0, liked:false, comments:0,
+  });
+  closePostComposer();
+  document.getElementById('composerText').value = '';
+  renderFeedPosts();
+  toast('✅ Post published!');
+}
+
+/* ══════════════════════════════
+   STATUS COMPOSER
+══════════════════════════════ */
+function openStatusComposer() { document.getElementById('statusComposerOv').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeStatusComposer() { document.getElementById('statusComposerOv').classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.scs-type').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.scs-type').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+/* ══════════════════════════════
+   LIBRARY TAB — DroboardLibrary component
+   (maps ALL_CHAPTERS -> the {id,cover,cat,title,author,avatar,status,
+   progress,lastCh,url} shape DroboardLibrary.attach() expects)
+══════════════════════════════ */
+const CH_FILTERS = ['All','💔 Betrayal','✨ Twist','👑 Family','🏙️ Urban','💍 Marriage','📜 Poems','📄 Short Stories'];
+let activeChFilter = 'All';
+let libraryCtl = null;
+
+function getFilteredChapters() {
+  if (activeChFilter === 'All') return ALL_CHAPTERS;
+  if (activeChFilter === '📜 Poems') return ALL_CHAPTERS.filter(c => c.type === 'poem');
+  if (activeChFilter === '📄 Short Stories') return ALL_CHAPTERS.filter(c => c.type === 'short');
+  const genre = activeChFilter.replace(/^[^ ]+ /, '');
+  return ALL_CHAPTERS.filter(c => c.cat.includes(genre));
+}
+
+function chapterToLibraryItem(c) {
+  const status = c.type === 'story' ? 'completed' : (c.type === 'poem' || c.type === 'short' ? 'saved' : 'reading');
+  return {
+    id: c.id,
+    cover: c.cover,
+    cat: c.cat,
+    title: c.title,
+    author: WRITER_NAME,
+    avatar: WRITER_AV,
+    status,
+    progress: status === 'reading' ? 68 : 0,
+    lastCh: `${c.reads} reads · ${c.likes} likes`,
+    url: 'https://droboard.app/story/' + c.id,
+  };
+}
+
+function renderLibraryFilters(){
+  document.getElementById('storyFilterPills').innerHTML = CH_FILTERS.map(g =>
+    `<div style="flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid ${g===activeChFilter?'var(--acc)':'var(--bd)'};background:${g===activeChFilter?'rgba(255,0,80,.1)':'transparent'};color:${g===activeChFilter?'var(--acc3)':'#444'};white-space:nowrap;transition:.2s" onclick="setChFilter('${g}')">${g}</div>`
+  ).join('');
+}
+
+function setChFilter(g) {
+  activeChFilter = g;
+  renderLibraryFilters();
+  refreshLibrary();
+}
+
+function refreshLibrary(){
+  const filtered = getFilteredChapters();
+  document.getElementById('storiesBadge').textContent = filtered.length;
+  const items = filtered.map(chapterToLibraryItem);
+  if (libraryCtl) { libraryCtl.setItems(items); return; }
+  libraryCtl = DroboardLibrary.attach('#libraryMount', {
+    items,
+    maxItems: 0,
+    onOpen(item){ toast('📖 Opening story…'); },
+    onShare(item){
+      window.openShareModal({ title:item.title, sub:'by @'+WRITER_NAME, img:item.cover, url:item.url });
+    },
+    onRemove(item){
+      const idx = ALL_CHAPTERS.findIndex(c => c.id === item.id);
+      if (idx > -1) ALL_CHAPTERS.splice(idx, 1);
+      document.getElementById('storiesBadge').textContent = getFilteredChapters().length;
+    },
+  });
+}
+
+function initLibraryTab(){
+  renderLibraryFilters();
+  refreshLibrary();
+}
+
+/* ══════════════════════════════
+   RENDER: STORIES (Series → Stories tab)
+══════════════════════════════ */
+function renderSeries() {
+  document.getElementById('storiesCountTitle').textContent = SERIES_DATA.length + ' Stories';
+  document.getElementById('seriesTabBadge').textContent = SERIES_DATA.length;
+  document.getElementById('seriesList').innerHTML = SERIES_DATA.map(s => {
+    const safeTitle = s.title.replace(/'/g, "\\'");
+    return `
+    <div class="series-card" onclick="location.href='series-reader.html?sid=${s.id}'">
+      <div class="series-header">
+        <div class="series-img" style="background-image:url('${s.cover}')"></div>
+        <div class="series-info">
+          <div class="series-cat">${s.cat}</div>
+          <div class="series-title">${s.title}</div>
+          <div class="series-writer">by @${WRITER_NAME}</div>
+          <div class="series-status">
+            ${s.complete ? '<span class="series-badge sb-complete">Complete</span>' : '<span class="series-badge sb-ongoing">Ongoing</span>'}
+            <span style="font-size:9px;color:var(--tx-muted)">${s.seasons} Season${s.seasons>1?'s':''} · ${s.chapters} chapters</span>
+          </div>
+        </div>
+      </div>
+      ${s.hasNew ? `<div class="new-ch-banner" onclick="event.stopPropagation();toast('📖 Opening new chapter…')">
+        <div class="new-ch-label"><span class="ndot"></span>${s.latestCh}</div>
+        <div class="new-ch-btn">Read Now</div>
+      </div>` : ''}
+      <div class="series-footer" onclick="event.stopPropagation()">
+        <div class="series-stats">
+          <div class="series-stat"><i class="far fa-eye" style="font-size:9px"></i><strong>${s.reads}</strong></div>
+          <div class="series-stat"><i class="far fa-heart" style="font-size:9px"></i><strong>${s.likes}</strong></div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <div class="sh-more" onclick="location.href='series-management.html?sid=${s.id}'">Manage</div>
+          <div style="font-size:9px;font-weight:700;color:#444;cursor:pointer;padding:3px 9px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--bd)" onclick="window.openShareModal({title:'${safeTitle}',sub:'Series by @${WRITER_NAME}',img:'${s.cover}',url:'https://droboard.app/series/${s.id}'})"><i class="fas fa-share-alt"></i></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   COLLECTIONS — DroboardCollectionCard
+══════════════════════════════ */
+function initCollections() {
+  DroboardCollectionCard.attach(document.getElementById('collectionsGrid'), {
+    onOpen(coll) {
+      location.href = 'collection.html?cid=' + coll.id;
+    },
+    onShare(coll) {
+      window.openShareModal({
+        title: coll.name,
+        sub: (coll.count || 0) + ' stories · @' + WRITER_NAME,
+        img: (coll.covers && coll.covers[0]) || '',
+        url: 'https://droboard.app/collection/' + coll.id,
+      });
+    },
+    onCreateNew() {
+      openNewCollection();
+    },
+    createButtonEl: document.querySelector('.new-coll-btn'),
+  });
+  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
+}
+
+/* ══════════════════════════════
+   RENDER: ANALYTICS
+══════════════════════════════ */
+function switchAnalyticsPeriod(period, btn) {
+  currentAnalyticsPeriod = period;
+  document.querySelectorAll('.anlyt-period').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAnalytics();
+}
+
+function renderAnalytics() {
+  const data = ANALYTICS_DATA[currentAnalyticsPeriod] || ANALYTICS_DATA.week;
+  document.getElementById('analyticsGrid').innerHTML = data.map(a =>
+    `<div class="anlyt-card">
+      <div class="anlyt-label">${a.label}</div>
+      <div class="anlyt-num">${a.num}</div>
+      <div class="anlyt-sub">${a.sub}</div>
+      <div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:${a.bar}%"></div></div>
+    </div>`).join('');
+
+  const ranks = ['#fbbf24','#a0a0b0','#a07040','#3f3f46','#3f3f46'];
+  document.getElementById('topSeriesList').innerHTML = TOP_SERIES.map((s,i) =>
+    `<div class="top-series-item" onclick="location.href='series-reader.html?sid=${s.id}'">
+      <div class="top-series-rank" style="color:${ranks[i]||'#3f3f46'}">${i+1}</div>
+      <div class="top-series-img" style="background-image:url('${s.cover}')"></div>
+      <div class="top-series-body">
+        <div class="top-series-title">${s.title}</div>
+        <div class="top-series-cat">${s.cat} · <span style="color:var(--green);font-weight:700">${s.trend}</span></div>
+      </div>
+      <div class="top-series-reads"><strong>${s.reads}</strong><span>reads</span></div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════
+   RENDER: FOLLOWING
+══════════════════════════════ */
+function renderFollowing() {
+  document.getElementById('followingList').innerHTML = FOLLOWING_DATA.map((f,i) =>
+    `<div class="follow-item">
+      <div class="follow-av"><img src="${f.av}" loading="lazy"/></div>
+      <div class="follow-info">
+        <div class="follow-name">@${f.name}</div>
+        <div class="follow-meta">${f.meta}</div>
+      </div>
+      <button class="follow-btn${f.following?' ing':''}" onclick="toggleFollow(${i},this)">${f.following?'✓ Following':'+ Follow'}</button>
+    </div>`).join('');
+}
+
+function toggleFollow(i, btn) {
+  FOLLOWING_DATA[i].following = !FOLLOWING_DATA[i].following;
+  btn.textContent = FOLLOWING_DATA[i].following ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', FOLLOWING_DATA[i].following);
+  toast(FOLLOWING_DATA[i].following ? `✅ Following @${FOLLOWING_DATA[i].name}` : `Unfollowed @${FOLLOWING_DATA[i].name}`);
+}
+
+/* ══════════════════════════════
+   GENRE EDIT
+══════════════════════════════ */
+function openGenreEdit() {
+  document.getElementById('genreTogGrid').innerHTML = GENRES_ALL.map(g =>
+    `<div class="genre-tog${activeGenres.has(g.id)?' on':''}" data-gid="${g.id}" onclick="this.classList.toggle('on')">${g.label}</div>`
+  ).join('');
+  document.getElementById('genreEditOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeGenreEdit() {
+  document.getElementById('genreEditOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function saveGenres() {
+  activeGenres = new Set([...document.querySelectorAll('#genreTogGrid .genre-tog.on')].map(el => el.dataset.gid));
+  const pillsEl = document.getElementById('genrePillsDisplay');
+  const shown = [...activeGenres].slice(0,6);
+  pillsEl.innerHTML = shown.map(id => {
+    const g = GENRES_ALL.find(x => x.id === id);
+    return g ? `<div class="genre-pill">${g.label}</div>` : '';
+  }).join('') + `<div class="genre-pill inactive" onclick="openGenreEdit()" style="cursor:pointer">+ Edit</div>`;
+  renderAboutGenres();
+  closeGenreEdit();
+  toast('✅ Genres saved!');
+}
+
+function renderAboutGenres() {
+  const el = document.getElementById('aboutGenreDisplay');
+  if (!el) return;
+  el.innerHTML = [...activeGenres].map(id => {
+    const g = GENRES_ALL.find(x => x.id === id);
+    return g ? `<div class="genre-pill">${g.label}</div>` : '';
+  }).join('');
+}
+
+/* ══════════════════════════════
+   NEW COLLECTION
+══════════════════════════════ */
+function openNewCollection() { document.getElementById('newCollOv').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeNewColl() { document.getElementById('newCollOv').classList.remove('open'); document.body.style.overflow=''; }
+let _ncPrivacy = 'private';
+function setNcPrivacy(val, btn) {
+  _ncPrivacy = val;
+  document.querySelectorAll('.nc-privacy-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function createCollection() {
+  const name = document.getElementById('newCollName').value.trim();
+  if(!name){ toast('📂 Give your collection a name!'); return; }
+  COLLECTIONS_DATA.push({id:'c_'+Date.now(),name,covers:[],count:0,privacy:_ncPrivacy});
+  closeNewColl();
+  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
+  toast(`📂 "${name}" created!`);
+}
+
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+initAdBanner();
+initPeopleToFollow();
+initFeedPosts();
+initLibraryTab();
+renderSeries();
+initCollections();
+renderAnalytics();
+renderFollowing();
+renderAboutGenres();
+</script>
+</body>
+</html>

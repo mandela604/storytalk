@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Droboard Admin · Control Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#0a0a0d;--l2:#0f1013;--l3:#14151a;--l4:#1a1b21;--l5:#22232a;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx-high:#d4d4d8;--tx-body:#a1a1aa;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --for-col:#34d399;--ag-col:#f87171;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx-body);font-family:'Space Grotesk',sans-serif;overflow:hidden}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,0,80,.25);border-radius:3px}
+
+/* ══ LAYOUT ══ */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--l1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:50}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2),var(--acc3))}
+.sb-logo{padding:22px 20px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
+.sb-logo-mark{width:34px;height:34px;border-radius:10px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:-1px;flex-shrink:0;box-shadow:0 0 16px var(--glow)}
+.sb-logo-text{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high);letter-spacing:-0.5px}
+.sb-logo-sub{font-size:8px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.12em;margin-top:1px}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 0;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-section{font-size:8px;font-weight:700;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.14em;padding:14px 20px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px 9px 20px;cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;text-align:left;border-radius:0;position:relative;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;color:var(--tx-muted)}
+.sb-item:hover{color:var(--tx-high);background:rgba(255,255,255,.03)}
+.sb-item.active{color:var(--acc2);background:rgba(255,0,80,.06)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:2.5px;background:var(--acc);border-radius:0 3px 3px 0}
+.sb-item i{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;background:var(--acc);color:#fff;flex-shrink:0}
+.sb-badge.blue{background:var(--blue)}
+.sb-badge.gold{background:var(--gold);color:#000}
+.sb-badge.green{background:var(--green);color:#000}
+.sb-footer{padding:14px 16px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.sb-admin-av{width:30px;height:30px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-admin-info{flex:1;min-width:0}
+.sb-admin-name{font-size:11px;font-weight:700;color:var(--tx-high)}
+.sb-admin-role{font-size:9px;color:var(--acc);font-weight:600}
+.sb-logout{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx-muted);font-size:11px;transition:.15s;flex-shrink:0}
+.sb-logout:hover{color:var(--ag-col);border-color:rgba(248,113,113,.3)}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{flex-shrink:0;height:56px;border-bottom:1px solid var(--bd);background:var(--l1);display:flex;align-items:center;padding:0 24px;gap:14px}
+.topbar-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--tx-high);flex:1}
+.topbar-search{display:flex;align-items:center;gap:8px;background:var(--l2);border:1px solid var(--bd);border-radius:20px;padding:6px 13px;min-width:220px;transition:.2s}
+.topbar-search:focus-within{border-color:var(--bd-acc)}
+.topbar-search i{color:var(--tx-faint);font-size:11px}
+.topbar-search input{background:none;border:none;outline:none;color:var(--tx-body);font-family:'Space Grotesk',sans-serif;font-size:12px}
+.topbar-search input::placeholder{color:var(--tx-faint)}
+.tb-icon{width:34px;height:34px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx-muted);font-size:13px;transition:.15s;position:relative}
+.tb-icon:hover{color:var(--acc2);border-color:var(--bd-acc)}
+.tb-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--acc);border:1.5px solid var(--l1)}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px;scrollbar-width:thin}
+
+/* ══ PANELS ══ */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ══ STAT CARDS ══ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:.2s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.red::before{background:var(--acc)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.gold::before{background:var(--gold)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-card.orange::before{background:var(--orange)}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.stat-icon.red{background:rgba(255,0,80,.1);color:var(--acc)}
+.stat-icon.blue{background:rgba(56,189,248,.1);color:var(--blue)}
+.stat-icon.green{background:rgba(52,211,153,.1);color:var(--green)}
+.stat-icon.gold{background:rgba(251,191,36,.1);color:var(--gold)}
+.stat-icon.purple{background:rgba(167,139,250,.1);color:var(--purple)}
+.stat-icon.orange{background:rgba(251,146,60,.1);color:var(--orange)}
+.stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--tx-high);line-height:1;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--tx-muted);font-weight:600}
+.stat-change{font-size:10px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:3px}
+.stat-change.up{color:var(--green)}
+.stat-change.down{color:var(--ag-col)}
+
+/* ══ SECTION HEADERS ══ */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:12px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
+.sec-title::after{content:'';height:1px;width:32px;background:var(--bd)}
+.sec-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'Space Grotesk',sans-serif;transition:.15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
+.btn-primary:hover{box-shadow:0 0 20px var(--glow)}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--tx-muted)}
+.btn-ghost:hover{color:var(--tx-high);border-color:rgba(255,255,255,.15)}
+.btn-danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--ag-col)}
+.btn-danger:hover{background:rgba(248,113,113,.18)}
+.btn-green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--green)}
+.btn-blue{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--blue)}
+.btn-gold{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--gold)}
+.btn-sm{padding:5px 10px;font-size:10px;border-radius:8px}
+.btn-xs{padding:3px 8px;font-size:9px;border-radius:6px;font-weight:700}
+
+/* ══ TABLES ══ */
+.table-wrap{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd2);flex-wrap:wrap}
+.filter-chip{padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--bd);color:var(--tx-muted);cursor:pointer;transition:.15s;white-space:nowrap}
+.filter-chip.active{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc2)}
+.filter-chip:hover{color:var(--tx-body)}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--bd)}
+thead th{text-align:left;font-size:9.5px;font-weight:700;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.1em;padding:10px 16px;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--bd2);transition:.15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody td{padding:11px 16px;font-size:12px;color:var(--tx-body);vertical-align:middle}
+.user-cell{display:flex;align-items:center;gap:9px}
+.user-av{width:30px;height:30px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
+.user-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-name{font-size:12px;font-weight:700;color:var(--tx-high)}
+.user-handle{font-size:10px;color:var(--tx-faint)}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.03em}
+.badge-active{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.badge-suspended{background:rgba(248,113,113,.12);color:var(--ag-col);border:1px solid rgba(248,113,113,.2)}
+.badge-pending{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.badge-writer{background:rgba(255,0,80,.1);color:var(--acc2);border:1px solid var(--bd-acc)}
+.badge-reader{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+.badge-verified{background:rgba(56,189,248,.12);color:var(--blue);border:1px solid rgba(56,189,248,.25)}
+.badge-hot{background:rgba(255,0,80,.12);color:var(--acc2);border:1px solid var(--bd-acc)}
+.badge-promoted{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.badge-trending{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2)}
+.badge-top{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.row-actions{display:flex;gap:6px;align-items:center}
+.action-btn{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;border:1px solid var(--bd);background:transparent;color:var(--tx-faint);transition:.15s}
+.action-btn:hover{color:var(--tx-high);border-color:rgba(255,255,255,.15)}
+.action-btn.danger:hover{color:var(--ag-col);border-color:rgba(248,113,113,.3)}
+.action-btn.success:hover{color:var(--green);border-color:rgba(52,211,153,.3)}
+.action-btn.acc:hover{color:var(--acc);border-color:var(--bd-acc)}
+
+/* ══ CARDS GRID ══ */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.cards-grid-3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:12px;font-weight:700;color:var(--tx-high)}
+.card-body{padding:16px}
+
+/* ══ FORM ELEMENTS ══ */
+.form-group{margin-bottom:14px}
+.form-label{font-size:10px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--l2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;color:var(--tx-body);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;transition:.2s}
+.form-input:focus{border-color:var(--bd-acc);box-shadow:0 0 0 3px rgba(255,0,80,.08)}
+.form-input::placeholder{color:var(--tx-faint)}
+.form-textarea{min-height:90px;resize:vertical}
+.form-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;padding-right:32px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.toggle-wrap{display:flex;align-items:center;gap:9px;cursor:pointer}
+.toggle{width:36px;height:20px;border-radius:20px;background:var(--l4);border:1px solid var(--bd);position:relative;transition:.25s;cursor:pointer;flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#666;transition:.25s}
+.toggle.on{background:var(--acc);border-color:var(--acc)}
+.toggle.on::after{left:18px;background:#fff}
+.toggle-label{font-size:12px;color:var(--tx-body)}
+
+/* ══ CHART BARS ══ */
+.chart-bar-wrap{display:flex;flex-direction:column;gap:10px}
+.chart-bar-item{display:flex;align-items:center;gap:10px}
+.chart-bar-label{font-size:10px;color:var(--tx-muted);width:70px;flex-shrink:0;font-weight:600}
+.chart-bar-track{flex:1;height:8px;background:var(--l3);border-radius:8px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:8px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.chart-bar-val{font-size:10px;font-weight:700;color:var(--tx-high);width:40px;text-align:right;flex-shrink:0}
+
+/* ══ ACTIVITY FEED ══ */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd2)}
+.activity-item:last-child{border-bottom:none}
+.act-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.act-dot.red{background:var(--acc)}
+.act-dot.blue{background:var(--blue)}
+.act-dot.green{background:var(--green)}
+.act-dot.gold{background:var(--gold)}
+.act-dot.purple{background:var(--purple)}
+.act-text{flex:1;font-size:11px;color:var(--tx-body);line-height:1.45}
+.act-text strong{color:var(--tx-high);font-weight:700}
+.act-time{font-size:9px;color:var(--tx-faint);flex-shrink:0;margin-top:3px}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--l1);border:1px solid var(--bd);border-radius:18px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;scrollbar-width:thin;box-shadow:0 24px 80px rgba(0,0,0,.9);animation:modalIn .25s cubic-bezier(.34,1.2,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
+.modal-wide{max-width:680px}
+.modal-header{padding:18px 20px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--tx-high)}
+.modal-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx-muted);font-size:12px;transition:.15s}
+.modal-close:hover{color:var(--tx-high)}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:9px}
+
+/* ══ TOAST ══ */
+.toast-stack{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-item{background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:10px 16px;border-radius:12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.8);animation:toastIn .3s ease;pointer-events:auto;max-width:320px}
+.toast-item.success{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.toast-item.error{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)}
+.toast-item.info{border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.08)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* ══ INLINE TABS ══ */
+.tabs{display:flex;gap:0;background:var(--l2);border-radius:10px;padding:3px;border:1px solid var(--bd);width:fit-content;margin-bottom:16px}
+.tab{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;color:var(--tx-muted);cursor:pointer;transition:.18s;white-space:nowrap}
+.tab.active{background:var(--acc);color:#fff;box-shadow:0 2px 10px var(--glow-sm)}
+
+/* ══ ADS SECTION ══ */
+.ad-platform-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.ad-platform-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,0,80,.05),transparent);opacity:0;transition:.2s}
+.ad-platform-card:hover::before{opacity:1}
+.ad-platform-card:hover{border-color:var(--bd-acc)}
+.ad-platform-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ad-platform-info{flex:1}
+.ad-platform-name{font-size:13px;font-weight:700;color:var(--tx-high);margin-bottom:2px}
+.ad-platform-desc{font-size:10px;color:var(--tx-muted)}
+.ad-platform-status{font-size:9px;font-weight:800;padding:3px 8px;border-radius:8px}
+.ap-active{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.ap-inactive{background:rgba(255,255,255,.05);color:var(--tx-faint);border:1px solid var(--bd)}
+
+/* ══ MINI CHART ══ */
+.sparkline-wrap{display:flex;align-items:flex-end;gap:3px;height:40px}
+.spark-bar{border-radius:3px 3px 0 0;transition:height .5s ease;flex:1;min-width:6px}
+
+/* ══ STORY TAG ROW ══ */
+.story-tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.story-tag{font-size:8px;font-weight:800;padding:2px 7px;border-radius:6px}
+
+/* ══ POPUP BUILDER ══ */
+.popup-preview{background:#000;border-radius:16px;overflow:hidden;position:relative;height:200px;border:1px solid var(--bd)}
+.popup-preview-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.popup-preview-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0d,#14151a);z-index:0}
+.popup-preview-inner{position:relative;z-index:2}
+
+/* ══ METRIC ROW ══ */
+.metric-row{display:flex;gap:12px;margin-bottom:20px}
+.metric-item{flex:1;background:var(--l2);border:1px solid var(--bd2);border-radius:11px;padding:13px;text-align:center}
+.metric-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--tx-high);margin-bottom:2px}
+.metric-label{font-size:9px;color:var(--tx-muted);font-weight:600}
+
+/* ══ BROADCAST MESSAGE ══ */
+.broadcast-target{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--l2);border:1px solid var(--bd);border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:6px}
+.broadcast-target:hover{border-color:var(--bd-acc)}
+.broadcast-target.selected{border-color:var(--acc);background:rgba(255,0,80,.06)}
+.broadcast-target input[type=checkbox]{accent-color:var(--acc)}
+.broadcast-target-info{flex:1}
+.broadcast-target-name{font-size:12px;font-weight:700;color:var(--tx-high)}
+.broadcast-target-desc{font-size:10px;color:var(--tx-muted)}
+
+/* ══ DATE RANGE ══ */
+.date-range-group{display:flex;gap:8px;align-items:center}
+.date-range-sep{color:var(--tx-faint);font-size:11px}
+
+/* ══ STATUS INDICATORS ══ */
+.pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;animation:pdot 1.4s ease-in-out infinite;flex-shrink:0;margin-right:4px}
+.pulse-dot.green{background:var(--green)}
+.pulse-dot.red{background:var(--acc)}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* ══ SCROLLABLE CHART ══ */
+.chart-area{background:var(--l2);border:1px solid var(--bd2);border-radius:10px;padding:14px;margin-bottom:14px;position:relative;overflow:hidden}
+.chart-title{font-size:10px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px}
+.bar-chart-bar{flex:1;border-radius:4px 4px 0 0;min-width:10px;position:relative;cursor:pointer;transition:.2s}
+.bar-chart-bar:hover{filter:brightness(1.2)}
+
+/* ══ STORY PROMO CARD ══ */
+.promo-story-card{background:var(--l2);border:1px solid var(--bd);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.promo-story-img{width:46px;height:54px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0}
+.promo-story-info{flex:1;min-width:0}
+.promo-story-title{font-size:11px;font-weight:700;color:var(--tx-high);line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.promo-story-writer{font-size:9px;color:var(--tx-faint)}
+.promo-story-stats{display:flex;gap:7px;margin-top:4px}
+.promo-stat{font-size:9px;color:var(--tx-muted);display:flex;align-items:center;gap:2px;font-weight:600}
+
+/* ══ VERIFICATION CARD ══ */
+.verify-card{background:var(--l2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px}
+.verify-card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.verify-reason{font-size:11px;color:var(--tx-body);line-height:1.45;margin-bottom:10px}
+.verify-actions{display:flex;gap:7px}
+
+/* ══ SUSPENSION MODAL DATE ══ */
+.duration-chip{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--bd);color:var(--tx-muted);cursor:pointer;transition:.15s;flex-shrink:0}
+.duration-chip.active{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--ag-col)}
+.duration-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+
+/* loading placeholder */
+.skeleton{background:linear-gradient(90deg,var(--l2) 25%,var(--l3) 50%,var(--l2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar::before"></div>
+    <div class="sb-logo">
+      <div class="sb-logo-mark">D</div>
+      <div>
+        <div class="sb-logo-text">Droboard</div>
+        <div class="sb-logo-sub">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Overview</div>
+      <button class="sb-item active" onclick="showPanel('dashboard',this)"><i class="fas fa-house-chimney"></i> Dashboard</button>
+      <button class="sb-item" onclick="showPanel('analytics',this)"><i class="fas fa-chart-area"></i> Analytics <span class="sb-badge gold">Live</span></button>
+
+      <div class="sb-section">Users</div>
+      <button class="sb-item" onclick="showPanel('users',this)"><i class="fas fa-users"></i> All Users <span class="sb-badge">48.2k</span></button>
+      <button class="sb-item" onclick="showPanel('verify',this)"><i class="fas fa-badge-check"></i> Verification <span class="sb-badge blue">12</span></button>
+      <button class="sb-item" onclick="showPanel('messages',this)"><i class="fas fa-paper-plane"></i> Broadcast</button>
+      <button class="sb-item" onclick="showPanel('reports',this)"><i class="fas fa-flag"></i> Reports <span class="sb-badge" style="background:var(--ag-col)">7</span></button>
+
+      <div class="sb-section">Content</div>
+      <button class="sb-item" onclick="showPanel('stories',this)"><i class="fas fa-book-open"></i> Stories <span class="sb-badge green">312</span></button>
+      <button class="sb-item" onclick="showPanel('debates',this)"><i class="fas fa-sword"></i> Debates</button>
+      <button class="sb-item" onclick="showPanel('popups',this)"><i class="fas fa-window-restore"></i> Pop-ups / Banners</button>
+
+      <div class="sb-section">Monetization</div>
+      <button class="sb-item" onclick="showPanel('ads',this)"><i class="fas fa-rectangle-ad"></i> Ad Manager</button>
+      <button class="sb-item" onclick="showPanel('earnings',this)"><i class="fas fa-coins"></i> Earnings</button>
+
+      <div class="sb-section">System</div>
+      <button class="sb-item" onclick="showPanel('settings',this)"><i class="fas fa-sliders-h"></i> Settings</button>
+      <button class="sb-item" onclick="showPanel('modlog',this)"><i class="fas fa-scroll"></i> Mod Log</button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-admin-av">SA</div>
+      <div class="sb-admin-info">
+        <div class="sb-admin-name">Super Admin</div>
+        <div class="sb-admin-role">Full Access</div>
+      </div>
+      <div class="sb-logout" title="Logout"><i class="fas fa-right-from-bracket"></i></div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-search">
+        <i class="fas fa-magnifying-glass"></i>
+        <input placeholder="Search users, stories, IDs…" id="globalSearch"/>
+      </div>
+      <div class="tb-icon" title="Notifications" onclick="showToast('🔔 7 new alerts','info')"><i class="fas fa-bell"></i><div class="tb-dot"></div></div>
+      <div class="tb-icon" title="Activity log" onclick="showPanel('modlog',null)"><i class="fas fa-clock-rotate-left"></i></div>
+      <div class="tb-icon" style="background:var(--acc);border-color:var(--acc);color:#fff" title="Quick actions" onclick="openModal('modal-quickaction')"><i class="fas fa-bolt"></i></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+
+      <!-- ═══════════════════════════════
+           PANEL: DASHBOARD
+      ══════════════════════════════════ -->
+      <div class="panel active" id="panel-dashboard">
+        <!-- Date filter -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pulse-dot green"></span>
+            <span style="font-size:11px;color:var(--tx-muted)">Live · Last updated 2 min ago</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="tabs" style="margin-bottom:0">
+              <div class="tab active" onclick="setDateRange(this,'7d')">7d</div>
+              <div class="tab" onclick="setDateRange(this,'30d')">30d</div>
+              <div class="tab" onclick="setDateRange(this,'90d')">90d</div>
+              <div class="tab" onclick="setDateRange(this,'custom')">Custom</div>
+            </div>
+            <div id="custom-date-range" style="display:none;align-items:center;gap:6px">
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px" id="date-from"/>
+              <span style="color:var(--tx-faint);font-size:11px">→</span>
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px" id="date-to"/>
+              <button class="btn btn-primary btn-sm" onclick="applyDateFilter()">Apply</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card red">
+            <div class="stat-icon red"><i class="fas fa-users"></i></div>
+            <div class="stat-num">48.2k</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +1,240 this week</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-book-open"></i></div>
+            <div class="stat-num">3,814</div>
+            <div class="stat-label">Total Stories</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +48 today</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon green"><i class="fas fa-eye"></i></div>
+            <div class="stat-num">1.4M</div>
+            <div class="stat-label">Story Reads (7d)</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +24% vs prev</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-icon gold"><i class="fas fa-coins"></i></div>
+            <div class="stat-num">₦2.1M</div>
+            <div class="stat-label">Total Tips Revenue</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +₦180k this week</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon purple"><i class="fas fa-fire"></i></div>
+            <div class="stat-num">8,263</div>
+            <div class="stat-label">Active Debates</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +312 today</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="fas fa-rectangle-ad"></i></div>
+            <div class="stat-num">₦840k</div>
+            <div class="stat-label">Ad Revenue (30d)</div>
+            <div class="stat-change down"><i class="fas fa-arrow-trend-down" style="font-size:9px"></i> -4% vs prev</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon red"><i class="fas fa-user-slash"></i></div>
+            <div class="stat-num">143</div>
+            <div class="stat-label">Suspended Accounts</div>
+            <div class="stat-change down" style="color:var(--green)"><i class="fas fa-arrow-trend-down" style="font-size:9px"></i> -12 this week</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-badge-check"></i></div>
+            <div class="stat-num">1,204</div>
+            <div class="stat-label">Verified Users</div>
+            <div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +12 pending</div>
+          </div>
+        </div>
+
+        <!-- Charts + Activity -->
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📈 Reads This Week</div>
+            </div>
+            <div class="card-body">
+              <div class="bar-chart" id="readsChart">
+                <!-- filled by JS -->
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:6px">
+                <span style="font-size:9px;color:var(--tx-faint)">Mon</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Tue</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Wed</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Thu</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Fri</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Sat</span>
+                <span style="font-size:9px;color:var(--tx-faint)">Sun</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚡ Live Activity</div>
+              <div class="badge badge-active"><span class="pulse-dot green" style="margin-right:0"></span> Live</div>
+            </div>
+            <div class="card-body" style="padding:8px 16px">
+              <div class="activity-list" id="activityFeed"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Genre breakdown + top stories -->
+        <div class="cards-grid cards-grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📖 Reads by Genre</div></div>
+            <div class="card-body">
+              <div class="chart-bar-wrap" id="genreChart"></div>
+            </div>
+          </div>
+          <div class="card" style="grid-column:span 2">
+            <div class="card-header">
+              <div class="card-title">🔥 Top Stories Today</div>
+              <button class="btn btn-ghost btn-sm" onclick="showPanel('stories',null)">View all</button>
+            </div>
+            <div class="card-body" style="padding:0">
+              <table style="width:100%">
+                <thead><tr>
+                  <th>Story</th><th>Reads</th><th>Likes</th><th>Status</th><th>Actions</th>
+                </tr></thead>
+                <tbody id="topStoriesTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: USERS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-users">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-users" style="color:var(--acc)"></i> User Management</div>
+          <div class="sec-actions">
+            <div class="date-range-group">
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px" id="user-date-from" placeholder="From"/>
+              <span class="date-range-sep">→</span>
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px" id="user-date-to" placeholder="To"/>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modal-broadcast')"><i class="fas fa-paper-plane"></i> Message All</button>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">47,891</div><div class="metric-label">Active</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--ag-col)">143</div><div class="metric-label">Suspended</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--blue)">1,204</div><div class="metric-label">Verified</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--acc)">8,340</div><div class="metric-label">Writers</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">156</div><div class="metric-label">New Today</div></div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="filter-chip active" onclick="filterUsers('all',this)">All Users</div>
+            <div class="filter-chip" onclick="filterUsers('active',this)">Active</div>
+            <div class="filter-chip" onclick="filterUsers('suspended',this)">Suspended</div>
+            <div class="filter-chip" onclick="filterUsers('writer',this)">Writers</div>
+            <div class="filter-chip" onclick="filterUsers('verified',this)">Verified</div>
+            <div class="filter-chip" onclick="filterUsers('new',this)">New (7d)</div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <input class="form-input" style="width:200px;padding:6px 12px;font-size:11px" placeholder="Search users…" oninput="searchUsers(this.value)"/>
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>User</th><th>Type</th><th>Joined</th><th>Stories</th><th>Followers</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd2)">
+            <span style="font-size:11px;color:var(--tx-muted)">Showing 1–20 of 48,243</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" onclick="showToast('← Previous page','info')">← Prev</button>
+              <button class="btn btn-ghost btn-sm">1</button>
+              <button class="btn btn-primary btn-sm">2</button>
+              <button class="btn btn-ghost btn-sm">3</button>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('Next page →','info')">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: VERIFICATION
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-verify">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-badge-check" style="color:var(--blue)"></i> Verification Requests</div>
+          <div class="sec-actions">
+            <button class="btn btn-green btn-sm" onclick="showToast('✅ All approved!','success')"><i class="fas fa-check-double"></i> Approve All</button>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">12</div><div class="metric-label">Pending</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">1,192</div><div class="metric-label">Approved</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--ag-col)">38</div><div class="metric-label">Rejected</div></div>
+        </div>
+        <div id="verifyList"></div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: BROADCAST MESSAGES
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-messages">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-paper-plane" style="color:var(--acc)"></i> Broadcast Messages</div>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📢 New Broadcast</div></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Message Type</label>
+                <div class="tabs" style="margin-bottom:0">
+                  <div class="tab active" onclick="setBroadcastType(this,'notification')">Notification</div>
+                  <div class="tab" onclick="setBroadcastType(this,'dm')">DM</div>
+                  <div class="tab" onclick="setBroadcastType(this,'popup')">Pop-up</div>
+                  <div class="tab" onclick="setBroadcastType(this,'email')">Email</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Target Audience</label>
+                <select class="form-input form-select">
+                  <option>All Users (48.2k)</option>
+                  <option>Writers Only (8.3k)</option>
+                  <option>Readers Only (39.9k)</option>
+                  <option>Verified Users (1.2k)</option>
+                  <option>Inactive (7d+) Users</option>
+                  <option>Specific Genre Followers</option>
+                  <option>Custom Segment</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Subject / Title</label>
+                <input class="form-input" placeholder="e.g. New feature just dropped 🔥"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Message Body</label>
+                <textarea class="form-input form-textarea" placeholder="Write your message here… supports @mentions and emojis ✨"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Schedule (optional)</label>
+                  <input type="datetime-local" class="form-input"/>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Priority</label>
+                  <select class="form-input form-select">
+                    <option>Normal</option>
+                    <option>High — shows at top</option>
+                    <option>Urgent — push + in-app</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:14px">
+                <button class="btn btn-ghost" onclick="showToast('👁 Preview mode','info')"><i class="fas fa-eye"></i> Preview</button>
+                <button class="btn btn-primary" onclick="showToast('📢 Broadcast sent to 48.2k users!','success')"><i class="fas fa-paper-plane"></i> Send Broadcast</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📋 Recent Broadcasts</div></div>
+            <div class="card-body" style="padding:0">
+              <div id="broadcastHistory"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: REPORTS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-reports">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-flag" style="color:var(--ag-col)"></i> Reports & Moderation</div>
+          <div class="sec-actions">
+            <button class="btn btn-danger btn-sm" onclick="showToast('🗑 Bulk delete pending','error')"><i class="fas fa-trash"></i> Bulk Action</button>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--ag-col)">7</div><div class="metric-label">Urgent</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">31</div><div class="metric-label">Pending</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">1,240</div><div class="metric-label">Resolved</div></div>
+          <div class="metric-item"><div class="metric-num">148</div><div class="metric-label">This Month</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="filter-chip active">All Reports</div>
+            <div class="filter-chip">Harassment</div>
+            <div class="filter-chip">Spam</div>
+            <div class="filter-chip">Hate Speech</div>
+            <div class="filter-chip">Copyright</div>
+            <div class="filter-chip">Impersonation</div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Report</th><th>Reported By</th><th>Target</th><th>Category</th><th>Date</th><th>Severity</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="reportsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: STORIES
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-stories">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-book-open" style="color:var(--acc)"></i> Story Management</div>
+          <div class="sec-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-promote')"><i class="fas fa-star"></i> Promote Story</button>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--acc)">3,814</div><div class="metric-label">Total Stories</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">2,941</div><div class="metric-label">Published</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">24</div><div class="metric-label">🔥 Promoted</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--blue)">8</div><div class="metric-label">Editor's Picks</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--orange)">48</div><div class="metric-label">Under Review</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="filter-chip active">All Stories</div>
+            <div class="filter-chip">Promoted</div>
+            <div class="filter-chip">🔥 Hot</div>
+            <div class="filter-chip">📈 Trending</div>
+            <div class="filter-chip">⭐ Editor's Pick</div>
+            <div class="filter-chip">🏆 Top This Week</div>
+            <div class="filter-chip">Under Review</div>
+            <div style="margin-left:auto">
+              <input class="form-input" style="width:180px;padding:6px 12px;font-size:11px" placeholder="Search stories…"/>
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Story</th><th>Writer</th><th>Genre</th><th>Reads</th><th>Likes</th><th>Labels</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="storiesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: POP-UPS / BANNERS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-popups">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-window-restore" style="color:var(--purple)"></i> Pop-ups & Banners</div>
+          <div class="sec-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-popup-builder')"><i class="fas fa-plus"></i> New Pop-up</button>
+          </div>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">⚡ Active Pop-ups</div><span class="badge badge-active">3 live</span></div>
+            <div class="card-body" style="padding:0" id="activePopupsList"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🎨 Quick Build</div></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Pop-up Type</label>
+                <select class="form-input form-select" id="popup-type" onchange="updatePopupPreview()">
+                  <option value="announcement">📢 Announcement</option>
+                  <option value="story">📖 Story Spotlight</option>
+                  <option value="feature">✨ New Feature</option>
+                  <option value="promo">🎁 Promotion</option>
+                  <option value="notification">🔔 Notification</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Title</label>
+                <input class="form-input" id="popup-title" placeholder="e.g. 🔥 Top story this week" oninput="updatePopupPreview()"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Message</label>
+                <textarea class="form-input" id="popup-msg" rows="2" placeholder="Your message…" oninput="updatePopupPreview()"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Show On</label>
+                <select class="form-input form-select">
+                  <option>App Open (any page)</option>
+                  <option>Home Feed only</option>
+                  <option>Profile Page</option>
+                  <option>Story Reader</option>
+                  <option>Debate Page</option>
+                  <option>First Visit Today</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">CTA Label</label>
+                  <input class="form-input" placeholder="Read Now"/>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">CTA Link</label>
+                  <input class="form-input" placeholder="droboard.app/story/1"/>
+                </div>
+              </div>
+              <label class="form-label" style="margin-top:14px;display:block">Preview</label>
+              <div class="popup-preview">
+                <div class="popup-preview-bg"></div>
+                <div class="popup-preview-content">
+                  <div class="popup-preview-inner" id="popupPreviewInner">
+                    <div style="font-size:11px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">📢 Announcement</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3">Your title here</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:12px">Your message here</div>
+                    <div style="background:var(--acc);color:#fff;padding:7px 18px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block">Read Now</div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;margin-top:10px;justify-content:center" onclick="showToast('🚀 Pop-up activated!','success')"><i class="fas fa-rocket"></i> Activate Pop-up</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: AD MANAGER
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-ads">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-rectangle-ad" style="color:var(--gold)"></i> Ad Manager</div>
+          <div class="sec-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-new-ad')"><i class="fas fa-plus"></i> New Ad</button>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">₦840k</div><div class="metric-label">Revenue (30d)</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">2.4M</div><div class="metric-label">Impressions</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--blue)">3.8%</div><div class="metric-label">Avg CTR</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--acc)">18</div><div class="metric-label">Active Ads</div></div>
+        </div>
+
+        <!-- Ad Networks -->
+        <div class="sec-hdr"><div class="sec-title">📡 Ad Networks</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
+          <div class="ad-platform-card">
+            <div class="ad-platform-icon" style="background:rgba(251,191,36,.1)">💰</div>
+            <div class="ad-platform-info">
+              <div class="ad-platform-name">Monetag</div>
+              <div class="ad-platform-desc">Popunder, push, banner ads</div>
+            </div>
+            <div>
+              <div class="ad-platform-status ap-active">Active</div>
+              <div style="font-size:9px;color:var(--green);font-weight:600;margin-top:4px">↑ ₦420k</div>
+            </div>
+          </div>
+          <div class="ad-platform-card">
+            <div class="ad-platform-icon" style="background:rgba(56,189,248,.1)">🔵</div>
+            <div class="ad-platform-info">
+              <div class="ad-platform-name">Google AdSense</div>
+              <div class="ad-platform-desc">Display & contextual ads</div>
+            </div>
+            <div>
+              <div class="ad-platform-status ap-active">Active</div>
+              <div style="font-size:9px;color:var(--green);font-weight:600;margin-top:4px">↑ ₦280k</div>
+            </div>
+          </div>
+          <div class="ad-platform-card" onclick="showToast('🔗 Connect PropellerAds','info')">
+            <div class="ad-platform-icon" style="background:rgba(167,139,250,.1)">🚀</div>
+            <div class="ad-platform-info">
+              <div class="ad-platform-name">In-Platform Ads</div>
+              <div class="ad-platform-desc">Direct brand partnerships</div>
+            </div>
+            <div>
+              <div class="ad-platform-status ap-inactive">Setup</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ad Placements -->
+        <div class="sec-hdr"><div class="sec-title">📍 Ad Placements</div><button class="btn btn-ghost btn-sm" onclick="openModal('modal-new-ad')">Configure</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Placement</th><th>Network</th><th>Format</th><th>Position</th><th>Impressions</th><th>CTR</th><th>Revenue</th><th>Status</th>
+            </tr></thead>
+            <tbody id="adsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: ANALYTICS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-analytics">
+        <div class="sec-hdr">
+          <div class="sec-title"><i class="fas fa-chart-area" style="color:var(--blue)"></i> Analytics</div>
+          <div class="sec-actions">
+            <div class="date-range-group">
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px"/>
+              <span class="date-range-sep">→</span>
+              <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px"/>
+              <button class="btn btn-ghost btn-sm"><i class="fas fa-download"></i> Export CSV</button>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card blue"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-num">3,241</div><div class="stat-label">DAU (Today)</div><div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +14% vs yesterday</div></div>
+          <div class="stat-card green"><div class="stat-icon green"><i class="fas fa-clock"></i></div><div class="stat-num">8.4min</div><div class="stat-label">Avg Session Time</div><div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +0.8min</div></div>
+          <div class="stat-card red"><div class="stat-icon red"><i class="fas fa-heart"></i></div><div class="stat-num">64k</div><div class="stat-label">Reactions Today</div><div class="stat-change up"><i class="fas fa-arrow-trend-up" style="font-size:9px"></i> +8%</div></div>
+        </div>
+        <div class="cards-grid">
+          <div class="card"><div class="card-header"><div class="card-title">🌍 Users by Country</div></div><div class="card-body"><div class="chart-bar-wrap" id="countryChart"></div></div></div>
+          <div class="card"><div class="card-header"><div class="card-title">📱 Device Breakdown</div></div><div class="card-body"><div class="chart-bar-wrap" id="deviceChart"></div></div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px"><div class="card-header"><div class="card-title">📈 30-Day Reads Trend</div></div><div class="card-body"><div class="bar-chart" id="trendChart" style="height:120px"></div></div></div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: EARNINGS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-earnings">
+        <div class="sec-hdr"><div class="sec-title"><i class="fas fa-coins" style="color:var(--gold)"></i> Earnings & Payouts</div></div>
+        <div class="metric-row">
+          <div class="metric-item"><div class="metric-num" style="color:var(--gold)">₦2.1M</div><div class="metric-label">Total Tips</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--green)">₦840k</div><div class="metric-label">Ad Revenue</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--acc)">₦420k</div><div class="metric-label">Platform Cut (20%)</div></div>
+          <div class="metric-item"><div class="metric-num" style="color:var(--orange)">₦180k</div><div class="metric-label">Pending Payouts</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="filter-chip active">All Transactions</div>
+            <div class="filter-chip">Tips</div>
+            <div class="filter-chip">Withdrawals</div>
+            <div class="filter-chip">Ad Revenue</div>
+            <div class="filter-chip">Pending</div>
+          </div>
+          <table>
+            <thead><tr><th>User</th><th>Type</th><th>Amount</th><th>Platform Fee</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="earningsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: DEBATES
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-debates">
+        <div class="sec-hdr"><div class="sec-title"><i class="fas fa-sword" style="color:var(--orange)"></i> Debates</div></div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="filter-chip active">All</div>
+            <div class="filter-chip">🔴 Live</div>
+            <div class="filter-chip">Hot</div>
+            <div class="filter-chip">Flagged</div>
+          </div>
+          <table>
+            <thead><tr><th>Debate</th><th>Story</th><th>Votes</th><th>Arguments</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="debatesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: SETTINGS
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-settings">
+        <div class="sec-hdr"><div class="sec-title"><i class="fas fa-sliders-h" style="color:var(--blue)"></i> Platform Settings</div></div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">⚙️ General</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="Droboard"/></div>
+              <div class="form-group"><label class="form-label">Support Email</label><input class="form-input" value="support@droboard.app"/></div>
+              <div class="form-group"><label class="form-label">Maintenance Mode</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle"></div><span class="toggle-label">Platform is Live</span></div></div>
+              <div class="form-group"><label class="form-label">Registration</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Open Registration</span></div></div>
+              <div class="form-group"><label class="form-label">Story Moderation</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle"></div><span class="toggle-label">Require Approval Before Publish</span></div></div>
+              <button class="btn btn-primary" onclick="showToast('✅ Settings saved','success')"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">💰 Monetization</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Platform Tip Cut (%)</label><input class="form-input" type="number" value="20"/></div>
+              <div class="form-group"><label class="form-label">Minimum Withdrawal (₦)</label><input class="form-input" type="number" value="1000"/></div>
+              <div class="form-group"><label class="form-label">Monetag Site ID</label><input class="form-input" value="9284561" placeholder="Your Monetag site ID"/></div>
+              <div class="form-group"><label class="form-label">Google AdSense Publisher ID</label><input class="form-input" value="pub-XXXXXXXX" placeholder="pub-XXXXXXXX"/></div>
+              <div class="form-group"><label class="form-label">In-App Ads</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Show In-Feed Ads</span></div></div>
+              <button class="btn btn-primary" onclick="showToast('✅ Monetization saved','success')"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🔔 Notification Config</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Push Notifications</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Enabled</span></div></div>
+              <div class="form-group"><label class="form-label">Email Digest Frequency</label><select class="form-input form-select"><option>Daily</option><option>Weekly</option><option>Off</option></select></div>
+              <div class="form-group"><label class="form-label">New Chapter Alerts</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Send to followers</span></div></div>
+              <button class="btn btn-primary" onclick="showToast('✅ Notifications saved','success')"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🛡 Safety & Moderation</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Auto-flag Threshold (reports)</label><input class="form-input" type="number" value="3" min="1"/></div>
+              <div class="form-group"><label class="form-label">Auto-suspend at (reports)</label><input class="form-input" type="number" value="10" min="1"/></div>
+              <div class="form-group"><label class="form-label">Profanity Filter</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Active</span></div></div>
+              <div class="form-group"><label class="form-label">Require Phone for Posting</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle"></div><span class="toggle-label">Off</span></div></div>
+              <button class="btn btn-primary" onclick="showToast('✅ Safety settings saved','success')"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           PANEL: MOD LOG
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-modlog">
+        <div class="sec-hdr"><div class="sec-title"><i class="fas fa-scroll" style="color:var(--purple)"></i> Moderation Log</div>
+        <div class="sec-actions">
+          <input type="date" class="form-input" style="width:130px;padding:6px 10px;font-size:11px"/>
+          <button class="btn btn-ghost btn-sm"><i class="fas fa-download"></i> Export</button>
+        </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Admin</th><th>Target</th><th>Reason</th><th>Date</th></tr></thead>
+            <tbody id="modlogTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ══════════════════════════════════
+     MODALS
+══════════════════════════════════ -->
+
+<!-- SUSPEND USER -->
+<div class="modal-overlay" id="modal-suspend">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚫 Suspend User</div>
+      <div class="modal-close" onclick="closeModal('modal-suspend')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px;background:var(--l2);border-radius:10px">
+        <div class="user-av" id="suspend-av" style="width:40px;height:40px;font-size:14px">A</div>
+        <div><div class="user-name" id="suspend-name">Ada_Writes</div><div class="user-handle" id="suspend-handle">@ada_writes</div></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Suspension Duration</label>
+        <div class="duration-row">
+          <div class="duration-chip active" onclick="selectDuration(this,'24h')">24 hours</div>
+          <div class="duration-chip" onclick="selectDuration(this,'3d')">3 days</div>
+          <div class="duration-chip" onclick="selectDuration(this,'7d')">7 days</div>
+          <div class="duration-chip" onclick="selectDuration(this,'30d')">30 days</div>
+          <div class="duration-chip" onclick="selectDuration(this,'perm')">Permanent</div>
+          <div class="duration-chip" onclick="selectDuration(this,'custom')">Custom</div>
+        </div>
+        <div id="custom-duration-field" style="display:none">
+          <input type="datetime-local" class="form-input" id="custom-suspend-date"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason</label>
+        <select class="form-input form-select">
+          <option>Harassment / Abuse</option>
+          <option>Spam</option>
+          <option>Hate Speech</option>
+          <option>Impersonation</option>
+          <option>Copyright Violation</option>
+          <option>Platform Manipulation</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Internal Notes</label>
+        <textarea class="form-input form-textarea" placeholder="Internal note (not visible to user)…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notify User</label>
+        <div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Send suspension notice email</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-suspend')">Cancel</button>
+      <button class="btn btn-danger" onclick="suspendUser()"><i class="fas fa-ban"></i> Suspend User</button>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGE USER -->
+<div class="modal-overlay" id="modal-msg-user">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Message User</div>
+      <div class="modal-close" onclick="closeModal('modal-msg-user')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px;background:var(--l2);border-radius:10px">
+        <div class="user-av" id="msg-av" style="width:40px;height:40px;font-size:14px">A</div>
+        <div><div class="user-name" id="msg-name">Ada_Writes</div><div class="user-handle" id="msg-handle">@ada_writes</div></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message Type</label>
+        <div class="tabs" style="margin-bottom:0">
+          <div class="tab active">DM</div>
+          <div class="tab" onclick="this.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Email</div>
+          <div class="tab" onclick="this.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Push</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <input class="form-input" placeholder="Message subject…"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-input form-textarea" placeholder="Write your message to this user…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-msg-user')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendUserMessage()"><i class="fas fa-paper-plane"></i> Send Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROMOTE STORY -->
+<div class="modal-overlay" id="modal-promote">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">⭐ Promote Story</div>
+      <div class="modal-close" onclick="closeModal('modal-promote')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Search Story</label>
+        <input class="form-input" placeholder="Search by title or writer…" oninput="searchPromoStories(this.value)"/>
+      </div>
+      <div id="promo-story-results">
+        <!-- Prefilled demo -->
+        <div class="promo-story-card" onclick="selectPromoStory(this,1)">
+          <div class="promo-story-img" style="background-image:url('https://i.pravatar.cc/100?img=32');background-color:var(--l3)"></div>
+          <div class="promo-story-info">
+            <div class="promo-story-title">I came home early and caught my husband kissing my late sister's photograph</div>
+            <div class="promo-story-writer">@Ada_Writes · S2·Ch4</div>
+            <div class="promo-story-stats"><span class="promo-stat"><i class="fas fa-eye"></i>171k</span><span class="promo-stat"><i class="fas fa-heart"></i>24.3k</span></div>
+          </div>
+          <div><input type="radio" name="promo-story" style="accent-color:var(--acc)"/></div>
+        </div>
+        <div class="promo-story-card" onclick="selectPromoStory(this,5)">
+          <div class="promo-story-img" style="background-image:url('https://i.pravatar.cc/100?img=53');background-color:var(--l3)"></div>
+          <div class="promo-story-info">
+            <div class="promo-story-title">The runaway bride — I left at the altar in my socked feet and found my actual life</div>
+            <div class="promo-story-writer">@Ifeanyi_Story · Complete</div>
+            <div class="promo-story-stats"><span class="promo-stat"><i class="fas fa-eye"></i>312k</span><span class="promo-stat"><i class="fas fa-heart"></i>45k</span></div>
+          </div>
+          <div><input type="radio" name="promo-story" style="accent-color:var(--acc)"/></div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Promotion Labels (select all that apply)</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <div class="filter-chip" onclick="this.classList.toggle('active')">🔥 Hot</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">📈 Trending</div>
+          <div class="filter-chip active" onclick="this.classList.toggle('active')">⭐ Editor's Pick</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">🏆 Top This Week</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">✨ Staff Favourite</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">🆕 New Drop</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">💎 Featured</div>
+          <div class="filter-chip" onclick="this.classList.toggle('active')">🔔 Chapter Drop</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Display Position</label>
+          <select class="form-input form-select">
+            <option>Home Feed — Top Banner</option>
+            <option>Home Feed — Inline Card</option>
+            <option>Discover Page — Featured Slider</option>
+            <option>Browse Page — Must Read</option>
+            <option>Search Results — Top</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Promotion Duration</label>
+          <select class="form-input form-select">
+            <option>24 hours</option>
+            <option>3 days</option>
+            <option>7 days</option>
+            <option>Custom…</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">X This Week Label (e.g. "#1 This Week")</label>
+        <input class="form-input" placeholder="e.g. #1 This Week or 📈 Top Story" value="#1 This Week"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-promote')">Cancel</button>
+      <button class="btn btn-primary" onclick="promoteStory()"><i class="fas fa-star"></i> Promote Story</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP BUILDER (full) -->
+<div class="modal-overlay" id="modal-popup-builder">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">🎨 Pop-up Builder</div>
+      <div class="modal-close" onclick="closeModal('modal-popup-builder')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row form-row-3">
+        <div class="form-group"><label class="form-label">Type</label><select class="form-input form-select"><option>Announcement</option><option>Story Spotlight</option><option>New Feature</option><option>Promotion</option><option>Welcome Back</option><option>Milestone</option></select></div>
+        <div class="form-group"><label class="form-label">Target Page</label><select class="form-input form-select"><option>App Open (Any)</option><option>Home Feed</option><option>Profile Page</option><option>Story Reader</option><option>Debate Page</option><option>Discover</option></select></div>
+        <div class="form-group"><label class="form-label">Target Audience</label><select class="form-input form-select"><option>All Users</option><option>Writers</option><option>Readers</option><option>New Users (≤7d)</option><option>Inactive Users</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Title</label><input class="form-input" placeholder="Pop-up title…"/></div>
+        <div class="form-group"><label class="form-label">Subtitle</label><input class="form-input" placeholder="Optional subtitle…"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Body Message</label><textarea class="form-input form-textarea" placeholder="Pop-up body content…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Primary CTA Label</label><input class="form-input" placeholder="Read Now"/></div>
+        <div class="form-group"><label class="form-label">Primary CTA Link</label><input class="form-input" placeholder="https://droboard.app/…"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Background Image URL (optional)</label><input class="form-input" placeholder="https://…"/></div>
+        <div class="form-group"><label class="form-label">Background Color</label><input class="form-input" type="color" value="#0a0a0d" style="padding:4px;height:40px"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Start Date/Time</label><input type="datetime-local" class="form-input"/></div>
+        <div class="form-group"><label class="form-label">End Date/Time</label><input type="datetime-local" class="form-input"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Frequency</label>
+        <select class="form-input form-select"><option>Once per session</option><option>Once per day</option><option>Once ever</option><option>Every visit</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Dismissable</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">User can close pop-up</span></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-popup-builder')">Cancel</button>
+      <button class="btn btn-ghost" onclick="showToast('👁 Preview mode','info')"><i class="fas fa-eye"></i> Preview</button>
+      <button class="btn btn-primary" onclick="savePopup()"><i class="fas fa-rocket"></i> Activate</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW AD SLOT -->
+<div class="modal-overlay" id="modal-new-ad">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">📢 Configure Ad Slot</div>
+      <div class="modal-close" onclick="closeModal('modal-new-ad')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ad Network</label><select class="form-input form-select"><option>Monetag</option><option>Google AdSense</option><option>In-Platform (Direct)</option></select></div>
+        <div class="form-group"><label class="form-label">Ad Format</label><select class="form-input form-select"><option>Banner (320×50)</option><option>Rectangle (300×250)</option><option>Native Feed Card</option><option>Interstitial</option><option>Push Notification</option><option>Popunder</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Placement</label><select class="form-input form-select"><option>Home Feed (every 5 posts)</option><option>Home Feed (every 3 posts)</option><option>Story Reader (mid-scroll)</option><option>Debate Page</option><option>Browse Page</option><option>Profile Page</option></select></div>
+        <div class="form-group"><label class="form-label">Ad Unit ID / Zone ID</label><input class="form-input" placeholder="Monetag Zone ID or AdSense Unit ID"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Frequency Cap</label>
+        <div class="form-row">
+          <input class="form-input" type="number" value="3" placeholder="Max ads"/>
+          <select class="form-input form-select"><option>per session</option><option>per day</option><option>per page</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Target Audience</label><select class="form-input form-select"><option>All Users</option><option>Free Users Only</option><option>Writers Only</option><option>Nigeria 🇳🇬</option><option>Ghana 🇬🇭</option></select></div>
+      <div class="form-group"><label class="form-label">Active</label><div class="toggle-wrap" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="toggle on"></div><span class="toggle-label">Enabled</span></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-ad')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdSlot()"><i class="fas fa-save"></i> Save Ad Slot</button>
+    </div>
+  </div>
+</div>
+
+<!-- BROADCAST MODAL -->
+<div class="modal-overlay" id="modal-broadcast">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📢 Broadcast to All Users</div>
+      <div class="modal-close" onclick="closeModal('modal-broadcast')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Subject</label><input class="form-input" placeholder="Subject line…"/></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-input form-textarea" placeholder="Message body…"></textarea></div>
+      <div class="form-group"><label class="form-label">Send Via</label>
+        <div class="broadcast-target selected"><input type="checkbox" checked/><div class="broadcast-target-info"><div class="broadcast-target-name">In-App Notification</div><div class="broadcast-target-desc">Reaches all users instantly</div></div></div>
+        <div class="broadcast-target"><input type="checkbox"/><div class="broadcast-target-info"><div class="broadcast-target-name">Push Notification</div><div class="broadcast-target-desc">Mobile push to subscribed users</div></div></div>
+        <div class="broadcast-target"><input type="checkbox"/><div class="broadcast-target-info"><div class="broadcast-target-name">Email Digest</div><div class="broadcast-target-desc">Batched email to all users</div></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-broadcast')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> Send to 48.2k Users</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ACTION -->
+<div class="modal-overlay" id="modal-quickaction">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><div class="modal-title">⚡ Quick Actions</div><div class="modal-close" onclick="closeModal('modal-quickaction')">✕</div></div>
+    <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px">
+      <button class="btn btn-primary" style="justify-content:center;flex-direction:column;height:70px;gap:6px" onclick="closeModal('modal-quickaction');showPanel('popups',null);setTimeout(()=>openModal('modal-popup-builder'),200)"><i class="fas fa-rocket" style="font-size:20px"></i>New Pop-up</button>
+      <button class="btn btn-gold" style="justify-content:center;flex-direction:column;height:70px;gap:6px" onclick="closeModal('modal-quickaction');setTimeout(()=>openModal('modal-promote'),200)"><i class="fas fa-star" style="font-size:20px"></i>Promote Story</button>
+      <button class="btn btn-blue" style="justify-content:center;flex-direction:column;height:70px;gap:6px" onclick="closeModal('modal-quickaction');setTimeout(()=>openModal('modal-broadcast'),200)"><i class="fas fa-paper-plane" style="font-size:20px"></i>Broadcast</button>
+      <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:70px;gap:6px" onclick="closeModal('modal-quickaction');showPanel('ads',null)"><i class="fas fa-rectangle-ad" style="font-size:20px"></i>Manage Ads</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="modal-overlay" id="modal-user-detail">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title" id="user-detail-title">User Profile</div>
+      <div class="modal-close" onclick="closeModal('modal-user-detail')">✕</div>
+    </div>
+    <div class="modal-body" id="user-detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-user-detail')">Close</button>
+      <button class="btn btn-blue" onclick="closeModal('modal-user-detail');openModal('modal-msg-user')"><i class="fas fa-paper-plane"></i> Message</button>
+      <button class="btn btn-danger" onclick="closeModal('modal-user-detail');openModal('modal-suspend')"><i class="fas fa-ban"></i> Suspend</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST STACK -->
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const USERS = [
+  {id:'u1',name:'Ada_Writes',handle:'@ada_writes',av:'A',color:'#ff0050',type:'writer',joined:'Mar 2021',stories:48,followers:'12.4k',status:'active',verified:true},
+  {id:'u2',name:'Ifeanyi_Story',handle:'@ifeanyi_story',av:'I',color:'#38bdf8',type:'writer',joined:'Jan 2022',stories:12,followers:'31.7k',status:'active',verified:true},
+  {id:'u3',name:'Chiamaka_N',handle:'@chiamaka_n',av:'C',color:'#a78bfa',type:'writer',joined:'Jun 2021',stories:31,followers:'19.2k',status:'active',verified:false},
+  {id:'u4',name:'CampusQueen',handle:'@campusqueen',av:'C',color:'#fbbf24',type:'writer',joined:'Aug 2022',stories:22,followers:'8.1k',status:'active',verified:false},
+  {id:'u5',name:'Chioma_R',handle:'@chioma_r',av:'C',color:'#34d399',type:'reader',joined:'Jan 2022',stories:0,followers:'312',status:'active',verified:false},
+  {id:'u6',name:'Zara_M',handle:'@zara_m',av:'Z',color:'#fb923c',type:'writer',joined:'May 2021',stories:19,followers:'14.8k',status:'active',verified:false},
+  {id:'u7',name:'Efe_O',handle:'@efe_o',av:'E',color:'#38bdf8',type:'writer',joined:'Apr 2021',stories:14,followers:'22.3k',status:'active',verified:true},
+  {id:'u8',name:'Kemi_A',handle:'@kemi_a',av:'K',color:'#f87171',type:'writer',joined:'Sep 2022',stories:16,followers:'6.5k',status:'suspended',verified:false},
+  {id:'u9',name:'SpamUser99',handle:'@spamuser99',av:'S',color:'#666',type:'reader',joined:'May 2024',stories:0,followers:'12',status:'suspended',verified:false},
+  {id:'u10',name:'Dami_Cole',handle:'@dami_cole',av:'D',color:'#a78bfa',type:'writer',joined:'Nov 2022',stories:11,followers:'9.4k',status:'active',verified:false},
+  {id:'u11',name:'Emeka_T',handle:'@emeka_t',av:'E',color:'#34d399',type:'reader',joined:'Feb 2023',stories:0,followers:'489',status:'active',verified:false},
+  {id:'u12',name:'Ngozi_J',handle:'@ngozi_j',av:'N',color:'#fbbf24',type:'writer',joined:'Jul 2023',stories:7,followers:'3.2k',status:'active',verified:false},
+];
+
+const STORIES_DATA = [
+  {id:1,title:"I came home early and caught my husband kissing my late sister's photograph",writer:'Ada_Writes',genre:'💔 Betrayal',reads:'171k',likes:'24.3k',labels:['hot','top-week'],status:'published'},
+  {id:2,title:"The richest boy in school suddenly started sitting beside me every morning",writer:'CampusQueen',genre:'🎓 Campus',reads:'134k',likes:'18.1k',labels:['new'],status:'published'},
+  {id:3,title:"My grandmother's will revealed I wasn't her blood",writer:'Chiamaka_N',genre:'👑 Family',reads:'204k',likes:'31k',labels:['editor-pick'],status:'published'},
+  {id:4,title:"The runaway bride — I left at the altar in my socked feet",writer:'Ifeanyi_Story',genre:'✨ Twist',reads:'312k',likes:'45k',labels:['hot','promoted','top-week'],status:'published'},
+  {id:5,title:"My stepmother stole my university fund",writer:'Zara_M',genre:'🔥 Revenge',reads:'192k',likes:'28k',labels:['hot'],status:'published'},
+  {id:6,title:"The letter he never sent was folded inside the pocket of his old jacket",writer:'Efe_O',genre:'🌙 Elegy',reads:'218k',likes:'36.5k',labels:['promoted','editor-pick'],status:'published'},
+];
+
+const ACTIVITY_DATA = [
+  {dot:'green',text:'<strong>Ifeanyi_Story</strong> just posted Chapter 8 of The Runaway Bride',time:'1m ago'},
+  {dot:'red',text:'<strong>SpamUser99</strong> was reported by 3 users for harassment',time:'4m ago'},
+  {dot:'blue',text:'<strong>8,263</strong> users are actively debating live right now',time:'6m ago'},
+  {dot:'gold',text:'<strong>Ada_Writes</strong> reached 1M total reads 🎉',time:'12m ago'},
+  {dot:'purple',text:'New verification request from <strong>Ngozi_J</strong>',time:'18m ago'},
+  {dot:'green',text:'<strong>Chioma_R</strong> tipped Ada_Writes ₦2,000',time:'24m ago'},
+  {dot:'red',text:'Story flagged by 4 users: "He proposed with my best friend\'s ring"',time:'31m ago'},
+];
+
+const REPORTS_DATA = [
+  {id:'r1',content:'Comment by @anon_99 on Ada_Writes story',reporter:'Chioma_R',target:'@anon_99',cat:'Harassment',date:'Today, 14:32',severity:'high'},
+  {id:'r2',content:'Story: "He proposed with my best friend\'s ring"',reporter:'Multiple (4)',target:'Kemi_A',cat:'Copyright',date:'Today, 11:18',severity:'medium'},
+  {id:'r3',content:'Profile: @spamuser99 — spam comments',reporter:'Multiple (7)',target:'@spamuser99',cat:'Spam',date:'Yesterday',severity:'high'},
+  {id:'r4',content:'Debate comment on "Ada Should Stay"',reporter:'Emeka_T',target:'@anon_44',cat:'Hate Speech',date:'Yesterday',severity:'medium'},
+];
+
+const ADS_DATA = [
+  {placement:'Home Feed (every 5)',network:'Monetag',format:'Native Card',position:'Inline',impressions:'1.2M',ctr:'4.1%',revenue:'₦320k',status:'active'},
+  {placement:'Story Reader (mid)',network:'Google AdSense',format:'Rectangle 300×250',position:'Mid-scroll',impressions:'840k',ctr:'3.8%',revenue:'₦180k',status:'active'},
+  {placement:'Debate Page',network:'Monetag',format:'Banner 320×50',position:'Bottom',impressions:'420k',ctr:'2.1%',revenue:'₦90k',status:'active'},
+  {placement:'Browse Page',network:'In-Platform',format:'Native Card',position:'Grid',impressions:'280k',ctr:'5.2%',revenue:'₦240k',status:'active'},
+  {placement:'Profile Page',network:'Google AdSense',format:'Rectangle 300×250',position:'Sidebar',impressions:'120k',ctr:'1.9%',revenue:'₦10k',status:'paused'},
+];
+
+const EARNINGS_DATA = [
+  {user:'Ada_Writes',type:'Tip Received',amount:'₦2,000',fee:'₦400',date:'Today, 14:12',status:'completed'},
+  {user:'Ifeanyi_Story',type:'Withdrawal',amount:'₦15,000',fee:'₦0',date:'Today, 11:30',status:'pending'},
+  {user:'Chiamaka_N',type:'Tip Received',amount:'₦500',fee:'₦100',date:'Yesterday',status:'completed'},
+  {user:'Zara_M',type:'Withdrawal',amount:'₦8,000',fee:'₦0',date:'Yesterday',status:'completed'},
+  {user:'Ad Network',type:'Ad Revenue',amount:'₦28,000',fee:'₦0',date:'2 days ago',status:'completed'},
+];
+
+const MODLOG_DATA = [
+  {action:'Suspended User',admin:'SuperAdmin',target:'@spamuser99',reason:'Spam / Multiple reports',date:'Today, 15:02'},
+  {action:'Story Promoted',admin:'SuperAdmin',target:'"The runaway bride…"',reason:'Top story this week',date:'Today, 13:45'},
+  {action:'Verified User',admin:'SuperAdmin',target:'@efe_o',reason:'Approved verification request',date:'Today, 11:22'},
+  {action:'Report Dismissed',admin:'SuperAdmin',target:'@kemi_a story',reason:'No violation found',date:'Yesterday'},
+  {action:'Broadcast Sent',admin:'SuperAdmin',target:'All 48.2k users',reason:'New feature announcement',date:'2 days ago'},
+  {action:'Pop-up Activated',admin:'SuperAdmin',target:'Chapter drop banner',reason:'Weekly story spotlight',date:'3 days ago'},
+];
+
+const DEBATES_DATA = [
+  {id:'d1',motion:'"Ada should stay and fight for her marriage"',story:'I came home early…',forV:2341,agV:3819,args:28,status:'live'},
+  {id:'d2',motion:'"Walking out publicly was brave, not dramatic"',story:'The runaway bride',forV:9800,agV:2100,args:41,status:'live'},
+  {id:'d3',motion:'"Adanna should search for her biological roots"',story:"Grandmother's will",forV:3100,agV:5200,args:19,status:'live'},
+];
+
+const POPUP_DATA = [
+  {title:'📢 New Chapter Drop!',type:'Story Spotlight',page:'Home Feed',audience:'All Users',created:'Today',status:'active'},
+  {title:'🎉 Welcome to Droboard',type:'Announcement',page:'App Open',audience:'New Users',created:'Yesterday',status:'active'},
+  {title:'🏆 Vote in Today\'s Debate',type:'Notification',page:'App Open',audience:'All Users',created:'2 days ago',status:'active'},
+];
+
+const VERIFY_DATA = [
+  {id:'v1',name:'Ngozi_J',handle:'@ngozi_j',av:'N',color:'#fbbf24',type:'writer',stories:7,followers:'3.2k',reason:'I have published 7 stories with over 300k total reads and an active following. I create original betrayal and campus fiction.'},
+  {id:'v2',name:'Kola_B',handle:'@kola_b',av:'K',color:'#34d399',type:'writer',stories:3,followers:'1.8k',reason:'Published 3 complete series and growing. Regular posting schedule since Jan 2024.'},
+  {id:'v3',name:'LagosReader22',handle:'@lagosreader22',av:'L',color:'#38bdf8',type:'reader',stories:0,followers:'2.1k',reason:'Active community member, top debater, curator of 6 public collections with 4,000+ saves.'},
+];
+
+const BROADCASTS_HISTORY = [
+  {title:'🔥 New Feature: Status Stories',type:'Notification',sent:'All Users (48.2k)',date:'2 days ago',opens:'34,210',ctr:'71%'},
+  {title:'📖 Top Story This Week Drop',type:'Push',sent:'Writers (8.3k)',date:'4 days ago',opens:'5,840',ctr:'70%'},
+  {title:'⚔️ Debate Season Kicks Off',type:'DM',sent:'All Users',date:'1 week ago',opens:'28,100',ctr:'58%'},
+];
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function showToast(msg, type='info'){
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div');
+  t.className = `toast-item ${type}`;
+  const icons = {success:'✅',error:'❌',info:'ℹ️'};
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  stack.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2800);
+  setTimeout(()=>t.remove(),3100);
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open')});
+});
+
+function showPanel(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  const titles = {dashboard:'Dashboard',analytics:'Analytics',users:'User Management',verify:'Verification Requests',messages:'Broadcast Messages',reports:'Reports & Moderation',stories:'Story Management',debates:'Debates',popups:'Pop-ups & Banners',ads:'Ad Manager',earnings:'Earnings & Payouts',settings:'Platform Settings',modlog:'Moderation Log'};
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+  if(el){document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');}
+  renderPanel(id);
+}
+
+function setDateRange(el,range){
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const cr = document.getElementById('custom-date-range');
+  cr.style.display = range==='custom' ? 'flex' : 'none';
+  if(range!=='custom') showToast(`📅 Showing ${range} data`,'info');
+}
+
+function applyDateFilter(){showToast('📅 Custom date filter applied','success')}
+
+// ═══════════════════════════════════════
+// RENDER PANELS
+// ═══════════════════════════════════════
+function renderPanel(id){
+  if(id==='dashboard') renderDashboard();
+  else if(id==='users') renderUsers(USERS);
+  else if(id==='stories') renderStories();
+  else if(id==='reports') renderReports();
+  else if(id==='ads') renderAds();
+  else if(id==='earnings') renderEarnings();
+  else if(id==='debates') renderDebates();
+  else if(id==='modlog') renderModlog();
+  else if(id==='verify') renderVerify();
+  else if(id==='analytics') renderAnalytics();
+  else if(id==='popups') renderPopups();
+  else if(id==='messages') renderMessages();
+}
+
+function renderDashboard(){
+  // Bar chart
+  const vals=[182,210,195,240,280,320,290];
+  const max=320;
+  document.getElementById('readsChart').innerHTML=vals.map((v,i)=>
+    `<div class="bar-chart-bar" style="height:${(v/max)*100}%;background:${i===6?'var(--acc)':'rgba(255,0,80,.35)'};border-top:2px solid ${i===6?'var(--acc2)':'rgba(255,0,80,.6)'};" title="${v}k reads"></div>`
+  ).join('');
+
+  // Activity
+  document.getElementById('activityFeed').innerHTML=ACTIVITY_DATA.map(a=>
+    `<div class="activity-item">
+      <div class="act-dot-wrap"><div class="act-dot ${a.dot}"></div></div>
+      <div class="act-text">${a.text}</div>
+      <div class="act-time">${a.time}</div>
+    </div>`).join('');
+
+  // Genre chart
+  const genres=[['💔 Betrayal',78],['👑 Family',62],['🎓 Campus',48],['✨ Twist',44],['🔥 Revenge',38],['🌙 Elegy',31]];
+  const cols=['var(--acc)','var(--purple)','var(--gold)','var(--blue)','var(--orange)','var(--green)'];
+  document.getElementById('genreChart').innerHTML=genres.map((g,i)=>
+    `<div class="chart-bar-item"><div class="chart-bar-label">${g[0]}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${g[1]}%;background:${cols[i]}"></div></div><div class="chart-bar-val">${g[1]}%</div></div>`
+  ).join('');
+
+  // Top stories table
+  document.getElementById('topStoriesTable').innerHTML=STORIES_DATA.slice(0,4).map(s=>
+    `<tr>
+      <td><div style="font-size:11px;font-weight:700;color:var(--tx-high);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.title}</div><div style="font-size:9px;color:var(--tx-faint)">@${s.writer}</div></td>
+      <td style="font-size:12px;font-weight:700;color:var(--blue)">${s.reads}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--acc)">${s.likes}</td>
+      <td>${s.labels.map(l=>labelBadge(l)).join(' ')}</td>
+      <td><div class="row-actions"><div class="action-btn acc" onclick="openModal('modal-promote')" title="Promote"><i class="fas fa-star"></i></div><div class="action-btn" title="View"><i class="fas fa-eye"></i></div></div></td>
+    </tr>`).join('');
+}
+
+function labelBadge(l){
+  const map={hot:'<span class="badge badge-hot">🔥 Hot</span>',promoted:'<span class="badge badge-promoted">⭐ Promoted</span>','top-week':'<span class="badge badge-top">🏆 Top</span>','editor-pick':'<span class="badge badge-top" style="background:rgba(56,189,248,.1);color:var(--blue);border-color:rgba(56,189,248,.25)">✨ Pick</span>',new:'<span class="badge badge-active">🆕 New</span>',trending:'<span class="badge badge-trending">📈 Trending</span>'};
+  return map[l]||'';
+}
+
+function renderUsers(list){
+  document.getElementById('usersTable').innerHTML=list.map(u=>`
+    <tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:${u.color}">${u.av}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-handle">${u.handle}</div></div>
+      </div></td>
+      <td><span class="badge ${u.type==='writer'?'badge-writer':'badge-reader'}">${u.type==='writer'?'✍️ Writer':'📖 Reader'}</span>${u.verified?'&nbsp;<span class="badge badge-verified">✓ Verified</span>':''}</td>
+      <td style="font-size:11px;color:var(--tx-muted)">${u.joined}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--blue)">${u.stories}</td>
+      <td style="font-size:12px;color:var(--tx-body)">${u.followers}</td>
+      <td><span class="badge ${u.status==='active'?'badge-active':'badge-suspended'}">${u.status==='active'?'Active':'Suspended'}</span></td>
+      <td><div class="row-actions">
+        <div class="action-btn" title="View Profile" onclick="viewUser('${u.id}')"><i class="fas fa-eye"></i></div>
+        <div class="action-btn" title="Message" onclick="msgUser('${u.id}')"><i class="fas fa-paper-plane"></i></div>
+        ${u.verified?'':'<div class="action-btn success" title="Verify" onclick="verifyUserQuick(\''+u.id+'\')"><i class="fas fa-badge-check"></i></div>'}
+        <div class="action-btn danger" title="${u.status==='active'?'Suspend':'Unsuspend'}" onclick="openSuspend('${u.id}')"><i class="fas fa-ban"></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function filterUsers(type,el){
+  document.querySelectorAll('#panel-users .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  let filtered=USERS;
+  if(type==='active')filtered=USERS.filter(u=>u.status==='active');
+  else if(type==='suspended')filtered=USERS.filter(u=>u.status==='suspended');
+  else if(type==='writer')filtered=USERS.filter(u=>u.type==='writer');
+  else if(type==='verified')filtered=USERS.filter(u=>u.verified);
+  renderUsers(filtered);
+}
+function searchUsers(q){const r=USERS.filter(u=>u.name.toLowerCase().includes(q.toLowerCase())||u.handle.toLowerCase().includes(q.toLowerCase()));renderUsers(r);}
+
+function viewUser(id){
+  const u=USERS.find(x=>x.id===id);if(!u)return;
+  document.getElementById('user-detail-title').textContent='@'+u.name;
+  document.getElementById('suspend-name').textContent=u.name;
+  document.getElementById('suspend-handle').textContent=u.handle;
+  document.getElementById('suspend-av').textContent=u.av;
+  document.getElementById('suspend-av').style.background=u.color;
+  document.getElementById('msg-name').textContent=u.name;
+  document.getElementById('msg-handle').textContent=u.handle;
+  document.getElementById('msg-av').textContent=u.av;
+  document.getElementById('msg-av').style.background=u.color;
+  document.getElementById('user-detail-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:14px;background:var(--l2);border-radius:12px">
+      <div class="user-av" style="width:54px;height:54px;font-size:20px;background:${u.color}">${u.av}</div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--tx-high)">${u.name}</div><div style="font-size:11px;color:var(--tx-muted)">${u.handle}</div><div style="margin-top:6px;display:flex;gap:6px"><span class="badge ${u.type==='writer'?'badge-writer':'badge-reader'}">${u.type}</span><span class="badge ${u.status==='active'?'badge-active':'badge-suspended'}">${u.status}</span>${u.verified?'<span class="badge badge-verified">✓ Verified</span>':''}</div></div>
+    </div>
+    <div class="form-row form-row-3" style="margin-bottom:14px">
+      <div style="text-align:center;padding:12px;background:var(--l2);border-radius:10px"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--acc)">${u.stories}</div><div style="font-size:9px;color:var(--tx-muted)">Stories</div></div>
+      <div style="text-align:center;padding:12px;background:var(--l2);border-radius:10px"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--blue)">${u.followers}</div><div style="font-size:9px;color:var(--tx-muted)">Followers</div></div>
+      <div style="text-align:center;padding:12px;background:var(--l2);border-radius:10px"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--green)">${u.joined}</div><div style="font-size:9px;color:var(--tx-muted)">Joined</div></div>
+    </div>`;
+  openModal('modal-user-detail');
+}
+
+function msgUser(id){const u=USERS.find(x=>x.id===id);if(!u)return;document.getElementById('msg-name').textContent=u.name;document.getElementById('msg-handle').textContent=u.handle;document.getElementById('msg-av').textContent=u.av;document.getElementById('msg-av').style.background=u.color;openModal('modal-msg-user');}
+function openSuspend(id){const u=USERS.find(x=>x.id===id);if(!u)return;document.getElementById('suspend-name').textContent=u.name;document.getElementById('suspend-handle').textContent=u.handle;document.getElementById('suspend-av').textContent=u.av;document.getElementById('suspend-av').style.background=u.color;openModal('modal-suspend');}
+function verifyUserQuick(id){showToast('✅ User verified!','success');}
+
+function renderStories(){
+  document.getElementById('storiesTable').innerHTML=STORIES_DATA.map(s=>`
+    <tr>
+      <td><div style="font-size:11px;font-weight:700;color:var(--tx-high);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.title}</div></td>
+      <td><div class="user-cell"><div class="user-av" style="background:var(--acc);width:24px;height:24px;font-size:9px">A</div><div style="font-size:11px;color:var(--tx-body)">@${s.writer}</div></div></td>
+      <td style="font-size:10px;color:var(--tx-muted)">${s.genre}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--blue)">${s.reads}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--acc)">${s.likes}</td>
+      <td><div class="story-tag-row">${s.labels.map(l=>labelBadge(l)).join('')}</div></td>
+      <td><div class="row-actions">
+        <div class="action-btn acc" title="Promote" onclick="openModal('modal-promote')"><i class="fas fa-star"></i></div>
+        <div class="action-btn" title="Edit Labels" onclick="showToast('✏️ Edit labels','info')"><i class="fas fa-tag"></i></div>
+        <div class="action-btn danger" title="Remove" onclick="showToast('🗑 Story removed','error')"><i class="fas fa-trash"></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderReports(){
+  const sev={high:'<span style="color:var(--ag-col);font-weight:800;font-size:10px">🔴 High</span>',medium:'<span style="color:var(--gold);font-weight:800;font-size:10px">🟡 Medium</span>',low:'<span style="color:var(--green);font-weight:800;font-size:10px">🟢 Low</span>'};
+  document.getElementById('reportsTable').innerHTML=REPORTS_DATA.map(r=>`
+    <tr>
+      <td style="font-size:11px;color:var(--tx-high);max-width:200px">${r.content}</td>
+      <td style="font-size:11px;color:var(--tx-muted)">${r.reporter}</td>
+      <td style="font-size:11px;font-weight:700;color:var(--acc)">${r.target}</td>
+      <td><span class="badge badge-suspended" style="font-size:9px">${r.cat}</span></td>
+      <td style="font-size:10px;color:var(--tx-faint)">${r.date}</td>
+      <td>${sev[r.severity]||''}</td>
+      <td><div class="row-actions">
+        <div class="action-btn success" title="Resolve" onclick="showToast('✅ Report resolved','success')"><i class="fas fa-check"></i></div>
+        <div class="action-btn danger" title="Suspend User" onclick="openModal('modal-suspend')"><i class="fas fa-ban"></i></div>
+        <div class="action-btn" title="Dismiss" onclick="showToast('👍 Dismissed','info')"><i class="fas fa-xmark"></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderAds(){
+  document.getElementById('adsTable').innerHTML=ADS_DATA.map(a=>`
+    <tr>
+      <td style="font-size:12px;font-weight:600;color:var(--tx-high)">${a.placement}</td>
+      <td><span style="font-size:10px;color:var(--gold);font-weight:700">${a.network}</span></td>
+      <td style="font-size:11px;color:var(--tx-muted)">${a.format}</td>
+      <td style="font-size:11px;color:var(--tx-muted)">${a.position}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--blue)">${a.impressions}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--green)">${a.ctr}</td>
+      <td style="font-size:12px;font-weight:700;color:var(--gold)">${a.revenue}</td>
+      <td><span class="badge ${a.status==='active'?'badge-active':'badge-pending'}">${a.status==='active'?'Active':'Paused'}</span></td>
+    </tr>`).join('');
+}
+
+function renderEarnings(){
+  document.getElementById('earningsTable').innerHTML=EARNINGS_DATA.map(e=>`
+    <tr>
+      <td style="font-size:12px;font-weight:700;color:var(--tx-high)">${e.user}</td>
+      <td><span style="font-size:10px;color:var(--tx-muted)">${e.type}</span></td>
+      <td style="font-size:12px;font-weight:700;color:var(--green)">${e.amount}</td>
+      <td style="font-size:12px;color:var(--acc)">${e.fee}</td>
+      <td style="font-size:10px;color:var(--tx-faint)">${e.date}</td>
+      <td><span class="badge ${e.status==='completed'?'badge-active':'badge-pending'}">${e.status}</span></td>
+      <td><div class="row-actions">
+        ${e.status==='pending'?'<div class="action-btn success" onclick="showToast(\'✅ Payout approved\',\'success\')" title="Approve"><i class="fas fa-check"></i></div>':''}
+        <div class="action-btn" onclick="showToast(\'🧾 Receipt downloaded\',\'info\')" title="Receipt"><i class="fas fa-receipt"></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderDebates(){
+  document.getElementById('debatesTable').innerHTML=DEBATES_DATA.map(d=>`
+    <tr>
+      <td style="font-size:11px;font-weight:600;color:var(--tx-high);max-width:240px">"${d.motion}"</td>
+      <td style="font-size:10px;color:var(--tx-muted)">${d.story}</td>
+      <td><div style="display:flex;gap:6px"><span style="font-size:10px;color:var(--for-col);font-weight:700">✅ ${(d.forV/1000).toFixed(1)}k</span><span style="color:var(--tx-faint)">|</span><span style="font-size:10px;color:var(--ag-col);font-weight:700">❌ ${(d.agV/1000).toFixed(1)}k</span></div></td>
+      <td style="font-size:12px;font-weight:700;color:var(--purple)">${d.args}</td>
+      <td><span class="badge badge-active"><span class="pulse-dot green" style="margin-right:0"></span> Live</span></td>
+      <td><div class="row-actions">
+        <div class="action-btn" onclick="showToast('👁 Viewing debate','info')"><i class="fas fa-eye"></i></div>
+        <div class="action-btn danger" onclick="showToast('⏹ Debate closed','error')"><i class="fas fa-stop"></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderModlog(){
+  document.getElementById('modlogTable').innerHTML=MODLOG_DATA.map(m=>`
+    <tr>
+      <td><span class="badge badge-pending" style="font-size:10px">${m.action}</span></td>
+      <td style="font-size:11px;font-weight:700;color:var(--acc)">${m.admin}</td>
+      <td style="font-size:11px;color:var(--tx-body)">${m.target}</td>
+      <td style="font-size:11px;color:var(--tx-muted)">${m.reason}</td>
+      <td style="font-size:10px;color:var(--tx-faint)">${m.date}</td>
+    </tr>`).join('');
+}
+
+function renderVerify(){
+  document.getElementById('verifyList').innerHTML=VERIFY_DATA.map(v=>`
+    <div class="verify-card">
+      <div class="verify-card-top">
+        <div class="user-av" style="width:42px;height:42px;font-size:16px;background:${v.color}">${v.av}</div>
+        <div style="flex:1"><div class="user-name">${v.name}</div><div class="user-handle">${v.handle}</div><div style="display:flex;gap:5px;margin-top:4px"><span class="badge ${v.type==='writer'?'badge-writer':'badge-reader'}">${v.type}</span><span style="font-size:10px;color:var(--tx-muted)">${v.stories} stories · ${v.followers} followers</span></div></div>
+      </div>
+      <div class="verify-reason">${v.reason}</div>
+      <div class="verify-actions">
+        <button class="btn btn-green btn-sm" onclick="showToast('✅ @${v.handle} verified!','success');this.closest('.verify-card').remove()"><i class="fas fa-check"></i> Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="this.closest('.verify-card').remove()"><i class="fas fa-times"></i> Reject</button>
+        <button class="btn btn-blue btn-sm" onclick="showToast('📩 Requested more info','info')"><i class="fas fa-question"></i> Request Info</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderAnalytics(){
+  // Country chart
+  const countries=[['🇳🇬 Nigeria',84],['🇬🇭 Ghana',9],['🇰🇪 Kenya',4],['🇿🇦 S.Africa',2],['🌍 Other',1]];
+  const cols2=['var(--acc)','var(--green)','var(--blue)','var(--gold)','var(--tx-muted)'];
+  document.getElementById('countryChart').innerHTML=countries.map((c,i)=>
+    `<div class="chart-bar-item"><div class="chart-bar-label" style="width:90px">${c[0]}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${c[1]}%;background:${cols2[i]}"></div></div><div class="chart-bar-val">${c[1]}%</div></div>`
+  ).join('');
+  // Device
+  const devices=[['📱 Mobile',78],['💻 Desktop',14],['📟 Tablet',8]];
+  const cols3=['var(--acc)','var(--blue)','var(--purple)'];
+  document.getElementById('deviceChart').innerHTML=devices.map((d,i)=>
+    `<div class="chart-bar-item"><div class="chart-bar-label" style="width:90px">${d[0]}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${d[1]}%;background:${cols3[i]}"></div></div><div class="chart-bar-val">${d[1]}%</div></div>`
+  ).join('');
+  // 30-day trend
+  const trend30=[40,48,52,45,60,72,68,80,75,88,95,90,102,98,110,108,120,115,130,125,140,135,150,145,160,155,165,170,180,190];
+  const mx=190;
+  document.getElementById('trendChart').innerHTML=trend30.map((v,i)=>
+    `<div class="bar-chart-bar" style="height:${(v/mx)*100}%;background:${i===29?'var(--acc)':'rgba(255,0,80,.3)'};min-width:8px" title="Day ${i+1}: ${v}k reads"></div>`
+  ).join('');
+}
+
+function renderPopups(){
+  document.getElementById('activePopupsList').innerHTML=POPUP_DATA.map(p=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bd2)">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--tx-high)">${p.title}</div>
+        <div style="font-size:9px;color:var(--tx-muted);margin-top:2px">${p.type} · ${p.page} · ${p.audience} · Created ${p.created}</div>
+      </div>
+      <span class="badge badge-active">Active</span>
+      <div class="row-actions">
+        <div class="action-btn" onclick="showToast('✏️ Editing pop-up','info')"><i class="fas fa-pen"></i></div>
+        <div class="action-btn danger" onclick="showToast('⏹ Pop-up deactivated','error');this.closest('[style]').remove()"><i class="fas fa-stop"></i></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMessages(){
+  document.getElementById('broadcastHistory').innerHTML=BROADCASTS_HISTORY.map(b=>`
+    <div style="padding:12px 16px;border-bottom:1px solid var(--bd2)">
+      <div style="font-size:12px;font-weight:700;color:var(--tx-high);margin-bottom:3px">${b.title}</div>
+      <div style="font-size:10px;color:var(--tx-muted)">Sent to ${b.sent} · ${b.date}</div>
+      <div style="display:flex;gap:12px;margin-top:6px">
+        <span style="font-size:10px;color:var(--green);font-weight:700"><i class="fas fa-eye" style="font-size:9px"></i> ${b.opens} opens</span>
+        <span style="font-size:10px;color:var(--blue);font-weight:700"><i class="fas fa-arrow-pointer" style="font-size:9px"></i> ${b.ctr} CTR</span>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════
+function suspendUser(){showToast('🚫 User suspended successfully','error');closeModal('modal-suspend');}
+function sendUserMessage(){showToast('💬 Message sent!','success');closeModal('modal-msg-user');}
+function sendBroadcast(){showToast('📢 Broadcast sent to 48.2k users!','success');closeModal('modal-broadcast');}
+function promoteStory(){showToast('⭐ Story promoted!','success');closeModal('modal-promote');}
+function savePopup(){showToast('🚀 Pop-up activated!','success');closeModal('modal-popup-builder');}
+function saveAdSlot(){showToast('✅ Ad slot saved!','success');closeModal('modal-new-ad');}
+function selectDuration(el,val){document.querySelectorAll('.duration-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');document.getElementById('custom-duration-field').style.display=val==='custom'?'block':'none';}
+function setBroadcastType(el,type){el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+function selectPromoStory(el,id){el.querySelector('input[type=radio]').checked=true;}
+function searchPromoStories(q){} // demo
+function updatePopupPreview(){
+  const t=document.getElementById('popup-title').value||'Your title here';
+  const m=document.getElementById('popup-msg').value||'Your message here';
+  document.getElementById('popupPreviewInner').innerHTML=`
+    <div style="font-size:11px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">📢 Announcement</div>
+    <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3">${t}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:12px">${m}</div>
+    <div style="background:var(--acc);color:#fff;padding:7px 18px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block">Read Now</div>`;
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+renderDashboard();
+// Animate chart bars on load
+setTimeout(()=>{
+  document.querySelectorAll('.chart-bar-fill').forEach(b=>{const w=b.style.width;b.style.width='0';requestAnimationFrame(()=>{b.style.width=w;});});
+},100);
+
+// Global search
+document.getElementById('globalSearch').addEventListener('input',function(){
+  if(this.value.length>2) showToast(`🔍 Searching for "${this.value}"…`,'info');
+});
+</script>
+</body>
+</html>

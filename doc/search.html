@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e0e0e0;--tx-body:#c0c0c0;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --tx-title:#e0e0e0;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --nav-h:60px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+
+/* ── TOP BAR ── */
+.top-bar{
+  position:sticky;top:0;z-index:200;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);
+  padding:10px 14px 9px;
+}
+.top-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;cursor:pointer}
+.search-wrap{
+  display:flex;align-items:center;gap:9px;
+  background:var(--l1);border:1.5px solid var(--bd);
+  border-radius:24px;padding:9px 14px;margin-top:9px;
+  transition:border-color .2s;
+}
+.search-wrap:focus-within{border-color:rgba(255,0,80,.3);box-shadow:0 0 0 3px var(--glow-sm)}
+.search-wrap i.search-icon{color:var(--tx-faint);font-size:13px;flex-shrink:0}
+.search-inp{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:14px;
+  caret-color:var(--acc);
+}
+.search-inp::placeholder{color:var(--tx-faint)}
+.search-clear{
+  width:22px;height:22px;border-radius:50%;background:var(--l4);
+  display:none;align-items:center;justify-content:center;
+  font-size:9px;color:var(--tx-muted);cursor:pointer;flex-shrink:0;
+}
+.search-clear.show{display:flex}
+.search-clear:active{transform:scale(.88)}
+
+/* ── FILTER PILLS ── */
+.filter-bar{
+  display:flex;gap:6px;padding:10px 14px 0;
+  overflow-x:auto;scrollbar-width:none;
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.fpill{
+  flex-shrink:0;padding:5px 14px;border-radius:20px;
+  font-size:10px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--bd);color:var(--tx-faint);
+  background:transparent;transition:all .18s;white-space:nowrap;
+  font-family:'DM Sans',sans-serif;
+}
+.fpill.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 2px 10px var(--glow-sm)}
+.fpill:active{transform:scale(.95)}
+
+/* ── SECTION HEADERS ── */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:18px 14px 10px}
+.sh-title{
+  font-size:11px;font-weight:800;color:var(--tx-muted);
+  text-transform:uppercase;letter-spacing:.1em;
+  display:flex;align-items:center;gap:6px;
+}
+.sh-more{
+  font-size:10px;font-weight:700;color:var(--acc3);cursor:pointer;
+  padding:3px 9px;border-radius:10px;
+  background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);
+}
+
+/* ── TRENDING SEARCHES ── */
+.trending-list{padding:0 14px;display:flex;flex-direction:column;gap:0}
+.trend-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--bd2);
+  cursor:pointer;transition:.15s;
+}
+.trend-item:last-child{border-bottom:none}
+.trend-item:active{opacity:.7}
+.trend-rank{
+  font-family:'Playfair Display',serif;
+  font-size:13px;font-weight:900;
+  width:24px;text-align:center;flex-shrink:0;
+}
+.trend-rank.t1{color:var(--gold)}
+.trend-rank.t2{color:#a0aec0}
+.trend-rank.t3{color:#c0956a}
+.trend-rank.td{color:var(--tx-faint)}
+.trend-body{flex:1;min-width:0}
+.trend-query{font-size:13px;font-weight:700;color:var(--tx-high)}
+.trend-meta{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.trend-arrow{font-size:11px;color:var(--tx-faint)}
+.trend-fire{font-size:13px;flex-shrink:0}
+
+/* ── RECENT SEARCHES ── */
+.recent-list{padding:0 14px}
+.recent-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--bd2);
+  cursor:pointer;
+}
+.recent-item:last-child{border-bottom:none}
+.recent-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--tx-muted);flex-shrink:0;
+}
+.recent-text{flex:1;font-size:13px;font-weight:600;color:var(--tx-body)}
+.recent-del{
+  width:26px;height:26px;border-radius:50%;
+  background:transparent;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--tx-faint);cursor:pointer;
+  flex-shrink:0;transition:.15s;
+}
+.recent-del:active{color:var(--acc)}
+
+/* ── STORY CARD (search result / featured) ── */
+.story-card{
+  display:flex;gap:11px;
+  background:var(--l1);border:1px solid var(--bd);border-radius:13px;
+  padding:10px;cursor:pointer;transition:border-color .2s;
+  margin-bottom:8px;position:relative;
+}
+.story-card:active{border-color:var(--bd-acc)}
+.story-card:hover{border-color:var(--bd-acc)}
+.sc-img{
+  width:72px;height:86px;border-radius:8px;
+  background-size:cover;background-position:center;
+  flex-shrink:0;
+}
+.sc-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.sc-cat{font-size:8px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.sc-title{
+  font-family:'Playfair Display',serif;
+  font-size:12px;font-weight:700;line-height:1.35;
+  color:var(--tx-high);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:5px;
+}
+.sc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sc-av{width:14px;height:14px;border-radius:50%;object-fit:cover;border:1px solid var(--bd)}
+.sc-author{font-size:9px;color:var(--tx-muted);font-weight:600}
+.sc-stat{font-size:9px;color:var(--tx-faint);display:flex;align-items:center;gap:2px;font-weight:600}
+.sc-badge{
+  position:absolute;top:8px;right:8px;
+  font-size:7px;font-weight:800;padding:2px 7px;
+  border-radius:6px;letter-spacing:.03em;
+}
+.badge-hot{background:var(--acc);color:#fff}
+.badge-new{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.badge-free{background:rgba(56,189,248,.08);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+
+/* ── WRITER CARD ── */
+.writer-card{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--bd2);cursor:pointer;
+}
+.writer-card:last-child{border-bottom:none}
+.wc-av-wrap{position:relative;flex-shrink:0}
+.wc-av-ring{
+  width:44px;height:44px;border-radius:50%;padding:2.5px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+}
+.wc-av-ring.blue-ring{background:linear-gradient(135deg,var(--blue),#0ea5e9)}
+.wc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000}
+.wc-av-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.wc-verified{
+  position:absolute;bottom:-1px;right:-1px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--blue);border:2px solid #000;
+  display:flex;align-items:center;justify-content:center;font-size:6px;color:#fff;
+}
+.wc-body{flex:1;min-width:0}
+.wc-name{font-size:13px;font-weight:700;color:var(--tx-high)}
+.wc-handle{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.wc-genre{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;
+  background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3);
+  margin-top:4px;
+}
+.wc-follow-btn{
+  padding:6px 14px;border-radius:20px;
+  font-size:10px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--bd);background:rgba(255,255,255,.05);color:#ccc;
+  white-space:nowrap;flex-shrink:0;transition:.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.wc-follow-btn.ing{background:var(--acc);border-color:var(--acc);color:#fff}
+.wc-follow-btn:active{transform:scale(.96)}
+
+/* ── HORIZONTAL SCROLL STORIES ── */
+.h-scroll{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:0 14px}
+.h-scroll::-webkit-scrollbar{display:none}
+.h-card{
+  flex-shrink:0;width:130px;cursor:pointer;
+  display:flex;flex-direction:column;
+}
+.h-card:active{opacity:.8}
+.h-cover{
+  position:relative;width:100%;height:160px;
+  border-radius:10px;overflow:hidden;
+  background:var(--l1);
+  box-shadow:0 4px 14px rgba(0,0,0,.5);
+}
+.h-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.h-scrim{
+  position:absolute;bottom:0;left:0;right:0;height:60%;
+  background:linear-gradient(0deg,rgba(0,0,0,.94),transparent);
+}
+.h-badge{
+  position:absolute;top:5px;left:0;font-size:7px;font-weight:800;
+  padding:2px 6px 2px 4px;border-radius:0 6px 6px 0;
+  text-transform:uppercase;z-index:2;
+}
+.h-views{
+  position:absolute;bottom:5px;left:7px;
+  font-size:8px;font-weight:700;color:rgba(255,255,255,.8);
+  display:flex;align-items:center;gap:2px;
+}
+.h-title{
+  font-size:10.5px;font-weight:700;line-height:1.35;
+  color:var(--tx-high);margin-top:6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.h-author{font-size:9px;color:var(--tx-muted);margin-top:3px;font-weight:600}
+
+/* ── CATEGORY GRID ── */
+.cat-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;padding:0 14px;
+}
+.cat-tile{
+  position:relative;border-radius:12px;overflow:hidden;
+  height:72px;cursor:pointer;transition:.15s;
+}
+.cat-tile:active{transform:scale(.97)}
+.cat-tile-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+}
+.cat-tile-ov{
+  position:absolute;inset:0;
+  display:flex;align-items:center;padding:0 12px;
+}
+.cat-tile-label{
+  font-family:'Playfair Display',serif;
+  font-size:13px;font-weight:900;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.7);
+}
+.cat-tile-count{font-size:9px;color:rgba(255,255,255,.65);margin-top:2px;font-weight:600}
+
+/* ── SEARCH RESULTS ── */
+.results-wrap{padding:0 14px}
+.results-count{font-size:11px;color:var(--tx-muted);font-weight:600;margin-bottom:12px;padding-top:4px}
+.results-count strong{color:var(--tx-high)}
+
+/* ── EMPTY STATE ── */
+.empty-state{padding:52px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.empty-state-icon{font-size:46px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.empty-state-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--tx-high)}
+.empty-state-body{font-size:12px;color:var(--tx-muted);line-height:1.6;max-width:240px}
+.empty-try{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.empty-try-pill{
+  font-size:10px;font-weight:700;padding:5px 12px;
+  border-radius:20px;cursor:pointer;
+  background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3);
+}
+
+/* ── DEBATE CARD ── */
+.debate-card{
+  background:var(--l1);border:1px solid var(--bd);
+  border-radius:13px;overflow:hidden;margin-bottom:8px;cursor:pointer;
+  transition:border-color .2s;
+}
+.debate-card:active{border-color:var(--bd-acc)}
+.dc-header{display:flex;gap:9px;padding:11px 12px 9px}
+.dc-thumb{width:44px;height:52px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.dc-body{flex:1;min-width:0}
+.dc-badge{
+  font-size:7.5px;font-weight:800;padding:2px 7px;border-radius:6px;
+  background:rgba(255,0,80,.1);color:var(--acc);border:1px solid rgba(255,0,80,.18);
+  display:inline-flex;align-items:center;gap:3px;margin-bottom:4px;
+}
+.dc-live-dot{width:4px;height:4px;border-radius:50%;background:var(--acc);animation:livep 1.3s ease-in-out infinite}
+@keyframes livep{0%,100%{opacity:1}50%{opacity:.3}}
+.dc-motion{font-size:11px;font-weight:700;color:var(--tx-high);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dc-bars{display:flex;gap:5px;padding:0 12px 10px}
+.dc-side{flex:1;border-radius:8px;padding:6px 8px;position:relative;overflow:hidden}
+.dc-side.for{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15)}
+.dc-side.ag{background:rgba(255,0,80,.05);border:1px solid var(--bd-acc)}
+.dc-side-bar{position:absolute;left:0;top:0;bottom:0;z-index:0;border-radius:8px}
+.dc-side.for .dc-side-bar{background:rgba(52,211,153,.12)}
+.dc-side.ag .dc-side-bar{background:rgba(255,0,80,.09)}
+.dc-side-inner{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center}
+.dc-side-lbl{font-size:8px;font-weight:800}
+.dc-side.for .dc-side-lbl{color:var(--green)}
+.dc-side.ag .dc-side-lbl{color:var(--acc3)}
+.dc-side-pct{font-size:11px;font-weight:900}
+.dc-side.for .dc-side-pct{color:var(--green)}
+.dc-side.ag .dc-side-pct{color:var(--acc3)}
+.dc-total{font-size:9px;color:var(--tx-faint);padding:0 12px 10px;font-weight:600}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);
+  border-top:1px solid var(--bd);display:flex;justify-content:space-around;
+  padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h);
+}
+.bn-item{
+  text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);
+  cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);
+  padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;
+  z-index:900;opacity:0;transition:.28s;pointer-events:none;
+  white-space:nowrap;max-width:92vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── DIVIDER ── */
+.sdiv{height:1px;background:var(--bd2);margin:6px 0}
+
+/* ── AD BANNER ── */
+.ad-banner{
+  margin:0 14px 14px;background:var(--l1);border:1px solid var(--bd);
+  border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;
+  position:relative;overflow:hidden;cursor:pointer;
+}
+.ad-banner::after{content:'AD';position:absolute;top:6px;right:8px;font-size:7px;font-weight:800;color:var(--tx-faint);letter-spacing:.08em}
+.ad-logo{width:36px;height:36px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd)}
+.ad-body{flex:1;min-width:0}
+.ad-brand{font-size:9px;font-weight:800;color:var(--blue);margin-bottom:2px}
+.ad-headline{font-size:11px;font-weight:700;color:var(--tx-high);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-sub{font-size:9px;color:var(--tx-faint)}
+.ad-cta{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:10px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'DM Sans',sans-serif}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fu{animation:fadeUp .22s ease both}
+.d1{animation-delay:.03s}.d2{animation-delay:.06s}.d3{animation-delay:.09s}
+.d4{animation-delay:.12s}.d5{animation-delay:.15s}.d6{animation-delay:.18s}
+
+/* ── VIEWS TOGGLE ── */
+#defaultView{display:block}
+#resultsView{display:none}
+#emptyView{display:none}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:2px">
+    <div class="top-logo" onclick="location.href='index.html'">D</div>
+    <span style="font-size:12px;font-weight:600;color:var(--tx-muted)">Search</span>
+  </div>
+  <div class="search-wrap">
+    <i class="fas fa-magnifying-glass search-icon"></i>
+    <input
+      class="search-inp"
+      id="searchInp"
+      type="search"
+      placeholder="Stories, writers, genres, keywords…"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+    />
+    <div class="search-clear" id="clearBtn" onclick="clearSearch()">
+      <i class="fas fa-xmark"></i>
+    </div>
+  </div>
+  <!-- Filter pills (only visible during results) -->
+  <div class="filter-bar" id="filterBar" style="display:none;padding-top:9px">
+    <div class="fpill on" data-f="all" onclick="setFilter('all',this)">🔥 All</div>
+    <div class="fpill" data-f="stories" onclick="setFilter('stories',this)">📖 Stories</div>
+    <div class="fpill" data-f="writers" onclick="setFilter('writers',this)">✍️ Writers</div>
+    <div class="fpill" data-f="debates" onclick="setFilter('debates',this)">⚔️ Debates</div>
+    <div class="fpill" data-f="tags" onclick="setFilter('tags',this)"># Tags</div>
+  </div>
+</div>
+
+<!-- DEFAULT VIEW (no query) -->
+<div id="defaultView">
+
+  <!-- Recent Searches -->
+  <div class="sh fu d1">
+    <div class="sh-title"><i class="fas fa-clock-rotate-left" style="font-size:10px"></i> Recent</div>
+    <div class="sh-more" onclick="clearAllRecent()">Clear all</div>
+  </div>
+  <div class="recent-list" id="recentList"></div>
+
+  <div class="sdiv" style="margin:14px 0 0"></div>
+
+  <!-- Trending Searches -->
+  <div class="sh fu d2">
+    <div class="sh-title"><i class="fas fa-fire" style="font-size:10px;color:var(--acc)"></i> Trending Searches</div>
+  </div>
+  <div class="trending-list fu d2" id="trendingList"></div>
+
+  <div class="sdiv" style="margin:14px 0 0"></div>
+
+  <!-- Browse by Category -->
+  <div class="sh fu d3">
+    <div class="sh-title"><i class="fas fa-compass" style="font-size:10px"></i> Browse by Genre</div>
+    <a class="sh-more" href="discover.html">See all</a>
+  </div>
+  <div class="cat-grid fu d3" id="catGrid"></div>
+
+  <div style="height:8px"></div>
+
+  <!-- Featured This Week -->
+  <div class="sh fu d4">
+    <div class="sh-title"><i class="fas fa-star" style="font-size:10px;color:var(--gold)"></i> Featured This Week</div>
+    <a class="sh-more" href="browse.html">Browse all</a>
+  </div>
+  <div class="h-scroll fu d4" id="featuredScroll" style="padding-bottom:10px"></div>
+
+  <div class="sdiv" style="margin:4px 0 0"></div>
+
+  <!-- Top Writers -->
+  <div class="sh fu d5">
+    <div class="sh-title"><i class="fas fa-pen-nib" style="font-size:10px"></i> Writers to Follow</div>
+  </div>
+  <div style="padding:0 14px" class="fu d5" id="writersList"></div>
+
+  <div class="sdiv" style="margin:14px 0 0"></div>
+
+  <!-- Hot Debates -->
+  <div class="sh fu d6">
+    <div class="sh-title"><i class="fas fa-gavel" style="font-size:10px;color:var(--acc)"></i> Hot Debates</div>
+    <a class="sh-more" href="debate.html">All debates</a>
+  </div>
+  <div style="padding:0 14px" class="fu d6" id="debatesList"></div>
+
+  <!-- Ad -->
+  <div class="ad-banner fu d6" onclick="toast('Opening PiggyVest…')">
+    <img class="ad-logo" src="https://i.pravatar.cc/100?img=23" loading="lazy" alt="PiggyVest"/>
+    <div class="ad-body">
+      <div class="ad-brand">PiggyVest</div>
+      <div class="ad-headline">Save smarter, build your future.</div>
+      <div class="ad-sub">4M+ Nigerians already saving.</div>
+    </div>
+    <button class="ad-cta">Start</button>
+  </div>
+
+</div>
+
+<!-- RESULTS VIEW -->
+<div id="resultsView">
+  <div class="results-wrap" id="resultsWrap"></div>
+</div>
+
+<!-- EMPTY VIEW -->
+<div id="emptyView">
+  <div class="empty-state">
+    <div class="empty-state-icon">🔍</div>
+    <div class="empty-state-title" id="emptyTitle">No results</div>
+    <div class="empty-state-body">Try a different keyword, writer name, or genre.</div>
+    <div class="empty-try" id="emptyTry"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item active" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── UTILS ── */
+function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d)}
+function fmtN(n){if(typeof n==='string')return n;return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+
+/* ── DATA ── */
+const RECENT_KEY='dro_recent_v1';
+function getRecent(){try{return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]')}catch{return[]}}
+function saveRecent(r){try{localStorage.setItem(RECENT_KEY,JSON.stringify(r))}catch{}}
+function addRecent(q){let r=getRecent().filter(x=>x!==q);r.unshift(q);r=r.slice(0,8);saveRecent(r)}
+function removeRecent(q){saveRecent(getRecent().filter(x=>x!==q));renderRecent()}
+
+const TRENDING=[
+  {q:'Ada_Writes',meta:'12.4k searches · Writer',fire:true},
+  {q:'betrayal stories',meta:'9.1k searches this week',fire:true},
+  {q:'The Runaway Bride',meta:'8.7k searches',fire:false},
+  {q:'campus romance 2025',meta:'7.2k searches',fire:false},
+  {q:'Chiamaka_N',meta:'6.8k searches · Writer',fire:false},
+  {q:'family drama series',meta:'5.9k searches',fire:false},
+  {q:'revenge arc',meta:'5.3k searches',fire:false},
+  {q:'best elegy stories',meta:'4.1k searches',fire:false},
+];
+
+const CATEGORIES=[
+  {label:'💔 Betrayal',count:'1.2k stories',bg:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'🎓 Campus',count:'890 stories',bg:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'👑 Family',count:'740 stories',bg:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'🔥 Revenge',count:'620 stories',bg:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'✨ Twist',count:'580 stories',bg:'https://i.postimg.cc/tY7KnJyr/images.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'🌙 Elegy',count:'310 stories',bg:'https://i.postimg.cc/N9jY0w4m/5.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'💍 Romance',count:'950 stories',bg:'https://i.postimg.cc/WF1j4Pnh/6.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+  {label:'😂 Comedy',count:'420 stories',bg:'https://i.postimg.cc/cgLZJNmC/8.jpg',grad:'linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))'},
+];
+
+const FEATURED=[
+  {img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing her photograph',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:'171k',badge:'hot'},
+  {img:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ Twist',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',views:'312k',badge:'hot'},
+  {img:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',views:'204k',badge:'free'},
+  {img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'🌙 Elegy',title:'The letter he never sent',author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:'218k',badge:''},
+  {img:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 Revenge',title:'I became his boss before telling him who I was',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:'192k',badge:'new'},
+  {img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'🎓 Campus',title:'The richest boy started sitting beside me every morning',author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:'134k',badge:'new'},
+];
+
+const WRITERS=[
+  {name:'Ada_Writes',handle:'@ada_writes',genre:'💔 Betrayal',av:'https://i.pravatar.cc/100?img=32',followers:'12.4k',verified:true,following:false},
+  {name:'Ifeanyi_Story',handle:'@ifeanyi_story',genre:'✨ Twist',av:'https://i.pravatar.cc/100?img=53',followers:'31.7k',verified:true,following:false},
+  {name:'Chiamaka_N',handle:'@chiamaka_n',genre:'👑 Family',av:'https://i.pravatar.cc/100?img=47',followers:'19.2k',verified:false,following:false},
+  {name:'Efe_O',handle:'@efe_o',genre:'🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',followers:'22.3k',verified:true,following:false},
+  {name:'Zara_M',handle:'@zara_m',genre:'🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',followers:'14.8k',verified:false,following:false},
+];
+
+const DEBATES=[
+  {thumb:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',motion:'Ada should stay and fight for her marriage, not leave.',forV:2341,agV:3819,live:true},
+  {thumb:'https://i.postimg.cc/tY7KnJyr/images.jpg',motion:'Walking out publicly at the altar was brave, not dramatic.',forV:9800,agV:2100,live:true},
+  {thumb:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',motion:'Legal action was the only appropriate response to theft.',forV:5800,agV:900,live:false},
+];
+
+/* Full story/writer pool for search */
+const SEARCH_POOL_STORIES=[
+  {type:'story',img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing my late sister\'s photograph',author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:'171k',likes:'24.3k',badge:'hot',keywords:['betrayal','husband','sister','photograph','ada']},
+  {type:'story',img:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',views:'312k',likes:'45k',badge:'hot',keywords:['twist','bride','altar','runaway','ifeanyi']},
+  {type:'story',img:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',views:'204k',likes:'31k',badge:'free',keywords:['family','grandmother','will','blood','chiamaka']},
+  {type:'story',img:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'🌙 Elegy',title:'The letter folded inside his jacket pocket — he died before sending it',author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:'218k',likes:'36.5k',badge:'',keywords:['elegy','letter','death','grief','efe']},
+  {type:'story',img:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I uncovered her entire secret life',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:'192k',likes:'28k',badge:'hot',keywords:['revenge','stepmother','fund','zara']},
+  {type:'story',img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:'134k',likes:'18.1k',badge:'new',keywords:['campus','rich','school','romance']},
+  {type:'story',img:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring — she giggled before he even knelt",author:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',views:'96k',likes:'19.2k',badge:'new',keywords:['heartbreak','proposal','ring','kemi']},
+  {type:'story',img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'🏙️ Urban Love',title:"She rejected me 3 times. Now we share a mortgage and a dog named 'Finally'",author:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',views:'22.4k',likes:'22.4k',badge:'',keywords:['romance','urban','love','dog','dami']},
+];
+
+const SEARCH_POOL_WRITERS=[
+  {type:'writer',name:'Ada_Writes',handle:'@ada_writes',genre:'💔 Betrayal',av:'https://i.pravatar.cc/100?img=32',followers:'12.4k',verified:true,following:false,keywords:['ada','ada_writes','betrayal','writer']},
+  {type:'writer',name:'Ifeanyi_Story',handle:'@ifeanyi_story',genre:'✨ Twist',av:'https://i.pravatar.cc/100?img=53',followers:'31.7k',verified:true,following:false,keywords:['ifeanyi','twist','writer']},
+  {type:'writer',name:'Chiamaka_N',handle:'@chiamaka_n',genre:'👑 Family',av:'https://i.pravatar.cc/100?img=47',followers:'19.2k',verified:false,following:false,keywords:['chiamaka','family','writer']},
+  {type:'writer',name:'Efe_O',handle:'@efe_o',genre:'🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',followers:'22.3k',verified:true,following:false,keywords:['efe','elegy','writer']},
+  {type:'writer',name:'Zara_M',handle:'@zara_m',genre:'🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',followers:'14.8k',verified:false,following:false,keywords:['zara','revenge','writer']},
+  {type:'writer',name:'CampusQueen',handle:'@campusqueen',genre:'🎓 Campus',av:'https://i.pravatar.cc/100?img=12',followers:'8.1k',verified:false,following:false,keywords:['campus','queen','writer']},
+  {type:'writer',name:'Kemi_A',handle:'@kemi_a',genre:'💔 Heartbreak',av:'https://i.pravatar.cc/100?img=28',followers:'6.5k',verified:false,following:false,keywords:['kemi','heartbreak','writer']},
+  {type:'writer',name:'Dami_Cole',handle:'@dami_cole',genre:'🏙️ Urban Love',av:'https://i.pravatar.cc/100?img=64',followers:'9.4k',verified:false,following:false,keywords:['dami','urban','love','writer']},
+];
+
+const SEARCH_POOL_DEBATES=[
+  {type:'debate',thumb:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',motion:'Ada should stay and fight for her marriage, not leave.',forV:2341,agV:3819,live:true,keywords:['debate','ada','marriage','stay','leave','betrayal']},
+  {type:'debate',thumb:'https://i.postimg.cc/tY7KnJyr/images.jpg',motion:'Walking out publicly at the altar was brave, not dramatic.',forV:9800,agV:2100,live:true,keywords:['debate','bride','altar','brave','dramatic','twist']},
+  {type:'debate',thumb:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',motion:'Legal action was the only appropriate response to theft.',forV:5800,agV:900,live:false,keywords:['debate','legal','theft','revenge','stepmother']},
+];
+
+const ALL_POOL=[...SEARCH_POOL_STORIES,...SEARCH_POOL_WRITERS,...SEARCH_POOL_DEBATES];
+
+/* ── RENDER: RECENT ── */
+function renderRecent(){
+  const r=getRecent();
+  const el=document.getElementById('recentList');
+  if(!r.length){
+    el.innerHTML=`<div style="padding:10px 14px;font-size:12px;color:var(--tx-faint)">No recent searches yet.</div>`;
+    return;
+  }
+  el.innerHTML=r.map(q=>`
+    <div class="recent-item" onclick="runSearch('${q.replace(/'/g,"\\'")}')">
+      <div class="recent-icon"><i class="fas fa-clock-rotate-left"></i></div>
+      <div class="recent-text">${q}</div>
+      <button class="recent-del" onclick="event.stopPropagation();removeRecent('${q.replace(/'/g,"\\'")}')">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>`).join('');
+}
+
+function clearAllRecent(){saveRecent([]);renderRecent();toast('🗑️ Recent searches cleared')}
+
+/* ── RENDER: TRENDING ── */
+function renderTrending(){
+  document.getElementById('trendingList').innerHTML=TRENDING.map((t,i)=>`
+    <div class="trend-item" onclick="runSearch('${t.q}')">
+      <div class="trend-rank ${i===0?'t1':i===1?'t2':i===2?'t3':'td'}">${i+1}</div>
+      <div class="trend-body">
+        <div class="trend-query">${t.q}</div>
+        <div class="trend-meta">${t.meta}</div>
+      </div>
+      ${t.fire?'<div class="trend-fire">🔥</div>':''}
+      <div class="trend-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>`).join('');
+}
+
+/* ── RENDER: CATEGORIES ── */
+function renderCategories(){
+  document.getElementById('catGrid').innerHTML=CATEGORIES.map(c=>`
+    <div class="cat-tile" onclick="runSearch('${c.label.replace(/[^a-zA-Z ]/g,'').trim()}')">
+      <div class="cat-tile-bg" style="background-image:url('${c.bg}');background-size:cover;background-position:center"></div>
+      <div class="cat-tile-ov" style="background:${c.grad}">
+        <div>
+          <div class="cat-tile-label">${c.label}</div>
+          <div class="cat-tile-count">${c.count}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── RENDER: FEATURED ── */
+function renderFeatured(){
+  document.getElementById('featuredScroll').innerHTML=FEATURED.map(s=>{
+    const bc=s.badge==='hot'?'badge-hot':s.badge==='new'?'badge-new':s.badge==='free'?'badge-free':'';
+    return`<div class="h-card" onclick="location.href='bridge.html'">
+      <div class="h-cover">
+        <img src="${s.img}" loading="lazy" alt=""/>
+        <div class="h-scrim"></div>
+        ${s.badge?`<div class="h-badge ${bc}">${s.badge.toUpperCase()}</div>`:''}
+        <div class="h-views"><i class="fas fa-eye" style="font-size:6px"></i> ${s.views}</div>
+      </div>
+      <div class="h-title">${s.title}</div>
+      <div class="h-author">@${s.author}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER: WRITERS ── */
+function renderWriters(){
+  document.getElementById('writersList').innerHTML=WRITERS.map((w,i)=>`
+    <div class="writer-card">
+      <div class="wc-av-wrap">
+        <div class="wc-av-ring${i%2===0?'':' blue-ring'}">
+          <div class="wc-av-inner"><img src="${w.av}" loading="lazy" alt=""/></div>
+        </div>
+        ${w.verified?`<div class="wc-verified"><i class="fas fa-check" style="font-size:5px"></i></div>`:''}
+      </div>
+      <div class="wc-body">
+        <div class="wc-name">${w.name}</div>
+        <div class="wc-handle">${w.handle} · ${w.followers} followers</div>
+        <div class="wc-genre">${w.genre}</div>
+      </div>
+      <button class="wc-follow-btn${w.following?' ing':''}" id="wf-${i}" onclick="toggleFollow(${i},this)">${w.following?'✓ Following':'+ Follow'}</button>
+    </div>`).join('');
+}
+function toggleFollow(i,btn){
+  WRITERS[i].following=!WRITERS[i].following;
+  btn.textContent=WRITERS[i].following?'✓ Following':'+ Follow';
+  btn.classList.toggle('ing',WRITERS[i].following);
+  toast(WRITERS[i].following?`✅ Following @${WRITERS[i].name}`:`Unfollowed @${WRITERS[i].name}`);
+}
+
+/* ── RENDER: DEBATES ── */
+function renderDebates(){
+  document.getElementById('debatesList').innerHTML=DEBATES.map(d=>{
+    const tot=(d.forV+d.agV)||1;
+    const fp=Math.round(d.forV/tot*100),ap=100-fp;
+    return`<div class="debate-card" onclick="toast('⚔️ Opening debate…')">
+      <div class="dc-header">
+        <div class="dc-thumb" style="background-image:url('${d.thumb}')"></div>
+        <div class="dc-body">
+          <div class="dc-badge">${d.live?`<span class="dc-live-dot"></span>LIVE`:'Debate'}</div>
+          <div class="dc-motion">"${d.motion}"</div>
+        </div>
+      </div>
+      <div class="dc-bars">
+        <div class="dc-side for">
+          <div class="dc-side-bar" style="width:${fp}%"></div>
+          <div class="dc-side-inner">
+            <span class="dc-side-lbl">✅ FOR</span>
+            <span class="dc-side-pct">${fp}%</span>
+          </div>
+        </div>
+        <div class="dc-side ag">
+          <div class="dc-side-bar" style="width:${ap}%"></div>
+          <div class="dc-side-inner">
+            <span class="dc-side-lbl">❌ AGAINST</span>
+            <span class="dc-side-pct">${ap}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-total">${fmtN(d.forV+d.agV)} voices</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── SEARCH LOGIC ── */
+let currentFilter='all';
+let _debounce=null;
+
+function setFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('on',p===el));
+  const q=document.getElementById('searchInp').value.trim();
+  if(q)displayResults(q);
+}
+
+function clearSearch(){
+  document.getElementById('searchInp').value='';
+  document.getElementById('clearBtn').classList.remove('show');
+  document.getElementById('filterBar').style.display='none';
+  document.getElementById('defaultView').style.display='block';
+  document.getElementById('resultsView').style.display='none';
+  document.getElementById('emptyView').style.display='none';
+}
+
+function runSearch(q){
+  const inp=document.getElementById('searchInp');
+  inp.value=q;
+  inp.dispatchEvent(new Event('input'));
+  inp.blur();
+}
+
+function doSearch(q){
+  q=q.trim();
+  if(!q){clearSearch();return;}
+  document.getElementById('clearBtn').classList.add('show');
+  document.getElementById('filterBar').style.display='flex';
+  addRecent(q);
+  displayResults(q);
+}
+
+function displayResults(q){
+  const qLow=q.toLowerCase();
+  let hits=ALL_POOL.filter(item=>{
+    const inKw=item.keywords.some(k=>k.includes(qLow)||qLow.includes(k));
+    const inTitle=(item.title||item.motion||item.name||'').toLowerCase().includes(qLow);
+    const inAuthor=(item.author||item.handle||'').toLowerCase().includes(qLow);
+    return inKw||inTitle||inAuthor;
+  });
+
+  // Apply type filter
+  if(currentFilter==='stories')hits=hits.filter(h=>h.type==='story');
+  else if(currentFilter==='writers')hits=hits.filter(h=>h.type==='writer');
+  else if(currentFilter==='debates')hits=hits.filter(h=>h.type==='debate');
+  else if(currentFilter==='tags')hits=hits.filter(h=>h.type==='story');
+
+  document.getElementById('defaultView').style.display='none';
+
+  if(!hits.length){
+    document.getElementById('resultsView').style.display='none';
+    document.getElementById('emptyView').style.display='block';
+    document.getElementById('emptyTitle').textContent=`Nothing for "${q}"`;
+    document.getElementById('emptyTry').innerHTML=
+      ['betrayal','campus','Ada_Writes','elegy','romance'].map(s=>
+        `<div class="empty-try-pill" onclick="runSearch('${s}')">${s}</div>`).join('');
+    return;
+  }
+
+  document.getElementById('resultsView').style.display='block';
+  document.getElementById('emptyView').style.display='none';
+
+  const storiesHits=hits.filter(h=>h.type==='story');
+  const writersHits=hits.filter(h=>h.type==='writer');
+  const debatesHits=hits.filter(h=>h.type==='debate');
+
+  let html=`<div class="results-count" style="padding-top:12px"><strong>${hits.length}</strong> result${hits.length!==1?'s':''} for "<strong>${q}</strong>"</div>`;
+
+  if(writersHits.length&&(currentFilter==='all'||currentFilter==='writers')){
+    html+=`<div class="sh" style="padding-top:4px"><div class="sh-title"><i class="fas fa-pen-nib" style="font-size:10px"></i> Writers</div></div>`;
+    html+=writersHits.map(w=>`
+      <div class="writer-card" style="margin-bottom:4px">
+        <div class="wc-av-wrap">
+          <div class="wc-av-ring">
+            <div class="wc-av-inner"><img src="${w.av}" loading="lazy" alt=""/></div>
+          </div>
+          ${w.verified?`<div class="wc-verified"><i class="fas fa-check" style="font-size:5px"></i></div>`:''}
+        </div>
+        <div class="wc-body">
+          <div class="wc-name">${w.name}</div>
+          <div class="wc-handle">${w.handle} · ${w.followers} followers</div>
+          <div class="wc-genre">${w.genre}</div>
+        </div>
+        <button class="wc-follow-btn" onclick="event.stopPropagation();this.textContent='✓ Following';this.classList.add('ing');toast('✅ Following @${w.name}')">${w.following?'✓ Following':'+ Follow'}</button>
+      </div>`).join('');
+    if(storiesHits.length||debatesHits.length)html+=`<div class="sdiv" style="margin:8px 0 0"></div>`;
+  }
+
+  if(storiesHits.length&&(currentFilter==='all'||currentFilter==='stories'||currentFilter==='tags')){
+    html+=`<div class="sh" style="padding-top:${writersHits.length?'12px':'4px'}"><div class="sh-title"><i class="fas fa-book-open" style="font-size:10px"></i> Stories</div></div>`;
+    html+=storiesHits.map(s=>{
+      const bc=s.badge==='hot'?'badge-hot':s.badge==='new'?'badge-new':s.badge==='free'?'badge-free':'';
+      return`<div class="story-card" onclick="location.href='bridge.html'">
+        <div class="sc-img" style="background-image:url('${s.img}')"></div>
+        <div class="sc-body">
+          <div class="sc-cat">${s.cat}</div>
+          <div class="sc-title">${s.title}</div>
+          <div class="sc-meta">
+            <img class="sc-av" src="${s.av}" loading="lazy" alt=""/>
+            <span class="sc-author">@${s.author}</span>
+            <span class="sc-stat"><i class="fas fa-eye" style="font-size:7px"></i>${s.views}</span>
+            <span class="sc-stat"><i class="fas fa-heart" style="font-size:7px;color:var(--acc)"></i>${s.likes}</span>
+          </div>
+        </div>
+        ${s.badge?`<span class="sc-badge ${bc}">${s.badge.toUpperCase()}</span>`:''}
+      </div>`;
+    }).join('');
+    if(debatesHits.length)html+=`<div class="sdiv" style="margin:4px 0 0"></div>`;
+  }
+
+  if(debatesHits.length&&(currentFilter==='all'||currentFilter==='debates')){
+    html+=`<div class="sh" style="padding-top:12px"><div class="sh-title"><i class="fas fa-gavel" style="font-size:10px;color:var(--acc)"></i> Debates</div></div>`;
+    html+=debatesHits.map(d=>{
+      const tot=(d.forV+d.agV)||1,fp=Math.round(d.forV/tot*100),ap=100-fp;
+      return`<div class="debate-card" onclick="toast('⚔️ Opening debate…')">
+        <div class="dc-header">
+          <div class="dc-thumb" style="background-image:url('${d.thumb}')"></div>
+          <div class="dc-body">
+            <div class="dc-badge">${d.live?`<span class="dc-live-dot"></span>LIVE`:'Debate'}</div>
+            <div class="dc-motion">"${d.motion}"</div>
+          </div>
+        </div>
+        <div class="dc-bars">
+          <div class="dc-side for"><div class="dc-side-bar" style="width:${fp}%"></div><div class="dc-side-inner"><span class="dc-side-lbl">✅ FOR</span><span class="dc-side-pct">${fp}%</span></div></div>
+          <div class="dc-side ag"><div class="dc-side-bar" style="width:${ap}%"></div><div class="dc-side-inner"><span class="dc-side-lbl">❌ AGAINST</span><span class="dc-side-pct">${ap}%</span></div></div>
+        </div>
+        <div class="dc-total">${fmtN(d.forV+d.agV)} voices</div>
+      </div>`;
+    }).join('');
+  }
+
+  html+=`<div style="height:8px"></div>`;
+  document.getElementById('resultsWrap').innerHTML=html;
+}
+
+/* ── SEARCH INPUT EVENT ── */
+document.getElementById('searchInp').addEventListener('input',e=>{
+  const q=e.target.value;
+  document.getElementById('clearBtn').classList.toggle('show',q.length>0);
+  clearTimeout(_debounce);
+  if(!q.trim()){clearSearch();return;}
+  _debounce=setTimeout(()=>doSearch(q),280);
+});
+
+document.getElementById('searchInp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    doSearch(document.getElementById('searchInp').value);
+  }
+});
+
+/* ── INIT ── */
+renderRecent();
+renderTrending();
+renderCategories();
+renderFeatured();
+renderWriters();
+renderDebates();
+</script>
+</body>
+</html>

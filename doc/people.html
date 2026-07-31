@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · People</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff6b8a;
+  --glow:rgba(255,0,80,.28);--glow2:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#0a0a0d;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b21;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx:#f0f0f0;--tx2:#999;--tx3:#555;
+  --blue:#00aaff;--green:#10b981;--gold:#f59e0b;--purple:#a78bfa;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 16px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--bd-acc);border-radius:2px}
+
+/* ─── TOP BAR ─── */
+.top-bar{position:sticky;top:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:calc(var(--safe-t) + 10px) 14px 10px;display:flex;align-items:center;gap:10px}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;flex-shrink:0;cursor:pointer}
+.search-bar{flex:1;display:flex;align-items:center;gap:7px;background:var(--l2);border:1.5px solid var(--bd);border-radius:24px;padding:8px 13px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--bd-acc)}
+.search-bar i{color:var(--tx3);font-size:12px}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px}
+.search-bar input::placeholder{color:var(--tx3)}
+.top-icon{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--tx2);cursor:pointer;flex-shrink:0;transition:.15s}
+.top-icon:active{transform:scale(.92);color:var(--acc)}
+
+/* ─── TABS ─── */
+.tabs-bar{position:sticky;top:calc(var(--safe-t) + 54px);z-index:190;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:11px 14px;font-size:12px;font-weight:700;color:var(--tx3);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.tab.active{color:var(--tx);border-bottom-color:var(--acc)}
+
+/* ─── SECTION HEADER ─── */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 8px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;padding:3px 9px;border-radius:10px;background:rgba(255,0,80,.07);border:1px solid rgba(255,0,80,.18)}
+.hdiv{height:1px;background:var(--bd2);margin:4px 0}
+.sdiv{height:6px;background:var(--l1);border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2);margin:8px 0}
+
+/* ─── STATUS RINGS ROW ─── */
+.statuses-row{display:flex;gap:14px;padding:12px 14px 10px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd2)}
+.statuses-row::-webkit-scrollbar{display:none}
+.s-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.s-item:active{opacity:.7}
+.s-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;position:relative}
+.s-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc3),var(--acc));animation:spinR 3s linear infinite}
+.s-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.s-ring.ring-viewed{background:var(--tx3)}
+.s-ring.ring-none{background:var(--l3)}
+@keyframes spinR{to{transform:rotate(360deg)}}
+.s-ring-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.s-ring-inner img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.s-ring-init{width:100%;height:100%;border-radius:50%;background:rgba(255,0,80,.12);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--acc2)}
+.s-live-dot{position:absolute;bottom:1px;right:1px;width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:900;color:#fff;animation:pd 1.4s ease-in-out infinite}
+@keyframes pd{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.s-name{font-size:9.5px;font-weight:700;color:var(--tx2);text-align:center;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-name.new-s{color:var(--tx)}
+
+/* ─── STATUS VIEWER ─── */
+.status-ov{position:fixed;inset:0;z-index:600;background:#000;display:none;flex-direction:column}
+.status-ov.open{display:flex}
+.status-top{position:absolute;top:0;left:0;right:0;z-index:20;padding:calc(var(--safe-t) + 10px) 14px 8px;background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent)}
+.s-prog-bars{display:flex;gap:4px;margin-bottom:10px}
+.spb{flex:1;height:2.5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.spb-fill{height:100%;background:#fff;border-radius:3px;width:0%}
+.s-writer-row{display:flex;align-items:center;gap:10px}
+.s-w-av{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--acc)}
+.s-w-name{font-size:13px;font-weight:700;color:#fff;flex:1}
+.s-w-time{font-size:10px;color:rgba(255,255,255,.4)}
+.s-close-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.status-cnt{flex:1;position:relative;overflow:hidden}
+.s-slide{position:absolute;inset:0;background-size:cover;background-position:center}
+.s-slide-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.2) 55%,transparent 100%)}
+.s-slide-txt{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:90px 24px 120px;text-align:center;pointer-events:none}
+.s-slide-q{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.42;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.s-slide-cap{font-size:12px;color:rgba(255,255,255,.55);margin-top:10px}
+.s-nav-l{position:absolute;left:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.s-nav-r{position:absolute;right:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.status-btm{position:absolute;bottom:0;left:0;right:0;padding:12px 16px calc(var(--safe-b) + 16px);background:linear-gradient(to top,rgba(0,0,0,.88),transparent);display:flex;align-items:center;gap:10px;z-index:15}
+.s-reply-inp{flex:1;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:28px;padding:9px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.s-reply-inp::placeholder{color:rgba(255,255,255,.45)}
+.s-react-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ─── WRITER CARD (large horizontal) ─── */
+.writer-card{background:var(--l1);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:10px;transition:border-color .2s}
+.writer-card:active{border-color:var(--bd-acc)}
+.wc-top{display:flex;gap:12px;padding:13px 13px 10px;align-items:flex-start}
+.wc-av-wrap{position:relative;flex-shrink:0}
+.wc-av-ring{width:54px;height:54px;border-radius:50%;padding:2.5px;cursor:pointer}
+.wc-av-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc));animation:spinR 3s linear infinite}
+.wc-av-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.wc-av-ring.ring-viewed{background:var(--tx3)}
+.wc-av-ring.ring-none{background:var(--l3)}
+.wc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.wc-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.wc-live-dot{position:absolute;bottom:0;right:0;width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:900;color:#fff;animation:pd 1.4s ease-in-out infinite}
+.wc-info{flex:1;min-width:0}
+.wc-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap}
+.wc-name{font-size:14px;font-weight:700;color:var(--tx);cursor:pointer}
+.wc-badge{font-size:8px;font-weight:800;padding:1px 6px;border-radius:7px;background:rgba(255,0,80,.12);border:1px solid var(--bd-acc);color:var(--acc2)}
+.wc-badge.blue{background:rgba(0,170,255,.1);border-color:rgba(0,170,255,.25);color:var(--blue)}
+.wc-badge.gold{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:var(--gold)}
+.wc-handle{font-size:11px;color:var(--tx3);margin-bottom:4px}
+.wc-bio{font-size:12px;color:var(--tx2);line-height:1.45;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wc-genres{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.wc-genre{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--tx3)}
+.wc-stats-row{display:flex;gap:12px;flex-wrap:wrap}
+.wc-stat{font-size:10px;color:var(--tx3);font-weight:600;display:flex;align-items:center;gap:3px}
+.wc-stat strong{color:var(--tx)}
+.wc-actions{display:flex;gap:8px;padding:0 13px 12px;align-items:center}
+.follow-btn{background:var(--acc);color:#fff;border:none;padding:8px 18px;border-radius:22px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 12px var(--glow2);transition:.2s;white-space:nowrap}
+.follow-btn.ing{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);color:var(--tx2);box-shadow:none}
+.follow-btn:active{transform:scale(.96)}
+.msg-btn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);color:var(--tx2);padding:7px 13px;border-radius:22px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s}
+.tip-btn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28);color:var(--gold);padding:7px 13px;border-radius:22px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;display:flex;align-items:center;gap:4px}
+.view-stories-btn{background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--tx2);padding:7px 13px;border-radius:22px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.wc-latest-story{display:flex;gap:9px;background:rgba(255,255,255,.03);border-top:1px solid var(--bd2);padding:9px 13px;cursor:pointer;transition:background .15s}
+.wc-latest-story:active{background:rgba(255,0,80,.05)}
+.wls-img{width:38px;height:44px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.wls-body{flex:1;min-width:0}
+.wls-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:1px}
+.wls-title{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;line-height:1.3;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px}
+.wls-ch{font-size:9px;color:var(--tx3)}
+.wls-arrow{color:var(--acc2);font-size:11px;align-self:center;flex-shrink:0}
+
+/* ─── READER CARD (compact) ─── */
+.reader-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd2);transition:background .15s;cursor:pointer}
+.reader-card:last-child{border-bottom:none}
+.reader-card:active{background:rgba(255,255,255,.03)}
+.rc-av-wrap{position:relative;flex-shrink:0}
+.rc-av-ring{width:46px;height:46px;border-radius:50%;padding:2px}
+.rc-av-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc));animation:spinR 3s linear infinite}
+.rc-av-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.rc-av-ring.ring-viewed{background:var(--tx3)}
+.rc-av-ring.ring-none{background:var(--l3)}
+.rc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.rc-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.rc-info{flex:1;min-width:0}
+.rc-name{font-size:13px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:5px;margin-bottom:1px}
+.rc-meta{font-size:10px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-genres{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
+.rc-genre{font-size:8px;font-weight:700;padding:1px 6px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--tx3)}
+.rc-follow-btn{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc2);padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:.2s;flex-shrink:0}
+.rc-follow-btn.ing{background:rgba(255,255,255,.06);border-color:var(--bd);color:var(--tx3)}
+
+/* ─── TRENDING WRITER (horizontal scroll cards) ─── */
+.trending-writers-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.trending-writers-scroll::-webkit-scrollbar{display:none}
+.tw-card{flex-shrink:0;width:130px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:13px 11px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:border-color .2s}
+.tw-card:active{border-color:var(--bd-acc)}
+.tw-rank{font-size:9px;font-weight:800;color:var(--acc);background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.18);padding:2px 7px;border-radius:8px;align-self:flex-start;margin-bottom:2px}
+.tw-av-ring{width:52px;height:52px;border-radius:50%;padding:2.5px;margin-bottom:2px}
+.tw-av-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc));animation:spinR 3s linear infinite}
+.tw-av-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.tw-av-ring.ring-viewed{background:var(--tx3)}
+.tw-av-ring.ring-none{background:var(--l3)}
+.tw-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.tw-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.tw-name{font-size:11px;font-weight:800;color:var(--tx);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.tw-genre{font-size:9px;color:var(--tx3);text-align:center}
+.tw-stat{font-size:10px;font-weight:700;color:var(--tx2);display:flex;align-items:center;gap:3px}
+.tw-follow{background:var(--acc);color:#fff;border:none;padding:5px 0;border-radius:14px;font-size:9px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:2px;transition:.15s}
+.tw-follow.ing{background:rgba(255,255,255,.07);border:1px solid var(--bd);color:var(--tx3)}
+
+/* ─── STORY YOU MAY LIKE ─── */
+.stories-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.stories-scroll::-webkit-scrollbar{display:none}
+.story-card{flex-shrink:0;width:140px;cursor:pointer;transition:.18s}
+.story-card:active{transform:scale(.97)}
+.sc-cover{position:relative;border-radius:10px;overflow:hidden;background:var(--l2);aspect-ratio:3/4;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.sc-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.sc-scrim{position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,rgba(0,0,0,.9),transparent)}
+.sc-badge{position:absolute;top:5px;left:0;font-size:7px;font-weight:900;padding:2px 6px 2px 4px;border-radius:0 6px 6px 0;letter-spacing:.03em;text-transform:uppercase}
+.badge-hot{background:var(--acc);color:#fff}
+.badge-new{background:#3b0764;color:#d8b4fe}
+.sc-stat{position:absolute;bottom:5px;left:6px;font-size:8px;font-weight:700;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:2px}
+.sc-ch{position:absolute;bottom:5px;right:6px;background:rgba(0,0,0,.55);padding:2px 5px;border-radius:7px;font-size:7px;font-weight:800;color:var(--acc3)}
+.sc-title{font-size:10.5px;font-weight:700;line-height:1.35;margin-top:7px;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-meta{display:flex;align-items:center;gap:4px;margin-top:3px}
+.sc-av{width:13px;height:13px;border-radius:50%;object-fit:cover;border:1px solid var(--bd);flex-shrink:0}
+.sc-sub{font-size:9px;color:var(--tx3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ─── MUTUAL CARD (compact readers list) ─── */
+.mutual-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none}
+.mutual-scroll::-webkit-scrollbar{display:none}
+.mutual-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;cursor:pointer}
+.mc-ring{width:52px;height:52px;border-radius:50%;padding:2px}
+.mc-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc));animation:spinR 3s linear infinite}
+.mc-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.mc-ring.ring-viewed{background:var(--tx3)}
+.mc-ring.ring-none{background:var(--l3)}
+.mc-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.mc-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.mc-name{font-size:9px;font-weight:700;color:var(--tx2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:66px}
+
+/* ─── GENRE FILTER PILLS ─── */
+.filter-bar{display:flex;gap:7px;padding:10px 14px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd2)}
+.filter-bar::-webkit-scrollbar{display:none}
+.fpill{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--bd);background:rgba(255,255,255,.02);color:var(--tx3);cursor:pointer;transition:.15s;white-space:nowrap}
+.fpill.active{border-color:var(--bd-acc);color:var(--acc2);background:rgba(255,0,80,.06)}
+
+/* ─── ACTIVITY FEED ─── */
+.act-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2);cursor:pointer;transition:background .15s}
+.act-item:active{background:rgba(255,255,255,.03)}
+.act-av-wrap{flex-shrink:0}
+.act-av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid var(--bd);background:var(--l1)}
+.act-av-init{width:38px;height:38px;border-radius:50%;background:rgba(255,0,80,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--acc2);flex-shrink:0}
+.act-body{flex:1;min-width:0}
+.act-text{font-size:12px;color:var(--tx2);line-height:1.45;margin-bottom:3px}
+.act-text strong{color:var(--tx);font-weight:700}
+.act-text .acc{color:var(--acc2);font-weight:700}
+.act-story-mini{display:flex;gap:7px;background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:9px;padding:7px 9px;margin-top:5px;cursor:pointer;transition:.15s}
+.act-story-mini:active{border-color:var(--bd-acc)}
+.act-story-img{width:32px;height:36px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.act-story-title{font-size:10px;font-weight:700;color:var(--tx);line-height:1.3;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.act-time{font-size:9px;color:var(--tx3);white-space:nowrap;flex-shrink:0;margin-top:1px}
+
+/* ─── LEADERBOARD ─── */
+.lb-card{display:flex;align-items:center;gap:11px;padding:10px 14px;border-bottom:1px solid var(--bd2);cursor:pointer;transition:background .15s}
+.lb-card:last-child{border-bottom:none}
+.lb-card:active{background:rgba(255,255,255,.03)}
+.lb-rank{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;width:24px;text-align:center;flex-shrink:0}
+.lb-rank.r1{color:#f5c542}
+.lb-rank.r2{color:#a0a0b8}
+.lb-rank.r3{color:#a07040}
+.lb-rank.rn{color:var(--tx3)}
+.lb-av-ring{width:42px;height:42px;border-radius:50%;padding:2px;flex-shrink:0}
+.lb-av-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc));animation:spinR 3s linear infinite}
+.lb-av-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.lb-av-ring.ring-viewed{background:var(--tx3)}
+.lb-av-ring.ring-none{background:var(--l3)}
+.lb-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.lb-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:13px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:5px}
+.lb-meta{font-size:10px;color:var(--tx3);margin-top:1px}
+.lb-num{text-align:right;flex-shrink:0}
+.lb-num-val{font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:var(--acc)}
+.lb-num-lbl{font-size:8px;color:var(--tx3);margin-top:1px}
+.lb-follow-btn{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc2);padding:5px 11px;border-radius:18px;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
+.lb-follow-btn.ing{background:rgba(255,255,255,.06);border-color:var(--bd);color:var(--tx3)}
+
+/* ─── AD BANNER ─── */
+.ad-banner{margin:0 14px 14px;background:linear-gradient(135deg,rgba(0,170,255,.06),rgba(255,0,80,.03));border:1px solid rgba(0,170,255,.12);border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden}
+.ad-banner::after{content:'AD';position:absolute;top:6px;right:8px;font-size:7px;font-weight:800;color:var(--tx3);letter-spacing:.08em}
+.ad-logo{width:36px;height:36px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd)}
+.ad-body{flex:1;min-width:0}
+.ad-brand{font-size:9px;font-weight:800;color:var(--blue);margin-bottom:2px}
+.ad-headline{font-size:11px;font-weight:700;color:var(--tx);margin-bottom:1px}
+.ad-sub{font-size:9px;color:var(--tx3)}
+.ad-cta{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:10px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* ─── SEARCH RESULTS ─── */
+.search-empty{text-align:center;padding:48px 20px}
+.search-empty .icon{font-size:40px;margin-bottom:10px}
+.search-empty h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:5px}
+.search-empty p{font-size:12px;color:var(--tx3);line-height:1.5}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx3);cursor:pointer;transition:.2s;padding:2px 8px}
+.bn-item i{font-size:20px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* ─── MODAL OVERLAY ─── */
+.modal-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .26s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(var(--safe-b) + 14px)}
+.modal-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:12px auto 0}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--bd2)}
+.modal-hdr h3{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px}
+.modal-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--tx2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease both}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo" onclick="window.location.href='index.html'">D</div>
+  <div class="search-bar">
+    <i class="fas fa-magnifying-glass"></i>
+    <input id="searchInp" placeholder="Search writers, readers…" autocomplete="off" oninput="onSearch(this.value)"/>
+    <i class="fas fa-times" id="searchClear" style="color:var(--tx3);font-size:12px;cursor:pointer;display:none" onclick="clearSearch()"></i>
+  </div>
+  <div class="top-icon" onclick="toast('🔔 7 new notifications')">
+    <i class="fas fa-bell"></i>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar" id="tabsBar">
+  <div class="tab active" data-tab="discover" onclick="switchTab('discover',this)">🔍 Discover</div>
+  <div class="tab" data-tab="writers" onclick="switchTab('writers',this)">✍️ Writers</div>
+  <div class="tab" data-tab="readers" onclick="switchTab('readers',this)">📖 Readers</div>
+  <div class="tab" data-tab="trending" onclick="switchTab('trending',this)">🔥 Trending</div>
+  <div class="tab" data-tab="activity" onclick="switchTab('activity',this)">⚡ Activity</div>
+  <div class="tab" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">🏆 Leaderboard</div>
+</div>
+
+<!-- SEARCH RESULTS (hidden unless searching) -->
+<div id="searchPanel" style="display:none;padding:12px 14px">
+  <div id="searchResults"></div>
+</div>
+
+<!-- ══════ DISCOVER TAB ══════ -->
+<div id="tab-discover" class="tab-panel">
+
+  <!-- Status Rings -->
+  <div class="statuses-row" id="statusRingsRow"></div>
+
+  <!-- Recommended Stories -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-wand-magic-sparkles" style="color:var(--gold);font-size:10px"></i> You Might Like</div>
+    <div class="sh-more" onclick="toast('📖 More recommendations')">See all</div>
+  </div>
+  <div class="stories-scroll" id="recommendedStories"></div>
+
+  <div class="sdiv"></div>
+
+  <!-- Trending Writers -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-fire" style="color:var(--acc);font-size:10px"></i> Trending Writers</div>
+    <div class="sh-more" onclick="switchTab('writers',document.querySelector('[data-tab=writers]'))">All writers</div>
+  </div>
+  <div class="trending-writers-scroll" id="trendingWritersRow"></div>
+
+  <div class="sdiv"></div>
+
+  <!-- Trending Readers -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-users" style="color:var(--blue);font-size:10px"></i> Top Readers This Week</div>
+    <div class="sh-more" onclick="switchTab('readers',document.querySelector('[data-tab=readers]'))">All readers</div>
+  </div>
+  <div class="mutual-scroll" id="topReadersRow"></div>
+
+  <div class="sdiv"></div>
+
+  <!-- Mutuals / People You May Know -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-user-plus" style="color:var(--green);font-size:10px"></i> People You May Know</div>
+  </div>
+  <div id="mutualsList"></div>
+
+  <!-- AD -->
+  <div class="ad-banner">
+    <img class="ad-logo" src="https://i.pravatar.cc/100?img=23" loading="lazy" alt="PiggyVest"/>
+    <div class="ad-body">
+      <div class="ad-brand">PiggyVest</div>
+      <div class="ad-headline">Save money. Build your future.</div>
+      <div class="ad-sub">Join 4M+ Nigerians saving smarter.</div>
+    </div>
+    <button class="ad-cta">Start</button>
+  </div>
+
+</div>
+
+<!-- ══════ WRITERS TAB ══════ -->
+<div id="tab-writers" class="tab-panel" style="display:none">
+  <div class="filter-bar" id="writersFilterBar">
+    <div class="fpill active" onclick="filterWriters('all',this)">🔥 All</div>
+    <div class="fpill" onclick="filterWriters('betrayal',this)">💔 Betrayal</div>
+    <div class="fpill" onclick="filterWriters('family',this)">👑 Family</div>
+    <div class="fpill" onclick="filterWriters('campus',this)">🎓 Campus</div>
+    <div class="fpill" onclick="filterWriters('romance',this)">🏙️ Romance</div>
+    <div class="fpill" onclick="filterWriters('revenge',this)">🔥 Revenge</div>
+    <div class="fpill" onclick="filterWriters('elegy',this)">🌙 Elegy</div>
+    <div class="fpill" onclick="filterWriters('twist',this)">✨ Twist</div>
+  </div>
+  <div style="padding:14px 14px 0" id="writersList"></div>
+</div>
+
+<!-- ══════ READERS TAB ══════ -->
+<div id="tab-readers" class="tab-panel" style="display:none">
+  <div class="filter-bar">
+    <div class="fpill active">All Readers</div>
+    <div class="fpill" onclick="toast('📖 Top readers')">Top Readers</div>
+    <div class="fpill" onclick="toast('🔥 Active this week')">Active</div>
+    <div class="fpill" onclick="toast('🤝 Mutual follows')">Mutuals</div>
+  </div>
+  <div id="readersList" style="background:var(--l1);margin:14px;border-radius:14px;border:1px solid var(--bd);overflow:hidden"></div>
+</div>
+
+<!-- ══════ TRENDING TAB ══════ -->
+<div id="tab-trending" class="tab-panel" style="display:none">
+
+  <!-- Trending Writers -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-fire" style="color:var(--acc);font-size:10px"></i> Writers Rising This Week</div>
+  </div>
+  <div class="trending-writers-scroll" id="trendingWriters2"></div>
+
+  <div class="sdiv"></div>
+
+  <!-- Trending Stories -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-bolt" style="color:var(--gold);font-size:10px"></i> Trending Stories Now</div>
+    <div class="sh-more" onclick="window.location.href='discover.html'">Browse all</div>
+  </div>
+  <div class="stories-scroll" id="trendingStories"></div>
+
+  <div class="sdiv"></div>
+
+  <!-- Trending Readers (detailed) -->
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-crown" style="color:var(--gold);font-size:10px"></i> Top Readers This Week</div>
+  </div>
+  <div id="trendingReadersList" style="background:var(--l1);margin:0 14px 14px;border-radius:14px;border:1px solid var(--bd);overflow:hidden"></div>
+
+</div>
+
+<!-- ══════ ACTIVITY TAB ══════ -->
+<div id="tab-activity" class="tab-panel" style="display:none">
+  <div class="sh" style="padding-bottom:4px">
+    <div class="sh-title"><i class="fas fa-bolt" style="color:var(--gold);font-size:10px"></i> What's Happening</div>
+  </div>
+  <div id="activityFeed"></div>
+</div>
+
+<!-- ══════ LEADERBOARD TAB ══════ -->
+<div id="tab-leaderboard" class="tab-panel" style="display:none">
+  <div class="filter-bar">
+    <div class="fpill active" onclick="switchLB('writers',this)">✍️ Writers</div>
+    <div class="fpill" onclick="switchLB('readers',this)">📖 Readers</div>
+    <div class="fpill" onclick="switchLB('debaters',this)">⚔️ Debaters</div>
+  </div>
+  <div class="sh" style="padding-top:12px">
+    <div class="sh-title" id="lbTitle"><i class="fas fa-trophy" style="color:var(--gold);font-size:10px"></i> Top Writers — This Month</div>
+  </div>
+  <div style="background:var(--l1);margin:0 14px 14px;border-radius:14px;border:1px solid var(--bd);overflow:hidden" id="leaderboardList"></div>
+</div>
+
+<!-- STATUS VIEWER -->
+<div class="status-ov" id="statusOv">
+  <div class="status-top">
+    <div class="s-prog-bars" id="sProgBars"></div>
+    <div class="s-writer-row">
+      <img class="s-w-av" id="sWAv" src="" alt=""/>
+      <div style="flex:1"><div class="s-w-name" id="sWName"></div><div class="s-w-time" id="sWTime"></div></div>
+      <button class="s-close-btn" onclick="closeStatus()">✕</button>
+    </div>
+  </div>
+  <div class="status-cnt" id="statusCnt"></div>
+  <div class="status-btm">
+    <input class="s-reply-inp" placeholder="Reply to status…"/>
+    <button class="s-react-btn" onclick="toast('❤️')">❤️</button>
+    <button class="s-react-btn" onclick="toast('🔥')">🔥</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="window.location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item" onclick="toast('✏️ Create')"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn-item active"><i class="fas fa-users"></i>People</div>
+  <div class="bn-item" onclick="window.location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════
+   DATA
+══════════════════════════════════ */
+const WRITER_STATUSES = {
+  w1:{id:'w1',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',isLive:true,ring:'ring-live',statuses:[{bg:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900',quote:'"Sometimes love is just grief wearing a familiar face."',caption:'Working on Chapter 5 🖊️',time:'2h ago'}]},
+  w5:{id:'w5',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900',quote:'"I walked out in socked feet and found my actual life."',caption:'Bare Kitchen is real 🥐',time:'30m ago'}]},
+  w2:{id:'w2',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900',quote:'"Not every love story ends with a wedding."',caption:'My reaction to chapter 4 🥺',time:'4h ago'}]},
+  w3:{id:'w3',name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=43',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900',quote:'"Family stories are the only stories."',caption:'Writing S3 Ch8 tonight 🌙',time:'1h ago'}]},
+  w4:{id:'w4',name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',ring:'ring-viewed',statuses:[{bg:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=900',quote:'"He deleted the anniversary photos."',caption:'Chapter 3 is live 📖',time:'6h ago'}]},
+  w6:{id:'w6',name:'Efe_O',avatar:'https://i.pravatar.cc/100?img=22',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=900',quote:'"He carried the letter so it would reach me someday."',caption:'The Letter sequel coming 💔',time:'3h ago'}]},
+  w7:{id:'w7',name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=900',quote:'"Revenge isn\'t punishment. It\'s reclaiming."',caption:'Final chapter next week 🔥',time:'8h ago'}]},
+  w8:{id:'w8',name:'Dami_Cole',avatar:'https://i.pravatar.cc/100?img=64',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900',quote:'"She said yes to the dog name 😂"',caption:'Finally found the name',time:'3h ago'}]},
+  r1:{id:'r1',name:'Lagos_Lit',avatar:'https://i.pravatar.cc/100?img=44',ring:'ring-has',statuses:[{bg:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=900',quote:'"Currently crying at chapter 4 in the dark."',caption:'Don\'t talk to me right now 😭',time:'1h ago'}]},
+  r2:{id:'r2',name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',ring:'ring-none',statuses:[]},
+};
+
+const WRITERS = [
+  {id:'w1',name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',bio:'The writer who makes Lagos cry on their commute. 5 ongoing series. Write at 2am, publish at 5am.',badge:'writer',genres:['betrayal','family','twist'],followers:'12.4k',reads:'1.1M',likes:'24.3k',ring:'ring-live',isLive:true,following:true,tipTarget:true,
+    latestStory:{cat:'💔 Betrayal',title:'I came home early and caught my husband kissing my late sister\'s photograph',ch:'S2·Ch5',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&q=75'}},
+  {id:'w5',name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',bio:'Stories that leave you unable to go back to your normal life. ✨ Twist, romance and the unexpected.',badge:'writer',genres:['twist','romance'],followers:'31.7k',reads:'3.2M',likes:'89k',ring:'ring-has',isLive:false,following:true,tipTarget:true,
+    latestStory:{cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',ch:'Complete',cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=300&q=75'}},
+  {id:'w3',name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=43',bio:'Family drama, secrets and the love that outlasts blood. 3 seasons of The Grandmother\'s Will.',badge:'writer',genres:['family','betrayal'],followers:'19.2k',reads:'842k',likes:'31k',ring:'ring-has',isLive:false,following:false,tipTarget:true,
+    latestStory:{cat:'👑 Family',title:'My grandmother\'s will revealed I wasn\'t her blood — but she left everything to me',ch:'S3·Ch8',cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&q=75'}},
+  {id:'w6',name:'Efe_O',handle:'@efe_o',avatar:'https://i.pravatar.cc/100?img=22',bio:'Elegy is just love that ran out of time. I write the kind of quiet grief that hits hardest.',badge:'verified',genres:['elegy','twist'],followers:'22.3k',reads:'1.4M',likes:'36.5k',ring:'ring-has',isLive:false,following:false,tipTarget:true,
+    latestStory:{cat:'🌙 Elegy',title:'The letter he never sent was folded inside the pocket of his old jacket',ch:'Complete',cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300&q=75'}},
+  {id:'w7',name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',bio:'Revenge arcs, secrets and accountability. Writing the stories nobody else dares to.',badge:'writer',genres:['revenge','family'],followers:'14.8k',reads:'620k',likes:'28k',ring:'ring-has',isLive:false,following:false,tipTarget:false,
+    latestStory:{cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I quietly uncovered her entire secret life',ch:'S1·Ch5',cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300&q=75'}},
+  {id:'w4',name:'Kemi_A',handle:'@kemi_a',avatar:'https://i.pravatar.cc/100?img=28',bio:'Heartbreak, healing and the stories you tell yourself at 2am.',badge:'writer',genres:['betrayal','romance'],followers:'6.5k',reads:'240k',likes:'19.2k',ring:'ring-viewed',isLive:false,following:false,tipTarget:false,
+    latestStory:{cat:'💔 Heartbreak',title:'He proposed with my best friend\'s ring — and she giggled before he even knelt',ch:'S1·Ch3',cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=300&q=75'}},
+  {id:'w8',name:'Dami_Cole',handle:'@dami_cole',avatar:'https://i.pravatar.cc/100?img=64',bio:'Urban love, Lagos nights and the love stories that surprise you.',badge:'writer',genres:['romance','twist'],followers:'9.4k',reads:'310k',likes:'22.4k',ring:'ring-has',isLive:false,following:true,tipTarget:false,
+    latestStory:{cat:'🏙️ Urban Love',title:'She rejected me 3 times. Now we share a mortgage and a dog named "Finally"',ch:'S2·Ch9',cover:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=300&q=75'}},
+  {id:'w2',name:'CampusQueen',handle:'@campusqueen',avatar:'https://i.pravatar.cc/100?img=12',bio:'Campus drama, secret romance and the richest boy who keeps choosing you.',badge:'writer',genres:['campus','romance'],followers:'8.1k',reads:'290k',likes:'18.1k',ring:'ring-none',isLive:false,following:false,tipTarget:false,
+    latestStory:{cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',ch:'S1·Ch7',cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&q=75'}},
+];
+
+const READERS = [
+  {id:'r1',name:'Chioma_R',handle:'@chioma_r',avatar:'https://i.pravatar.cc/100?img=47',bio:'I read so I don\'t have to deal with real people 💔',genres:['betrayal','family','twist'],followers:'312',reads:'94 stories',reactions:'8.4k',ring:'ring-has',following:true,isMutual:true},
+  {id:'r2',name:'Lagos_Lit',handle:'@lagos_lit',avatar:'https://i.pravatar.cc/100?img=44',bio:'Sharing Droboard stories before they go viral.',genres:['betrayal','elegy'],followers:'1.2k',reads:'200+ stories',reactions:'14.2k',ring:'ring-has',following:false,isMutual:false},
+  {id:'r3',name:'Emeka_T',handle:'@emeka_t',avatar:'https://i.pravatar.cc/100?img=15',bio:'For the debates. Always in the argument section.',genres:['debate','campus'],followers:'88',reads:'62 stories',reactions:'3.1k',ring:'ring-none',following:false,isMutual:true},
+  {id:'r4',name:'Nkechi_B',handle:'@nkechi_b',avatar:null,bio:'Chapter 5 of every good story finishes me.',genres:['family','romance'],followers:'47',reads:'38 stories',reactions:'1.8k',ring:'ring-none',following:false,isMutual:false},
+  {id:'r5',name:'Bola_Lagos',handle:'@bola_lagos',avatar:'https://i.pravatar.cc/100?img=55',bio:'Bookmarking everything, reading half.',genres:['betrayal','twist'],followers:'203',reads:'109 stories',reactions:'5.4k',ring:'ring-has',following:false,isMutual:true},
+  {id:'r6',name:'Tunde_W',handle:'@tunde_w',avatar:'https://i.pravatar.cc/100?img=33',bio:'My girlfriend thinks I\'m working late. I am reading.',genres:['romance','campus'],followers:'129',reads:'77 stories',reactions:'2.9k',ring:'ring-none',following:false,isMutual:false},
+  {id:'r7',name:'Amara_K',handle:'@amara_k',avatar:'https://i.pravatar.cc/100?img=25',bio:'Someone forward this to grief counselors. Genuinely.',genres:['elegy','family'],followers:'61',reads:'42 stories',reactions:'1.2k',ring:'ring-none',following:false,isMutual:false},
+  {id:'r8',name:'Sola_Ng',handle:'@sola_ng',avatar:null,bio:'Screenshots for the whatsapp group.',genres:['betrayal','campus'],followers:'94',reads:'53 stories',reactions:'2.1k',ring:'ring-none',following:false,isMutual:false},
+];
+
+const RECOMMENDED_STORIES = [
+  {cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing my late sister\'s photograph',writer:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:'171k',badge:'hot',ch:'S2·Ch5'},
+  {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',writer:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',views:'312k',badge:'hot',ch:'Complete'},
+  {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',cat:'👑 Family',title:'My grandmother\'s will revealed I wasn\'t her blood',writer:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=43',views:'204k',badge:'',ch:'S3·Ch8'},
+  {cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400',cat:'🌙 Elegy',title:'The letter he never sent was folded inside the pocket of his old jacket',writer:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:'218k',badge:'',ch:'Complete'},
+  {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400',cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I quietly uncovered her secret life',writer:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:'192k',badge:'new',ch:'S1·Ch5'},
+  {cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',writer:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:'134k',badge:'new',ch:'S1·Ch7'},
+];
+
+const ACTIVITY_FEED = [
+  {type:'follow',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',target:'Chioma_R',time:'2m ago',story:null},
+  {type:'reaction',name:'Lagos_Lit',avatar:'https://i.pravatar.cc/100?img=44',reaction:'😭',time:'5m ago',story:{cat:'💔 Betrayal',title:'I came home early…',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'}},
+  {type:'chapter',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',time:'1h ago',story:{cat:'💔 Betrayal',title:'Season 2 · Chapter 5 just dropped',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'}},
+  {type:'debate',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',side:'AGAINST',motion:'Ada should stay and fight for her marriage',time:'2h ago',story:null},
+  {type:'reaction',name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',reaction:'🔥',time:'2h ago',story:{cat:'🔥 Revenge',title:'My stepmother stole my university fund',cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200'}},
+  {type:'follow',name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=43',target:'Efe_O',time:'3h ago',story:null},
+  {type:'chapter',name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=43',time:'4h ago',story:{cat:'👑 Family',title:'Season 3 · Chapter 8 just dropped',cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200'}},
+  {type:'reaction',name:'Bola_Lagos',avatar:'https://i.pravatar.cc/100?img=55',reaction:'💔',time:'4h ago',story:{cat:'🌙 Elegy',title:'The letter he never sent',cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=200'}},
+  {type:'debate',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',side:'FOR',motion:'Walking out publicly was brave, not dramatic',time:'5h ago',story:null},
+  {type:'follow',name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',target:'Dami_Cole',time:'6h ago',story:null},
+];
+
+const LEADERBOARD_DATA = {
+  writers: [
+    {id:'w5',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',meta:'✨ Twist · 3.2M reads',num:'89k',lbl:'Likes',ring:'ring-has',following:true},
+    {id:'w1',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',meta:'💔 Betrayal · 1.1M reads',num:'24.3k',lbl:'Likes',ring:'ring-live',following:true},
+    {id:'w6',name:'Efe_O',avatar:'https://i.pravatar.cc/100?img=22',meta:'🌙 Elegy · 1.4M reads',num:'36.5k',lbl:'Likes',ring:'ring-has',following:false},
+    {id:'w3',name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=43',meta:'👑 Family · 842k reads',num:'31k',lbl:'Likes',ring:'ring-has',following:false},
+    {id:'w7',name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',meta:'🔥 Revenge · 620k reads',num:'28k',lbl:'Likes',ring:'ring-has',following:false},
+    {id:'w4',name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',meta:'💔 Heartbreak · 240k reads',num:'19.2k',lbl:'Likes',ring:'ring-viewed',following:false},
+    {id:'w8',name:'Dami_Cole',avatar:'https://i.pravatar.cc/100?img=64',meta:'🏙️ Urban Love · 310k reads',num:'22.4k',lbl:'Likes',ring:'ring-has',following:true},
+    {id:'w2',name:'CampusQueen',avatar:'https://i.pravatar.cc/100?img=12',meta:'🎓 Campus · 290k reads',num:'18.1k',lbl:'Likes',ring:'ring-none',following:false},
+  ],
+  readers: [
+    {id:'r2',name:'Lagos_Lit',avatar:'https://i.pravatar.cc/100?img=44',meta:'📖 200+ stories · 14.2k reactions',num:'14.2k',lbl:'Reactions',ring:'ring-has',following:false},
+    {id:'r1',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',meta:'📖 94 stories · 8.4k reactions',num:'8.4k',lbl:'Reactions',ring:'ring-has',following:true},
+    {id:'r5',name:'Bola_Lagos',avatar:'https://i.pravatar.cc/100?img=55',meta:'📖 109 stories · 5.4k reactions',num:'5.4k',lbl:'Reactions',ring:'ring-has',following:false},
+    {id:'r3',name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',meta:'📖 62 stories · 3.1k reactions',num:'3.1k',lbl:'Reactions',ring:'ring-none',following:false},
+    {id:'r6',name:'Tunde_W',avatar:'https://i.pravatar.cc/100?img=33',meta:'📖 77 stories · 2.9k reactions',num:'2.9k',lbl:'Reactions',ring:'ring-none',following:false},
+    {id:'r8',name:'Sola_Ng',avatar:null,meta:'📖 53 stories · 2.1k reactions',num:'2.1k',lbl:'Reactions',ring:'ring-none',following:false},
+    {id:'r4',name:'Nkechi_B',avatar:null,meta:'📖 38 stories · 1.8k reactions',num:'1.8k',lbl:'Reactions',ring:'ring-none',following:false},
+    {id:'r7',name:'Amara_K',avatar:'https://i.pravatar.cc/100?img=25',meta:'📖 42 stories · 1.2k reactions',num:'1.2k',lbl:'Reactions',ring:'ring-none',following:false},
+  ],
+  debaters: [
+    {id:'r1',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',meta:'⚔️ 47 debates · 89% win rate',num:'89%',lbl:'Win rate',ring:'ring-has',following:true},
+    {id:'r3',name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',meta:'⚔️ 31 debates · 74% win rate',num:'74%',lbl:'Win rate',ring:'ring-none',following:false},
+    {id:'w1',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',meta:'⚔️ 28 debates · 71% win rate',num:'71%',lbl:'Win rate',ring:'ring-live',following:true},
+    {id:'r2',name:'Lagos_Lit',avatar:'https://i.pravatar.cc/100?img=44',meta:'⚔️ 22 debates · 68% win rate',num:'68%',lbl:'Win rate',ring:'ring-has',following:false},
+    {id:'w5',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',meta:'⚔️ 19 debates · 63% win rate',num:'63%',lbl:'Win rate',ring:'ring-has',following:true},
+  ],
+};
+
+/* ══════════════════════════════════
+   UTILS
+══════════════════════════════════ */
+function toast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+/* ══════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════ */
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  if(el){el.classList.add('active');el.scrollIntoView({inline:'center',behavior:'smooth'});}
+  else{document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');}
+  document.getElementById('tab-'+tab).style.display='block';
+  document.getElementById('searchPanel').style.display='none';
+  document.getElementById('searchInp').value='';
+  document.getElementById('searchClear').style.display='none';
+}
+
+/* ══════════════════════════════════
+   SEARCH
+══════════════════════════════════ */
+function onSearch(q) {
+  const clear = document.getElementById('searchClear');
+  q = q.trim();
+  clear.style.display = q ? 'block' : 'none';
+  if (!q) {
+    document.getElementById('searchPanel').style.display = 'none';
+    document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+    document.getElementById('tab-discover').style.display='block';
+    return;
+  }
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  const panel = document.getElementById('searchPanel');
+  panel.style.display = 'block';
+  const lq = q.toLowerCase();
+  const wHits = WRITERS.filter(w=>w.name.toLowerCase().includes(lq)||w.bio.toLowerCase().includes(lq));
+  const rHits = READERS.filter(r=>r.name.toLowerCase().includes(lq)||(r.bio||'').toLowerCase().includes(lq));
+  const results = document.getElementById('searchResults');
+  if (!wHits.length && !rHits.length) {
+    results.innerHTML=`<div class="search-empty"><div class="icon">🔍</div><h3>No results for "${q}"</h3><p>Try a different name, genre, or handle.</p></div>`;
+    return;
+  }
+  let html = '';
+  if (wHits.length) {
+    html += `<div class="sh" style="padding:0 0 8px"><div class="sh-title">✍️ Writers (${wHits.length})</div></div>`;
+    html += wHits.map(w => buildWriterCardHTML(w)).join('');
+  }
+  if (rHits.length) {
+    html += `<div class="sh" style="padding:12px 0 4px"><div class="sh-title">📖 Readers (${rHits.length})</div></div>`;
+    html += `<div style="background:var(--l1);border-radius:14px;border:1px solid var(--bd);overflow:hidden">${rHits.map(r=>buildReaderRowHTML(r)).join('')}</div>`;
+  }
+  results.innerHTML = html;
+  attachReaderEvents(results);
+  attachWriterEvents(results);
+}
+function clearSearch() {
+  document.getElementById('searchInp').value='';
+  document.getElementById('searchClear').style.display='none';
+  document.getElementById('searchPanel').style.display='none';
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-discover').style.display='block';
+  document.querySelector('[data-tab="discover"]').classList.add('active');
+}
+
+/* ══════════════════════════════════
+   STATUS RINGS
+══════════════════════════════════ */
+function renderStatusRings() {
+  const row = document.getElementById('statusRingsRow');
+  const writers = Object.values(WRITER_STATUSES);
+  let html = `<div class="s-item" onclick="toast('✏️ Post your status')">
+    <div class="s-ring ring-none" style="position:relative">
+      <div class="s-ring-inner"><div class="s-ring-init">Y</div></div>
+      <div style="position:absolute;bottom:0;right:0;width:16px;height:16px;border-radius:50%;background:var(--acc);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900">+</div>
+    </div>
+    <div class="s-name">Your Story</div>
+  </div>`;
+  // Sort: live → unviewed → viewed → none
+  const sorted = [...writers].sort((a,b)=>{
+    const score = x => x.ring==='ring-live'?0:x.ring==='ring-has'?1:x.ring==='ring-viewed'?2:3;
+    return score(a)-score(b);
+  });
+  sorted.forEach(ws => {
+    const liveEl = ws.isLive ? `<div class="s-live-dot"><i class="fas fa-signal" style="font-size:5px"></i></div>` : '';
+    const avHtml = ws.avatar ? `<img src="${ws.avatar}" loading="lazy" alt=""/>` : `<div class="s-ring-init">${ws.name[0]}</div>`;
+    const hasStatus = ws.statuses && ws.statuses.length;
+    html += `<div class="s-item" onclick="${hasStatus ? `openStatus('${ws.id}')` : `toast('No status from @${ws.name} yet')`}">
+      <div class="s-ring ${ws.ring}" style="position:relative">
+        <div class="s-ring-inner">${avHtml}</div>
+        ${liveEl}
+      </div>
+      <div class="s-name${ws.ring==='ring-has'||ws.ring==='ring-live'?' new-s':''}">${ws.name.split('_')[0]}</div>
+    </div>`;
+  });
+  row.innerHTML = html;
+}
+
+/* ══════════════════════════════════
+   STATUS VIEWER
+══════════════════════════════════ */
+let statusWid=null,statusIdx=0,statusTimer=null,statusPaused=false,statusElapsed=0;
+const S_DUR=5000;
+
+function openStatus(wid) {
+  const ws = WRITER_STATUSES[wid];
+  if (!ws || !ws.statuses.length) return;
+  statusWid = wid; statusIdx = 0;
+  document.getElementById('sWAv').src = ws.avatar || '';
+  document.getElementById('sWName').textContent = '@' + ws.name;
+  document.getElementById('statusOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderStatusSlide();
+}
+function renderStatusSlide() {
+  const ws = WRITER_STATUSES[statusWid];
+  if (!ws) return;
+  const slide = ws.statuses[statusIdx];
+  statusElapsed = 0; statusPaused = false;
+  document.getElementById('sWTime').textContent = slide.time;
+  document.getElementById('sProgBars').innerHTML = ws.statuses.map((_,i) =>
+    `<div class="spb"><div class="spb-fill" id="spb${i}" style="width:${i<statusIdx?100:0}%"></div></div>`
+  ).join('');
+  const cnt = document.getElementById('statusCnt');
+  cnt.innerHTML = `<div class="s-slide" style="background-image:url('${slide.bg}');background-size:cover;position:absolute;inset:0">
+    <div class="s-slide-grad"></div>
+    <div class="s-slide-txt"><div class="s-slide-q">${slide.quote}</div><div class="s-slide-cap">${slide.caption}</div></div>
+  </div><div class="s-nav-l" id="sNL"></div><div class="s-nav-r" id="sNR"></div>`;
+  document.getElementById('sNL').onclick = () => statusNav(-1);
+  document.getElementById('sNR').onclick = () => statusNav(1);
+  const ov = document.getElementById('statusOv');
+  if (ov._pp) { ov.removeEventListener('pointerdown',ov._pp); ov.removeEventListener('pointerup',ov._pu); }
+  ov._pp = e => { if(e.target.closest('.s-close-btn,.s-reply-inp,.s-react-btn'))return; pauseStatus(); };
+  ov._pu = () => resumeStatus();
+  ov.addEventListener('pointerdown',ov._pp);
+  ov.addEventListener('pointerup',ov._pu);
+  clearTimeout(statusTimer);
+  requestAnimationFrame(() => {
+    const fill = document.getElementById('spb'+statusIdx);
+    if (fill) { fill.style.transition=`width ${S_DUR}ms linear`; fill.style.width='100%'; }
+    statusTimer = setTimeout(() => statusNav(1), S_DUR);
+  });
+  ws.ring = 'ring-viewed';
+}
+function pauseStatus() {
+  if (statusPaused) return; statusPaused = true; clearTimeout(statusTimer);
+  const fill = document.getElementById('spb'+statusIdx);
+  if (fill) { const w=parseFloat(window.getComputedStyle(fill).width); const tw=fill.parentElement?.getBoundingClientRect().width||1; const pct=(w/tw*100); statusElapsed=(pct/100)*S_DUR; fill.style.transition='none'; fill.style.width=pct+'%'; }
+}
+function resumeStatus() {
+  if (!statusPaused) return; statusPaused = false;
+  const rem = Math.max(0, S_DUR - statusElapsed);
+  const fill = document.getElementById('spb'+statusIdx);
+  if (fill) { fill.style.transition=`width ${rem}ms linear`; fill.style.width='100%'; }
+  clearTimeout(statusTimer); statusTimer = setTimeout(() => statusNav(1), rem);
+}
+function statusNav(dir) {
+  const ws = WRITER_STATUSES[statusWid];
+  if (!ws) return; clearTimeout(statusTimer);
+  statusIdx += dir;
+  if (statusIdx < 0 || statusIdx >= ws.statuses.length) { closeStatus(); return; }
+  renderStatusSlide();
+}
+function closeStatus() {
+  clearTimeout(statusTimer);
+  const ov = document.getElementById('statusOv');
+  if (ov._pp) { ov.removeEventListener('pointerdown',ov._pp); ov.removeEventListener('pointerup',ov._pu); }
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+  statusWid = null;
+  renderStatusRings();
+}
+
+/* ══════════════════════════════════
+   WRITER CARD HTML
+══════════════════════════════════ */
+function buildWriterCardHTML(w) {
+  const bc = w.badge === 'verified' ? 'blue' : w.badge === 'gold' ? 'gold' : '';
+  const bl = w.badge === 'verified' ? '✓ Verified' : '✍️ Writer';
+  return `<div class="writer-card fade-up" data-wid="${w.id}">
+    <div class="wc-top">
+      <div class="wc-av-wrap">
+        <div class="wc-av-ring ${w.ring}" onclick="openStatus('${w.id}');event.stopPropagation()">
+          <div class="wc-av-inner"><img src="${w.avatar}" loading="lazy" alt="${w.name}"/></div>
+        </div>
+        ${w.isLive ? `<div class="wc-live-dot"><i class="fas fa-signal" style="font-size:5px"></i></div>` : ''}
+      </div>
+      <div class="wc-info">
+        <div class="wc-name-row">
+          <span class="wc-name">${w.name}</span>
+          <span class="wc-badge ${bc}">${bl}</span>
+        </div>
+        <div class="wc-handle">${w.handle}</div>
+        <div class="wc-bio">${w.bio}</div>
+        <div class="wc-genres">${w.genres.map(g=>`<span class="wc-genre">${g}</span>`).join('')}</div>
+        <div class="wc-stats-row">
+          <div class="wc-stat"><i class="fas fa-users" style="font-size:8px"></i><strong>${w.followers}</strong> followers</div>
+          <div class="wc-stat"><i class="far fa-eye" style="font-size:8px"></i><strong>${w.reads}</strong> reads</div>
+          <div class="wc-stat"><i class="far fa-heart" style="font-size:8px"></i><strong>${w.likes}</strong> likes</div>
+        </div>
+      </div>
+    </div>
+    <div class="wc-actions">
+      <button class="follow-btn${w.following?' ing':''}" data-wid="${w.id}">${w.following?'✓ Following':'+ Follow'}</button>
+      <button class="msg-btn" onclick="toast('💬 DM opening soon…')"><i class="fas fa-paper-plane" style="font-size:10px"></i> DM</button>
+      ${w.tipTarget ? `<button class="tip-btn" onclick="toast('💛 Tipping ${w.name}…')"><i class="fas fa-coins" style="font-size:10px"></i> Tip</button>` : ''}
+    </div>
+    <div class="wc-latest-story" onclick="toast('📖 Opening story…')">
+      <div class="wls-img" style="background-image:url('${w.latestStory.cover}')"></div>
+      <div class="wls-body">
+        <div class="wls-cat">${w.latestStory.cat} · ${w.latestStory.ch}</div>
+        <div class="wls-title">${w.latestStory.title}</div>
+      </div>
+      <div class="wls-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+  </div>`;
+}
+
+function attachWriterEvents(container) {
+  container.querySelectorAll('.follow-btn[data-wid]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const w = WRITERS.find(x => x.id === btn.dataset.wid);
+      if (!w) return;
+      w.following = !w.following;
+      btn.textContent = w.following ? '✓ Following' : '+ Follow';
+      btn.classList.toggle('ing', w.following);
+      toast(w.following ? `✅ Following @${w.name}` : `Unfollowed @${w.name}`);
+    });
+  });
+}
+
+/* ══════════════════════════════════
+   READER ROW HTML
+══════════════════════════════════ */
+function buildReaderRowHTML(r) {
+  const avHtml = r.avatar
+    ? `<img src="${r.avatar}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt="${r.name}"/>`
+    : `<div style="width:100%;height:100%;border-radius:50%;background:rgba(255,0,80,.18);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--acc2)">${r.name[0]}</div>`;
+  return `<div class="reader-card" data-rid="${r.id}" onclick="toast('👤 Opening @${r.name} profile…')">
+    <div class="rc-av-wrap">
+      <div class="rc-av-ring ${r.ring}" style="position:relative">
+        <div class="rc-av-inner">${avHtml}</div>
+      </div>
+    </div>
+    <div class="rc-info">
+      <div class="rc-name">${r.name} ${r.isMutual?'<span style="font-size:8px;font-weight:700;color:var(--green);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);padding:1px 6px;border-radius:7px">Mutual</span>':''}</div>
+      <div class="rc-meta">${r.reads} · ❤️ ${r.reactions}</div>
+      <div class="rc-genres">${(r.genres||[]).map(g=>`<span class="rc-genre">${g}</span>`).join('')}</div>
+    </div>
+    <button class="rc-follow-btn${r.following?' ing':''}" data-rid="${r.id}" onclick="event.stopPropagation();toggleReaderFollow('${r.id}',this)">${r.following?'✓ Following':'+ Follow'}</button>
+  </div>`;
+}
+
+function attachReaderEvents(container) {
+  container.querySelectorAll('.rc-follow-btn[data-rid]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = READERS.find(x => x.id === btn.dataset.rid);
+      if (!r) return;
+      r.following = !r.following;
+      btn.textContent = r.following ? '✓ Following' : '+ Follow';
+      btn.classList.toggle('ing', r.following);
+      toast(r.following ? `✅ Following @${r.name}` : `Unfollowed @${r.name}`);
+    });
+  });
+}
+
+function toggleReaderFollow(rid, btn) {
+  const r = READERS.find(x => x.id === rid);
+  if (!r) return;
+  r.following = !r.following;
+  btn.textContent = r.following ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', r.following);
+  toast(r.following ? `✅ Following @${r.name}` : `Unfollowed @${r.name}`);
+}
+
+/* ══════════════════════════════════
+   RENDER SECTIONS
+══════════════════════════════════ */
+function renderRecommendedStories() {
+  document.getElementById('recommendedStories').innerHTML = RECOMMENDED_STORIES.map(s => {
+    const bc = s.badge === 'hot' ? 'badge-hot' : 'badge-new';
+    return `<div class="story-card" onclick="toast('📖 Opening story…')">
+      <div class="sc-cover">
+        <img src="${s.cover}" loading="lazy" alt=""/>
+        <div class="sc-scrim"></div>
+        ${s.badge ? `<div class="sc-badge ${bc}">${s.badge.toUpperCase()}</div>` : ''}
+        <div class="sc-stat"><i class="fas fa-eye" style="font-size:6px"></i>${s.views}</div>
+        <div class="sc-ch">${s.ch}</div>
+      </div>
+      <div class="sc-title">${s.title}</div>
+      <div class="sc-meta">
+        <img class="sc-av" src="${s.av}" loading="lazy" alt=""/>
+        <span class="sc-sub">@${s.writer}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTrendingWriters(containerId) {
+  document.getElementById(containerId).innerHTML = WRITERS.slice(0,6).map((w, i) => `
+    <div class="tw-card" onclick="switchTab('writers',document.querySelector('[data-tab=writers]'))">
+      <div class="tw-rank">#${i+1}</div>
+      <div class="tw-av-ring ${w.ring}" style="position:relative">
+        <div class="tw-av-inner"><img src="${w.avatar}" loading="lazy" alt="${w.name}"/></div>
+        ${w.isLive ? `<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;background:var(--acc);border:2px solid #000"></div>` : ''}
+      </div>
+      <div class="tw-name">${w.name}</div>
+      <div class="tw-genre">${w.genres[0]}</div>
+      <div class="tw-stat"><i class="fas fa-eye" style="font-size:8px;color:var(--tx3)"></i>${w.reads}</div>
+      <button class="tw-follow${w.following?' ing':''}" onclick="event.stopPropagation();toggleTWFollow('${w.id}',this)">${w.following?'✓':'+ Follow'}</button>
+    </div>`).join('');
+}
+
+function toggleTWFollow(wid, btn) {
+  const w = WRITERS.find(x => x.id === wid);
+  if (!w) return;
+  w.following = !w.following;
+  btn.textContent = w.following ? '✓' : '+ Follow';
+  btn.classList.toggle('ing', w.following);
+  toast(w.following ? `✅ Following @${w.name}` : `Unfollowed @${w.name}`);
+}
+
+function renderTopReaders(containerId) {
+  document.getElementById(containerId).innerHTML = READERS.slice(0,6).map(r => {
+    const avHtml = r.avatar
+      ? `<img src="${r.avatar}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt=""/>`
+      : `<div style="width:100%;height:100%;border-radius:50%;background:rgba(0,170,255,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--blue)">${r.name[0]}</div>`;
+    return `<div class="mutual-card" onclick="openStatus('${r.id}')">
+      <div class="mc-ring ${r.ring}"><div class="mc-inner">${avHtml}</div></div>
+      <div class="mc-name">${r.name.split('_')[0]}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMutuals() {
+  const mutuals = WRITERS.filter(w => !w.following).concat(READERS.filter(r => !r.following && r.isMutual));
+  const suggestions = mutuals.slice(0, 6);
+  const list = document.getElementById('mutualsList');
+  list.innerHTML = `<div style="background:var(--l1);margin:0 14px;border-radius:14px;border:1px solid var(--bd);overflow:hidden">` +
+    suggestions.map(p => {
+      const avHtml = p.avatar
+        ? `<img src="${p.avatar}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt=""/>`
+        : `<div style="width:100%;height:100%;border-radius:50%;background:rgba(255,0,80,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--acc2)">${p.name[0]}</div>`;
+      const isWriter = !!p.badge;
+      return `<div class="reader-card" onclick="toast('👤 Opening profile…')">
+        <div class="rc-av-wrap">
+          <div class="rc-av-ring ${p.ring||'ring-none'}">
+            <div class="rc-av-inner">${avHtml}</div>
+          </div>
+        </div>
+        <div class="rc-info">
+          <div class="rc-name">${p.name} ${isWriter ? '<span style="font-size:8px;font-weight:700;color:var(--acc2);background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);padding:1px 6px;border-radius:7px">Writer</span>' : ''}</div>
+          <div class="rc-meta">${isWriter ? p.reads+' reads · '+p.followers+' followers' : (p.reads||'')+' · '+p.reactions+' reactions'}</div>
+          <div class="rc-genres">${(p.genres||[]).slice(0,3).map(g=>`<span class="rc-genre">${g}</span>`).join('')}</div>
+        </div>
+        <button class="rc-follow-btn" onclick="event.stopPropagation();this.textContent='✓ Following';this.classList.add('ing');toast('✅ Following @${p.name}')">+ Follow</button>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+function renderWriters(filter) {
+  const filtered = filter === 'all' ? WRITERS : WRITERS.filter(w => w.genres.includes(filter));
+  const container = document.getElementById('writersList');
+  if (!filtered.length) {
+    container.innerHTML = `<div class="search-empty"><div class="icon">✍️</div><h3>No writers found</h3><p>Try a different genre filter.</p></div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(w => buildWriterCardHTML(w)).join('');
+  attachWriterEvents(container);
+}
+
+let writerFilter = 'all';
+function filterWriters(filter, el) {
+  writerFilter = filter;
+  document.querySelectorAll('#writersFilterBar .fpill').forEach(p => p.classList.toggle('active', p === el));
+  renderWriters(filter);
+}
+
+function renderReaders() {
+  const container = document.getElementById('readersList');
+  container.innerHTML = READERS.map(r => buildReaderRowHTML(r)).join('');
+  attachReaderEvents(container);
+}
+
+function renderTrendingReaders(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = READERS.slice(0,5).map((r,i) => {
+    const avHtml = r.avatar
+      ? `<img src="${r.avatar}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt=""/>`
+      : `<div style="width:100%;height:100%;border-radius:50%;background:rgba(0,170,255,.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--blue)">${r.name[0]}</div>`;
+    return `<div class="lb-card" onclick="toast('👤 Opening @${r.name}…')">
+      <div class="lb-rank ${['r1','r2','r3','rn','rn'][i]}">${i+1}</div>
+      <div class="lb-av-ring ${r.ring}"><div class="lb-av-inner">${avHtml}</div></div>
+      <div class="lb-info"><div class="lb-name">${r.name}</div><div class="lb-meta">${r.reads} · ❤️ ${r.reactions}</div></div>
+      <div class="lb-num"><div class="lb-num-val">${r.reactions}</div><div class="lb-num-lbl">reactions</div></div>
+      <button class="lb-follow-btn${r.following?' ing':''}" onclick="event.stopPropagation();this.textContent=this.classList.toggle('ing')?'✓ Following':'+ Follow';toast('✅ Following @${r.name}')">${r.following?'✓ Following':'+ Follow'}</button>
+    </div>`;
+  }).join('');
+}
+
+function renderActivity() {
+  document.getElementById('activityFeed').innerHTML = ACTIVITY_FEED.map(a => {
+    let text = '';
+    if (a.type === 'follow') text = `<strong>${a.name}</strong> started following <span class="acc">@${a.target}</span>`;
+    else if (a.type === 'reaction') text = `<strong>${a.name}</strong> reacted ${a.reaction} to a story`;
+    else if (a.type === 'chapter') text = `<strong>${a.name}</strong> dropped a new chapter`;
+    else if (a.type === 'debate') text = `<strong>${a.name}</strong> voted <strong style="color:${a.side==='FOR'?'var(--green)':'#f87171'}">${a.side}</strong> in a debate`;
+    const avHtml = a.avatar
+      ? `<img class="act-av" src="${a.avatar}" loading="lazy" alt=""/>`
+      : `<div class="act-av-init">${a.name[0]}</div>`;
+    const storyHtml = a.story ? `<div class="act-story-mini" onclick="toast('📖 Opening story…')">
+      <div class="act-story-img" style="background-image:url('${a.story.cover}')"></div>
+      <div class="act-story-title">${a.story.title}</div>
+    </div>` : '';
+    return `<div class="act-item">
+      <div class="act-av-wrap">${avHtml}</div>
+      <div class="act-body">
+        <div class="act-text">${text}</div>
+        ${storyHtml}
+      </div>
+      <div class="act-time">${a.time}</div>
+    </div>`;
+  }).join('');
+}
+
+let lbMode = 'writers';
+function switchLB(mode, el) {
+  lbMode = mode;
+  document.querySelectorAll('#tab-leaderboard .fpill').forEach(p => p.classList.toggle('active', p === el));
+  const titles = { writers:'✍️ Writers — This Month', readers:'📖 Readers — This Month', debaters:'⚔️ Debaters — This Month' };
+  document.getElementById('lbTitle').innerHTML = `<i class="fas fa-trophy" style="color:var(--gold);font-size:10px"></i> Top ${titles[mode]}`;
+  renderLeaderboard();
+}
+function renderLeaderboard() {
+  const data = LEADERBOARD_DATA[lbMode] || [];
+  document.getElementById('leaderboardList').innerHTML = data.map((p, i) => {
+    const rankCls = i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    const avHtml = p.avatar
+      ? `<img src="${p.avatar}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt=""/>`
+      : `<div style="width:100%;height:100%;border-radius:50%;background:rgba(255,0,80,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--acc2)">${p.name[0]}</div>`;
+    return `<div class="lb-card fade-up" onclick="toast('👤 Opening profile…')">
+      <div class="lb-rank ${rankCls}">${i+1}</div>
+      <div class="lb-av-ring ${p.ring}"><div class="lb-av-inner">${avHtml}</div></div>
+      <div class="lb-info"><div class="lb-name">${p.name}</div><div class="lb-meta">${p.meta}</div></div>
+      <div class="lb-num"><div class="lb-num-val">${p.num}</div><div class="lb-num-lbl">${p.lbl}</div></div>
+      <button class="lb-follow-btn${p.following?' ing':''}" onclick="event.stopPropagation();this.classList.toggle('ing');this.textContent=this.classList.contains('ing')?'✓ Following':'+ Follow';toast('✅ Done!')">${p.following?'✓ Following':'+ Follow'}</button>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+renderStatusRings();
+renderRecommendedStories();
+renderTrendingWriters('trendingWritersRow');
+renderTopReaders('topReadersRow');
+renderMutuals();
+renderWriters('all');
+renderReaders();
+renderTrendingWriters('trendingWriters2');
+document.getElementById('trendingStories').innerHTML = document.getElementById('recommendedStories').innerHTML;
+renderTrendingReaders('trendingReadersList');
+renderActivity();
+renderLeaderboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Create Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ─── TOKENS (match other Droboard pages) ─── */
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.25);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000;--l1:#07070b;--l2:#0d0e12;--l3:#131418;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx:#f2f2f4;--tx2:#a1a1aa;--tx3:#71717a;--tx4:#3f3f46;
+  --green:#34d399;--blue:#38bdf8;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --nav-h:56px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font-d:'Playfair Display',serif;
+  --font-b:'DM Sans',sans-serif;
+  --font-story:'Lora',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow-x:hidden}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:var(--font-b)}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:rgba(255,0,80,.18);border-radius:2px}
+
+/* ─── APP SHELL ─── */
+.shell{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  overflow:hidden;
+  /* safe area top padding handled by topbar */
+}
+
+/* ─── TOP BAR ─── */
+.topbar{
+  flex-shrink:0;
+  padding-top:var(--safe-t);
+  display:flex;align-items:center;gap:8px;
+  padding-left:14px;padding-right:14px;padding-bottom:10px;
+  padding-top:calc(var(--safe-t) + 10px);
+  background:rgba(0,0,0,.97);
+  border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);
+  z-index:200;
+}
+.tb-logo{
+  font-family:var(--font-d);font-size:20px;font-weight:900;color:var(--acc);
+  letter-spacing:-1px;cursor:pointer;flex-shrink:0;
+  text-decoration:none;
+}
+.tb-title{
+  flex:1;font-size:13px;font-weight:700;color:var(--tx);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;
+}
+.save-status{
+  display:flex;align-items:center;gap:4px;
+  font-size:9px;font-weight:700;flex-shrink:0;white-space:nowrap;
+}
+.save-status.saved{color:var(--green)}
+.save-status.saving{color:var(--gold)}
+.save-status.unsaved{color:var(--acc)}
+.save-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.tb-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--tx2);cursor:pointer;
+  transition:.15s;flex-shrink:0;
+}
+.tb-btn:active{transform:scale(.9);background:rgba(255,0,80,.08);color:var(--acc)}
+
+/* ─── STEP PROGRESS BAR ─── */
+.step-bar{
+  flex-shrink:0;
+  padding:10px 14px 8px;
+  background:var(--l1);
+  border-bottom:1px solid var(--bd);
+}
+.step-track{display:flex;align-items:center}
+.step-node{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;flex-shrink:0;
+  transition:.3s;cursor:pointer;
+}
+.step-node.done{background:var(--green);color:#000}
+.step-node.active{background:var(--acc);color:#fff;box-shadow:0 0 10px var(--glow-sm)}
+.step-node.pending{background:var(--l3);border:1.5px solid var(--bd);color:var(--tx4)}
+.step-line{flex:1;height:2px;transition:.3s;min-width:0}
+.step-line.done{background:var(--green)}
+.step-line.pending{background:var(--bd)}
+.step-labels{display:flex;justify-content:space-between;margin-top:5px}
+.step-label{
+  font-size:8px;font-weight:700;color:var(--tx4);
+  flex:1;text-align:center;transition:.3s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.step-label:first-child{text-align:left}
+.step-label:last-child{text-align:right}
+.step-label.active{color:var(--acc)}
+.step-label.done{color:var(--green)}
+
+/* ─── PAGES (slide container) ─── */
+.pages-wrap{
+  flex:1;
+  overflow:hidden;
+  min-height:0;
+  position:relative;
+}
+.pages-track{
+  display:flex;
+  /* 6 pages, each 100vw */
+  width:600%;
+  height:100%;
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.page{
+  /* Each page = 1/6 of track = 100vw */
+  width:calc(100%/6);
+  height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  flex-shrink:0;
+  /* bottom padding = nav bar + safe area + breathing room */
+  padding-bottom:calc(var(--nav-h) + var(--safe-b) + 24px);
+}
+.page::-webkit-scrollbar{width:2px}
+/* Write page has toolbar built in — no generic padding-bottom override needed */
+.page.write-page{
+  display:flex;flex-direction:column;
+  padding:0;
+}
+
+.page-inner{padding:18px 14px 0}
+.page-title{
+  font-family:var(--font-d);font-size:20px;font-weight:900;color:var(--tx);
+  margin-bottom:4px;line-height:1.2;
+}
+.page-sub{font-size:12px;color:var(--tx3);margin-bottom:18px;line-height:1.5}
+
+/* ─── STORY TYPE CARDS ─── */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.type-card{
+  background:var(--l1);border:1.5px solid var(--bd);border-radius:16px;
+  padding:16px 14px;cursor:pointer;transition:.2s;
+  display:flex;flex-direction:column;align-items:flex-start;gap:7px;
+  position:relative;overflow:hidden;
+}
+.type-card.selected{
+  border-color:var(--acc);background:rgba(255,0,80,.05);
+  box-shadow:0 0 18px var(--glow-sm);
+}
+.type-card:active{transform:scale(.97)}
+.type-emoji{font-size:26px;line-height:1}
+.type-name{font-size:12px;font-weight:800;color:var(--tx)}
+.type-desc{font-size:10px;color:var(--tx3);line-height:1.45}
+.type-check{
+  position:absolute;top:9px;right:9px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--acc);display:none;align-items:center;justify-content:center;
+  font-size:9px;color:#fff;
+}
+.type-card.selected .type-check{display:flex}
+
+/* Upload zone */
+.or-div{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;color:var(--tx4);font-size:10px;font-weight:700;
+}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--bd)}
+.upload-zone{
+  background:var(--l1);border:2px dashed rgba(56,189,248,.25);border-radius:16px;
+  padding:24px 16px;text-align:center;cursor:pointer;transition:.2s;
+  margin-bottom:14px;
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--blue);background:rgba(56,189,248,.04)}
+.upload-zone.has-file{border-color:var(--green);background:rgba(52,211,153,.04);border-style:solid}
+.uz-icon{font-size:30px;margin-bottom:7px;display:block}
+.uz-title{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.uz-sub{font-size:11px;color:var(--tx3);line-height:1.5;margin-bottom:10px}
+.uz-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(56,189,248,.1);border:1.5px solid rgba(56,189,248,.25);
+  color:var(--blue);padding:7px 16px;border-radius:20px;
+  font-size:11px;font-weight:700;cursor:pointer;
+}
+.uz-formats{font-size:9px;color:var(--tx4);margin-top:8px}
+.uz-file-display{display:none}
+.uz-file-display.show{display:flex;align-items:center;gap:10px;justify-content:center}
+.uz-file-icon{font-size:22px}
+.uz-file-name{font-size:12px;font-weight:700;color:var(--tx)}
+.uz-file-size{font-size:10px;color:var(--tx3);margin-top:2px}
+.uz-file-remove{
+  margin-left:auto;width:28px;height:28px;border-radius:50%;
+  background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);
+  color:#f87171;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;
+}
+.uz-processing{display:none;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--gold)}
+.uz-processing.show{display:flex;justify-content:center}
+.uz-spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(251,191,36,.2);border-top-color:var(--gold);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.info-box{
+  background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.12);
+  border-radius:10px;padding:10px 12px;margin-top:4px;
+}
+.info-box-title{font-size:10px;font-weight:700;color:var(--blue);margin-bottom:3px}
+.info-box-body{font-size:10px;color:var(--tx3);line-height:1.55}
+
+/* ─── SHARED FORM FIELDS ─── */
+.field{margin-bottom:14px}
+.field-label{
+  font-size:9px;font-weight:800;color:var(--tx3);
+  text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:5px;display:flex;align-items:center;gap:5px;
+}
+.field-label .req{color:var(--acc);font-size:10px}
+.field-input{
+  width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);
+  border-radius:10px;padding:10px 12px;color:var(--tx);font-size:13px;
+  outline:none;transition:.2s;
+}
+.field-input:focus{border-color:var(--bd-acc);background:rgba(255,0,80,.03)}
+.field-input::placeholder{color:var(--tx4)}
+.field-textarea{resize:none;min-height:80px;line-height:1.6}
+.field-select{
+  width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);
+  border-radius:10px;padding:10px 12px;color:var(--tx);font-size:13px;
+  outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;
+}
+.field-select option{background:#0d0e12}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-hint{font-size:9.5px;color:var(--tx4);margin-top:4px;line-height:1.4}
+.char-count{font-size:9px;color:var(--tx4);float:right;margin-top:4px}
+
+/* Genre pills */
+.genre-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.gp{
+  padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;
+  border:1.5px solid var(--bd);background:transparent;color:var(--tx3);
+  cursor:pointer;transition:.15s;user-select:none;
+}
+.gp.on{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc3)}
+.gp:active{transform:scale(.95)}
+
+/* Cover zone */
+.cover-zone{
+  position:relative;border-radius:14px;overflow:hidden;
+  background:var(--l2);border:1.5px dashed rgba(255,255,255,.1);
+  margin-bottom:14px;cursor:pointer;transition:.2s;
+  min-height:130px;display:flex;align-items:center;justify-content:center;
+}
+.cover-zone:hover{border-color:rgba(255,0,80,.3)}
+.cover-zone img{width:100%;height:180px;object-fit:cover;display:block;border-radius:14px}
+.cover-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px;color:var(--tx4);font-size:11px;font-weight:600}
+.cover-placeholder i{font-size:26px}
+.cover-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.2s;border-radius:14px;
+}
+.cover-zone:hover .cover-overlay{opacity:1}
+.cover-change-btn{
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);color:#fff;
+  padding:6px 14px;border-radius:12px;font-size:10px;font-weight:700;
+}
+
+/* ─── WRITE PAGE ─── */
+.write-toolbar{
+  flex-shrink:0;height:44px;
+  display:flex;align-items:center;gap:1px;
+  padding:0 8px;
+  background:var(--l1);border-bottom:1px solid var(--bd);
+  overflow-x:auto;scrollbar-width:none;
+}
+.write-toolbar::-webkit-scrollbar{display:none}
+.wt-btn{
+  width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx3);cursor:pointer;transition:.15s;flex-shrink:0;
+}
+.wt-btn:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.wt-btn:active{background:rgba(255,0,80,.08);color:var(--acc)}
+.wt-btn.active{background:rgba(255,0,80,.1);color:var(--acc);border:1px solid var(--bd-acc)}
+.wt-lbl{
+  font-size:10px;font-weight:800;color:var(--tx3);
+  padding:0 6px;cursor:pointer;border-radius:6px;
+  height:34px;display:flex;align-items:center;flex-shrink:0;transition:.15s;
+}
+.wt-lbl:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.wt-div{width:1px;height:20px;background:var(--bd);margin:0 2px;flex-shrink:0}
+.wc-pill{
+  margin-left:auto;flex-shrink:0;font-size:9px;font-weight:700;color:var(--tx4);
+  background:var(--l2);border:1px solid var(--bd);padding:3px 9px;border-radius:20px;
+  white-space:nowrap;
+}
+.write-scroll{
+  flex:1;overflow-y:auto;
+  padding:14px 14px 0;
+  padding-bottom:calc(var(--nav-h) + var(--safe-b) + 24px);
+}
+.author-note-zone{
+  background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);
+  border-radius:10px;padding:10px 12px;margin-bottom:12px;display:none;
+}
+.author-note-zone.show{display:block}
+.an-label{font-size:8.5px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.an-inp{
+  width:100%;background:transparent;border:none;outline:none;
+  font-size:12px;color:rgba(251,191,36,.8);resize:none;line-height:1.55;min-height:36px;
+}
+.an-inp::placeholder{color:rgba(251,191,36,.3)}
+.writing-area{
+  min-height:55vh;padding:0 0 40px;outline:none;
+  font-family:var(--font-story);font-size:15px;line-height:1.9;
+  color:#e4e4e8;caret-color:var(--acc);word-break:break-word;
+}
+.writing-area:empty::before{content:attr(data-placeholder);color:rgba(255,255,255,.15);font-style:italic;pointer-events:none}
+.writing-area.poem-mode{font-family:var(--font-d);font-size:17px;line-height:2.1;text-align:center}
+
+/* ─── ENGAGEMENT ─── */
+.engagement-types{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.eng-card{
+  background:var(--l1);border:1.5px solid var(--bd);border-radius:14px;
+  padding:14px 12px;cursor:pointer;transition:.2s;
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+  position:relative;
+}
+.eng-card.active{border-color:var(--acc);background:rgba(255,0,80,.04)}
+.eng-card:active{transform:scale(.97)}
+.eng-card-check{
+  position:absolute;top:8px;right:8px;width:18px;height:18px;
+  border-radius:50%;background:var(--acc);display:none;
+  align-items:center;justify-content:center;font-size:8px;color:#fff;
+}
+.eng-card.active .eng-card-check{display:flex}
+.eng-em{font-size:22px}
+.eng-name{font-size:11px;font-weight:800;color:var(--tx)}
+.eng-desc{font-size:9.5px;color:var(--tx3);line-height:1.4}
+
+/* Builders */
+.builder{
+  background:var(--l1);border:1px solid var(--bd);border-radius:14px;
+  padding:14px;margin-bottom:14px;display:none;
+}
+.builder.show{display:block}
+.builder-title{
+  font-size:10px;font-weight:800;color:var(--tx2);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+/* Debate sides */
+.debate-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.debate-side{background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:10px;padding:10px}
+.ds-for{border-color:rgba(52,211,153,.2);background:rgba(52,211,153,.03)}
+.ds-ag{border-color:rgba(248,113,113,.15);background:rgba(248,113,113,.03)}
+.ds-label{font-size:8px;font-weight:800;margin-bottom:6px}
+.ds-for .ds-label{color:var(--green)}
+.ds-ag .ds-label{color:#f87171}
+.ds-inp{width:100%;background:transparent;border:none;outline:none;font-size:11px;color:var(--tx);resize:none;min-height:40px;line-height:1.45}
+.ds-inp::placeholder{color:#333}
+/* Poll */
+.poll-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.poll-opt-row{display:flex;align-items:center;gap:7px}
+.poll-opt-input{
+  flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);
+  border-radius:8px;padding:8px 10px;color:var(--tx);font-size:12px;outline:none;
+}
+.poll-opt-input:focus{border-color:var(--bd-acc)}
+.poll-opt-del{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);
+  color:#f87171;display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;flex-shrink:0;
+}
+.add-opt-btn{
+  display:flex;align-items:center;gap:5px;color:var(--green);
+  font-size:11px;font-weight:700;cursor:pointer;padding:5px 0;
+}
+/* Prediction */
+.pred-opt{
+  display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);
+  border:1.5px solid var(--bd);border-radius:10px;padding:9px 10px;margin-bottom:8px;
+}
+.pred-label{width:20px;height:20px;border-radius:50%;background:var(--acc);
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0}
+/* Teams */
+.teams-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.team-card{background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:10px;padding:10px}
+.team-label{font-size:8px;font-weight:800;color:var(--tx3);margin-bottom:6px}
+.team-inp{width:100%;background:transparent;border:none;outline:none;font-size:12px;color:var(--tx);margin-bottom:5px}
+.team-inp::placeholder{color:#333}
+.team-color-row{display:flex;gap:5px;margin-top:4px}
+.tc-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;flex-shrink:0}
+.tc-dot.on{border-color:#fff;transform:scale(1.2)}
+
+.eng-tip{font-size:11px;color:var(--tx4);background:var(--l1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;line-height:1.55}
+
+/* ─── SCHEDULE ─── */
+.pub-opts{margin-bottom:16px}
+.pub-opt{
+  display:flex;align-items:center;gap:12px;padding:13px 14px;
+  background:var(--l1);border:1.5px solid var(--bd);border-radius:13px;
+  cursor:pointer;transition:.2s;margin-bottom:8px;
+}
+.pub-opt.selected{border-color:var(--acc);background:rgba(255,0,80,.04)}
+.pub-opt-radio{
+  width:18px;height:18px;border-radius:50%;border:2px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;
+}
+.pub-opt.selected .pub-opt-radio{border-color:var(--acc)}
+.pub-opt-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--acc);display:none}
+.pub-opt.selected .pub-opt-radio::after{display:block}
+.pub-opt-icon{font-size:18px;flex-shrink:0}
+.pub-opt-title{font-size:13px;font-weight:700;color:var(--tx)}
+.pub-opt-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+
+/* Calendar */
+.cal-wrap{
+  background:var(--l1);border:1px solid var(--bd);border-radius:14px;
+  padding:14px;margin-bottom:14px;display:none;
+}
+.cal-wrap.show{display:block}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav{
+  width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);
+  border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--tx2);cursor:pointer;
+}
+.cal-nav:active{background:rgba(255,0,80,.08);color:var(--acc)}
+.cal-month-label{font-size:13px;font-weight:800;color:var(--tx)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px}
+.cal-day-label{font-size:9px;font-weight:700;color:var(--tx4);text-align:center;padding:3px 0}
+.cal-day{
+  height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;transition:.15s;
+}
+.cal-day:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.cal-day.today{color:var(--acc);font-weight:800}
+.cal-day.selected{background:var(--acc);color:#fff;box-shadow:0 0 8px var(--glow-sm)}
+.cal-day.other-month{color:var(--tx4);opacity:.5}
+.cal-day.past{opacity:.3;pointer-events:none}
+.time-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+.time-label{font-size:10px;font-weight:700;color:var(--tx3);white-space:nowrap}
+.time-input{
+  flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);
+  border-radius:8px;padding:8px 10px;color:var(--tx);font-size:13px;font-weight:700;
+  outline:none;text-align:center;
+}
+.time-input:focus{border-color:var(--bd-acc)}
+.sched-summary{
+  background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);
+  border-radius:10px;padding:10px 12px;margin-top:8px;
+  font-size:11px;color:var(--gold);font-weight:600;display:none;
+}
+.sched-summary.show{display:block}
+
+/* Settings toggles */
+.settings-section{background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:12px;font-weight:600;color:var(--tx)}
+.settings-row-sub{font-size:10px;color:var(--tx3);margin-top:1px}
+.toggle{
+  width:42px;height:24px;border-radius:12px;background:var(--l3);border:1.5px solid var(--bd);
+  position:relative;cursor:pointer;transition:.25s;flex-shrink:0;
+}
+.toggle.on{background:var(--acc);border-color:var(--acc)}
+.toggle-knob{
+  width:18px;height:18px;border-radius:50%;background:#fff;
+  position:absolute;top:1px;left:1px;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.4);
+}
+.toggle.on .toggle-knob{left:19px}
+
+/* ─── REVIEW PAGE ─── */
+.preview-cover{
+  width:100%;height:200px;border-radius:14px;overflow:hidden;
+  background:var(--l2);margin-bottom:14px;position:relative;
+}
+.preview-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.preview-cover-placeholder{
+  height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx4);flex-direction:column;gap:8px;
+}
+.preview-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.3) 55%,transparent 100%);
+}
+.preview-cover-content{position:absolute;bottom:0;left:0;right:0;padding:14px}
+.preview-cat-pill{
+  display:inline-block;background:var(--acc);color:#fff;
+  font-size:8px;font-weight:800;padding:2px 8px;border-radius:6px;margin-bottom:6px;
+}
+.preview-title{
+  font-family:var(--font-d);font-size:17px;font-weight:900;color:#fff;
+  line-height:1.25;text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+.preview-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.preview-av{width:20px;height:20px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.preview-writer{font-size:10px;color:var(--tx2);font-weight:600}
+.preview-stats{display:flex;gap:10px;font-size:9px;color:var(--tx4)}
+.preview-excerpt{
+  font-family:var(--font-story);font-size:13px;line-height:1.75;
+  color:#ccc;background:var(--l1);border:1px solid var(--bd);border-radius:10px;
+  padding:12px;margin-bottom:14px;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* Checklist */
+.checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.check-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:var(--l1);border:1px solid var(--bd);border-radius:10px;
+}
+.ci-icon{font-size:14px;flex-shrink:0}
+.ci-label{flex:1;font-size:11px;font-weight:600;color:var(--tx2)}
+.ci-status.ok{color:var(--green)}
+.ci-status.warn{color:var(--gold)}
+.ci-status.bad{color:#f87171}
+.publish-btn{
+  width:100%;padding:14px;border-radius:14px;
+  background:var(--acc);color:#fff;
+  font-size:14px;font-weight:800;cursor:pointer;
+  box-shadow:0 0 20px var(--glow-sm);transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:8px;
+}
+.publish-btn:active{transform:scale(.98)}
+.save-draft-btn{
+  width:100%;padding:11px;border-radius:14px;
+  background:rgba(255,255,255,.06);color:var(--tx2);
+  border:1px solid var(--bd);font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+
+/* ─── BOTTOM NAV BAR (step controls) ─── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:150;
+  height:calc(var(--nav-h) + var(--safe-b));
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);
+  border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;
+  padding-bottom:var(--safe-b);
+}
+.nav-back-btn{
+  width:44px;height:44px;border-radius:12px;background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--tx2);
+  cursor:pointer;transition:.15s;flex-shrink:0;
+}
+.nav-back-btn:active{transform:scale(.95)}
+.nav-center{flex:1;min-width:0}
+.nav-step-label{font-size:9px;font-weight:700;color:var(--tx4);margin-bottom:2px}
+.nav-step-title{font-size:12px;font-weight:800;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-next-btn{
+  background:var(--acc);color:#fff;
+  padding:0 20px;height:44px;border-radius:12px;
+  font-size:12px;font-weight:800;cursor:pointer;
+  white-space:nowrap;flex-shrink:0;box-shadow:0 0 12px var(--glow-sm);
+  display:flex;align-items:center;gap:6px;
+}
+.nav-next-btn:active{transform:scale(.97)}
+.nav-next-btn.publish{background:linear-gradient(135deg,#ff0050,#ff4d7a);box-shadow:0 0 18px var(--glow)}
+
+/* ─── HAMBURGER MENU ─── */
+.hm-overlay{position:fixed;inset:0;z-index:998;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none}
+.hm-overlay.open{display:block}
+.hamburger-menu{
+  position:fixed;top:calc(var(--safe-t) + 60px);right:14px;z-index:999;
+  background:var(--l2);border:1px solid var(--bd);border-radius:16px;
+  padding:6px;min-width:210px;
+  box-shadow:0 8px 40px rgba(0,0,0,.95);
+  transform:scale(.85) translateY(-12px);opacity:0;pointer-events:none;
+  transform-origin:top right;
+  transition:transform .22s cubic-bezier(.34,1.3,.64,1),opacity .18s ease;
+}
+.hamburger-menu.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+.hm-section-label{font-size:9px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;padding:8px 12px 4px}
+.hm-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:10px;font-size:12px;font-weight:600;color:var(--tx2);
+  cursor:pointer;transition:.12s;
+}
+.hm-item:active{background:rgba(255,0,80,.08);color:var(--acc3)}
+.hm-item i{font-size:13px;width:16px;text-align:center;color:inherit;flex-shrink:0}
+.hm-item.danger{color:#f87171}
+.hm-divider{height:1px;background:var(--bd2);margin:3px 8px}
+
+/* ─── INSERT SHEET ─── */
+.sheet-overlay{
+  position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(12px);display:none;align-items:flex-end;
+}
+.sheet-overlay.open{display:flex}
+.sheet{
+  width:100%;background:var(--l2);border-radius:20px 20px 0 0;
+  animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;
+  scrollbar-width:none;
+  padding-bottom:calc(var(--safe-b) + 16px);
+}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.sheet-hdr h3{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:7px}
+.sheet-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--tx2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.insert-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 8px}
+.insert-opt{
+  display:flex;align-items:center;gap:9px;padding:11px 12px;
+  background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:12px;
+  cursor:pointer;transition:.15s;
+}
+.insert-opt:active{transform:scale(.97);border-color:var(--bd-acc)}
+.insert-opt-icon{font-size:18px;flex-shrink:0}
+.insert-opt-title{font-size:11px;font-weight:700;color:var(--tx)}
+.insert-opt-sub{font-size:9px;color:var(--tx3);margin-top:1px}
+
+/* ─── AI ASSIST SHEET ─── */
+.ai-prompt-btn{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  background:rgba(255,255,255,.03);border:1.5px solid var(--bd);
+  border-radius:12px;cursor:pointer;transition:.15s;margin:0 16px 8px;
+}
+.ai-prompt-btn:active{transform:scale(.98);border-color:rgba(167,139,250,.3)}
+.ai-prompt-btn i{font-size:13px;color:var(--purple);width:18px;text-align:center;flex-shrink:0}
+.ai-prompt-btn span{font-size:12px;font-weight:600;color:var(--tx2)}
+.ai-custom-wrap{
+  background:rgba(255,255,255,.03);border:1px solid var(--bd);
+  border-radius:12px;overflow:hidden;margin:0 16px 12px;
+}
+.ai-custom-inp{
+  width:100%;background:transparent;border:none;outline:none;
+  padding:10px 12px;color:var(--tx);font-size:12px;resize:none;min-height:56px;line-height:1.55;
+}
+.ai-custom-inp::placeholder{color:var(--tx4)}
+.ai-custom-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 10px;border-top:1px solid var(--bd);
+}
+.ai-send-btn{
+  background:linear-gradient(135deg,var(--purple),var(--acc2));
+  color:#fff;border:none;padding:6px 14px;border-radius:10px;
+  font-size:10px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+}
+.ai-thinking{display:none;align-items:center;gap:8px;padding:10px 16px;font-size:11px;color:var(--purple)}
+.ai-thinking.show{display:flex}
+.ai-spin{width:14px;height:14px;border-radius:50%;border:2.5px solid rgba(167,139,250,.2);border-top-color:var(--purple);animation:spin .7s linear infinite}
+.ai-response-box{
+  background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);
+  border-radius:12px;padding:12px;margin:0 16px 12px;
+  font-size:12px;color:var(--tx2);line-height:1.65;display:none;
+}
+.ai-response-box.show{display:block}
+.ai-res-actions{display:flex;gap:7px;margin-top:8px}
+.ai-res-btn{
+  flex:1;padding:7px 8px;border-radius:9px;text-align:center;font-size:10px;
+  font-weight:700;cursor:pointer;border:1px solid var(--bd);background:rgba(255,255,255,.04);color:var(--tx2);
+}
+.ai-res-btn.insert{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.25);color:var(--purple)}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;
+  bottom:calc(var(--safe-b) + var(--nav-h) + 14px);
+  left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--l3);border:1px solid var(--bd);color:var(--tx);
+  padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;
+  z-index:900;opacity:0;transition:.28s;pointer-events:none;
+  white-space:nowrap;max-width:92vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a class="tb-logo" href="index.html">D</a>
+    <div class="tb-title" id="topTitle">New Story</div>
+    <div class="save-status saved" id="saveStatus">
+      <div class="save-dot"></div>
+      <span id="saveLabel">Saved</span>
+    </div>
+    <div class="tb-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+  </div>
+
+  <!-- STEP PROGRESS BAR -->
+  <div class="step-bar">
+    <div class="step-track" id="stepTrack"></div>
+    <div class="step-labels" id="stepLabels"></div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages-wrap">
+    <div class="pages-track" id="pagesTrack">
+
+      <!-- ── PAGE 1: TYPE ── -->
+      <div class="page" id="page-0">
+        <div class="page-inner">
+          <div class="page-title">What are you creating?</div>
+          <div class="page-sub">Choose the type that best fits. You can change it anytime.</div>
+
+          <div class="type-grid">
+            <div class="type-card" data-type="series" onclick="selectType('series',this)">
+              <span class="type-emoji">📺</span>
+              <div class="type-name">Series</div>
+              <div class="type-desc">Multi-chapter ongoing story with seasons</div>
+              <div class="type-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="type-card" data-type="short" onclick="selectType('short',this)">
+              <span class="type-emoji">✨</span>
+              <div class="type-name">Short Story</div>
+              <div class="type-desc">Complete standalone story in one read</div>
+              <div class="type-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="type-card" data-type="poem" onclick="selectType('poem',this)">
+              <span class="type-emoji">🌙</span>
+              <div class="type-name">Poem</div>
+              <div class="type-desc">Verse, elegy, spoken word or lyric form</div>
+              <div class="type-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="type-card" data-type="elegy" onclick="selectType('elegy',this)">
+              <span class="type-emoji">🕯️</span>
+              <div class="type-name">Elegy</div>
+              <div class="type-desc">Tribute, memorial or grief writing</div>
+              <div class="type-check"><i class="fas fa-check"></i></div>
+            </div>
+          </div>
+
+          <div class="or-div">or upload an existing story file</div>
+          <div class="upload-zone" id="uploadZone"
+            onclick="triggerFileUpload()"
+            ondragover="onDragOver(event)"
+            ondragleave="onDragLeave(event)"
+            ondrop="onFileDrop(event)">
+            <div id="uzDefault">
+              <span class="uz-icon">📄</span>
+              <div class="uz-title">Drop your story file here</div>
+              <div class="uz-sub">We'll auto-detect the type, extract the title,<br>split chapters, and set everything up.</div>
+              <div class="uz-btn"><i class="fas fa-folder-open"></i> Browse Files</div>
+              <div class="uz-formats">Supported: .txt · .docx · .pdf · .md</div>
+            </div>
+            <div class="uz-file-display" id="uzFileDisplay">
+              <div class="uz-file-icon" id="uzFileIcon">📄</div>
+              <div>
+                <div class="uz-file-name" id="uzFileName">story.txt</div>
+                <div class="uz-file-size" id="uzFileSize">24 KB</div>
+              </div>
+              <div class="uz-file-remove" onclick="removeFile(event)"><i class="fas fa-times"></i></div>
+            </div>
+            <div class="uz-processing" id="uzProcessing">
+              <div class="uz-spin"></div>
+              <span id="uzProcessText">Reading your story…</span>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-title"><i class="fas fa-info-circle" style="font-size:9px;margin-right:4px"></i>How file upload works</div>
+            <div class="info-box-body">Upload a .txt, .docx, .pdf or .md file. Droboard will auto-extract your title, detect chapters by headings, pick a category, and pre-fill your story details — you just review and publish.</div>
+          </div>
+          <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.md,.doc" style="display:none" onchange="handleFileSelect(this)"/>
+        </div>
+      </div>
+
+      <!-- ── PAGE 2: DETAILS ── -->
+      <div class="page" id="page-1">
+        <div class="page-inner">
+          <div class="page-title" id="detailsTitle">Story Details</div>
+          <div class="page-sub">Fill in the basics — you can edit anytime before publishing.</div>
+
+          <div class="cover-zone" id="coverZone" onclick="cycleCover()">
+            <div class="cover-placeholder" id="coverPlaceholder">
+              <i class="fas fa-image"></i>
+              <span>Tap to add cover image</span>
+            </div>
+            <img id="coverImg" style="display:none" alt="Cover"/>
+            <div class="cover-overlay"><div class="cover-change-btn"><i class="fas fa-camera"></i> Change Cover</div></div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Story Title <span class="req">*</span></div>
+            <input class="field-input" id="storyTitle" placeholder="Give your story a title…"
+              oninput="markUnsaved();updateTopTitle(this.value);document.getElementById('titleCount').textContent=this.value.length+'/120'" maxlength="120"/>
+            <div class="char-count" id="titleCount">0/120</div>
+          </div>
+
+          <div class="field" id="seriesField" style="display:none">
+            <div class="field-label">Series Name</div>
+            <input class="field-input" id="seriesName" placeholder="If this is part of a series…" oninput="markUnsaved()"/>
+            <div class="field-hint">Leave blank if this is a standalone chapter.</div>
+          </div>
+
+          <div class="field-row" id="seasonChRow" style="display:none">
+            <div class="field">
+              <div class="field-label">Season</div>
+              <input class="field-input" type="number" id="seasonNum" value="1" min="1" max="99" oninput="markUnsaved()"/>
+            </div>
+            <div class="field">
+              <div class="field-label">Chapter</div>
+              <input class="field-input" type="number" id="chapterNum" value="1" min="1" oninput="markUnsaved()"/>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Category <span class="req">*</span></div>
+            <select class="field-select field-input" id="storyCat" onchange="markUnsaved()">
+              <option value="">Choose a category…</option>
+              <option>💔 Betrayal</option>
+              <option>✨ Twist</option>
+              <option>👑 Family</option>
+              <option>🏙️ Urban Love</option>
+              <option>🔥 Revenge</option>
+              <option>🌙 Elegy</option>
+              <option>🎓 Campus</option>
+              <option>💍 Marriage</option>
+              <option>😂 Comedy</option>
+              <option>😱 Thriller</option>
+              <option>🌿 Spiritual</option>
+              <option>💪 Motivation</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Tagline / One-liner <span class="req">*</span></div>
+            <input class="field-input" id="storyTagline" placeholder="The hook that makes readers stop scrolling…" maxlength="140" oninput="markUnsaved()"/>
+            <div class="field-hint">Keep it under 140 characters. Shows on the feed card.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Synopsis</div>
+            <textarea class="field-input field-textarea" id="storySynopsis" placeholder="A longer description for the story page (2–4 sentences)…" rows="3" oninput="markUnsaved()"></textarea>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Genre Tags</div>
+            <div class="genre-pills" id="genrePills">
+              <div class="gp" onclick="toggleGenre(this)">Betrayal</div>
+              <div class="gp" onclick="toggleGenre(this)">Family</div>
+              <div class="gp" onclick="toggleGenre(this)">Heartbreak</div>
+              <div class="gp" onclick="toggleGenre(this)">Twist</div>
+              <div class="gp" onclick="toggleGenre(this)">Romance</div>
+              <div class="gp" onclick="toggleGenre(this)">Revenge</div>
+              <div class="gp" onclick="toggleGenre(this)">Campus</div>
+              <div class="gp" onclick="toggleGenre(this)">Elegy</div>
+              <div class="gp" onclick="toggleGenre(this)">Marriage</div>
+              <div class="gp" onclick="toggleGenre(this)">Urban</div>
+              <div class="gp" onclick="toggleGenre(this)">Comedy</div>
+              <div class="gp" onclick="toggleGenre(this)">Dark</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Content Warning</div>
+            <input class="field-input" id="contentWarning" placeholder="e.g. Grief, Domestic tension… (optional)" oninput="markUnsaved()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 3: WRITE ── -->
+      <div class="page write-page" id="page-2">
+        <div class="write-toolbar" id="writeToolbar">
+          <div class="wt-btn" onclick="fmt('bold')"><i class="fas fa-bold"></i></div>
+          <div class="wt-btn" onclick="fmt('italic')"><i class="fas fa-italic"></i></div>
+          <div class="wt-btn" onclick="fmt('underline')"><i class="fas fa-underline"></i></div>
+          <div class="wt-div"></div>
+          <div class="wt-lbl" onclick="fmt('h1')">H1</div>
+          <div class="wt-lbl" onclick="fmt('h2')">H2</div>
+          <div class="wt-div"></div>
+          <div class="wt-btn" onclick="fmt('blockquote')"><i class="fas fa-quote-left"></i></div>
+          <div class="wt-btn" onclick="insertSceneBreak()"><i class="fas fa-minus"></i></div>
+          <div class="wt-btn" onclick="fmt('ul')"><i class="fas fa-list-ul"></i></div>
+          <div class="wt-div"></div>
+          <div class="wt-btn" onclick="fmt('align-center')"><i class="fas fa-align-center"></i></div>
+          <div class="wt-btn" id="anBtn" onclick="toggleAuthorNote()"><i class="fas fa-feather-pointed"></i></div>
+          <div class="wt-div"></div>
+          <div class="wt-btn" onclick="openInsert()"><i class="fas fa-plus-circle"></i></div>
+          <div class="wt-btn" onclick="openAI()" style="color:var(--purple)"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div class="wc-pill" id="wcPill">0 words</div>
+        </div>
+        <div class="write-scroll" id="writeScroll">
+          <div class="author-note-zone" id="authorNoteZone">
+            <div class="an-label"><i class="fas fa-feather-pointed" style="font-size:8px;margin-right:3px"></i>Author's Note</div>
+            <textarea class="an-inp" id="authorNoteInp" placeholder="Write a note to your readers before this chapter…" rows="2" oninput="markUnsaved()"></textarea>
+          </div>
+          <div class="writing-area" id="writingArea"
+            contenteditable="true"
+            data-placeholder="Begin your story here…"
+            oninput="onWriteInput()"
+            onkeydown="onWriteKeyDown(event)"></div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 4: ENGAGEMENT ── -->
+      <div class="page" id="page-3">
+        <div class="page-inner">
+          <div class="page-title">Add Engagement</div>
+          <div class="page-sub">Make your story interactive. All optional — you can add more after publishing.</div>
+
+          <div class="engagement-types">
+            <div class="eng-card" data-eng="debate" onclick="toggleEng('debate',this)">
+              <div class="eng-card-check"><i class="fas fa-check"></i></div>
+              <div class="eng-em">⚔️</div>
+              <div class="eng-name">Debate</div>
+              <div class="eng-desc">FOR vs AGAINST — readers vote and argue.</div>
+            </div>
+            <div class="eng-card" data-eng="poll" onclick="toggleEng('poll',this)">
+              <div class="eng-card-check"><i class="fas fa-check"></i></div>
+              <div class="eng-em">📊</div>
+              <div class="eng-name">Poll</div>
+              <div class="eng-desc">Ask readers to vote on story choices.</div>
+            </div>
+            <div class="eng-card" data-eng="prediction" onclick="toggleEng('prediction',this)">
+              <div class="eng-card-check"><i class="fas fa-check"></i></div>
+              <div class="eng-em">🔮</div>
+              <div class="eng-name">Prediction</div>
+              <div class="eng-desc">What happens next? Let readers predict.</div>
+            </div>
+            <div class="eng-card" data-eng="teams" onclick="toggleEng('teams',this)">
+              <div class="eng-card-check"><i class="fas fa-check"></i></div>
+              <div class="eng-em">🏆</div>
+              <div class="eng-name">Teams</div>
+              <div class="eng-desc">Pick a side — fans rally for characters.</div>
+            </div>
+          </div>
+
+          <!-- Debate builder -->
+          <div class="builder" id="debateBuilder">
+            <div class="builder-title"><i class="fas fa-gavel" style="color:var(--acc);font-size:11px"></i> Debate Motion</div>
+            <div class="field-label">The Motion</div>
+            <input class="field-input" id="debateMotion" placeholder='"Ada should stay and fight for her marriage…"' oninput="markUnsaved()" style="margin-top:5px"/>
+            <div class="debate-sides">
+              <div class="debate-side ds-for">
+                <div class="ds-label">✅ FOR</div>
+                <textarea class="ds-inp" placeholder="Opening argument hint (optional)…" rows="2"></textarea>
+              </div>
+              <div class="debate-side ds-ag">
+                <div class="ds-label">❌ AGAINST</div>
+                <textarea class="ds-inp" placeholder="Opening argument hint (optional)…" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Poll builder -->
+          <div class="builder" id="pollBuilder">
+            <div class="builder-title"><i class="fas fa-poll" style="color:var(--blue);font-size:11px"></i> Poll Question</div>
+            <input class="field-input" id="pollQuestion" placeholder="What should happen next?" oninput="markUnsaved()" style="margin-bottom:12px"/>
+            <div class="poll-opts" id="pollOpts">
+              <div class="poll-opt-row">
+                <input class="poll-opt-input" placeholder="Option 1…"/>
+                <div class="poll-opt-del" onclick="removePollOpt(this)"><i class="fas fa-times"></i></div>
+              </div>
+              <div class="poll-opt-row">
+                <input class="poll-opt-input" placeholder="Option 2…"/>
+                <div class="poll-opt-del" onclick="removePollOpt(this)"><i class="fas fa-times"></i></div>
+              </div>
+            </div>
+            <div class="add-opt-btn" onclick="addPollOpt()"><i class="fas fa-plus-circle"></i> Add Option</div>
+          </div>
+
+          <!-- Prediction builder -->
+          <div class="builder" id="predictionBuilder">
+            <div class="builder-title"><i class="fas fa-crystal-ball" style="color:var(--purple);font-size:11px"></i> Prediction Question</div>
+            <input class="field-input" id="predQuestion" placeholder="What do you think will happen?" oninput="markUnsaved()" style="margin-bottom:12px"/>
+            <div class="field-label" style="margin-bottom:6px">Prediction options</div>
+            <div id="predOpts">
+              <div class="pred-opt">
+                <div class="pred-label">A</div>
+                <input class="field-input" style="flex:1;border:none;background:transparent;padding:0;font-size:12px" placeholder="Prediction A…"/>
+              </div>
+              <div class="pred-opt">
+                <div class="pred-label" style="background:var(--blue)">B</div>
+                <input class="field-input" style="flex:1;border:none;background:transparent;padding:0;font-size:12px" placeholder="Prediction B…"/>
+              </div>
+              <div class="pred-opt">
+                <div class="pred-label" style="background:var(--green)">C</div>
+                <input class="field-input" style="flex:1;border:none;background:transparent;padding:0;font-size:12px" placeholder="Prediction C…"/>
+              </div>
+            </div>
+            <div class="add-opt-btn" onclick="addPredOpt()" style="margin-top:8px"><i class="fas fa-plus-circle"></i> Add Option</div>
+            <div class="field" style="margin-top:12px">
+              <div class="field-label">Reveal date</div>
+              <input class="field-input" type="date" id="predRevealDate" oninput="markUnsaved()"/>
+            </div>
+          </div>
+
+          <!-- Teams builder -->
+          <div class="builder" id="teamsBuilder">
+            <div class="builder-title"><i class="fas fa-users" style="color:var(--gold);font-size:11px"></i> Team Rivalry</div>
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:12px">Readers pick a team/character to support. The tally shows live.</div>
+            <div class="teams-grid">
+              <div class="team-card" style="border-color:rgba(52,211,153,.2)">
+                <div class="team-label" style="color:var(--green)">Team A</div>
+                <input class="team-inp" placeholder="Team / character name…" oninput="markUnsaved()"/>
+                <div style="font-size:9px;color:var(--tx4);margin-bottom:5px">Colour</div>
+                <div class="team-color-row">
+                  <div class="tc-dot on" style="background:#34d399;border-color:#fff"></div>
+                  <div class="tc-dot" style="background:#38bdf8" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#fbbf24" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#a78bfa" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#fb923c" onclick="selectTeamColor(this)"></div>
+                </div>
+              </div>
+              <div class="team-card" style="border-color:rgba(248,113,113,.2)">
+                <div class="team-label" style="color:#f87171">Team B</div>
+                <input class="team-inp" placeholder="Team / character name…" oninput="markUnsaved()"/>
+                <div style="font-size:9px;color:var(--tx4);margin-bottom:5px">Colour</div>
+                <div class="team-color-row">
+                  <div class="tc-dot on" style="background:#f87171;border-color:#fff"></div>
+                  <div class="tc-dot" style="background:#ff0050" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#fb923c" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#fbbf24" onclick="selectTeamColor(this)"></div>
+                  <div class="tc-dot" style="background:#a78bfa" onclick="selectTeamColor(this)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="eng-tip">
+            <i class="fas fa-lightbulb" style="color:var(--gold);font-size:10px;margin-right:4px"></i>
+            You can skip this step and add engagement features later from the chapter settings.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 5: SCHEDULE ── -->
+      <div class="page" id="page-4">
+        <div class="page-inner">
+          <div class="page-title">Schedule &amp; Settings</div>
+          <div class="page-sub">Choose when your story goes live and who can see it.</div>
+
+          <div class="pub-opts">
+            <div class="pub-opt selected" id="pubNow" onclick="setPubOpt('now')">
+              <div class="pub-opt-radio"></div>
+              <div class="pub-opt-icon">🚀</div>
+              <div>
+                <div class="pub-opt-title">Publish Now</div>
+                <div class="pub-opt-sub">Goes live immediately after you publish</div>
+              </div>
+            </div>
+            <div class="pub-opt" id="pubSchedule" onclick="setPubOpt('schedule')">
+              <div class="pub-opt-radio"></div>
+              <div class="pub-opt-icon">⏰</div>
+              <div>
+                <div class="pub-opt-title">Schedule for Later</div>
+                <div class="pub-opt-sub">Pick a date and time — we'll publish automatically</div>
+              </div>
+            </div>
+            <div class="pub-opt" id="pubDraft" onclick="setPubOpt('draft')">
+              <div class="pub-opt-radio"></div>
+              <div class="pub-opt-icon">📝</div>
+              <div>
+                <div class="pub-opt-title">Save as Draft</div>
+                <div class="pub-opt-sub">Keep private until you're ready</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cal-wrap" id="calendarWrap">
+            <div style="font-size:10px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">
+              <i class="fas fa-calendar" style="color:var(--gold);margin-right:5px"></i>Pick Publish Date
+            </div>
+            <div class="cal-header">
+              <div class="cal-nav" onclick="calNav(-1)"><i class="fas fa-chevron-left"></i></div>
+              <div class="cal-month-label" id="calMonth">June 2026</div>
+              <div class="cal-nav" onclick="calNav(1)"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="time-row">
+              <div class="time-label"><i class="fas fa-clock" style="color:var(--gold);margin-right:3px"></i>Time</div>
+              <input class="time-input" type="time" id="schedTime" value="00:00" style="max-width:100px" oninput="updateScheduleSummary()"/>
+              <select class="field-select" id="schedTZ" style="flex:1;padding:7px 10px;font-size:11px" onchange="updateScheduleSummary()">
+                <option>WAT (Lagos +1)</option>
+                <option>GMT (London)</option>
+                <option>EST (New York -5)</option>
+                <option>CAT (Nairobi +3)</option>
+              </select>
+            </div>
+            <div class="sched-summary" id="schedSummary">
+              <i class="fas fa-calendar-check" style="margin-right:5px"></i>
+              <span id="schedSummaryText">Scheduled for: —</span>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Visibility</div>
+                <div class="settings-row-sub">Who can read this story</div>
+              </div>
+              <select class="field-select" id="visibilitySel" style="width:auto;padding:6px 24px 6px 10px;font-size:11px;border-radius:8px">
+                <option>🌍 Everyone</option>
+                <option>👥 Followers</option>
+                <option>🔒 Only Me</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Comments</div>
+                <div class="settings-row-sub">Allow readers to comment</div>
+              </div>
+              <div class="toggle on" id="commentsToggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Mature Content Warning</div>
+                <div class="settings-row-sub">Shows a notice before reading</div>
+              </div>
+              <div class="toggle" id="matureToggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Allow Tips</div>
+                <div class="settings-row-sub">Readers can tip you after reading</div>
+              </div>
+              <div class="toggle on" id="tipsToggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Content Warning Label</div>
+            <input class="field-input" id="cwLabel" placeholder="e.g. Grief, Domestic tension, Loss… (optional)"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 6: REVIEW ── -->
+      <div class="page" id="page-5">
+        <div class="page-inner">
+          <div class="page-title">Review &amp; Publish</div>
+          <div class="page-sub">This is how your story will look to readers. Everything good? Let's go.</div>
+
+          <div class="preview-cover" id="previewCoverWrap">
+            <div id="previewCoverInner" class="preview-cover-placeholder">
+              <i class="fas fa-image" style="font-size:28px;color:var(--tx4)"></i>
+              <span style="font-size:11px;color:var(--tx4)">No cover added</span>
+            </div>
+            <div class="preview-grad" id="previewGrad" style="display:none"></div>
+            <div class="preview-cover-content" id="previewCoverContent" style="display:none">
+              <div class="preview-cat-pill" id="previewCat">📖 Story</div>
+              <div class="preview-title" id="previewTitle">Your story title here</div>
+            </div>
+          </div>
+
+          <div class="preview-meta">
+            <div class="preview-av"></div>
+            <div class="preview-writer">@You · Just now</div>
+            <div class="preview-stats"><span><i class="far fa-eye"></i> 0</span><span><i class="far fa-heart"></i> 0</span></div>
+          </div>
+
+          <div class="preview-excerpt" id="previewExcerpt" style="font-style:italic;color:var(--tx3)">Start writing in Step 3 to see a preview here…</div>
+
+          <div class="checklist" id="publishChecklist"></div>
+
+          <button class="publish-btn" id="publishFinalBtn" onclick="publishNow()">
+            <i class="fas fa-rocket"></i>
+            <span id="publishBtnText">Publish Story</span>
+          </button>
+          <button class="save-draft-btn" onclick="saveDraft()">
+            <i class="fas fa-floppy-disk" style="font-size:11px"></i> Save as Draft
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /pages-track -->
+  </div><!-- /pages-wrap -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-back-btn" id="navBackBtn" onclick="prevStep()"><i class="fas fa-chevron-left"></i></div>
+    <div class="nav-center">
+      <div class="nav-step-label" id="navStepLabel">Step 1 of 6</div>
+      <div class="nav-step-title" id="navStepTitle">Story Type</div>
+    </div>
+    <div class="nav-next-btn" id="navNextBtn" onclick="nextStep()">
+      Next <i class="fas fa-chevron-right"></i>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- HAMBURGER MENU -->
+<div class="hm-overlay" id="hmOverlay" onclick="closeMenu()"></div>
+<div class="hamburger-menu" id="hamburgerMenu">
+  <div class="hm-section-label">Story</div>
+  <div class="hm-item" onclick="goToStep(0);closeMenu()"><i class="fas fa-layer-group"></i> Change Story Type</div>
+  <div class="hm-item" onclick="goToStep(1);closeMenu()"><i class="fas fa-sliders"></i> Edit Details</div>
+  <div class="hm-item" onclick="goToStep(2);closeMenu()"><i class="fas fa-pen-nib"></i> Continue Writing</div>
+  <div class="hm-item" onclick="goToStep(3);closeMenu()"><i class="fas fa-gavel"></i> Engagement Features</div>
+  <div class="hm-item" onclick="goToStep(4);closeMenu()"><i class="fas fa-calendar"></i> Schedule &amp; Settings</div>
+  <div class="hm-item" onclick="goToStep(5);closeMenu()"><i class="fas fa-rocket"></i> Publish</div>
+  <div class="hm-divider"></div>
+  <div class="hm-section-label">Actions</div>
+  <div class="hm-item" onclick="saveDraft();closeMenu()"><i class="fas fa-floppy-disk"></i> Save Draft</div>
+  <div class="hm-item" onclick="closeMenu()"><i class="fas fa-cog"></i> Story Settings</div>
+  <div class="hm-divider"></div>
+  <div class="hm-item danger" onclick="confirmDiscard()"><i class="fas fa-trash"></i> Discard Story</div>
+</div>
+
+<!-- INSERT SHEET -->
+<div class="sheet-overlay" id="insertOv" onclick="if(event.target===this)closeInsert()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-plus-circle" style="color:var(--acc);font-size:13px"></i> Insert</h3>
+      <button class="sheet-close" onclick="closeInsert()">✕</button>
+    </div>
+    <div class="insert-grid">
+      <div class="insert-opt" onclick="ins('scene-break')">
+        <div class="insert-opt-icon">✦</div>
+        <div><div class="insert-opt-title">Scene Break</div><div class="insert-opt-sub">Separate scenes visually</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('epigraph')">
+        <div class="insert-opt-icon">❝</div>
+        <div><div class="insert-opt-title">Epigraph</div><div class="insert-opt-sub">Opening quote</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('letter')">
+        <div class="insert-opt-icon">✉️</div>
+        <div><div class="insert-opt-title">Letter / Note</div><div class="insert-opt-sub">In-story letter format</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('flashback')">
+        <div class="insert-opt-icon">⏮️</div>
+        <div><div class="insert-opt-title">Flashback</div><div class="insert-opt-sub">Indented flashback scene</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('thought')">
+        <div class="insert-opt-icon">💭</div>
+        <div><div class="insert-opt-title">Inner Thought</div><div class="insert-opt-sub">Character's internal voice</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('time-skip')">
+        <div class="insert-opt-icon">⏩</div>
+        <div><div class="insert-opt-title">Time Skip</div><div class="insert-opt-sub">Mark a time jump</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('cliffhanger')">
+        <div class="insert-opt-icon">🪝</div>
+        <div><div class="insert-opt-title">Cliffhanger End</div><div class="insert-opt-sub">Chapter-ending hook</div></div>
+      </div>
+      <div class="insert-opt" onclick="ins('social-post')">
+        <div class="insert-opt-icon">📱</div>
+        <div><div class="insert-opt-title">Social Post</div><div class="insert-opt-sub">In-story tweet/DM mockup</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI ASSIST SHEET -->
+<div class="sheet-overlay" id="aiOv" onclick="if(event.target===this)closeAI()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-wand-magic-sparkles" style="color:var(--purple);font-size:13px"></i> AI Story Assistant</h3>
+      <button class="sheet-close" onclick="closeAI()">✕</button>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Continue the story from where I left off, matching my voice and style.')">
+      <i class="fas fa-pen-nib"></i><span>Continue writing</span>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Suggest 3 different directions this chapter could go next.')">
+      <i class="fas fa-code-branch"></i><span>Suggest plot directions</span>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Rewrite the last paragraph with more emotional depth and sensory detail.')">
+      <i class="fas fa-heart"></i><span>Add emotional depth</span>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Improve the dialogue to sound more natural and character-specific.')">
+      <i class="fas fa-comments"></i><span>Improve dialogue</span>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Write a gripping cliffhanger ending for this chapter.')">
+      <i class="fas fa-bolt"></i><span>Write a cliffhanger</span>
+    </div>
+    <div class="ai-prompt-btn" onclick="aiPrompt('Generate a compelling title and 2-sentence synopsis for this story.')">
+      <i class="fas fa-heading"></i><span>Generate title &amp; synopsis</span>
+    </div>
+    <div style="font-size:9px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;padding:4px 16px 8px">Custom Prompt</div>
+    <div class="ai-custom-wrap">
+      <textarea class="ai-custom-inp" id="aiCustomInp" placeholder="e.g. Write the scene where Ada confronts her husband…" rows="3"></textarea>
+      <div class="ai-custom-foot">
+        <span style="font-size:9px;color:var(--tx4)">Context-aware · Uses your story</span>
+        <button class="ai-send-btn" onclick="aiCustomSend()"><i class="fas fa-paper-plane" style="font-size:9px"></i> Generate</button>
+      </div>
+    </div>
+    <div class="ai-thinking" id="aiThinking"><div class="ai-spin"></div><span>Thinking…</span></div>
+    <div class="ai-response-box" id="aiResponseBox"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── STATE ── */
+const STATE = {
+  step: 0,
+  type: null,
+  saved: true,
+  autoSaveTimer: null,
+  coverUrl: null,
+  coverIdx: 0,
+  pubMode: 'now',
+  calYear: 2026,
+  calMonth: 5, // 0-indexed, June
+  calSelectedDay: null,
+  engActive: new Set(),
+  uploadedFile: null,
+};
+
+const STEPS = [
+  { label:'Type',     title:'Story Type' },
+  { label:'Details',  title:'Story Details' },
+  { label:'Write',    title:'Write' },
+  { label:'Engage',   title:'Engagement' },
+  { label:'Schedule', title:'Schedule' },
+  { label:'Publish',  title:'Review' },
+];
+
+const DEMO_COVERS = [
+  'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+  'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+  'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+  'https://i.postimg.cc/23WvkFLH/images-(2).jpg',
+  'https://i.postimg.cc/cgLZJNmC/8.jpg',
+  'https://i.postimg.cc/0MyxNqfz/7.jpg',
+  'https://i.postimg.cc/WF1j4Pnh/6.jpg',
+  'https://i.postimg.cc/N9jY0w4m/5.jpg',
+];
+
+/* ── UTILS ── */
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function getWordCount() {
+  const txt = (document.getElementById('writingArea')?.innerText || '').trim();
+  return txt ? txt.split(/\s+/).filter(Boolean).length : 0;
+}
+function markUnsaved() {
+  if (STATE.saved) {
+    STATE.saved = false;
+    const el = document.getElementById('saveStatus');
+    el.className = 'save-status unsaved';
+    document.getElementById('saveLabel').textContent = 'Unsaved';
+  }
+  clearTimeout(STATE.autoSaveTimer);
+  STATE.autoSaveTimer = setTimeout(autoSave, 2000);
+}
+function autoSave() {
+  const el = document.getElementById('saveStatus');
+  el.className = 'save-status saving';
+  document.getElementById('saveLabel').textContent = 'Saving…';
+  setTimeout(() => {
+    STATE.saved = true;
+    el.className = 'save-status saved';
+    document.getElementById('saveLabel').textContent = 'Saved';
+  }, 600);
+}
+function saveDraft() {
+  autoSave();
+  toast('📝 Draft saved!');
+  closeMenu();
+}
+function updateTopTitle(v) {
+  document.getElementById('topTitle').textContent = v || 'New Story';
+}
+function toggleSwitch(el) {
+  el.classList.toggle('on');
+  markUnsaved();
+}
+
+/* ── STEP BAR ── */
+function renderStepBar() {
+  const track = document.getElementById('stepTrack');
+  const labels = document.getElementById('stepLabels');
+  const n = STEPS.length;
+  let tHtml = '', lHtml = '';
+  STEPS.forEach((s, i) => {
+    const cls = i < STATE.step ? 'done' : i === STATE.step ? 'active' : 'pending';
+    tHtml += `<div class="step-node ${cls}" onclick="goToStep(${i})">${i < STATE.step ? '✓' : i+1}</div>`;
+    if (i < n-1) tHtml += `<div class="step-line ${i < STATE.step ? 'done' : 'pending'}"></div>`;
+    lHtml += `<div class="step-label ${cls}">${s.label}</div>`;
+  });
+  track.innerHTML = tHtml;
+  labels.innerHTML = lHtml;
+}
+
+function updateNavBar() {
+  const s = STEPS[STATE.step];
+  document.getElementById('navStepLabel').textContent = `Step ${STATE.step+1} of ${STEPS.length}`;
+  document.getElementById('navStepTitle').textContent = s.title;
+  const nextBtn = document.getElementById('navNextBtn');
+  const backBtn = document.getElementById('navBackBtn');
+  if (STATE.step === STEPS.length - 1) {
+    nextBtn.className = 'nav-next-btn publish';
+    nextBtn.innerHTML = '<i class="fas fa-rocket"></i> Publish';
+    nextBtn.onclick = publishNow;
+  } else {
+    nextBtn.className = 'nav-next-btn';
+    nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextBtn.onclick = nextStep;
+  }
+  backBtn.style.opacity = STATE.step === 0 ? '0.3' : '1';
+  backBtn.style.pointerEvents = STATE.step === 0 ? 'none' : 'auto';
+}
+
+function goToStep(n) {
+  if (n < 0 || n >= STEPS.length) return;
+  STATE.step = n;
+  // Each page = 100vw; track is 600vw wide (6 pages)
+  // We translate by (n * 100vw) but since track = 600% of wrapper,
+  // each page is 100/6 % of track — so we translate by n*(100/6)%
+  document.getElementById('pagesTrack').style.transform = `translateX(-${n * (100/6)}%)`;
+  renderStepBar();
+  updateNavBar();
+  if (n === 4) renderCalendar();
+  if (n === 5) buildPreview();
+}
+function nextStep() {
+  if (STATE.step === 0 && !STATE.type) { toast('⚠️ Please select a story type first'); return; }
+  if (STATE.step === 1) {
+    if (!document.getElementById('storyTitle').value.trim()) { toast('⚠️ Add a story title before continuing'); return; }
+    if (!document.getElementById('storyCat').value) { toast('⚠️ Choose a category'); return; }
+  }
+  if (STATE.step < STEPS.length - 1) goToStep(STATE.step + 1);
+}
+function prevStep() {
+  if (STATE.step > 0) goToStep(STATE.step - 1);
+}
+
+/* ── STORY TYPE ── */
+function selectType(type, el) {
+  STATE.type = type;
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const isSeq = type === 'series';
+  document.getElementById('seriesField').style.display = isSeq ? '' : 'none';
+  document.getElementById('seasonChRow').style.display = isSeq ? '' : 'none';
+  const placeholders = { series:'Begin your chapter here…', short:'Tell your story…', poem:'Write your poem, line by line…', elegy:'Pour your elegy onto the page…' };
+  const wa = document.getElementById('writingArea');
+  wa.dataset.placeholder = placeholders[type] || 'Begin writing…';
+  wa.classList.toggle('poem-mode', type === 'poem' || type === 'elegy');
+  document.getElementById('detailsTitle').textContent = type === 'series' ? 'Chapter Details' : type === 'poem' ? 'Poem Details' : 'Story Details';
+  markUnsaved();
+  toast(`✅ ${el.querySelector('.type-name').textContent} selected`);
+}
+
+/* ── FILE UPLOAD ── */
+function triggerFileUpload() { document.getElementById('fileInput').click(); }
+function onDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
+function onDragLeave() { document.getElementById('uploadZone').classList.remove('drag-over'); }
+function onFileDrop(e) { e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processUploadedFile(f); }
+function handleFileSelect(input) { const f = input.files[0]; if (f) processUploadedFile(f); }
+function processUploadedFile(file) {
+  const allowed = ['.txt','.docx','.pdf','.md','.doc'];
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  if (!allowed.includes(ext)) { toast('⚠️ Use .txt, .docx, .pdf or .md'); return; }
+  STATE.uploadedFile = file;
+  document.getElementById('uzDefault').style.display = 'none';
+  const fd = document.getElementById('uzFileDisplay');
+  fd.classList.add('show');
+  const icons = {'.txt':'📄','.docx':'📝','.pdf':'📕','.md':'📋'};
+  document.getElementById('uzFileIcon').textContent = icons[ext] || '📄';
+  document.getElementById('uzFileName').textContent = file.name;
+  document.getElementById('uzFileSize').textContent = (file.size/1024).toFixed(1)+' KB · Processing…';
+  document.getElementById('uploadZone').classList.add('has-file');
+  const proc = document.getElementById('uzProcessing'); proc.classList.add('show');
+  const steps = ['Reading your story…','Detecting chapters…','Extracting title…','Auto-filling details…','Done! ✅'];
+  let i = 0;
+  const interval = setInterval(() => {
+    document.getElementById('uzProcessText').textContent = steps[i]; i++;
+    if (i >= steps.length) {
+      clearInterval(interval); proc.classList.remove('show');
+      document.getElementById('uzFileSize').textContent = (file.size/1024).toFixed(1)+' KB · Ready';
+      autoFillFromFile(file);
+    }
+  }, 600);
+}
+function autoFillFromFile(file) {
+  const name = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ');
+  const titleEl = document.getElementById('storyTitle');
+  if (!titleEl.value) {
+    titleEl.value = name.charAt(0).toUpperCase() + name.slice(1);
+    updateTopTitle(titleEl.value);
+    document.getElementById('titleCount').textContent = titleEl.value.length + '/120';
+  }
+  if (!STATE.type) selectType('short', document.querySelector('[data-type="short"]'));
+  toast('✅ Story imported! Review your details in Step 2.');
+  setTimeout(() => goToStep(1), 1200);
+}
+function removeFile(e) {
+  e.stopPropagation();
+  STATE.uploadedFile = null;
+  document.getElementById('uploadZone').classList.remove('has-file','drag-over');
+  document.getElementById('uzDefault').style.display = '';
+  document.getElementById('uzFileDisplay').classList.remove('show');
+  document.getElementById('uzProcessing').classList.remove('show');
+  document.getElementById('fileInput').value = '';
+}
+
+/* ── COVER ── */
+function cycleCover() {
+  STATE.coverUrl = DEMO_COVERS[STATE.coverIdx % DEMO_COVERS.length];
+  STATE.coverIdx++;
+  const img = document.getElementById('coverImg');
+  img.src = STATE.coverUrl; img.style.display = 'block';
+  document.getElementById('coverPlaceholder').style.display = 'none';
+  markUnsaved();
+  toast('🖼️ Cover updated — tap again to cycle');
+}
+
+/* ── GENRE PILLS ── */
+function toggleGenre(el) { el.classList.toggle('on'); markUnsaved(); }
+
+/* ── WRITING ── */
+function onWriteInput() {
+  const wc = getWordCount();
+  const mins = Math.max(1, Math.round(wc / 220));
+  document.getElementById('wcPill').textContent = `${wc.toLocaleString()} words · ~${mins} min`;
+  markUnsaved();
+}
+function onWriteKeyDown(e) {
+  if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '    '); }
+}
+function fmt(cmd) {
+  document.getElementById('writingArea').focus();
+  if (cmd === 'h1') document.execCommand('formatBlock', false, 'h1');
+  else if (cmd === 'h2') document.execCommand('formatBlock', false, 'h2');
+  else if (cmd === 'blockquote') document.execCommand('formatBlock', false, 'blockquote');
+  else if (cmd === 'align-center') document.execCommand('justifyCenter');
+  else if (cmd === 'ul') document.execCommand('insertUnorderedList');
+  else document.execCommand(cmd);
+  markUnsaved();
+}
+function insertSceneBreak() {
+  document.getElementById('writingArea').focus();
+  document.execCommand('insertHTML', false, '<div contenteditable="false" style="display:flex;align-items:center;gap:10px;padding:12px 0;opacity:.5;user-select:none"><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.1);margin:0"/><span style="color:#555;font-size:12px">✦</span><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.1);margin:0"/></div><p><br></p>');
+  markUnsaved();
+}
+function toggleAuthorNote() {
+  const z = document.getElementById('authorNoteZone');
+  z.classList.toggle('show');
+  document.getElementById('anBtn').classList.toggle('active', z.classList.contains('show'));
+  if (z.classList.contains('show')) document.getElementById('authorNoteInp').focus();
+}
+
+/* ── INSERT ── */
+function openInsert() { document.getElementById('insertOv').classList.add('open'); }
+function closeInsert() { document.getElementById('insertOv').classList.remove('open'); }
+const INSERT_SNIPPETS = {
+  'scene-break':'<div contenteditable="false" style="display:flex;align-items:center;gap:12px;padding:14px 0;user-select:none"><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.08);margin:0"/><span style="color:#555;letter-spacing:.2em">✦ ✦ ✦</span><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.08);margin:0"/></div><p><br></p>',
+  'epigraph':'<blockquote style="font-style:italic;padding:8px 0 8px 14px;border-left:3px solid #ff0050;margin:12px 0;color:#a1a1aa"><em>Type your opening quote here…</em></blockquote><p><br></p>',
+  'letter':'<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;margin:12px 0;font-style:italic;color:#c0c0cc"><p><em>Dear [Name],</em></p><p><br></p><p><em>Write your letter here…</em></p><p><br></p><p><em>Yours,<br/>[Sender]</em></p></div><p><br></p>',
+  'flashback':'<div style="border-left:3px solid rgba(167,139,250,.4);padding-left:14px;margin:14px 0;opacity:.88"><p style="font-size:11px;color:rgba(167,139,250,.6);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">— Flashback —</p><p>Write your flashback scene here…</p></div><p><br></p>',
+  'thought':'<p><em style="color:#a0c0e8">[Inner thought: …]</em></p><p><br></p>',
+  'time-skip':'<div contenteditable="false" style="text-align:center;padding:12px 0;font-size:10px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:.15em;text-transform:uppercase;user-select:none">— Three Months Later —</div><p><br></p>',
+  'cliffhanger':'<div contenteditable="false" style="text-align:center;padding:16px 0;color:rgba(255,0,80,.4);font-size:11px;font-weight:700;letter-spacing:.08em;user-select:none">✦ End of Chapter ✦</div>',
+  'social-post':'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin:12px 0;font-size:12px;color:#ccc"><div style="font-size:9px;font-weight:800;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">In-story Social Post</div><p><em>@username: "Write your character\'s tweet or message here…"</em></p></div><p><br></p>',
+};
+function ins(type) {
+  closeInsert();
+  document.getElementById('writingArea').focus();
+  document.execCommand('insertHTML', false, INSERT_SNIPPETS[type] || '');
+  markUnsaved();
+  toast('✅ Inserted');
+}
+
+/* ── ENGAGEMENT ── */
+function toggleEng(type, el) {
+  if (STATE.engActive.has(type)) { STATE.engActive.delete(type); el.classList.remove('active'); }
+  else { STATE.engActive.add(type); el.classList.add('active'); }
+  document.getElementById('debateBuilder').classList.toggle('show', STATE.engActive.has('debate'));
+  document.getElementById('pollBuilder').classList.toggle('show', STATE.engActive.has('poll'));
+  document.getElementById('predictionBuilder').classList.toggle('show', STATE.engActive.has('prediction'));
+  document.getElementById('teamsBuilder').classList.toggle('show', STATE.engActive.has('teams'));
+  markUnsaved();
+}
+function addPollOpt() {
+  const opts = document.getElementById('pollOpts');
+  const n = opts.children.length + 1;
+  if (n > 6) { toast('📊 Max 6 options'); return; }
+  const row = document.createElement('div'); row.className = 'poll-opt-row';
+  row.innerHTML = `<input class="poll-opt-input" placeholder="Option ${n}…"/><div class="poll-opt-del" onclick="removePollOpt(this)"><i class="fas fa-times"></i></div>`;
+  opts.appendChild(row);
+}
+function removePollOpt(el) {
+  if (document.querySelectorAll('.poll-opt-row').length <= 2) { toast('📊 Minimum 2 options'); return; }
+  el.closest('.poll-opt-row').remove();
+}
+function addPredOpt() {
+  const opts = document.getElementById('predOpts');
+  const labels = ['A','B','C','D','E','F'];
+  const n = opts.children.length;
+  if (n >= 6) { toast('🔮 Max 6 predictions'); return; }
+  const colors = ['var(--acc)','var(--blue)','var(--green)','var(--purple)','var(--gold)','var(--orange)'];
+  const div = document.createElement('div'); div.className = 'pred-opt';
+  div.innerHTML = `<div class="pred-label" style="background:${colors[n]}">${labels[n]}</div><input class="field-input" style="flex:1;border:none;background:transparent;padding:0;font-size:12px" placeholder="Prediction ${labels[n]}…"/>`;
+  opts.appendChild(div);
+}
+function selectTeamColor(el) {
+  el.closest('.team-color-row').querySelectorAll('.tc-dot').forEach(d => d.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ── SCHEDULE ── */
+function setPubOpt(mode) {
+  STATE.pubMode = mode;
+  ['Now','Schedule','Draft'].forEach(m => document.getElementById('pub'+m)?.classList.remove('selected'));
+  document.getElementById('pub' + mode.charAt(0).toUpperCase() + mode.slice(1))?.classList.add('selected');
+  document.getElementById('calendarWrap').classList.toggle('show', mode === 'schedule');
+  markUnsaved();
+}
+function renderCalendar() {
+  const {calYear:y, calMonth:m} = STATE;
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonth').textContent = MONTHS[m] + ' ' + y;
+  const first = new Date(y, m, 1).getDay();
+  const days = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+  const DAYS = ['S','M','T','W','T','F','S'];
+  let html = DAYS.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) html += `<div class="cal-day other-month"></div>`;
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(y, m, d);
+    const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isToday = date.toDateString() === today.toDateString();
+    const isSel = STATE.calSelectedDay === d && STATE.calMonth === m && STATE.calYear === y;
+    html += `<div class="cal-day${isToday?' today':''}${isSel?' selected':''}${isPast?' past':''}" onclick="selectCalDay(${d})">${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+function calNav(dir) {
+  STATE.calMonth += dir;
+  if (STATE.calMonth > 11) { STATE.calMonth = 0; STATE.calYear++; }
+  if (STATE.calMonth < 0) { STATE.calMonth = 11; STATE.calYear--; }
+  renderCalendar();
+}
+function selectCalDay(d) { STATE.calSelectedDay = d; renderCalendar(); updateScheduleSummary(); }
+function updateScheduleSummary() {
+  if (!STATE.calSelectedDay) return;
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const time = document.getElementById('schedTime').value || '00:00';
+  const tz = document.getElementById('schedTZ').value;
+  const summary = `${STATE.calSelectedDay} ${MONTHS[STATE.calMonth]} ${STATE.calYear} at ${time} (${tz.split(' ')[0]})`;
+  document.getElementById('schedSummaryText').textContent = '📅 Scheduled: ' + summary;
+  document.getElementById('schedSummary').classList.add('show');
+  markUnsaved();
+}
+
+/* ── PREVIEW & PUBLISH ── */
+function buildPreview() {
+  const title = document.getElementById('storyTitle').value || 'Untitled Story';
+  const cat = document.getElementById('storyCat').value || '📖 Story';
+  const text = document.getElementById('writingArea').innerText || '';
+  const excerpt = text.trim().substring(0, 300) || '(No content yet — go to Step 3 to start writing)';
+
+  const coverInner = document.getElementById('previewCoverInner');
+  const grad = document.getElementById('previewGrad');
+  const content = document.getElementById('previewCoverContent');
+  if (STATE.coverUrl) {
+    coverInner.innerHTML = `<img src="${STATE.coverUrl}" style="width:100%;height:100%;object-fit:cover;display:block"/>`;
+    grad.style.display = 'block'; content.style.display = 'block';
+    document.getElementById('previewCat').textContent = cat;
+    document.getElementById('previewTitle').textContent = title;
+  } else {
+    grad.style.display = 'none'; content.style.display = 'none';
+  }
+  document.getElementById('previewExcerpt').textContent = excerpt;
+  buildPublishChecklist();
+}
+function buildPublishChecklist() {
+  const title = document.getElementById('storyTitle').value.trim();
+  const cat = document.getElementById('storyCat').value;
+  const wc = getWordCount();
+  const items = [
+    { icon:'📝', label: title ? `Title: "${title.substring(0,40)}${title.length>40?'…':''}"` : 'Missing story title', ok: !!title },
+    { icon:'🗂️', label: STATE.type ? `Type: ${STATE.type}` : 'Story type not selected', ok: !!STATE.type },
+    { icon:'🏷️', label: cat ? `Category: ${cat}` : 'Category not chosen', ok: !!cat },
+    { icon:'📖', label: wc >= 50 ? `${wc.toLocaleString()} words written` : `Too short — ${wc} words (min 50)`, ok: wc >= 50 },
+    { icon:'🖼️', label: STATE.coverUrl ? 'Cover image set' : 'No cover (recommended)', ok: !!STATE.coverUrl, warn: !STATE.coverUrl },
+    { icon:'📄', label: document.getElementById('storySynopsis').value.trim() ? 'Synopsis added' : 'Synopsis missing (recommended)', ok: !!document.getElementById('storySynopsis').value.trim(), warn: !document.getElementById('storySynopsis').value.trim() },
+  ];
+  const allCritical = !!title && !!STATE.type && !!cat && wc >= 50;
+  const pubText = document.getElementById('publishBtnText');
+  if (STATE.pubMode === 'draft') pubText.textContent = 'Save as Draft';
+  else if (STATE.pubMode === 'schedule') pubText.textContent = 'Schedule Story';
+  else pubText.textContent = allCritical ? 'Publish Story' : 'Fix Issues First';
+  document.getElementById('publishChecklist').innerHTML = items.map(c =>
+    `<div class="check-item"><span class="ci-icon">${c.icon}</span><span class="ci-label">${c.label}</span><span class="ci-status ${c.ok?'ok':c.warn?'warn':'bad'}">${c.ok?'✓':c.warn?'⚠️':'✕'}</span></div>`
+  ).join('');
+}
+function publishNow() {
+  if (STATE.pubMode === 'draft') { saveDraft(); return; }
+  const title = document.getElementById('storyTitle').value.trim();
+  const wc = getWordCount();
+  if (!title) { toast('📝 Add a story title first'); return; }
+  if (!STATE.type) { toast('🗂️ Select a story type first'); return; }
+  if (wc < 50) { toast(`✍️ Story too short (${wc} words)`); return; }
+  autoSave();
+  toast(STATE.pubMode === 'schedule' ? '⏰ Story scheduled! 🎉' : '🚀 Story published! 🎉', 3000);
+}
+
+/* ── MENU ── */
+function toggleMenu() {
+  const menu = document.getElementById('hamburgerMenu');
+  const overlay = document.getElementById('hmOverlay');
+  if (menu.classList.contains('open')) { closeMenu(); }
+  else { menu.classList.add('open'); overlay.classList.add('open'); }
+}
+function closeMenu() {
+  document.getElementById('hamburgerMenu').classList.remove('open');
+  document.getElementById('hmOverlay').classList.remove('open');
+}
+function confirmDiscard() {
+  closeMenu();
+  if (confirm('Discard this story? All unsaved changes will be lost.')) location.href = 'profile.html';
+}
+
+/* ── AI ASSIST ── */
+function openAI() { document.getElementById('aiOv').classList.add('open'); }
+function closeAI() { document.getElementById('aiOv').classList.remove('open'); }
+function aiPrompt(p) { document.getElementById('aiCustomInp').value = p; aiCustomSend(); }
+async function aiCustomSend() {
+  const inp = document.getElementById('aiCustomInp');
+  const prompt = inp.value.trim();
+  if (!prompt) { toast('✍️ Enter a prompt first'); return; }
+  const title = document.getElementById('storyTitle').value;
+  const storyText = document.getElementById('writingArea').innerText || '';
+  const thinking = document.getElementById('aiThinking');
+  const box = document.getElementById('aiResponseBox');
+  thinking.classList.add('show');
+  box.classList.remove('show'); box.innerHTML = '';
+  const sys = `You are a story writing assistant for Droboard, a Nigerian-focused creative writing platform. Help writers craft compelling, emotionally resonant fiction with authentic African settings and voices. Write in a literary but accessible style. Be specific, sensory, and emotionally true. Maximum 200 words per response unless asked otherwise.`;
+  const ctx = [title ? `Story title: "${title}"` : '', storyText ? `Story so far:\n${storyText.slice(-600)}` : 'No content written yet.'].filter(Boolean).join('\n');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:sys,messages:[{role:'user',content:`${ctx}\n\nWriter's request: ${prompt}`}]})
+    });
+    const data = await res.json();
+    thinking.classList.remove('show');
+    const text = (data.content||[]).map(c=>c.text||'').join('\n');
+    if (!text) { toast('⚠️ No response. Try again.'); return; }
+    box.dataset.rawText = text;
+    box.innerHTML = text.replace(/\n/g,'<br>') + `
+      <div class="ai-res-actions">
+        <div class="ai-res-btn insert" onclick="insertAIText()">⬇ Insert</div>
+        <div class="ai-res-btn" onclick="copyAIText()">📋 Copy</div>
+        <div class="ai-res-btn" onclick="document.getElementById('aiResponseBox').classList.remove('show')">✕</div>
+      </div>`;
+    box.classList.add('show');
+  } catch(e) {
+    thinking.classList.remove('show');
+    toast('⚠️ AI request failed. Check connection.');
+  }
+}
+function insertAIText() {
+  const text = document.getElementById('aiResponseBox').dataset.rawText || '';
+  if (!text) return;
+  document.getElementById('writingArea').focus();
+  document.execCommand('insertHTML', false, '<p>' + text.split('\n').filter(Boolean).join('</p><p>') + '</p>');
+  markUnsaved(); closeAI(); toast('✅ Text inserted!');
+}
+function copyAIText() {
+  const text = document.getElementById('aiResponseBox').dataset.rawText || '';
+  navigator.clipboard?.writeText(text).catch(()=>{});
+  toast('📋 Copied!');
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDraft(); }
+  if (e.key === 'Escape') { closeMenu(); closeInsert(); closeAI(); }
+});
+
+/* ── INIT ── */
+renderStepBar();
+updateNavBar();
+renderCalendar();
+document.addEventListener('visibilitychange', () => { if (document.hidden && !STATE.saved) autoSave(); });
+</script>
+</body>
+</html>

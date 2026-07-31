@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Status Thread</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ═══════════════════════════════════════════════
+   DROBOARD — STATUS THREAD PAGE
+   CSS Variables: all design tokens in one place
+   ═══════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --acc: #ff0050;
+  --acc2: #ff4d7a;
+  --acc3: #ff6b8a;
+  --glow: rgba(255, 0, 80, .28);
+  --glow-sm: rgba(255, 0, 80, .14);
+
+  /* Backgrounds */
+  --bg: #000000;
+  --layer-1: #08090c;   /* card base */
+  --layer-2: #0e0f13;   /* elevated card */
+  --layer-3: #13141a;   /* input / hover */
+
+  /* Borders */
+  --bd: rgba(255, 255, 255, .07);
+  --bd2: rgba(255, 255, 255, .04);
+  --bd-acc: rgba(255, 0, 80, .22);
+
+  /* Text */
+  --tx: #f0f0f0;
+  --tx2: #999;
+  --tx3: #555;
+
+  /* System */
+  --blue: #00aaff;
+  --green: #10b981;
+  --gold: #f59e0b;
+
+  /* Nav */
+  --nav-h: 58px;
+  --top-h: 54px;
+  --status-bar-h: env(safe-area-inset-top, 0px);
+  --bottom-safe: env(safe-area-inset-bottom, 0px);
+
+  /* Thread */
+  --line-color: rgba(255, 0, 80, .18);
+  --reply-indent: 44px;
+  --avatar-size: 36px;
+  --avatar-size-sm: 28px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+body {
+  padding-bottom: calc(var(--bottom-safe) + var(--nav-h) + 8px);
+}
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-thumb { background: var(--bd-acc); border-radius: 2px; }
+
+/* ─── TOP BAR ─── */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, .97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--bd);
+  padding: calc(var(--status-bar-h) + 10px) 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--layer-1);
+  border: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #ccc;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: .15s;
+}
+.back-btn:active { background: var(--layer-3); }
+.top-bar-title {
+  flex: 1;
+  min-width: 0;
+}
+.top-bar-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-bar-title .sub {
+  font-size: 10px;
+  color: var(--tx3);
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--acc);
+  animation: blink 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.top-bar-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.top-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--layer-1);
+  border: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  transition: .15s;
+  position: relative;
+  flex-shrink: 0;
+}
+.top-icon-btn:active { background: var(--layer-3); color: var(--acc); }
+
+/* ─── STATUS HERO (pinned original status at top) ─── */
+.status-hero {
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--layer-1);
+  border-bottom: 1px solid var(--bd);
+}
+.status-hero-cover {
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  background-position: center 30%;
+  position: relative;
+}
+.status-hero-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.45) 55%, rgba(0,0,0,.22) 100%);
+}
+.status-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 14px 14px;
+  margin-top: -60px;
+}
+.status-hero-writer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+.hero-av-ring {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: conic-gradient(var(--acc), var(--acc2), var(--acc));
+  padding: 2.5px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px var(--glow);
+}
+.hero-av-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg);
+}
+.hero-av-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+.hero-meta { flex: 1; min-width: 0; }
+.hero-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.writer-badge {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(255, 0, 80, .12);
+  border: 1px solid var(--bd-acc);
+  color: var(--acc3);
+  letter-spacing: .04em;
+}
+.hero-time { font-size: 10px; color: var(--tx3); margin-top: 1px; }
+.follow-pill {
+  background: var(--acc);
+  color: #fff;
+  border: none;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 0 12px var(--glow-sm);
+  transition: .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.follow-pill.following {
+  background: rgba(255,255,255,.08);
+  border: 1px solid var(--bd);
+  color: #ccc;
+  box-shadow: none;
+}
+.status-hero-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+  line-height: 1.55;
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--acc);
+}
+.status-hero-caption {
+  font-size: 12px;
+  color: var(--tx2);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.status-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.status-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 4px 7px;
+  border-radius: 9px;
+  transition: .15s;
+}
+.status-stat:active { background: var(--layer-2); color: var(--tx2); }
+.status-stat.liked { color: var(--acc); }
+.status-stat i { font-size: 13px; }
+.status-hero-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--bd2);
+}
+.hero-act {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 7px 0;
+  border-radius: 9px;
+  background: var(--layer-2);
+  border: 1px solid var(--bd2);
+  transition: .15s;
+}
+.hero-act:active { background: rgba(255,0,80,.08); color: var(--acc); }
+.hero-act.liked { color: var(--acc); }
+.hero-act i { font-size: 13px; }
+
+/* ─── THREAD HEADER ─── */
+.thread-header {
+  padding: 10px 14px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,.6);
+  border-bottom: 1px solid var(--bd2);
+  position: sticky;
+  top: calc(var(--top-h) + var(--status-bar-h));
+  z-index: 100;
+  backdrop-filter: blur(16px);
+}
+.thread-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.thread-count strong { color: var(--acc); font-family: 'Playfair Display', serif; font-size: 15px; }
+.thread-sort {
+  display: flex;
+  gap: 4px;
+}
+.sort-btn {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1px solid var(--bd);
+  color: var(--tx3);
+  background: transparent;
+  transition: .15s;
+}
+.sort-btn.active {
+  background: var(--acc);
+  color: #fff;
+  border-color: var(--acc);
+  box-shadow: 0 0 8px var(--glow-sm);
+}
+
+/* ─── THREAD LIST ─── */
+.thread-list {
+  padding: 0;
+}
+
+/* ─── THREAD ITEM ─── */
+.thread-item {
+  position: relative;
+  padding: 12px 14px 0;
+  animation: fadeIn .22s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.thread-item.reply-indent {
+  padding-left: calc(14px + var(--reply-indent));
+}
+.thread-item.reply-indent-2 {
+  padding-left: calc(14px + var(--reply-indent) * 1.6);
+}
+
+/* Connector line */
+.thread-line {
+  position: absolute;
+  left: calc(14px + var(--avatar-size) / 2);
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--line-color);
+  pointer-events: none;
+}
+.thread-item.reply-indent .thread-line {
+  left: calc(14px + var(--reply-indent) + var(--avatar-size) / 2);
+}
+.thread-item.last-in-group .thread-line {
+  height: 50px;
+}
+.thread-item.no-line .thread-line { display: none; }
+
+/* Connector branch (horizontal line from parent) */
+.thread-branch {
+  position: absolute;
+  top: 24px;
+  width: 24px;
+  height: 1.5px;
+  background: var(--line-color);
+  left: calc(14px + var(--reply-indent) - 24px);
+}
+.thread-item:not(.reply-indent) .thread-branch { display: none; }
+
+/* ─── COMMENT ROW ─── */
+.cm-row {
+  display: flex;
+  gap: 9px;
+  padding-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+.cm-av-wrap {
+  flex-shrink: 0;
+  position: relative;
+}
+.cm-av {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 1.5px solid var(--bd);
+  background: var(--layer-1);
+}
+.cm-av-init {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  background: rgba(255, 0, 80, .18);
+  border: 1.5px solid var(--bd-acc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--acc3);
+  flex-shrink: 0;
+}
+.cm-av.sm, .cm-av-init.sm {
+  --avatar-size: var(--avatar-size-sm);
+  width: var(--avatar-size-sm);
+  height: var(--avatar-size-sm);
+  font-size: 10px;
+}
+.writer-ring {
+  border-color: var(--acc) !important;
+  box-shadow: 0 0 8px var(--glow-sm);
+}
+.cm-body { flex: 1; min-width: 0; }
+.cm-bubble {
+  background: var(--layer-1);
+  border: 1px solid var(--bd);
+  border-radius: 0 14px 14px 14px;
+  padding: 9px 11px;
+  position: relative;
+  transition: border-color .15s;
+}
+.cm-bubble:active { border-color: var(--bd-acc); }
+.cm-bubble.writer-bubble {
+  background: rgba(255, 0, 80, .05);
+  border-color: var(--bd-acc);
+}
+.cm-bubble.pinned-bubble {
+  background: rgba(245, 158, 11, .06);
+  border-color: rgba(245, 158, 11, .25);
+}
+.cm-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+.cm-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tx);
+  cursor: pointer;
+}
+.cm-name:hover { color: var(--acc2); }
+.cm-badge {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 7px;
+  letter-spacing: .04em;
+}
+.badge-writer {
+  background: rgba(255, 0, 80, .12);
+  border: 1px solid var(--bd-acc);
+  color: var(--acc3);
+}
+.badge-pinned {
+  background: rgba(245, 158, 11, .12);
+  border: 1px solid rgba(245, 158, 11, .3);
+  color: var(--gold);
+}
+.badge-top {
+  background: rgba(0, 170, 255, .1);
+  border: 1px solid rgba(0, 170, 255, .25);
+  color: var(--blue);
+}
+.cm-mention { color: var(--acc2); font-weight: 700; }
+.cm-text {
+  font-size: 13px;
+  color: #e0e0e0;
+  line-height: 1.55;
+  word-break: break-word;
+}
+.cm-story-ref {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--layer-2);
+  border: 1px solid var(--bd2);
+  border-radius: 9px;
+  padding: 7px 9px;
+  margin-top: 7px;
+  cursor: pointer;
+}
+.cm-story-ref:active { border-color: var(--bd-acc); }
+.cm-story-img {
+  width: 34px;
+  height: 38px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.cm-story-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tx);
+  line-height: 1.3;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cm-story-cta { font-size: 9px; font-weight: 700; color: var(--acc); white-space: nowrap; }
+
+/* Meta row (time · likes · reply) */
+.cm-meta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+.cm-time { font-size: 10px; color: var(--tx3); }
+.cm-sep { font-size: 10px; color: var(--tx3); margin: 0 3px; }
+.cm-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 7px;
+  transition: .12s;
+  user-select: none;
+}
+.cm-like-btn:active { background: rgba(255,0,80,.08); }
+.cm-like-btn.liked { color: var(--acc); }
+.cm-like-btn i { font-size: 11px; }
+.cm-reply-btn {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--acc2);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 7px;
+  transition: .12s;
+}
+.cm-reply-btn:active { background: rgba(255,0,80,.08); }
+.cm-more-btn {
+  font-size: 10px;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 5px;
+  margin-left: auto;
+  transition: .12s;
+}
+.cm-more-btn:active { color: var(--tx2); }
+
+/* Pinned tag */
+.pinned-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 5px;
+  margin-left: calc(var(--avatar-size) + 9px);
+}
+
+/* ─── LOAD MORE ─── */
+.load-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: calc(100% - 28px);
+  margin: 10px 14px 14px;
+  padding: 11px;
+  background: var(--layer-1);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tx2);
+  cursor: pointer;
+  transition: .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.load-more-btn:active { background: var(--layer-2); border-color: var(--bd-acc); color: var(--acc2); }
+.load-more-spinner { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── REPLY INPUT BAR ─── */
+.reply-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, .97);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--bd);
+  padding: 8px 12px calc(var(--bottom-safe) + 8px);
+}
+.reply-to-banner {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--tx3);
+  padding: 4px 0 6px;
+  border-bottom: 1px solid var(--bd2);
+  margin-bottom: 7px;
+}
+.reply-to-banner.show { display: flex; }
+.reply-to-name { color: var(--acc2); font-weight: 700; }
+.cancel-reply {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: var(--layer-2);
+  border: 1px solid var(--bd);
+}
+.reply-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+.reply-me-av {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 0, 80, .18);
+  border: 1.5px solid var(--bd-acc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--acc3);
+  flex-shrink: 0;
+}
+.reply-inp {
+  flex: 1;
+  background: var(--layer-2);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 8px 13px;
+  color: var(--tx);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  resize: none;
+  line-height: 1.45;
+  min-height: 36px;
+  max-height: 100px;
+  transition: border-color .15s;
+}
+.reply-inp::placeholder { color: var(--tx3); }
+.reply-inp:focus { border-color: var(--bd-acc); }
+.reply-inp-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+.inp-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--layer-2);
+  border: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--tx3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: .12s;
+}
+.inp-icon-btn:active { color: var(--acc); border-color: var(--bd-acc); }
+.send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--acc);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px var(--glow-sm);
+  transition: .15s;
+}
+.send-btn:disabled { background: var(--layer-2); box-shadow: none; cursor: default; }
+.send-btn:not(:disabled):active { transform: scale(.9); }
+
+/* ─── ALERT PANEL (slide in from top, for demo of notification) ─── */
+.alert-toast {
+  position: fixed;
+  top: calc(var(--status-bar-h) + 8px);
+  left: 14px;
+  right: 14px;
+  z-index: 500;
+  background: var(--layer-2);
+  border: 1px solid var(--bd-acc);
+  border-radius: 14px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transform: translateY(-110%);
+  transition: transform .32s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+  opacity: 0;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0,0,0,.7);
+}
+.alert-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.alert-av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--acc);
+  flex-shrink: 0;
+}
+.alert-body { flex: 1; min-width: 0; }
+.alert-title { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 1px; }
+.alert-sub { font-size: 10px; color: var(--tx3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.alert-acc-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); flex-shrink: 0; animation: blink 1.2s ease-in-out infinite; }
+
+/* ─── CONTEXT MENU ─── */
+.ctx-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: flex-end;
+}
+.ctx-bg.open { display: flex; }
+.ctx-sheet {
+  width: 100%;
+  background: var(--layer-1);
+  border-radius: 20px 20px 0 0;
+  padding: 0 0 calc(var(--bottom-safe) + 8px);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.ctx-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--bd);
+  border-radius: 4px;
+  margin: 12px auto 4px;
+}
+.ctx-preview {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 16px 10px;
+  border-bottom: 1px solid var(--bd2);
+  margin-bottom: 4px;
+}
+.ctx-preview-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--layer-2);
+}
+.ctx-preview-name { font-size: 12px; font-weight: 700; color: var(--tx); }
+.ctx-preview-text { font-size: 10px; color: var(--tx3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: .12s;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tx2);
+}
+.ctx-item:active { background: var(--layer-2); }
+.ctx-item i { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; color: #888; }
+.ctx-item.danger { color: #ff6060; }
+.ctx-item.danger i { color: #ff6060; }
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, .97);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--bd);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 calc(var(--bottom-safe) + 8px);
+  min-height: var(--nav-h);
+  /* Push nav below reply bar */
+  display: none;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: calc(var(--bottom-safe) + 80px);
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--layer-2);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  padding: 8px 18px;
+  border-radius: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 900;
+  opacity: 0;
+  transition: .28s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 92vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ─── EMPTY STATE ─── */
+.empty-thread {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--tx3);
+}
+.empty-thread .icon { font-size: 38px; margin-bottom: 10px; }
+.empty-thread h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--tx2); margin-bottom: 5px; }
+.empty-thread p { font-size: 12px; line-height: 1.5; max-width: 220px; margin: 0 auto; }
+
+/* ─── VIEWER COUNT PILL ─── */
+.viewer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 0, 80, .08);
+  border: 1px solid var(--bd-acc);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--acc2);
+  cursor: pointer;
+}
+.viewer-pill i { font-size: 11px; }
+
+/* ─── HORIZONTAL DIVIDER ─── */
+.hdiv {
+  height: 1px;
+  background: var(--bd2);
+  margin: 0 14px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar" id="topBar">
+  <div class="back-btn" onclick="window.history.back()">
+    <i class="fas fa-arrow-left"></i>
+  </div>
+  <div class="top-bar-title">
+    <h1>Status Thread</h1>
+    <div class="sub">
+      <span class="live-dot"></span>
+      <span id="threadSubLabel">614 in thread · live</span>
+    </div>
+  </div>
+  <div class="top-bar-actions">
+    <div class="top-icon-btn" onclick="shareThread()" title="Share">
+      <i class="fas fa-share-alt"></i>
+    </div>
+    <div class="top-icon-btn" onclick="openNotifSettings()" title="Notifications">
+      <i class="fas fa-bell" id="notifIcon"></i>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS HERO — original status pinned at top -->
+<div class="status-hero" id="statusHero">
+  <div class="status-hero-cover" id="heroCover" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80')"></div>
+  <div class="status-hero-content">
+    <div class="status-hero-writer">
+      <div class="hero-av-ring">
+        <div class="hero-av-inner">
+          <img src="https://i.pravatar.cc/100?img=32" id="heroAvImg" alt="Ada_Writes"/>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-name">
+          <span id="heroName">Ada_Writes</span>
+          <span class="writer-badge">✍️ Writer</span>
+        </div>
+        <div class="hero-time" id="heroTime">2h ago · Status</div>
+      </div>
+      <button class="follow-pill" id="heroFollowBtn" onclick="toggleHeroFollow()">+ Follow</button>
+    </div>
+    <div class="status-hero-quote" id="heroQuote">
+      "Sometimes love is just grief wearing a familiar face."
+    </div>
+    <div class="status-hero-caption" id="heroCaption">
+      Working on Chapter 5 right now — this scene broke me open. Not sure I can finish it tonight. 🖊️
+    </div>
+    <div class="status-hero-stats">
+      <div class="status-stat liked" id="heroLikeStat" onclick="toggleHeroLike()">
+        <i class="fas fa-heart"></i>
+        <span id="heroLikeCount">3,241</span>
+      </div>
+      <div class="status-stat" onclick="toast('👁️ 8,914 views')">
+        <i class="far fa-eye"></i>
+        <span>8.9k</span>
+      </div>
+      <div class="viewer-pill" onclick="toast('👥 614 people in this thread right now')">
+        <i class="fas fa-circle" style="font-size:6px;color:var(--green)"></i>
+        <span id="viewerCount">614 in thread</span>
+      </div>
+    </div>
+    <div class="status-hero-actions">
+      <div class="hero-act liked" id="heroLikeAct" onclick="toggleHeroLike()">
+        <i class="fas fa-heart"></i> Like
+      </div>
+      <div class="hero-act" onclick="focusReply()">
+        <i class="far fa-comment"></i> Reply
+      </div>
+      <div class="hero-act" onclick="shareThread()">
+        <i class="fas fa-share-alt"></i> Share
+      </div>
+      <div class="hero-act" onclick="openRepost()">
+        <i class="fas fa-retweet"></i> Repost
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THREAD HEADER (sticky) -->
+<div class="thread-header">
+  <div class="thread-count">
+    <strong id="replyCountLabel">614</strong> replies
+  </div>
+  <div class="thread-sort">
+    <div class="sort-btn active" onclick="sortThread('top',this)">Top</div>
+    <div class="sort-btn" onclick="sortThread('new',this)">Newest</div>
+    <div class="sort-btn" onclick="sortThread('writer',this)">Writer</div>
+  </div>
+</div>
+
+<!-- THREAD LIST -->
+<div class="thread-list" id="threadList"></div>
+
+<!-- LOAD MORE -->
+<button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">
+  <i class="fas fa-chevron-down"></i> Load more replies
+</button>
+
+<!-- EMPTY STATE (hidden by default) -->
+<div class="empty-thread" id="emptyThread" style="display:none">
+  <div class="icon">💬</div>
+  <h3>No replies yet</h3>
+  <p>Be the first to reply to this status and start the conversation.</p>
+</div>
+
+<!-- REPLY BAR (fixed bottom) -->
+<div class="reply-bar" id="replyBar">
+  <div class="reply-to-banner" id="replyBanner">
+    <i class="fas fa-reply" style="font-size:10px;color:var(--acc2)"></i>
+    <span>Replying to <span class="reply-to-name" id="replyToName">@Ada_Writes</span></span>
+    <div class="cancel-reply" onclick="cancelReply()">Cancel</div>
+  </div>
+  <div class="reply-input-row">
+    <div class="reply-me-av">C</div>
+    <textarea class="reply-inp" id="replyInp" placeholder="Reply to this status…" rows="1" oninput="onInpChange(this)" onkeydown="onInpKey(event)"></textarea>
+    <div class="reply-inp-actions">
+      <div class="inp-icon-btn" onclick="toast('😊 Emoji picker')"><i class="far fa-smile"></i></div>
+      <div class="inp-icon-btn" onclick="toast('📎 Attach image')"><i class="fas fa-image"></i></div>
+      <button class="send-btn" id="sendBtn" disabled onclick="postReply()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT TOAST (demo) -->
+<div class="alert-toast" id="alertToast" onclick="dismissAlert()">
+  <img class="alert-av" src="https://i.pravatar.cc/100?img=47" alt="Chioma_R"/>
+  <div class="alert-body">
+    <div class="alert-title">Chioma_R replied to your status</div>
+    <div class="alert-sub">"This is literally my life right now 😭 The way you write grief…"</div>
+  </div>
+  <div class="alert-acc-dot"></div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-bg" id="ctxBg" onclick="closeCtx()">
+  <div class="ctx-sheet" onclick="event.stopPropagation()">
+    <div class="ctx-handle"></div>
+    <div class="ctx-preview" id="ctxPreview"></div>
+    <div class="ctx-item" onclick="ctxAction('like')"><i class="fas fa-heart"></i> Like this reply</div>
+    <div class="ctx-item" onclick="ctxAction('reply')"><i class="fas fa-reply"></i> Reply</div>
+    <div class="ctx-item" onclick="ctxAction('share')"><i class="fas fa-share-alt"></i> Share</div>
+    <div class="ctx-item" onclick="ctxAction('copy')"><i class="far fa-copy"></i> Copy text</div>
+    <div class="ctx-item" onclick="ctxAction('quote')"><i class="fas fa-quote-right"></i> Quote as image</div>
+    <div class="ctx-item" onclick="ctxAction('profile')"><i class="fas fa-user"></i> View profile</div>
+    <div class="ctx-item danger" onclick="ctxAction('report')"><i class="fas fa-flag"></i> Report</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════ */
+const PAGE = {
+  heroLiked: true,
+  heroLikes: 3241,
+  heroFollowing: false,
+  notifOn: true,
+  replyTarget: null,  /* { id, name } or null (= reply to status) */
+  ctxCm: null,
+  sortMode: 'top',
+  page: 1,
+  totalReplies: 614,
+};
+
+/* ═══════════════════════════════════════════════
+   DATA — seed comments
+   ═══════════════════════════════════════════════ */
+const COMMENTS_SEED = [
+  {
+    id: 'c1', name: 'Chioma_R', avatar: 'https://i.pravatar.cc/100?img=47',
+    text: 'This is literally my life right now 😭 The way you write grief as a living, breathing thing that sits in the body... I felt this in my chest.',
+    time: '1h', likes: 342, liked: false, pinned: true, isWriter: false,
+    replies: [
+      {
+        id: 'r1', name: 'Ada_Writes', avatar: 'https://i.pravatar.cc/100?img=32',
+        text: '@Chioma_R This comment made me cry. Thank you for reading with your whole heart. 🙏',
+        time: '58m', likes: 89, liked: false, isWriter: true,
+        replies: [
+          {
+            id: 'r1a', name: 'Emeka_T', avatar: 'https://i.pravatar.cc/100?img=15',
+            text: '@Ada_Writes Writer of the year honestly. The way you respond to readers 💔',
+            time: '55m', likes: 21, liked: false, isWriter: false, replies: []
+          }
+        ]
+      },
+      {
+        id: 'r2', name: 'Bola_Lagos', avatar: 'https://i.pravatar.cc/100?img=55',
+        text: '@Chioma_R Same! I had to put down my phone and just sit for a moment.',
+        time: '50m', likes: 14, liked: false, isWriter: false, replies: []
+      }
+    ]
+  },
+  {
+    id: 'c2', name: 'Ifeanyi_Story', avatar: 'https://i.pravatar.cc/100?img=53',
+    text: 'One of the best writing voices on this app. Period. Chapter 5 is going to wreck us and we are READY. 🔥',
+    time: '55m', likes: 210, liked: false, pinned: false, isWriter: true,
+    replies: [
+      {
+        id: 'r3', name: 'CampusQueen', avatar: 'https://i.pravatar.cc/100?img=12',
+        text: '@Ifeanyi_Story Said exactly what I was thinking!! Two writers at the top of their game.',
+        time: '48m', likes: 44, liked: false, isWriter: true, replies: []
+      }
+    ]
+  },
+  {
+    id: 'c3', name: 'Nkechi_B', avatar: null,
+    text: 'I showed this status to my sister and she said "that\'s a whole therapy session in one sentence." She\'s not even wrong. 😭',
+    time: '49m', likes: 178, liked: false, pinned: false, isWriter: false, replies: []
+  },
+  {
+    id: 'c4', name: 'Kemi_A', avatar: 'https://i.pravatar.cc/100?img=28',
+    text: 'Chapter 5 is the one I have been waiting for. I just know it. Can you give us ONE hint, just one? 🥺',
+    time: '44m', likes: 96, liked: false, pinned: false, isWriter: false,
+    replies: [
+      {
+        id: 'r4', name: 'Ada_Writes', avatar: 'https://i.pravatar.cc/100?img=32',
+        text: '@Kemi_A OK one hint: someone says something they cannot unsay. That is all.',
+        time: '40m', likes: 312, liked: false, isWriter: true, replies: [
+          {
+            id: 'r4a', name: 'Nkechi_B', avatar: null,
+            text: '@Ada_Writes WHAT DO YOU MEAN 😭😭😭',
+            time: '38m', likes: 67, liked: false, isWriter: false, replies: []
+          },
+          {
+            id: 'r4b', name: 'Chioma_R', avatar: 'https://i.pravatar.cc/100?img=47',
+            text: '@Ada_Writes I am going to need to call in sick tomorrow I can already tell.',
+            time: '37m', likes: 54, liked: false, isWriter: false, replies: []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'c5', name: 'Dami_Cole', avatar: 'https://i.pravatar.cc/100?img=64',
+    text: 'The reason I keep coming back to Droboard is writing like this. Not for the algorithm. For Ada.',
+    time: '38m', likes: 145, liked: false, pinned: false, isWriter: true, replies: []
+  },
+  {
+    id: 'c6', name: 'Zara_M', avatar: 'https://i.pravatar.cc/100?img=16',
+    text: 'I quoted this in my own status. Just felt like everyone needed to read it twice today.',
+    time: '32m', likes: 88, liked: false, pinned: false, isWriter: false, replies: [],
+    storyRef: {
+      cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',
+      title: 'I came home early and caught my husband kissing my late sister\'s photograph',
+    }
+  },
+  {
+    id: 'c7', name: 'Tunde_W', avatar: 'https://i.pravatar.cc/100?img=33',
+    text: 'My girlfriend read this over my shoulder and she said "who wrote this? they clearly know something about us." I said nothing. 😅',
+    time: '27m', likes: 203, liked: false, pinned: false, isWriter: false, replies: []
+  },
+  {
+    id: 'c8', name: 'Amara_K', avatar: 'https://i.pravatar.cc/100?img=25',
+    text: 'Someone forward this to grief counselors. Genuinely.',
+    time: '22m', likes: 76, liked: false, pinned: false, isWriter: false, replies: []
+  },
+];
+
+/* Extra pages (loaded on demand) */
+const COMMENTS_PAGE2 = [
+  {
+    id: 'c9', name: 'Olu_Reads', avatar: 'https://i.pravatar.cc/100?img=40',
+    text: 'I have been following Ada_Writes for 14 months and every single update hits different. This is why I read fiction.',
+    time: '18m', likes: 54, liked: false, pinned: false, isWriter: false, replies: []
+  },
+  {
+    id: 'c10', name: 'Sola_Ng', avatar: null,
+    text: 'Took a screenshot. This goes in my "sentences that rearranged my brain" folder.',
+    time: '15m', likes: 119, liked: false, pinned: false, isWriter: false, replies: []
+  },
+  {
+    id: 'c11', name: 'Chiamaka_N', avatar: 'https://i.pravatar.cc/100?img=47',
+    text: 'A colleague once told me grief and love are the same word spelled differently. I never understood it until now.',
+    time: '12m', likes: 87, liked: false, pinned: false, isWriter: false, replies: []
+  },
+  {
+    id: 'c12', name: 'Lagos_Lit', avatar: 'https://i.pravatar.cc/100?img=44',
+    text: 'Sharing this in our book club WhatsApp. The discussion it is going to start... 🙏',
+    time: '9m', likes: 31, liked: false, pinned: false, isWriter: false, replies: []
+  },
+];
+
+let loadedComments = [...COMMENTS_SEED];
+let allPages = [COMMENTS_SEED, COMMENTS_PAGE2];
+let currentPage = 0;
+
+/* ═══════════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════════ */
+function toast(msg, dur = 2400) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function fmtN(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n); }
+function fmtText(txt) {
+  return (txt || '').replace(/(@[\w_]+)/g, '<span class="cm-mention">$1</span>');
+}
+
+/* ═══════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════ */
+function toggleHeroLike() {
+  PAGE.heroLiked = !PAGE.heroLiked;
+  PAGE.heroLikes += PAGE.heroLiked ? 1 : -1;
+  const stat = document.getElementById('heroLikeStat');
+  const act = document.getElementById('heroLikeAct');
+  const ct = document.getElementById('heroLikeCount');
+  stat.classList.toggle('liked', PAGE.heroLiked);
+  act.classList.toggle('liked', PAGE.heroLiked);
+  const icon = stat.querySelector('i');
+  if (icon) icon.className = PAGE.heroLiked ? 'fas fa-heart' : 'far fa-heart';
+  ct.textContent = fmtN(PAGE.heroLikes);
+  toast(PAGE.heroLiked ? '❤️ Liked!' : 'Unliked');
+}
+function toggleHeroFollow() {
+  PAGE.heroFollowing = !PAGE.heroFollowing;
+  const btn = document.getElementById('heroFollowBtn');
+  btn.textContent = PAGE.heroFollowing ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('following', PAGE.heroFollowing);
+  toast(PAGE.heroFollowing ? '✅ Following Ada_Writes' : 'Unfollowed');
+}
+function shareThread() {
+  if (navigator.share) {
+    navigator.share({ title: 'Status Thread — Ada_Writes', url: window.location.href });
+  } else {
+    navigator.clipboard?.writeText(window.location.href).catch(() => {});
+    toast('🔗 Link copied!');
+  }
+}
+function openNotifSettings() {
+  PAGE.notifOn = !PAGE.notifOn;
+  const icon = document.getElementById('notifIcon');
+  icon.className = PAGE.notifOn ? 'fas fa-bell' : 'fas fa-bell-slash';
+  toast(PAGE.notifOn ? '🔔 Thread notifications ON' : '🔕 Notifications muted');
+}
+function openRepost() { toast('🔄 Repost status to your profile'); }
+
+/* ═══════════════════════════════════════════════
+   RENDER THREAD
+   ═══════════════════════════════════════════════ */
+function renderThread(comments, append = false) {
+  const list = document.getElementById('threadList');
+  if (!append) list.innerHTML = '';
+  if (!comments.length) {
+    document.getElementById('emptyThread').style.display = 'block';
+    document.getElementById('loadMoreBtn').style.display = 'none';
+    return;
+  }
+  document.getElementById('emptyThread').style.display = 'none';
+  comments.forEach((cm, ci) => {
+    list.appendChild(buildCmNode(cm, 0, ci === comments.length - 1));
+  });
+}
+
+function buildCmNode(cm, depth, isLast) {
+  const frag = document.createDocumentFragment();
+  const item = document.createElement('div');
+  item.className = 'thread-item' + (depth === 1 ? ' reply-indent' : depth >= 2 ? ' reply-indent-2' : '');
+  const hasReplies = cm.replies && cm.replies.length > 0;
+  const isLastItem = isLast && !hasReplies;
+  if (isLastItem) item.classList.add('no-line');
+  item.dataset.cmid = cm.id;
+
+  /* Vertical connector line */
+  const line = document.createElement('div');
+  line.className = 'thread-line';
+  item.appendChild(line);
+
+  /* Horizontal branch (for replies) */
+  if (depth > 0) {
+    const branch = document.createElement('div');
+    branch.className = 'thread-branch';
+    item.appendChild(branch);
+  }
+
+  /* Pinned label */
+  if (cm.pinned) {
+    const pin = document.createElement('div');
+    pin.className = 'pinned-tag';
+    pin.innerHTML = `<i class="fas fa-thumbtack" style="font-size:9px"></i> Pinned reply`;
+    item.appendChild(pin);
+  }
+
+  /* Comment row */
+  const row = document.createElement('div');
+  row.className = 'cm-row';
+
+  /* Avatar */
+  const avWrap = document.createElement('div');
+  avWrap.className = 'cm-av-wrap';
+  if (cm.avatar) {
+    const img = document.createElement('img');
+    img.className = 'cm-av' + (cm.isWriter ? ' writer-ring' : '') + (depth > 0 ? ' sm' : '');
+    img.src = cm.avatar;
+    img.loading = 'lazy';
+    img.alt = cm.name;
+    avWrap.appendChild(img);
+  } else {
+    const init = document.createElement('div');
+    init.className = 'cm-av-init' + (depth > 0 ? ' sm' : '');
+    init.textContent = cm.name[0] || '?';
+    avWrap.appendChild(init);
+  }
+  row.appendChild(avWrap);
+
+  /* Body */
+  const body = document.createElement('div');
+  body.className = 'cm-body';
+
+  /* Bubble */
+  const bubble = document.createElement('div');
+  bubble.className = 'cm-bubble' + (cm.isWriter ? ' writer-bubble' : '') + (cm.pinned ? ' pinned-bubble' : '');
+
+  /* Name row */
+  const nameRow = document.createElement('div');
+  nameRow.className = 'cm-name-row';
+  const name = document.createElement('span');
+  name.className = 'cm-name';
+  name.textContent = '@' + cm.name;
+  name.onclick = () => toast(`👤 Opening @${cm.name} profile…`);
+  nameRow.appendChild(name);
+  if (cm.isWriter) {
+    const b = document.createElement('span');
+    b.className = 'cm-badge badge-writer';
+    b.textContent = '✍️ Writer';
+    nameRow.appendChild(b);
+  }
+  if (cm.pinned) {
+    const b = document.createElement('span');
+    b.className = 'cm-badge badge-pinned';
+    b.textContent = '📌 Pinned';
+    nameRow.appendChild(b);
+  }
+  if (cm.likes > 200) {
+    const b = document.createElement('span');
+    b.className = 'cm-badge badge-top';
+    b.textContent = '🔥 Top reply';
+    nameRow.appendChild(b);
+  }
+  bubble.appendChild(nameRow);
+
+  /* Text */
+  const txt = document.createElement('div');
+  txt.className = 'cm-text';
+  txt.innerHTML = fmtText(cm.text);
+  bubble.appendChild(txt);
+
+  /* Story ref */
+  if (cm.storyRef) {
+    const ref = document.createElement('div');
+    ref.className = 'cm-story-ref';
+    ref.onclick = () => toast('📖 Opening story…');
+    ref.innerHTML = `<div class="cm-story-img" style="background-image:url('${cm.storyRef.cover}')"></div>
+      <div class="cm-story-title">${cm.storyRef.title}</div>
+      <div class="cm-story-cta">Read →</div>`;
+    bubble.appendChild(ref);
+  }
+
+  body.appendChild(bubble);
+
+  /* Meta row */
+  const meta = document.createElement('div');
+  meta.className = 'cm-meta';
+  meta.innerHTML = `<span class="cm-time">${cm.time}</span>
+    <span class="cm-sep">·</span>
+    <span class="cm-like-btn${cm.liked ? ' liked' : ''}" data-cmid="${cm.id}">
+      <i class="${cm.liked ? 'fas' : 'far'} fa-heart"></i>
+      <span class="like-ct">${fmtN(cm.likes)}</span>
+    </span>
+    <span class="cm-sep">·</span>
+    <span class="cm-reply-btn" data-cmid="${cm.id}" data-name="${cm.name}">Reply</span>
+    <span class="cm-more-btn" data-cmid="${cm.id}" data-name="${cm.name}" data-text="${cm.text.replace(/"/g,'&quot;').substring(0,60)}">
+      <i class="fas fa-ellipsis-h"></i>
+    </span>`;
+  body.appendChild(meta);
+  row.appendChild(body);
+  item.appendChild(row);
+  frag.appendChild(item);
+
+  /* Render nested replies */
+  if (cm.replies && cm.replies.length) {
+    cm.replies.forEach((rep, ri) => {
+      const child = buildCmNode(rep, Math.min(depth + 1, 2), ri === cm.replies.length - 1 && isLast);
+      frag.appendChild(child);
+    });
+  }
+
+  return frag;
+}
+
+/* ═══════════════════════════════════════════════
+   EVENTS — DELEGATED
+   ═══════════════════════════════════════════════ */
+document.getElementById('threadList').addEventListener('click', e => {
+  /* Like */
+  const lb = e.target.closest('.cm-like-btn');
+  if (lb) {
+    const cm = findComment(loadedComments, lb.dataset.cmid);
+    if (!cm) return;
+    cm.liked = !cm.liked;
+    cm.likes += cm.liked ? 1 : -1;
+    lb.classList.toggle('liked', cm.liked);
+    lb.querySelector('i').className = cm.liked ? 'fas fa-heart' : 'far fa-heart';
+    lb.querySelector('.like-ct').textContent = fmtN(cm.likes);
+    return;
+  }
+  /* Reply */
+  const rb = e.target.closest('.cm-reply-btn');
+  if (rb) {
+    setReplyTarget(rb.dataset.cmid, rb.dataset.name);
+    return;
+  }
+  /* More */
+  const mb = e.target.closest('.cm-more-btn');
+  if (mb) {
+    openCtx(mb.dataset.cmid, mb.dataset.name, mb.dataset.text);
+    return;
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   CONTEXT MENU
+   ═══════════════════════════════════════════════ */
+function openCtx(id, name, text) {
+  PAGE.ctxCm = { id, name, text };
+  document.getElementById('ctxPreview').innerHTML = `
+    <div><div class="ctx-preview-name">@${name}</div>
+    <div class="ctx-preview-text">${text}…</div></div>`;
+  document.getElementById('ctxBg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCtx() {
+  document.getElementById('ctxBg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function ctxAction(action) {
+  closeCtx();
+  const c = PAGE.ctxCm;
+  if (!c) return;
+  const msgs = {
+    like: '❤️ Liked!',
+    reply: () => setReplyTarget(c.id, c.name),
+    share: '🔗 Link copied!',
+    copy: '📋 Copied!',
+    quote: '✨ Quote card opening…',
+    profile: `👤 Opening @${c.name} profile…`,
+    report: '🚩 Reported'
+  };
+  if (action === 'reply') { msgs.reply(); return; }
+  toast(msgs[action] || '✓ Done');
+}
+
+/* ═══════════════════════════════════════════════
+   REPLY
+   ═══════════════════════════════════════════════ */
+function setReplyTarget(id, name) {
+  PAGE.replyTarget = { id, name };
+  document.getElementById('replyToName').textContent = '@' + name;
+  document.getElementById('replyBanner').classList.add('show');
+  focusReply();
+}
+function cancelReply() {
+  PAGE.replyTarget = null;
+  document.getElementById('replyBanner').classList.remove('show');
+  document.getElementById('replyInp').placeholder = 'Reply to this status…';
+}
+function focusReply() {
+  const inp = document.getElementById('replyInp');
+  inp.focus();
+  inp.placeholder = PAGE.replyTarget ? `Replying to @${PAGE.replyTarget.name}…` : 'Reply to this status…';
+}
+function onInpChange(el) {
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = el.value.trim().length === 0;
+  el.style.height = '36px';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+function onInpKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postReply(); }
+}
+function postReply() {
+  const inp = document.getElementById('replyInp');
+  const text = inp.value.trim();
+  if (!text) return;
+  const newCm = {
+    id: 'user_' + Date.now(),
+    name: 'You',
+    avatar: null,
+    text: PAGE.replyTarget ? `@${PAGE.replyTarget.name} ${text}` : text,
+    time: 'Just now',
+    likes: 0,
+    liked: false,
+    pinned: false,
+    isWriter: false,
+    replies: []
+  };
+  if (PAGE.replyTarget) {
+    const parent = findComment(loadedComments, PAGE.replyTarget.id);
+    if (parent) {
+      parent.replies = parent.replies || [];
+      parent.replies.push(newCm);
+    } else {
+      loadedComments.push(newCm);
+    }
+  } else {
+    loadedComments.push(newCm);
+  }
+  PAGE.totalReplies++;
+  updateCountLabels();
+  inp.value = '';
+  inp.style.height = '36px';
+  document.getElementById('sendBtn').disabled = true;
+  cancelReply();
+  renderThread(loadedComments);
+  toast('💬 Reply posted!');
+  /* scroll to bottom of list */
+  setTimeout(() => {
+    const last = document.getElementById('threadList').lastElementChild;
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+/* ═══════════════════════════════════════════════
+   SORT
+   ═══════════════════════════════════════════════ */
+function sortThread(mode, btn) {
+  PAGE.sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let sorted = [...loadedComments];
+  if (mode === 'top') sorted.sort((a, b) => b.likes - a.likes);
+  else if (mode === 'new') sorted.sort((a, b) => a.time.localeCompare(b.time));
+  else if (mode === 'writer') sorted = sorted.filter(c => c.isWriter).concat(sorted.filter(c => !c.isWriter));
+  renderThread(sorted);
+  toast(mode === 'top' ? '🔥 Sorted by top' : mode === 'new' ? '⏱ Sorted by newest' : '✍️ Writer replies first');
+}
+
+/* ═══════════════════════════════════════════════
+   LOAD MORE
+   ═══════════════════════════════════════════════ */
+function loadMore() {
+  const btn = document.getElementById('loadMoreBtn');
+  btn.innerHTML = `<i class="fas fa-circle-notch load-more-spinner"></i> Loading…`;
+  btn.disabled = true;
+  setTimeout(() => {
+    currentPage++;
+    if (currentPage < allPages.length) {
+      const next = allPages[currentPage];
+      next.forEach(cm => loadedComments.push(cm));
+      renderThread(next, true);
+      btn.innerHTML = `<i class="fas fa-chevron-down"></i> Load more replies`;
+      btn.disabled = false;
+    } else {
+      btn.innerHTML = `✓ All ${PAGE.totalReplies}+ replies loaded`;
+      btn.disabled = true;
+      btn.style.opacity = '.4';
+    }
+    updateCountLabels();
+  }, 900);
+}
+
+/* ═══════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════ */
+function findComment(arr, id) {
+  for (const c of arr) {
+    if (c.id === id) return c;
+    if (c.replies) {
+      const r = findComment(c.replies, id);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+function updateCountLabels() {
+  document.getElementById('replyCountLabel').textContent = fmtN(PAGE.totalReplies);
+  document.getElementById('threadSubLabel').textContent = fmtN(PAGE.totalReplies) + ' in thread · live';
+  document.getElementById('viewerCount').textContent = fmtN(PAGE.totalReplies) + ' in thread';
+}
+
+/* ═══════════════════════════════════════════════
+   ALERT DEMO — shows 2s after load
+   ═══════════════════════════════════════════════ */
+function showAlert() {
+  const at = document.getElementById('alertToast');
+  at.classList.add('show');
+  setTimeout(() => at.classList.remove('show'), 4500);
+}
+function dismissAlert() { document.getElementById('alertToast').classList.remove('show'); }
+
+/* ═══════════════════════════════════════════════
+   LIVE COUNTER SIMULATION
+   ═══════════════════════════════════════════════ */
+function simulateLiveActivity() {
+  /* Randomly add a like to an existing comment */
+  setInterval(() => {
+    if (!loadedComments.length) return;
+    const rndCm = loadedComments[Math.floor(Math.random() * Math.min(5, loadedComments.length))];
+    if (rndCm && Math.random() > .6) {
+      rndCm.likes++;
+      const lb = document.querySelector(`.cm-like-btn[data-cmid="${rndCm.id}"] .like-ct`);
+      if (lb) lb.textContent = fmtN(rndCm.likes);
+    }
+  }, 3800);
+  /* Occasionally increment viewer count */
+  setInterval(() => {
+    PAGE.totalReplies += Math.floor(Math.random() * 3);
+    updateCountLabels();
+  }, 7000);
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════ */
+renderThread(loadedComments);
+setTimeout(showAlert, 2000);
+simulateLiveActivity();
+</script>
+</body>
+</html>

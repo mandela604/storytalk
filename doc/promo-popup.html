@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Droboard — Story Promo Popup</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── BASE RESET ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  background:#07070b;
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+/* ── DEMO BACKDROP (simulate the reader page behind) ── */
+.demo-page{
+  width:100%;
+  max-width:480px;
+  min-height:80vh;
+  background:#0a0a0d;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.07);
+  padding:24px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.demo-label{
+  font-size:11px;
+  font-weight:700;
+  color:rgba(255,255,255,.2);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  text-align:center;
+}
+.demo-lines{display:flex;flex-direction:column;gap:8px;width:100%;opacity:.15;}
+.demo-line{height:10px;background:#fff;border-radius:4px;}
+.demo-line.short{width:65%;}
+.demo-line.mid{width:80%;}
+
+/* ── POPUP OVERLAY ── */
+.promo-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9000;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  animation:overlayIn .3s ease;
+}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+.promo-overlay.hiding{animation:overlayOut .3s ease forwards;}
+@keyframes overlayOut{from{opacity:1}to{opacity:0}}
+
+/* ── POPUP CARD ── */
+.promo-card{
+  width:100%;
+  max-width:390px;
+  background:#0a0a0d;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.1);
+  position:relative;
+  animation:cardIn .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 60px rgba(0,0,0,.9);
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.promo-card.hiding{animation:cardOut .28s ease forwards;}
+@keyframes cardOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.92)}}
+
+/* ── CLOSE BUTTON ── */
+.close-btn{
+  position:absolute;
+  top:11px;
+  right:11px;
+  z-index:20;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:rgba(0,0,0,.65);
+  border:1px solid rgba(255,255,255,.22);
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  line-height:1;
+  transition:.15s;
+  font-family:'DM Sans',sans-serif;
+}
+.close-btn:hover{background:rgba(255,0,80,.3);border-color:#ff0050;}
+
+/* ── SLIDE TRACK ── */
+.slide-viewport{overflow:hidden;width:100%;}
+.slide-track{
+  display:flex;
+  width:300%;
+  transition:transform .42s cubic-bezier(.4,0,.2,1);
+}
+.slide{flex:0 0 33.333%;position:relative;}
+
+/* ── SLIDE COVER IMAGE ── */
+.slide-cover{
+  height:195px;
+  position:relative;
+  overflow:hidden;
+}
+.slide-cover-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center 30%;
+  opacity:.22;
+  transition:opacity .4s;
+}
+.slide-cover:hover .slide-cover-bg{opacity:.3;}
+.slide-cover-gradient{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(0deg,#0a0a0d 0%,rgba(0,0,0,.18) 100%);
+}
+.slide-badge{
+  position:absolute;
+  top:13px;
+  left:13px;
+  font-size:9px;
+  font-weight:800;
+  padding:3px 10px;
+  border-radius:20px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.slide-cover-body{
+  position:absolute;
+  bottom:13px;
+  left:13px;
+  right:44px;
+}
+.slide-cat{font-size:10px;font-weight:700;margin-bottom:4px;}
+.slide-title{
+  font-family:'Playfair Display',serif;
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+  line-height:1.3;
+  text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+
+/* ── SLIDE BODY ── */
+.slide-body{padding:12px 14px 14px;}
+.slide-author-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:9px;
+}
+.slide-author-row img{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.slide-author-name{font-size:11px;color:#ccc;}
+.slide-likes{margin-left:auto;font-size:10px;color:#888;}
+.slide-excerpt{
+  font-size:12px;
+  color:#aaa;
+  line-height:1.55;
+  margin-bottom:12px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.read-btn{
+  width:100%;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  letter-spacing:.02em;
+  transition:.15s;
+}
+.read-btn:active{transform:scale(.97);}
+
+/* ── FOOTER: dots + countdown + pause ── */
+.promo-footer{
+  padding:10px 14px 13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{
+  height:4px;
+  border-radius:2px;
+  cursor:pointer;
+  transition:width .35s,background .35s;
+  background:rgba(255,255,255,.25);
+  width:6px;
+}
+.dot.active{width:20px;}
+.footer-right{display:flex;align-items:center;gap:7px;}
+.countdown-pill{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  padding:4px 10px;
+}
+.countdown-label{font-size:9px;color:#888;}
+.countdown-num{font-size:13px;font-weight:800;color:#fff;font-family:monospace;min-width:12px;text-align:center;}
+.pause-btn{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  color:#aaa;
+  cursor:pointer;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+  font-family:'DM Sans',sans-serif;
+}
+.pause-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+/* ── PROGRESS BAR on cover image ── */
+.progress-bar-wrap{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:rgba(255,255,255,.1);
+  z-index:10;
+}
+.progress-bar-fill{
+  height:100%;
+  width:0%;
+  transition:none;
+}
+
+/* ── REOPEN BUTTON (after close) ── */
+.reopen-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:8999;
+  background:#ff0050;
+  color:#fff;
+  border:none;
+  padding:10px 18px;
+  border-radius:24px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 20px rgba(255,0,80,.4);
+  display:none;
+  animation:fadeUp .3s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.reopen-btn:active{transform:scale(.96);}
+</style>
+</head>
+<body>
+
+<!-- ════ DEMO PAGE BEHIND THE POPUP ════ -->
+<div class="demo-page">
+  <div class="demo-label">Droboard Reader — story content here</div>
+  <div class="demo-lines">
+    <div class="demo-line"></div>
+    <div class="demo-line mid"></div>
+    <div class="demo-line"></div>
+    <div class="demo-line short"></div>
+    <div class="demo-line"></div>
+    <div class="demo-line mid"></div>
+    <div class="demo-line"></div>
+    <div class="demo-line short"></div>
+    <div class="demo-line"></div>
+    <div class="demo-line mid"></div>
+  </div>
+</div>
+
+<!-- ════ PROMO POPUP OVERLAY ════ -->
+<div class="promo-overlay" id="promoOverlay">
+  <div class="promo-card" id="promoCard">
+
+    <!-- Close button -->
+    <button class="close-btn" id="closeBtn" aria-label="Close promotional popup">&#x2715;</button>
+
+    <!-- Slide viewport -->
+    <div class="slide-viewport">
+      <div class="slide-track" id="slideTrack">
+
+        <!-- ── SLIDE 1: The Runaway Bride ── -->
+        <div class="slide">
+          <div class="slide-cover" style="background:linear-gradient(135deg,#1a0010,#2d0030);">
+            <div class="slide-cover-bg" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=70');"></div>
+            <div class="slide-cover-gradient"></div>
+            <div class="slide-badge" style="background:#ff0050;color:#fff;">🔥 Hot This Week</div>
+            <div class="slide-cover-body">
+              <div class="slide-cat" style="color:rgba(255,130,160,.9);">✨ Twist</div>
+              <div class="slide-title">The Runaway Bride — I left at the altar in my socked feet</div>
+            </div>
+            <!-- progress bar -->
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb0" style="background:#ff0050;"></div></div>
+          </div>
+          <div class="slide-body">
+            <div class="slide-author-row">
+              <img src="https://i.pravatar.cc/100?img=53" loading="lazy" alt="Ifeanyi_Story"/>
+              <span class="slide-author-name">@Ifeanyi_Story</span>
+              <span class="slide-likes">❤️ 45k likes</span>
+            </div>
+            <div class="slide-excerpt">Four hundred guests. A dress that cost a fortune. And a pastor who said "speak now or forever hold your peace." I opened my mouth.</div>
+            <button class="read-btn" style="background:#ff0050;color:#fff;" onclick="handleRead(this,'The Runaway Bride')">Read Now →</button>
+          </div>
+        </div>
+
+        <!-- ── SLIDE 2: My Husband & My Sister ── -->
+        <div class="slide">
+          <div class="slide-cover" style="background:linear-gradient(135deg,#001020,#001a30);">
+            <div class="slide-cover-bg" style="background-image:url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=700&q=70');"></div>
+            <div class="slide-cover-gradient"></div>
+            <div class="slide-badge" style="background:#3b0764;color:#d8b4fe;">📖 New Chapter</div>
+            <div class="slide-cover-body">
+              <div class="slide-cat" style="color:#60a5fa;">💔 Betrayal</div>
+              <div class="slide-title">I came home early and caught my husband kissing my late sister's photograph</div>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb1" style="background:#60a5fa;"></div></div>
+          </div>
+          <div class="slide-body">
+            <div class="slide-author-row">
+              <img src="https://i.pravatar.cc/100?img=32" loading="lazy" alt="Ada_Writes" style="border:1.5px solid #60a5fa;"/>
+              <span class="slide-author-name">@Ada_Writes</span>
+              <span class="slide-likes">❤️ 24.3k likes</span>
+            </div>
+            <div class="slide-excerpt">I opened the front door quietly. A surprise dinner was my plan. But there was a sound from the sitting room — low, like a sob and a prayer.</div>
+            <button class="read-btn" style="background:#60a5fa;color:#000;" onclick="handleRead(this,'I Came Home Early')">Read Now →</button>
+          </div>
+        </div>
+
+        <!-- ── SLIDE 3: Grandmother's Will ── -->
+        <div class="slide">
+          <div class="slide-cover" style="background:linear-gradient(135deg,#001a10,#002a18);">
+            <div class="slide-cover-bg" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=700&q=70');"></div>
+            <div class="slide-cover-gradient"></div>
+            <div class="slide-badge" style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.35);">📈 Trending</div>
+            <div class="slide-cover-body">
+              <div class="slide-cat" style="color:#4ade80;">👑 Family</div>
+              <div class="slide-title">My grandmother's will revealed I wasn't her blood — but she left everything to me</div>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb2" style="background:#4ade80;"></div></div>
+          </div>
+          <div class="slide-body">
+            <div class="slide-author-row">
+              <img src="https://i.pravatar.cc/100?img=47" loading="lazy" alt="Chiamaka_N" style="border:1.5px solid #4ade80;"/>
+              <span class="slide-author-name">@Chiamaka_N</span>
+              <span class="slide-likes">❤️ 31k likes</span>
+            </div>
+            <div class="slide-excerpt">The lawyer said: "Miss Obi was adopted at eleven days old." The room went very quiet. The kind that isn't the absence of sound…</div>
+            <button class="read-btn" style="background:#4ade80;color:#000;" onclick="handleRead(this,'Grandmother\'s Will')">Read Now →</button>
+          </div>
+        </div>
+
+      </div><!-- /slide-track -->
+    </div><!-- /slide-viewport -->
+
+    <!-- Footer: dots + countdown + pause -->
+    <div class="promo-footer">
+      <div class="dots" id="dots">
+        <div class="dot active" data-i="0" style="background:#ff0050;" onclick="userGoTo(0)"></div>
+        <div class="dot" data-i="1" onclick="userGoTo(1)"></div>
+        <div class="dot" data-i="2" onclick="userGoTo(2)"></div>
+      </div>
+      <div class="footer-right">
+        <div class="countdown-pill">
+          <span class="countdown-label">Next in</span>
+          <span class="countdown-num" id="timerNum">5</span>
+          <span class="countdown-label">s</span>
+        </div>
+        <button class="pause-btn" id="pauseBtn" aria-label="Pause auto-slide" onclick="togglePause()">⏸</button>
+      </div>
+    </div>
+
+  </div><!-- /promo-card -->
+</div><!-- /promo-overlay -->
+
+<!-- Reopen button shown after closing -->
+<button class="reopen-btn" id="reopenBtn" onclick="reopenPopup()">📖 Featured Stories</button>
+
+<script>
+/* ════════════════════
+   CONFIGURATION
+════════════════════ */
+const TOTAL_SLIDES = 3;
+const SLIDE_DURATION = 5000; // ms per slide
+
+// Dot accent colours matching each slide
+const DOT_COLORS = ['#ff0050','#60a5fa','#4ade80'];
+
+/* ════════════════════
+   STATE
+════════════════════ */
+let current = 0;
+let paused = false;
+let timeLeft = SLIDE_DURATION / 1000;
+let countdownInterval = null;
+let progressRAF = null;
+let progressStart = null;
+let progressElapsed = 0; // ms accumulated when paused
+
+/* ════════════════════
+   ELEMENTS
+════════════════════ */
+const overlay   = document.getElementById('promoOverlay');
+const card      = document.getElementById('promoCard');
+const track     = document.getElementById('slideTrack');
+const dotEls    = document.querySelectorAll('.dot');
+const timerEl   = document.getElementById('timerNum');
+const pauseBtn  = document.getElementById('pauseBtn');
+const closeBtn  = document.getElementById('closeBtn');
+const reopenBtn = document.getElementById('reopenBtn');
+const pbEls     = [document.getElementById('pb0'), document.getElementById('pb1'), document.getElementById('pb2')];
+
+/* ════════════════════
+   SLIDE NAVIGATION
+════════════════════ */
+function goTo(n) {
+  current = ((n % TOTAL_SLIDES) + TOTAL_SLIDES) % TOTAL_SLIDES;
+  track.style.transform = 'translateX(-' + (current * 33.333) + '%)';
+  dotEls.forEach((d, i) => {
+    if (i === current) {
+      d.classList.add('active');
+      d.style.background = DOT_COLORS[current];
+    } else {
+      d.classList.remove('active');
+      d.style.background = 'rgba(255,255,255,0.25)';
+    }
+  });
+  // Reset progress bars
+  pbEls.forEach((pb, i) => {
+    if (i === current) {
+      pb.style.transition = 'none';
+      pb.style.width = '0%';
+    } else {
+      pb.style.transition = 'none';
+      pb.style.width = i < current ? '100%' : '0%';
+    }
+  });
+}
+
+function userGoTo(n) {
+  goTo(n);
+  restartTimers();
+}
+
+function next() {
+  goTo(current + 1);
+  restartTimers();
+}
+
+/* ════════════════════
+   COUNTDOWN TIMER
+════════════════════ */
+function startCountdown() {
+  clearInterval(countdownInterval);
+  timeLeft = SLIDE_DURATION / 1000;
+  timerEl.textContent = timeLeft;
+  countdownInterval = setInterval(() => {
+    if (paused) return;
+    timeLeft--;
+    timerEl.textContent = Math.max(0, timeLeft);
+    if (timeLeft <= 0) {
+      clearInterval(countdownInterval);
+    }
+  }, 1000);
+}
+
+/* ════════════════════
+   PROGRESS BAR (rAF-based)
+════════════════════ */
+function startProgress() {
+  cancelAnimationFrame(progressRAF);
+  progressElapsed = 0;
+  progressStart = null;
+  const pb = pbEls[current];
+  pb.style.transition = 'none';
+  pb.style.width = '0%';
+
+  function tick(ts) {
+    if (!progressStart) progressStart = ts;
+    if (!paused) progressElapsed += (ts - (progressStart));
+    progressStart = ts;
+    const pct = Math.min(100, (progressElapsed / SLIDE_DURATION) * 100);
+    pb.style.width = pct + '%';
+    if (pct >= 100) {
+      next();
+      return;
+    }
+    progressRAF = requestAnimationFrame(tick);
+  }
+  progressRAF = requestAnimationFrame(tick);
+}
+
+function restartTimers() {
+  cancelAnimationFrame(progressRAF);
+  clearInterval(countdownInterval);
+  startCountdown();
+  startProgress();
+}
+
+/* ════════════════════
+   PAUSE / RESUME
+════════════════════ */
+function togglePause() {
+  paused = !paused;
+  pauseBtn.textContent = paused ? '▶' : '⏸';
+  pauseBtn.setAttribute('aria-label', paused ? 'Resume auto-slide' : 'Pause auto-slide');
+  if (!paused) {
+    // Resume progress tracking
+    progressStart = null;
+    cancelAnimationFrame(progressRAF);
+    const pb = pbEls[current];
+    const currentPct = parseFloat(pb.style.width) || 0;
+    progressElapsed = (currentPct / 100) * SLIDE_DURATION;
+    function tick(ts) {
+      if (!progressStart) progressStart = ts;
+      if (!paused) progressElapsed += (ts - progressStart);
+      progressStart = ts;
+      const pct = Math.min(100, (progressElapsed / SLIDE_DURATION) * 100);
+      pb.style.width = pct + '%';
+      // Sync countdown
+      timeLeft = Math.ceil(((100 - pct) / 100) * (SLIDE_DURATION / 1000));
+      timerEl.textContent = Math.max(0, timeLeft);
+      if (pct >= 100) { next(); return; }
+      progressRAF = requestAnimationFrame(tick);
+    }
+    progressRAF = requestAnimationFrame(tick);
+  }
+}
+
+/* ════════════════════
+   CLOSE & REOPEN
+════════════════════ */
+function closePopup() {
+  cancelAnimationFrame(progressRAF);
+  clearInterval(countdownInterval);
+  overlay.classList.add('hiding');
+  card.classList.add('hiding');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.classList.remove('hiding');
+    card.classList.remove('hiding');
+    reopenBtn.style.display = 'block';
+  }, 300);
+}
+
+function reopenPopup() {
+  overlay.style.display = 'flex';
+  reopenBtn.style.display = 'none';
+  paused = false;
+  pauseBtn.textContent = '⏸';
+  goTo(0);
+  restartTimers();
+}
+
+closeBtn.addEventListener('click', closePopup);
+overlay.addEventListener('click', e => { if (e.target === overlay) closePopup(); });
+
+/* ════════════════════
+   READ BUTTON HANDLER
+════════════════════ */
+function handleRead(btn, title) {
+  const original = btn.textContent;
+  btn.textContent = 'Opening…';
+  btn.style.opacity = '.7';
+  btn.disabled = true;
+  // In your real app: window.location.href = '/story/...'
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.style.opacity = '1';
+    btn.disabled = false;
+    alert('📖 Opening: ' + title + '\n\n(Wire this to your router in the real app)');
+  }, 900);
+}
+
+/* ════════════════════
+   TOUCH / SWIPE SUPPORT
+════════════════════ */
+let touchStartX = 0;
+let touchStartY = 0;
+
+track.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+track.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    userGoTo(dx < 0 ? current + 1 : current - 1);
+  }
+}, { passive: true });
+
+/* Mouse drag support for desktop */
+let mouseStartX = 0;
+let isDragging = false;
+track.addEventListener('mousedown', e => { mouseStartX = e.clientX; isDragging = true; });
+track.addEventListener('mousemove', e => { if (isDragging) e.preventDefault(); });
+track.addEventListener('mouseup', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  const dx = e.clientX - mouseStartX;
+  if (Math.abs(dx) > 40) userGoTo(dx < 0 ? current + 1 : current - 1);
+});
+track.addEventListener('mouseleave', () => { isDragging = false; });
+
+/* ════════════════════
+   KEYBOARD NAVIGATION
+════════════════════ */
+document.addEventListener('keydown', e => {
+  if (overlay.style.display === 'none') return;
+  if (e.key === 'ArrowRight') userGoTo(current + 1);
+  if (e.key === 'ArrowLeft') userGoTo(current - 1);
+  if (e.key === 'Escape') closePopup();
+  if (e.key === ' ') { e.preventDefault(); togglePause(); }
+});
+
+/* ════════════════════
+   INIT
+════════════════════ */
+goTo(0);
+restartTimers();
+
+/*
+  ══════════════════════════════════════════════════════════════
+  HOW TO USE IN YOUR DROBOARD READER PAGE
+  ──────────────────────────────────────────────────────────────
+  1. Copy the <style> block into your reader page's <style> or
+     a separate CSS file.
+
+  2. Copy the promo-overlay <div> and reopen-btn into your
+     reader page's <body> — outside the scroll container.
+
+  3. Copy the <script> block into your page, then remove the
+     demo-page div (that's just for this preview).
+
+  4. To auto-show after a delay (e.g. 8 seconds into reading):
+     Replace the goTo(0) + restartTimers() at the bottom with:
+
+       overlay.style.display = 'none';
+       setTimeout(() => { reopenPopup(); }, 8000);
+
+  5. Wire the handleRead() function to your router:
+     Replace the alert() with:
+       window.location.href = '/story/' + storySlug;
+     or your app's navigation method.
+
+  6. Populate slides dynamically from your API by replacing
+     the hardcoded slide HTML with a JS render function, e.g.:
+       function renderSlides(stories) { ... }
+  ══════════════════════════════════════════════════════════════
+*/
+</script>
+</body>
+</html>

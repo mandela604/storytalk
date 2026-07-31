@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#f7f7f8" id="themeColorMeta"/>
+<title>Droboard · Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   THEME TOKENS
+   :root = LIGHT (default) — pulled from discover.html's palette
+   html[data-theme="dark"] = DARK — the original feed.html palette
+   Every other rule in this file reads colors ONLY through these
+   custom properties, so toggling data-theme repaints instantly.
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  /* accent */
+  --acc:#ff2d55;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,45,85,.18);--glow-sm:rgba(255,45,85,.10);
+
+  /* surfaces */
+  --bg:#f7f7f8;--card:#ffffff;
+  --l1:#ffffff;--l2:#ffffff;--l3:#f4f4f5;--l4:#ebebed;
+
+  /* borders */
+  --bd:#ebebed;--bd2:#f2f2f3;--bd-acc:rgba(255,45,85,.22);
+
+  /* text */
+  --tx-high:#1a1a1a;--tx-body:#48484a;--tx-muted:#8e8e93;--tx-faint:#c7c7cc;
+  --tx-title:#1a1a1a;
+
+  /* semantic / data colors */
+  --blue:#0284c7;--green:#16a34a;--gold:#d97706;--purple:#9333ea;--orange:#ea580c;
+  --for-col:#16a34a;--ag-col:#dc2626;
+
+  --post-sep:#ebebed;
+
+  /* chrome-only helpers (not on discover.html, needed for feed chrome) */
+  --nav-blur-bg:rgba(247,247,248,.92);
+  --sheet-shadow:0 8px 40px rgba(0,0,0,.12);
+  --overlay-bg:rgba(20,20,22,.45);
+  --fab-shadow:0 4px 22px var(--glow);
+  --scrollbar-thumb:rgba(255,45,85,.25);
+
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+
+html[data-theme="dark"]{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+
+  --bg:#000000;--card:#000000;
+  --l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+
+  --tx-high:#e8e8e8;--tx-body:#a8b0ba;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --tx-title:#dedede;
+
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --for-col:#34d399;--ag-col:#f87171;
+
+  --post-sep:#1a1b22;
+
+  --nav-blur-bg:rgba(0,0,0,.97);
+  --sheet-shadow:0 8px 40px rgba(0,0,0,.95);
+  --overlay-bg:rgba(0,0,0,.7);
+  --fab-shadow:0 4px 22px var(--glow);
+  --scrollbar-thumb:rgba(255,0,80,.2);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px);transition:background-color .25s ease,color .25s ease}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:2px}
+
+/* Elements that visibly repaint on theme toggle get an explicit transition
+   so the switch feels intentional rather than a hard flash. */
+body,.top-bar,.tabs-bar,.search-bar,.top-icon,.bottom-nav,.fab,.hamburger-sheet,
+.toast,.load-more-btn,.status-ring-inner,.tab,.bn-item,.live-banner,.hm-item,
+.empty-state{
+  transition:background-color .25s ease,border-color .25s ease,color .25s ease,box-shadow .25s ease;
+}
+
+/* ══ TOP BAR ══ */
+.top-bar{position:sticky;top:0;z-index:200;background:var(--nav-blur-bg);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:calc(var(--safe-t) + 10px) 14px 10px;display:flex;align-items:center;gap:10px}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;flex-shrink:0;cursor:pointer}
+.search-bar{flex:1;display:flex;align-items:center;gap:7px;background:var(--l2);border:1.5px solid var(--bd);border-radius:24px;padding:8px 13px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--bd-acc)}
+.search-bar i{color:var(--tx-faint);font-size:12px}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--tx-body);font-family:'DM Sans',sans-serif;font-size:13px}
+.search-bar input::placeholder{color:var(--tx-faint)}
+.top-icon{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--tx-muted);cursor:pointer;flex-shrink:0;position:relative;transition:.15s}
+.top-icon:active{transform:scale(.92);color:var(--acc)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:2px solid var(--l2)}
+.top-icon.theme-toggle i{transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.top-icon.theme-toggle:active i{transform:rotate(35deg)}
+
+/* ══ TABS ══ */
+.tabs-bar{position:sticky;top:calc(var(--safe-t) + 54px);z-index:190;background:var(--nav-blur-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;font-size:12px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
+.tab-ct{background:var(--glow-sm);color:var(--acc);font-size:8px;font-weight:800;padding:1px 5px;border-radius:6px}
+
+/* ══ STATUS RINGS (top row — custom, not part of any component) ══ */
+.statuses-row{display:flex;gap:14px;padding:14px 14px 12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--post-sep)}
+.statuses-row::-webkit-scrollbar{display:none}
+.status-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.status-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;position:relative}
+.status-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.status-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc3),var(--acc))}
+.status-ring.ring-viewed{background:var(--tx-faint)}
+.status-ring.ring-none{background:var(--l3)}
+.status-ring-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--card)}
+.status-ring-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.status-ring-initial{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--acc3);background:var(--glow-sm)}
+.status-live-dot{position:absolute;bottom:1px;right:1px;width:14px;height:14px;border-radius:50%;background:var(--acc);border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:900;color:#fff;animation:pdot 1.4s ease-in-out infinite}
+@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.status-name{font-size:9.5px;font-weight:700;color:var(--tx-muted);text-align:center;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-name.new-s{color:var(--tx-high)}
+
+/* ══ FEATURED SLIDER (custom) ══ */
+.featured-slider-wrap{margin:0;border-radius:0;overflow:hidden;position:relative;border-bottom:1px solid var(--post-sep)}
+.fs-track{display:flex;will-change:transform;transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.fs-slide{flex:0 0 100%;position:relative;cursor:pointer}
+.fb-img{width:100%;height:200px;background-size:cover;background-position:center 25%}
+/* Slide text sits on a photo, so its scrim + type stay a fixed dark-on-light
+   treatment in both themes — that isn't page chrome, it's image legibility. */
+.fb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.1) 100%)}
+.fb-content{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px}
+.fb-tags{display:flex;gap:5px;margin-bottom:7px}
+.fb-tag{font-size:8px;font-weight:900;padding:2px 8px;border-radius:6px;letter-spacing:.05em;text-transform:uppercase}
+.fb-tag-hot{background:var(--acc);color:#fff}
+.fb-tag-cat{background:rgba(255,255,255,.12);backdrop-filter:blur(4px);color:rgba(255,255,255,.85)}
+.fb-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;line-height:1.28;color:#e8e8e8;margin-bottom:8px}
+.fb-meta{display:flex;align-items:center;gap:8px}
+.fb-av{width:20px;height:20px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.3)}
+.fb-author{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);flex:1}
+.fb-stats{display:flex;gap:8px}
+.fb-stat{font-size:10px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:3px;font-weight:600}
+.fb-read-btn{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:14px;font-size:10px;font-weight:800;cursor:pointer}
+.fs-dots{display:flex;gap:5px;justify-content:center;padding:7px 0 4px}
+.fs-dot{width:5px;height:5px;border-radius:50%;background:var(--tx-faint);cursor:pointer;transition:.25s}
+.fs-dot.on{width:18px;border-radius:3px;background:var(--acc)}
+
+/* ══ LIVE BANNER (custom) ══ */
+.live-banner{padding:12px 14px;display:none;align-items:center;gap:10px;border-bottom:1px solid var(--post-sep);background:linear-gradient(135deg,var(--glow-sm),rgba(0,0,0,0))}
+.live-banner.show{display:flex}
+.live-dot-big{width:10px;height:10px;border-radius:50%;background:var(--acc);animation:pdot 1.2s ease-in-out infinite;flex-shrink:0}
+.live-banner-info{flex:1}
+.live-banner-label{font-size:9px;font-weight:900;color:var(--acc);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.live-banner-title{font-size:13px;font-weight:800;color:var(--tx-high);line-height:1.3}
+.live-banner-meta{font-size:10px;color:var(--tx-muted);margin-top:2px}
+.live-banner-btn{background:var(--acc);color:#fff;border:none;padding:7px 14px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0}
+
+/* ══ HAMBURGER TIME-FILTER MENU (custom) ══ */
+.hamburger-menu{position:fixed;inset:0;z-index:9999 !important;background:var(--overlay-bg);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:flex-end}
+.hamburger-menu.open{display:flex !important}
+.hamburger-sheet{background:var(--l2) !important;border:1px solid var(--bd);border-radius:16px;margin:calc(var(--safe-t) + 60px) 14px 0 0;min-width:200px;padding:6px;box-shadow:var(--sheet-shadow);animation:popIn .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.hm-label{font-size:9px;font-weight:800;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.1em;padding:8px 12px 4px}
+.hm-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx-body);cursor:pointer;transition:.12s}
+.hm-item:hover{background:var(--bd2);color:var(--tx-high)}
+.hm-item.active{color:var(--acc);background:var(--glow-sm)}
+.hm-item i{font-size:13px;width:16px;text-align:center;color:inherit}
+.hm-divider{height:1px;background:var(--bd2);margin:3px 8px}
+
+/* ══ LOAD MORE (custom) ══ */
+.load-more-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:transparent;border-top:1px solid var(--post-sep);font-size:12px;font-weight:700;color:var(--tx-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;border:none}
+.load-more-btn:active{color:var(--acc2)}
+
+/* ══ FAB (custom) ══ */
+.fab{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);right:16px;z-index:150;width:50px;height:50px;border-radius:50%;background:var(--acc);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;cursor:pointer;box-shadow:var(--fab-shadow);transition:.18s}
+.fab:active{transform:scale(.92)}
+
+/* ══ BOTTOM NAV (custom) ══ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--nav-blur-bg);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* ══ TOAST (custom, shared with components via window.toast) ══ */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty-state{text-align:center;padding:40px 24px;color:var(--tx-muted)}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block;color:var(--tx-faint)}
+.empty-state h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--tx-body);margin-bottom:6px}
+.empty-state p{font-size:12px;line-height:1.55;max-width:220px;margin:0 auto}
+
+#feedArea{border-top:1px solid var(--post-sep)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo" onclick="location.href='index.html'">D</div>
+  <div class="search-bar" onclick="location.href='search.html'">
+    <i class="fas fa-magnifying-glass"></i>
+    <input placeholder="Search stories, writers, debates…" readonly/>
+  </div>
+  <div class="top-icon" onclick="toast('🔔 7 new notifications')">
+    <i class="fas fa-bell"></i>
+    <div class="notif-dot"></div>
+  </div>
+  <div class="top-icon theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark mode">
+    <i class="fas fa-moon" id="themeToggleIcon"></i>
+  </div>
+  <div class="top-icon" id="hamburgerBtn" onclick="toggleHamburger(event)">
+    <i class="fas fa-bars"></i>
+  </div>
+</div>
+
+<!-- HAMBURGER TIME FILTER MENU -->
+<div class="hamburger-menu" id="hamburgerMenu" onclick="if(event.target===this)closeHamburger()">
+  <div class="hamburger-sheet">
+    <div class="hm-label">Time Filter</div>
+    <div class="hm-item active" id="tf-all" onclick="setTimeFilter('all',this)"><i class="fas fa-infinity"></i> All Time</div>
+    <div class="hm-item" id="tf-today" onclick="setTimeFilter('today',this)"><i class="fas fa-sun"></i> Today</div>
+    <div class="hm-item" id="tf-week" onclick="setTimeFilter('week',this)"><i class="fas fa-calendar-week"></i> This Week</div>
+    <div class="hm-item" id="tf-month" onclick="setTimeFilter('month',this)"><i class="fas fa-calendar-alt"></i> This Month</div>
+    <div class="hm-divider"></div>
+    <div class="hm-item" onclick="setTimeFilter('all',document.getElementById('tf-all'));closeHamburger()"><i class="fas fa-times"></i> Clear Filter</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active" data-tab="all" onclick="switchTab(this,'all')"><i class="fas fa-house" style="font-size:11px"></i> For You</div>
+  <div class="tab" data-tab="following" onclick="switchTab(this,'following')"><i class="fas fa-user-group" style="font-size:11px"></i> Following</div>
+  <div class="tab" data-tab="stories" onclick="switchTab(this,'stories')"><i class="fas fa-book-open" style="font-size:11px"></i> Stories <span class="tab-ct">48</span></div>
+  <div class="tab" data-tab="debates" onclick="switchTab(this,'debates')"><i class="fas fa-scale-balanced" style="font-size:11px"></i> Debates <span class="tab-ct">12</span></div>
+  <div class="tab" data-tab="forum" onclick="switchTab(this,'forum')"><i class="fas fa-comments" style="font-size:11px"></i> Forum</div>
+  <div class="tab" data-tab="career" onclick="switchTab(this,'career')"><i class="fas fa-briefcase" style="font-size:11px"></i> Career</div>
+  <div class="tab" data-tab="live" onclick="switchTab(this,'live')"><i class="fas fa-circle" style="font-size:8px;color:var(--acc)"></i> Live</div>
+</div>
+
+<!-- STATUS RINGS -->
+<div class="statuses-row" id="statusesRow"></div>
+
+<!-- FEATURED SLIDER -->
+<div class="featured-slider-wrap" id="featuredSlider">
+  <div class="fs-track" id="fsTrack"></div>
+</div>
+<div class="fs-dots" id="fsDots"></div>
+
+<!-- LIVE BANNER -->
+<div class="live-banner" id="liveBanner">
+  <div class="live-dot-big"></div>
+  <div class="live-banner-info">
+    <div class="live-banner-label"><i class="fas fa-signal" style="font-size:8px;margin-right:3px"></i> Live Now</div>
+    <div class="live-banner-title">Ada_Writes · Ask Me Anything 🎙</div>
+    <div class="live-banner-meta">847 watching · Writing dark chapters · Series S3</div>
+  </div>
+  <button class="live-banner-btn" onclick="toast('🎙 Joining live AMA…')"><i class="fas fa-arrow-right" style="font-size:10px"></i> Join</button>
+</div>
+
+<!-- FEED (post cards rendered by DroboardPostCard; ads + people-to-follow interleaved by feed.html) -->
+<div id="feedArea"></div>
+
+<!-- LOAD MORE -->
+<button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">
+  <i class="fas fa-chevron-down"></i> Load more posts
+</button>
+
+<!-- BOTTOM NAV — active on Feed -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item active" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="toast('✏️ What would you like to post?')">
+  <i class="fas fa-pen"></i>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<!-- Load components from component/ folder -->
+<script src="component/save-modal.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/status-viewer.js"></script>
+<script src="component/ad-card.js"></script>
+<script src="component/post-card.js"></script>
+<script src="component/people-to-follow.js"></script>
+
+<!-- Load data from data/ folder -->
+<script src="data/post-data.js"></script>
+<script src="data/ad-data.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   feed.html glue script
+   Wires WRITER_STATUSES / FEED / MORE_FEED / TOP3 (post-data.js)
+   and NATIVE_ADS / STORY_PROMO_ADS / ALL_ADS (ad-data.js) into
+   the shared components: post-card, ad-card, people-to-follow,
+   status-viewer, share-modal, save-modal.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══ THEME TOGGLE ═══
+   Light (Discover's palette) is the default. Toggling flips the
+   `data-theme` attribute on <html>, which swaps every CSS custom
+   property defined in :root / html[data-theme="dark"] above.
+   State lives in memory only (no persistence) — pages that embed
+   this feed can wire up their own persistence later if desired. */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('themeToggleIcon');
+  if (icon) icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  const meta = document.getElementById('themeColorMeta');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#000000' : '#f7f7f8');
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  toast(next === 'dark' ? '🌙 Dark mode' : '☀️ Light mode');
+}
+
+/* ═══ TOAST (shared globally — components call window.toast if present) ═══ */
+function toast(m, dur = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function fmtN(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n || 0); }
+
+/* ═══ DATA HELPERS ═══ */
+function allPosts() { return FEED.concat(MORE_FEED); }
+function findOriginal(pid) { return allPosts().find(x => x.id === pid); }
+function getWriterStatus(wid) { return wid ? WRITER_STATUSES.find(w => w.id === wid) : null; }
+
+/* Map a post-data.js post into the shape post-card.js expects.
+   post-data.js is untouched — ring + statusUpdate are derived here
+   via the wid -> WRITER_STATUSES lookup instead of living on the post. */
+function mapPostForCard(p) {
+  const ws = getWriterStatus(p.wid);
+  return Object.assign({}, p, {
+    avatarRing: ws ? ws.ring : 'ring-none',
+    statusUpdate: (p.showStatusUpdate && ws && ws.statusUpdate) ? ws.statusUpdate : undefined,
+  });
+}
+
+/* ═══ LOCAL REACTION STATE (post-data.js has no per-emoji counts) ═══ */
+const REACTION_IDS = ['love', 'fire', 'cry', 'shock', 'angry', 'clap'];
+const rxState = {};
+function getReactionFor(post) {
+  if (!rxState[post.id]) {
+    const o = { userRx: null };
+    REACTION_IDS.forEach(r => (o[r] = Math.floor(Math.random() * 300) + 5));
+    rxState[post.id] = o;
+  }
+  return rxState[post.id];
+}
+
+/* ═══ SHARE / SAVE HELPERS ═══ */
+function shareDataFor(post) {
+  return {
+    title: post.title || post.quote || (post.text ? post.text.substring(0, 60) : 'Droboard Post'),
+    sub: '@' + post.name,
+    img: post.image || post.chapterRef?.cover || post.storyRef?.cover || '',
+    url: `https://droboard.app/post/${post.id}`,
+  };
+}
+function doShare(post) { window.openShareModal(shareDataFor(post)); }
+function doSave(post) {
+  const d = shareDataFor(post);
+  window.openSaveModal({ title: d.title, sub: d.sub, img: d.img, storyId: post.id });
+}
+
+/* ═══ STATUS RING ROW (top of feed — custom, feeds WRITER_STATUSES into openStatusViewer) ═══ */
+function renderStatuses() {
+  document.getElementById('statusesRow').innerHTML = WRITER_STATUSES.map(ws => {
+    if (ws.isYou) {
+      return `<div class="status-item" data-you="1">
+        <div class="status-ring ring-none" style="position:relative">
+          <div class="status-ring-inner"><div class="status-ring-initial">Y</div></div>
+          <div style="position:absolute;bottom:1px;right:1px;width:16px;height:16px;border-radius:50%;background:var(--acc);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900">+</div>
+        </div>
+        <div class="status-name">Your Story</div>
+      </div>`;
+    }
+    const liveEl = ws.isLive ? `<div class="status-live-dot"><i class="fas fa-signal" style="font-size:5px"></i></div>` : '';
+    const avHtml = ws.avatar
+      ? `<img src="${ws.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" loading="lazy"/>`
+      : `<div class="status-ring-initial">${ws.name[0]}</div>`;
+    return `<div class="status-item" data-wid="${ws.id}">
+      <div class="status-ring ${ws.ring}" style="position:relative">
+        <div class="status-ring-inner">${avHtml}</div>${liveEl}
+      </div>
+      <div class="status-name${ws.ring !== 'ring-viewed' && ws.ring !== 'ring-none' ? ' new-s' : ''}">${ws.name.split('_')[0]}</div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('#statusesRow .status-item[data-you]').forEach(el => {
+    el.addEventListener('click', () => toast('✏️ Add to your story'));
+  });
+  document.querySelectorAll('#statusesRow .status-item[data-wid]').forEach(el => {
+    el.addEventListener('click', () => window.openStatusViewer(WRITER_STATUSES, el.dataset.wid));
+  });
+}
+
+/* status-viewer.js calls this global whenever a writer's status gets viewed.
+   people-to-follow.js chains onto whatever is here when it renders, so this
+   must be set BEFORE the first renderFeed() call. */
+window.onStatusViewerChange = function (wid, ring) {
+  const w = WRITER_STATUSES.find(x => x.id === wid);
+  if (w) w.ring = ring;
+  renderStatuses();
+};
+
+/* ═══ FEATURED SLIDER (custom, uses TOP3 from post-data.js) ═══ */
+let fsIdx = 0, fsTimer = null;
+function initFeaturedSlider() {
+  const track = document.getElementById('fsTrack');
+  const dots = document.getElementById('fsDots');
+  track.innerHTML = TOP3.map(s => `<div class="fs-slide" onclick="toast('📖 Opening story…')"><div class="fb-img" style="background-image:url('${s.bg}')"></div><div class="fb-scrim"></div><div class="fb-content"><div class="fb-tags"><span class="fb-tag fb-tag-hot"><i class="fas fa-trophy" style="font-size:7px;margin-right:3px"></i>${s.rank}</span><span class="fb-tag fb-tag-cat">${s.cat}</span></div><div class="fb-title">${s.title}</div><div class="fb-meta"><img class="fb-av" src="${s.av}"/><span class="fb-author">${s.author}</span><div class="fb-stats"><span class="fb-stat"><i class="fas fa-eye" style="font-size:9px"></i>${s.reads}</span><span class="fb-stat"><i class="fas fa-heart" style="font-size:9px"></i>${s.likes}</span></div><button class="fb-read-btn" onclick="event.stopPropagation();toast('📖 Reading now')">Read Now</button></div></div></div>`).join('');
+  dots.innerHTML = TOP3.map((_, i) => `<div class="fs-dot${i === 0 ? ' on' : ''}" onclick="goSlide(${i})"></div>`).join('');
+  let sx = 0;
+  const wrap = document.getElementById('featuredSlider');
+  wrap.addEventListener('touchstart', e => { sx = e.touches[0].clientX; clearTimeout(fsTimer); }, { passive: true });
+  wrap.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) goSlide(dx < 0 ? (fsIdx + 1) % 3 : (fsIdx - 1 + 3) % 3); else startSlider(); }, { passive: true });
+  startSlider();
+}
+function goSlide(i) {
+  fsIdx = i;
+  document.getElementById('fsTrack').style.transform = `translateX(-${i * 100}%)`;
+  document.querySelectorAll('.fs-dot').forEach((d, j) => d.classList.toggle('on', j === i));
+  clearTimeout(fsTimer);
+  startSlider();
+}
+function startSlider() { fsTimer = setTimeout(() => goSlide((fsIdx + 1) % 3), 4500); }
+
+/* ═══ TABS / TIME FILTER (custom, filters FEED from post-data.js) ═══ */
+let currentTab = 'all';
+let currentTimeFilter = 'all';
+let feedLoaded = false;
+const PEOPLE_INJECT_AT = 7; // inject people-to-follow after the 7th rendered card
+const TIME_LIMITS = { today: 24, week: 168, month: 720 };
+
+function passesTimeFilter(p) {
+  if (currentTimeFilter === 'all') return true;
+  return p.timeHours <= (TIME_LIMITS[currentTimeFilter] || 999);
+}
+
+function setTimeFilter(val, el) {
+  currentTimeFilter = val;
+  document.querySelectorAll('.hm-item').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderFeed(currentFeedList());
+  closeHamburger();
+  const labels = { all: 'All Time', today: 'Today', week: 'This Week', month: 'This Month' };
+  toast('📅 Showing: ' + labels[val]);
+}
+
+function toggleHamburger(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('hamburgerMenu').classList.toggle('open');
+}
+function closeHamburger() { document.getElementById('hamburgerMenu').classList.remove('open'); }
+
+function filteredFeed() {
+  let posts = FEED.filter(p => passesTimeFilter(p));
+  if (currentTab === 'all') return posts;
+  if (currentTab === 'live') return posts.filter(p => p.type === 'ama' && p.amaData?.isLive);
+  if (currentTab === 'forum') return posts.filter(p => ['forum-post', 'forum-poll', 'forum-review', 'confession', 'writer-post'].includes(p.type) && p.type !== 'ama' && p.type !== 'debate');
+  if (currentTab === 'debates') return posts.filter(p => p.type === 'debate');
+  if (currentTab === 'stories') return posts.filter(p => ['chapter-drop', 'quote', 'motivation', 'repost', 'photo-post'].includes(p.type));
+  if (currentTab === 'career') return posts.filter(p => ['career-post'].includes(p.type) || p.tab?.includes('career'));
+  if (currentTab === 'following') return posts.filter(p => p.tab?.includes('following'));
+  return posts;
+}
+
+/* filteredFeed() + MORE_FEED once "Load more" has been tapped */
+function currentFeedList() {
+  return feedLoaded ? filteredFeed().concat(MORE_FEED) : filteredFeed();
+}
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  el.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+  currentTab = tab;
+  document.getElementById('liveBanner').classList.toggle('show', tab === 'live');
+  document.getElementById('featuredSlider').style.display = tab === 'all' ? 'block' : 'none';
+  document.getElementById('fsDots').style.display = tab === 'all' ? 'flex' : 'none';
+  renderFeed(currentFeedList());
+}
+
+/* ═══ AD CYCLE (ad-data.js → DroboardAdCard) ═══ */
+const AD_CYCLE = [];
+(function buildAdCycle() {
+  const n = Math.max(NATIVE_ADS.length, STORY_PROMO_ADS.length);
+  for (let i = 0; i < n; i++) {
+    if (NATIVE_ADS[i]) AD_CYCLE.push({ kind: 'native', ad: NATIVE_ADS[i] });
+    if (STORY_PROMO_ADS[i]) AD_CYCLE.push({ kind: 'promo', ad: STORY_PROMO_ADS[i] });
+  }
+})();
+let adCycleIdx = 0;
+function nextAdNode() {
+  if (!AD_CYCLE.length) return null;
+  const item = AD_CYCLE[adCycleIdx % AD_CYCLE.length];
+  adCycleIdx++;
+  const html = item.kind === 'native' ? DroboardAdCard.renderNative(item.ad) : DroboardAdCard.renderStoryPromo(item.ad);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html.trim();
+  return tmp.firstElementChild;
+}
+function refreshAdNode(ad) {
+  const el = document.querySelector(`#feedArea [data-adid="${ad.id}"]`);
+  if (!el) return;
+  const isNative = el.dataset.adtype === 'native';
+  const html = isNative ? DroboardAdCard.renderNative(ad) : DroboardAdCard.renderStoryPromo(ad);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html.trim();
+  el.replaceWith(tmp.firstElementChild);
+}
+
+/* ═══ PEOPLE-TO-FOLLOW POOL (built from WRITER_STATUSES) ═══ */
+function peoplePoolFromWriters() {
+  const VERIFIED_IDS = ['w1', 'w5', 'w6'];
+  return WRITER_STATUSES.filter(w => !w.isYou).map(w => ({
+    id: w.id,
+    name: w.name,
+    av: w.avatar,
+    ring: w.ring,
+    isLive: w.isLive || false,
+    statuses: w.statuses,
+    verified: VERIFIED_IDS.includes(w.id),
+    rank: w.isLive ? '🔴 Live now' : null,
+    following: false,
+    profileUrl: 'profile.html',
+  }));
+}
+let ptfInstance = null;
+function renderPeopleBlock(container) {
+  if (ptfInstance) ptfInstance.destroy();
+  ptfInstance = DroboardPeopleToFollow.render(container, {
+    people: peoplePoolFromWriters(),
+    title: 'People to Follow',
+  });
+}
+
+/* ═══ MAIN FEED RENDER ═══
+   1. DroboardPostCard.setPosts() renders every post card into #feedArea
+      (this also builds each card's 3-dot menu).
+   2. We then walk the freshly-rendered card elements and splice in
+      ad cards (every 5th card) and one people-to-follow block
+      (after the 7th card, or at the end if fewer than 7 posts). */
+function renderFeed(posts) {
+  const area = document.getElementById('feedArea');
+
+  if (!posts.length) {
+    area.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h4>Nothing here yet</h4><p>No posts match your current filter. Try a different tab or time range.</p></div>`;
+    return;
+  }
+
+  const mapped = posts.map(mapPostForCard);
+  DroboardPostCard.setPosts(mapped);
+
+  const cardEls = Array.from(area.children);
+  let peopleInjected = false;
+
+  cardEls.forEach((el, idx) => {
+    const cardCount = idx + 1;
+
+    if (cardCount % 5 === 0) {
+      const adNode = nextAdNode();
+      if (adNode) area.insertBefore(adNode, el.nextSibling);
+    }
+
+    if (!peopleInjected && cardCount === PEOPLE_INJECT_AT) {
+      peopleInjected = true;
+      const wrap = document.createElement('div');
+      area.insertBefore(wrap, el.nextSibling);
+      renderPeopleBlock(wrap);
+    }
+  });
+
+  if (!peopleInjected) {
+    const wrap = document.createElement('div');
+    area.appendChild(wrap);
+    renderPeopleBlock(wrap);
+  }
+}
+
+function loadMore() {
+  if (feedLoaded) { toast('✅ All posts loaded!'); return; }
+  feedLoaded = true;
+  renderFeed(currentFeedList());
+  document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-check"></i> All posts loaded';
+  toast('✨ More posts loaded!');
+}
+
+/* ═══ POST-CARD HOOKS ═══ */
+DroboardPostCard.attach(document.getElementById('feedArea'), {
+  getReaction: getReactionFor,
+
+  onLike(post) {
+    const orig = findOriginal(post.id);
+    if (!orig) return;
+    orig.liked = !orig.liked;
+    orig.likes += orig.liked ? 1 : -1;
+    DroboardPostCard.update(mapPostForCard(orig));
+  },
+
+  onReact(post, rid) {
+    const rx = getReactionFor(post);
+    if (rx.userRx === rid) { rx[rid]--; rx.userRx = null; }
+    else { if (rx.userRx) rx[rx.userRx]--; rx[rid]++; rx.userRx = rid; }
+    const orig = findOriginal(post.id);
+    if (orig) DroboardPostCard.update(mapPostForCard(orig));
+    toast('Reaction saved');
+  },
+
+  onComment(post) { location.href = 'post.html?pid=' + post.id; },
+
+  onShare(post) { doShare(post); },
+
+  onDotsAction(action, post) {
+    if (action === 'edit') { toast('✏️ Editing post…'); return; }
+    if (action === 'delete') {
+      let idx = FEED.findIndex(x => x.id === post.id);
+      if (idx > -1) FEED.splice(idx, 1);
+      else { idx = MORE_FEED.findIndex(x => x.id === post.id); if (idx > -1) MORE_FEED.splice(idx, 1); }
+      renderFeed(currentFeedList());
+      toast('🗑️ Post deleted.');
+      return;
+    }
+    if (action === 'report') { toast('🚩 Reported.'); return; }
+    if (action === 'less') { toast("👁️ You'll see less of this."); return; }
+    if (action === 'follow') { toast(`✅ Following @${post.name}!`); return; }
+    if (action === 'share') { doShare(post); return; }
+    if (action === 'save') { doSave(post); return; }
+  },
+
+  onPollVote(post, oi) {
+    const orig = findOriginal(post.id);
+    if (!orig || !orig.poll) return;
+    if (orig.poll.voted >= 0) { toast('✅ Already voted!'); return; }
+    orig.poll.opts[oi].v++;
+    orig.poll.voted = oi;
+    orig.poll.total++;
+    DroboardPostCard.update(mapPostForCard(orig));
+    toast('✅ Vote cast!');
+  },
+
+  onDebateVote(post, side) {
+    const orig = findOriginal(post.id);
+    if (!orig || !orig.debateData) return;
+    if (orig.debateData.userVote) { toast('✅ Already voted!'); return; }
+    orig.debateData.userVote = side;
+    if (side === 'for') orig.debateData.forV++; else orig.debateData.agV++;
+    DroboardPostCard.update(mapPostForCard(orig));
+    toast(side === 'for' ? '✅ Voted FOR!' : '❌ Voted AGAINST!');
+  },
+
+  onAvatarClick(post) {
+    const ws = getWriterStatus(post.wid);
+    if (ws && ws.statuses && ws.statuses.length) {
+      window.openStatusViewer(WRITER_STATUSES, ws.id);
+    } else {
+      location.href = 'profile.html';
+    }
+  },
+
+  onReplySend(post, text) {
+    const orig = findOriginal(post.id);
+    if (!orig) return;
+    orig.comments++;
+    DroboardPostCard.update(mapPostForCard(orig));
+    toast('💬 Reply posted!');
+  },
+});
+
+/* ═══ AD-CARD HOOKS ═══ */
+DroboardAdCard.attach(document.getElementById('feedArea'), {
+  getAds: () => ALL_ADS,
+
+  onOpen(ad, type) {
+    if (ad.url) window.open(ad.url, '_blank');
+    else toast('Opening ' + ad.brand + '…');
+  },
+
+  onLike(ad) {
+    ad.liked = !ad.liked;
+    ad.likes += ad.liked ? 1 : -1;
+    refreshAdNode(ad);
+  },
+
+  onComment(ad) { toast('💬 ' + fmtN(ad.comments) + ' comments'); },
+
+  onShare(ad, type) {
+    window.openShareModal({
+      title: ad.heading || ad.title || ad.brand,
+      sub: 'Sponsored · ' + ad.brand,
+      img: ad.image || ad.cover || '',
+      url: ad.url || 'https://droboard.app',
+    });
+  },
+
+  onCta(ad, type) {
+    toast('Opening ' + ad.brand + '…');
+    if (ad.url) window.open(ad.url, '_blank');
+  },
+});
+
+/* Decorative post-card click targets (chapter card, story chip, AMA banner,
+   image) that post-card.js exposes via data-* attributes but doesn't wire
+   up itself — feed.html adds the toast feedback for them here. */
+document.getElementById('feedArea').addEventListener('click', (e) => {
+  if (e.target.closest('[data-chapter-open]')) toast('📖 Reading chapter…');
+  else if (e.target.closest('[data-story-chip]')) toast('📖 Opening story…');
+  else if (e.target.closest('[data-ama-open]')) toast('🎙 Joining AMA…');
+  else if (e.target.closest('[data-image-open]')) toast('🖼 Viewing…');
+});
+
+/* ═══ COSMETIC LIVE TICKER ═══ */
+function simulateLive() {
+  setInterval(() => {
+    const pool = FEED.filter(p => typeof p.likes === 'number');
+    if (!pool.length) return;
+    const rnd = pool[Math.floor(Math.random() * Math.min(4, pool.length))];
+    if (rnd && Math.random() > 0.5) {
+      rnd.likes += Math.floor(Math.random() * 3) + 1;
+      DroboardPostCard.update(mapPostForCard(rnd));
+    }
+  }, 3500);
+}
+
+/* ═══ INIT ═══ */
+applyTheme('light');
+renderStatuses();
+initFeaturedSlider();
+renderFeed(currentFeedList());
+simulateLive();
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#hamburgerMenu') && !e.target.closest('#hamburgerBtn')) closeHamburger();
+});
+</script>
+</body>
+</html>

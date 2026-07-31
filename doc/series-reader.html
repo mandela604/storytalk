@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Series</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e8e8e8;--tx-body:#c8c8c8;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --safe-b:env(safe-area-inset-bottom,0px);--nav-h:60px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2)}
+
+/* ─── TOP BAR ─── */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.tb-back{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:#ccc;cursor:pointer;flex-shrink:0}
+.tb-back:active{transform:scale(.9)}
+.tb-title{flex:1;min-width:0}
+.tb-series-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--tx-high);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-series-sub{font-size:9px;color:var(--tx-muted);margin-top:1px}
+.tb-actions{display:flex;gap:7px}
+.tb-btn{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ccc;cursor:pointer;transition:.15s}
+.tb-btn:active{transform:scale(.9)}
+.tb-btn.active{background:rgba(255,0,80,.12);border-color:var(--bd-acc);color:var(--acc)}
+
+/* ─── HERO ─── */
+.series-hero{position:relative;width:100%;height:280px;overflow:hidden;flex-shrink:0}
+.hero-cover{position:absolute;inset:0;background-size:cover;background-position:center 30%;filter:brightness(.45)}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,#000 0%,rgba(0,0,0,.7) 45%,rgba(0,0,0,.2) 100%)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;z-index:5;padding:18px 16px 20px}
+.hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hbadge{font-size:8px;font-weight:800;padding:3px 9px;border-radius:8px;letter-spacing:.05em;text-transform:uppercase}
+.hb-cat{background:var(--acc);color:#fff}
+.hb-ongoing{background:rgba(255,0,80,.12);border:1px solid var(--bd-acc);color:var(--acc3)}
+.hb-complete{background:rgba(255,255,255,.07);border:1px solid var(--bd);color:#666}
+.hb-contest{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:var(--gold)}
+.hero-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;line-height:1.2;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.9);margin-bottom:8px}
+.hero-writer-row{display:flex;align-items:center;gap:8px}
+.hw-av{width:28px;height:28px;border-radius:50%;border:2px solid var(--acc);object-fit:cover}
+.hw-name{font-size:12px;font-weight:700;color:#ccc;flex:1}
+.hw-follow{background:var(--acc);color:#fff;border:none;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+.hw-follow.ing{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#ccc}
+
+/* ─── QUICK STATS ─── */
+.quick-stats{display:grid;grid-template-columns:repeat(5,1fr);background:var(--l1);border-bottom:1px solid var(--bd)}
+.qs-item{text-align:center;padding:11px 4px;border-right:1px solid var(--bd)}
+.qs-item:last-child{border-right:none}
+.qs-num{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;line-height:1;color:var(--tx-high)}
+.qs-num.r{color:var(--acc)}
+.qs-num.b{color:var(--blue)}
+.qs-num.g{color:var(--green)}
+.qs-num.gold{color:var(--gold)}
+.qs-label{font-size:7.5px;color:var(--tx-muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* ─── CONTINUE BANNER ─── */
+.continue-banner{margin:14px 14px 0;background:linear-gradient(135deg,rgba(255,0,80,.08),rgba(255,0,80,.03));border:1px solid var(--bd-acc);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.continue-banner:active{transform:scale(.99)}
+.cb-icon{width:40px;height:40px;border-radius:10px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cb-body{flex:1;min-width:0}
+.cb-label{font-size:9px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.cb-ch{font-size:12px;font-weight:700;color:var(--tx-high);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-meta{font-size:9px;color:var(--tx-muted);margin-top:1px}
+.cb-arrow{font-size:14px;color:var(--acc);flex-shrink:0}
+.cb-progress{margin:8px 0 0;height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.cb-progress-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px}
+
+/* ─── SECTION TABS ─── */
+.section-tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd);background:rgba(0,0,0,.97);backdrop-filter:blur(12px);position:sticky;top:58px;z-index:100;margin-top:14px}
+.section-tabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;padding:10px 13px;font-size:11px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.stab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
+
+/* ─── PANELS ─── */
+.tab-panel{display:none;padding:14px}
+.tab-panel.active{display:block}
+
+/* ─── SYNOPSIS ─── */
+.synopsis-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.synopsis-text{font-size:13px;color:var(--tx-body);line-height:1.65}
+.synopsis-text.truncated{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.synopsis-toggle{font-size:11px;font-weight:700;color:var(--acc3);cursor:pointer;margin-top:7px;display:inline-block}
+
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)}
+.info-row:last-child{border-bottom:none}
+.info-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.info-label{font-size:9px;color:var(--tx-muted);font-weight:600}
+.info-val{font-size:12px;color:var(--tx-high);font-weight:600;margin-top:2px;line-height:1.4}
+
+/* Tags */
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.genre-pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3)}
+
+/* ─── SEASON ACCORDION ─── */
+.season-block{margin-bottom:10px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.season-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;transition:.15s}
+.season-hdr:active{background:rgba(255,255,255,.02)}
+.season-num{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:var(--tx-high)}
+.season-meta{flex:1}
+.season-title{font-size:12px;font-weight:700;color:var(--tx-high)}
+.season-sub{font-size:9px;color:var(--tx-muted);margin-top:1px;display:flex;gap:8px;align-items:center}
+.season-badge{font-size:7px;font-weight:800;padding:2px 6px;border-radius:6px}
+.sb-new{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.sb-done{background:rgba(255,255,255,.05);color:#555;border:1px solid var(--bd)}
+.season-arrow{font-size:11px;color:var(--tx-faint);transition:transform .25s}
+.season-arrow.open{transform:rotate(180deg)}
+.season-body{display:none;border-top:1px solid var(--bd2)}
+.season-body.open{display:block}
+
+/* Chapter row */
+.ch-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2);cursor:pointer;transition:.15s}
+.ch-row:last-child{border-bottom:none}
+.ch-row:active{background:rgba(255,255,255,.02)}
+.ch-row.current-ch{background:rgba(255,0,80,.04)}
+.ch-num-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;background:var(--l3);border:1.5px solid var(--bd);color:var(--tx-muted)}
+.ch-num-badge.done{background:rgba(22,163,74,.08);color:#4ade80;border-color:rgba(22,163,74,.2)}
+.ch-num-badge.current{background:rgba(255,0,80,.12);color:var(--acc);border-color:var(--bd-acc)}
+.ch-num-badge.locked{color:#333}
+.ch-info{flex:1;min-width:0}
+.ch-title{font-size:12px;font-weight:700;color:var(--tx-high);line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-meta{font-size:9px;color:var(--tx-muted);display:flex;align-items:center;gap:8px}
+.ch-badge{font-size:7px;font-weight:800;padding:1.5px 6px;border-radius:6px}
+.crb-new{background:rgba(255,0,80,.08);color:var(--acc3);border:1px solid var(--bd-acc)}
+.crb-free{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.18)}
+.ch-right{flex-shrink:0;display:flex;align-items:center;gap:7px}
+.ch-read-btn{background:var(--acc);color:#fff;border:none;padding:5px 12px;border-radius:10px;font-size:9px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.ch-done-ico{color:#4ade80;font-size:12px}
+.ch-lock-ico{color:#333;font-size:12px}
+.ch-current-tag{font-size:7px;font-weight:800;color:var(--acc);background:rgba(255,0,80,.1);padding:2px 6px;border-radius:6px;border:1px solid var(--bd-acc)}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 0 4px}
+.pg-btn{width:32px;height:32px;border-radius:8px;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--tx-muted);transition:.15s}
+.pg-btn.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.pg-btn:active{transform:scale(.92)}
+.pg-btn.disabled{opacity:.3;pointer-events:none}
+.pg-ellipsis{font-size:11px;color:var(--tx-faint)}
+
+/* ─── TEAMS ─── */
+.teams-section{margin-bottom:14px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.team-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--bd);background:var(--l1);cursor:pointer;transition:.18s;user-select:none}
+.team-btn:active{transform:scale(.98)}
+.team-icon{font-size:18px;flex-shrink:0}
+.team-info{flex:1;min-width:0}
+.team-name{font-size:10px;font-weight:800;color:var(--tx-high)}
+.team-count{font-size:9px;color:var(--tx-muted);margin-top:1px}
+.team-check{font-size:13px;color:var(--tx-faint)}
+.team-btn[data-team="a"]{border-color:rgba(255,0,80,.3);background:rgba(255,0,80,.04)}
+.team-btn[data-team="a"].selected{background:rgba(255,0,80,.14);border-color:#ff0050;box-shadow:0 2px 12px rgba(255,0,80,.2)}
+.team-btn[data-team="a"].selected .team-name{color:#ff0050}
+.team-btn[data-team="a"].selected .team-check{color:#ff0050}
+.team-btn[data-team="b"]{border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.04)}
+.team-btn[data-team="b"].selected{background:rgba(56,189,248,.16);border-color:#38bdf8;box-shadow:0 2px 12px rgba(56,189,248,.2)}
+.team-btn[data-team="b"].selected .team-name{color:#38bdf8}
+.team-btn[data-team="b"].selected .team-check{color:#38bdf8}
+.team-btn[data-team="c"]{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.04)}
+.team-btn[data-team="c"].selected{background:rgba(52,211,153,.16);border-color:#34d399;box-shadow:0 2px 12px rgba(52,211,153,.2)}
+.team-btn[data-team="c"].selected .team-name{color:#34d399}
+.team-btn[data-team="c"].selected .team-check{color:#34d399}
+.team-btn[data-team="d"]{border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04)}
+.team-btn[data-team="d"].selected{background:rgba(167,139,250,.16);border-color:#a78bfa;box-shadow:0 2px 12px rgba(167,139,250,.2)}
+.team-btn[data-team="d"].selected .team-name{color:#a78bfa}
+.team-btn[data-team="d"].selected .team-check{color:#a78bfa}
+
+.team-bars{height:5px;border-radius:5px;background:var(--bd);overflow:hidden;display:flex;margin-bottom:6px}
+.team-bar-seg{height:100%;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.team-bar-seg[data-team="a"]{background:#ff0050}
+.team-bar-seg[data-team="b"]{background:#38bdf8}
+.team-bar-seg[data-team="c"]{background:#34d399}
+.team-bar-seg[data-team="d"]{background:#a78bfa}
+.team-bar-labels{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.tbl-item{font-size:8px;font-weight:800;display:flex;align-items:center;gap:3px}
+.tbl-dot{width:7px;height:7px;border-radius:50%}
+
+/* ─── POLLS ─── */
+.poll-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.poll-hdr{padding:12px 14px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:7px}
+.poll-icon{font-size:14px}
+.poll-title{font-size:12px;font-weight:700;color:var(--tx-high);flex:1}
+.poll-season-tag{font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);color:var(--acc3)}
+.poll-opts{padding:10px 14px}
+.poll-opt{position:relative;border-radius:10px;padding:10px 12px;cursor:pointer;overflow:hidden;border:1.5px solid var(--bd);margin-bottom:7px;transition:border-color .2s;user-select:none}
+.poll-opt:last-child{margin-bottom:0}
+.poll-opt.voted{border-color:var(--acc)}
+.poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.09);z-index:0;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.poll-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.poll-opt-txt{font-size:12px;font-weight:600;color:var(--tx-body)}
+.poll-pct{font-size:11px;font-weight:800;color:var(--acc)}
+.poll-footer{padding:8px 14px;border-top:1px solid var(--bd2);display:flex;align-items:center;justify-content:space-between}
+.poll-total{font-size:9px;color:var(--tx-faint)}
+.poll-share{font-size:9px;font-weight:700;color:var(--acc3);cursor:pointer}
+
+/* ─── PREDICTIONS ─── */
+.pred-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.pred-hdr{padding:12px 14px;border-bottom:1px solid var(--bd2)}
+.pred-label{font-size:9px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.pred-question{font-size:13px;font-weight:700;color:var(--tx-high);line-height:1.4}
+.pred-opts{padding:10px 14px}
+.pred-opt{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;border:1.5px solid var(--bd);background:rgba(255,255,255,.02);margin-bottom:7px;cursor:pointer;transition:.2s;user-select:none}
+.pred-opt:last-child{margin-bottom:0}
+.pred-opt:active{transform:scale(.99)}
+.pred-opt.picked{border-color:var(--purple);background:rgba(167,139,250,.1)}
+.pred-opt-em{font-size:18px;flex-shrink:0}
+.pred-opt-body{flex:1}
+.pred-opt-txt{font-size:12px;font-weight:600;color:var(--tx-body)}
+.pred-opt-sub{font-size:9px;color:var(--tx-muted);margin-top:1px}
+.pred-opt-pct{font-size:11px;font-weight:800;color:var(--purple)}
+.pred-footer{padding:8px 14px;border-top:1px solid var(--bd2);font-size:9px;color:var(--tx-faint);display:flex;align-items:center;gap:5px}
+
+/* ─── DEBATES ─── */
+.debate-card{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.debate-hdr{padding:12px 14px;border-bottom:1px solid var(--bd2)}
+.debate-live-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);border-radius:8px;padding:3px 8px;font-size:8px;font-weight:800;color:var(--acc);margin-bottom:6px}
+.dlive-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.debate-motion{font-size:13px;font-weight:700;color:var(--tx-high);line-height:1.4;font-style:italic}
+.debate-motion::before{content:'"';color:var(--acc);font-family:'Playfair Display',serif;font-size:18px;line-height:0;vertical-align:-.3em;margin-right:2px}
+.debate-motion::after{content:'"';color:var(--acc);font-family:'Playfair Display',serif;font-size:18px;line-height:0;vertical-align:-.3em;margin-left:2px}
+.debate-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}
+.deb-side{border-radius:11px;padding:12px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(255,255,255,.02);text-align:center;transition:.2s;user-select:none}
+.deb-side:active{transform:scale(.97)}
+.deb-side.for.chosen{border-color:#10b981;background:rgba(16,185,129,.08)}
+.deb-side.against.chosen{border-color:#ef4444;background:rgba(239,68,68,.08)}
+.deb-em{font-size:22px;margin-bottom:4px}
+.deb-lbl{font-size:11px;font-weight:800;margin-bottom:6px}
+.deb-side.for .deb-lbl{color:#10b981}
+.deb-side.against .deb-lbl{color:#ef4444}
+.deb-bar-wrap{height:3px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.deb-bar{height:100%;border-radius:3px;transition:width .6s ease}
+.deb-side.for .deb-bar{background:#10b981}
+.deb-side.against .deb-bar{background:#ef4444}
+.deb-pct{font-size:12px;font-weight:800;color:var(--tx-muted)}
+.deb-cnt{font-size:9px;color:var(--tx-faint);margin-top:2px}
+.debate-stats-row{padding:0 14px 8px;display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx-faint)}
+.debate-comments{padding:0 14px}
+.deb-cm-label{font-size:9px;font-weight:800;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.deb-cm-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.deb-cm-item:last-child{border-bottom:none}
+.deb-cm-av{width:26px;height:26px;border-radius:50%;background:rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.deb-cm-av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.deb-cm-body{flex:1}
+.deb-cm-name{font-size:11px;font-weight:700;color:var(--tx-high);display:flex;align-items:center;gap:5px}
+.deb-side-tag{font-size:7px;font-weight:800;padding:1.5px 6px;border-radius:6px}
+.dst-for{background:rgba(16,185,129,.1);color:#10b981}
+.dst-against{background:rgba(239,68,68,.1);color:#ef4444}
+.deb-cm-txt{font-size:12px;color:var(--tx-muted);line-height:1.4;margin-top:2px}
+.deb-cm-meta{font-size:9px;color:var(--tx-faint);margin-top:4px;display:flex;align-items:center;gap:8px}
+.deb-cm-like{cursor:pointer;user-select:none;padding:2px 4px;border-radius:5px;display:flex;align-items:center;gap:2px}
+.deb-cm-like.liked{color:var(--acc)}
+.debate-input-row{padding:10px 14px 14px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--bd2)}
+.deb-inp{flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);border-radius:20px;padding:7px 13px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.deb-inp:focus{border-color:var(--bd-acc)}
+.deb-post-btn{background:var(--acc);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+
+/* ─── SHARE SHEET (built-in lightweight version) ─── */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.share-sheet{width:100%;background:var(--l2);border-radius:20px 20px 0 0;animation:slideUp .28s ease;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ss-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.ss-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.ss-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high)}
+.ss-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ss-preview{display:flex;gap:10px;background:rgba(255,255,255,.03);border-radius:12px;padding:10px;margin:0 16px 12px;border:1px solid var(--bd)}
+.ss-prev-thumb{width:44px;height:44px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0}
+.ss-prev-title{font-size:12px;font-weight:700;color:var(--tx-high)}
+.ss-prev-sub{font-size:9px;color:var(--tx-muted);margin-top:2px}
+.ss-link-row{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:10px;padding:8px 11px;margin:0 16px 12px}
+.ss-link-row input{flex:1;background:transparent;border:none;color:var(--tx-muted);font-size:11px;outline:none}
+.ss-copy-btn{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}
+.ss-icons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:0 16px 4px}
+.sh-ico{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s}
+.sh-ico:active{transform:scale(.9)}
+.sh-ico-bg{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sh-ico span{font-size:9px;font-weight:600;color:var(--tx-faint)}
+.ss-copy-msg{text-align:center;font-size:11px;color:var(--green);font-weight:600;height:18px;padding:4px 0 10px}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── EMPTY / LOADING ─── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--tx-faint)}
+.empty-state i{font-size:32px;margin-bottom:10px;display:block}
+.empty-state p{font-size:12px}
+
+/* ─── AD STRIP ─── */
+.ad-strip{margin:0 0 14px;background:var(--l1);border:1px solid var(--bd);border-radius:13px;padding:10px 12px;display:flex;align-items:center;gap:9px;position:relative}
+.ad-strip::after{content:'AD';position:absolute;top:6px;right:8px;font-size:7px;font-weight:800;color:#333;letter-spacing:.08em}
+.ad-strip-logo{width:34px;height:34px;border-radius:8px;flex-shrink:0;background:rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-size:14px}
+.ad-strip-body{flex:1;min-width:0}
+.ad-strip-brand{font-size:8px;font-weight:800;color:var(--blue);margin-bottom:1px}
+.ad-strip-h{font-size:11px;font-weight:700;color:var(--tx-high);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-strip-sub{font-size:9px;color:var(--tx-faint)}
+.ad-strip-cta{background:var(--acc);color:#fff;border:none;padding:5px 11px;border-radius:9px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* utility */
+.sdiv{height:1px;background:var(--bd);margin:14px 0}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar" id="topBar">
+  <div class="tb-back" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-title">
+    <div class="tb-series-name" id="tbSeriesName">Loading…</div>
+    <div class="tb-series-sub" id="tbSeriesSub"></div>
+  </div>
+  <div class="tb-actions">
+    <div class="tb-btn" id="saveBtn" onclick="toggleSave()"><i class="far fa-bookmark"></i></div>
+    <div class="tb-btn" onclick="openShare()"><i class="fas fa-share-alt"></i></div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="series-hero">
+  <div class="hero-cover" id="heroCover"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-content">
+    <div class="hero-badges" id="heroBadges"></div>
+    <div class="hero-title" id="heroTitle"></div>
+    <div class="hero-writer-row">
+      <img class="hw-av" id="hwAv" src="" alt=""/>
+      <span class="hw-name" id="hwName"></span>
+      <button class="hw-follow" id="hwFollow" onclick="toggleFollow()">+ Follow</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK STATS -->
+<div class="quick-stats" id="quickStats"></div>
+
+<!-- CONTINUE BANNER -->
+<div class="continue-banner" id="continueBanner" onclick="toast('📖 Resuming from where you left off…')">
+  <div class="cb-icon">📖</div>
+  <div class="cb-body">
+    <div class="cb-label">Continue Reading</div>
+    <div class="cb-ch" id="cbChName"></div>
+    <div class="cb-meta" id="cbChMeta"></div>
+    <div class="cb-progress"><div class="cb-progress-fill" id="cbProgress"></div></div>
+  </div>
+  <div class="cb-arrow"><i class="fas fa-chevron-right"></i></div>
+</div>
+
+<!-- SECTION TABS -->
+<div class="section-tabs" id="sectionTabs">
+  <div class="stab active" data-tab="chapters" onclick="switchTab('chapters')">📖 Chapters</div>
+  <div class="stab" data-tab="overview" onclick="switchTab('overview')">ℹ️ Overview</div>
+  <div class="stab" data-tab="teams" onclick="switchTab('teams')" id="teamsTab" style="display:none">⚔️ Teams</div>
+  <div class="stab" data-tab="polls" onclick="switchTab('polls')">📊 Polls & Predictions</div>
+  <div class="stab" data-tab="debates" onclick="switchTab('debates')">💬 Debates</div>
+</div>
+
+<!-- ═══ CHAPTERS PANEL ═══ -->
+<div class="tab-panel active" id="panel-chapters">
+  <div id="chaptersContent"></div>
+</div>
+
+<!-- ═══ OVERVIEW PANEL ═══ -->
+<div class="tab-panel" id="panel-overview">
+  <div class="synopsis-card">
+    <div class="synopsis-text truncated" id="synopsisText"></div>
+    <span class="synopsis-toggle" id="synToggle" onclick="toggleSynopsis()">Read more ›</span>
+  </div>
+
+  <div style="background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px" id="infoRows"></div>
+
+  <!-- Ad -->
+  <div class="ad-strip">
+    <div class="ad-strip-logo">💰</div>
+    <div class="ad-strip-body">
+      <div class="ad-strip-brand">PiggyVest</div>
+      <div class="ad-strip-h">Save money. Build your future.</div>
+      <div class="ad-strip-sub">4M+ Nigerians saving smarter</div>
+    </div>
+    <button class="ad-strip-cta">Start</button>
+  </div>
+
+  <!-- Series stats deep dive -->
+  <div style="background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px">
+    <div class="sh" style="margin-bottom:10px"><div class="sh-title">Series Stats</div></div>
+    <div id="statsDeep"></div>
+  </div>
+</div>
+
+<!-- ═══ TEAMS PANEL ═══ -->
+<div class="tab-panel" id="panel-teams">
+  <div class="teams-section" id="teamsSection"></div>
+</div>
+
+<!-- ═══ POLLS & PREDICTIONS PANEL ═══ -->
+<div class="tab-panel" id="panel-polls">
+  <div id="pollsContent"></div>
+</div>
+
+<!-- ═══ DEBATES PANEL ═══ -->
+<div class="tab-panel" id="panel-debates">
+  <div id="debatesContent"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- SHARE SHEET -->
+<div class="overlay-bg" id="shareOv" onclick="if(event.target===this)closeShare()">
+  <div class="share-sheet">
+    <div class="ss-handle"></div>
+    <div class="ss-hdr"><h3>Share Series 📤</h3><button class="ss-close" onclick="closeShare()">✕</button></div>
+    <div class="ss-preview" id="ssPreview"></div>
+    <div class="ss-link-row"><input type="text" id="ssLink" readonly/><button class="ss-copy-btn" onclick="copyLink()">Copy</button></div>
+    <div class="ss-icons">
+      <div class="sh-ico" onclick="shareVia('whatsapp')"><div class="sh-ico-bg" style="background:#1ebe57"><i class="fab fa-whatsapp" style="color:#fff"></i></div><span>WhatsApp</span></div>
+      <div class="sh-ico" onclick="shareVia('twitter')"><div class="sh-ico-bg" style="background:#000;border:1px solid #333"><i class="fab fa-x-twitter" style="color:#fff;font-size:18px"></i></div><span>X</span></div>
+      <div class="sh-ico" onclick="shareVia('instagram')"><div class="sh-ico-bg" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)"><i class="fab fa-instagram" style="color:#fff"></i></div><span>Instagram</span></div>
+      <div class="sh-ico" onclick="shareVia('telegram')"><div class="sh-ico-bg" style="background:#0088cc"><i class="fab fa-telegram" style="color:#fff"></i></div><span>Telegram</span></div>
+      <div class="sh-ico" onclick="copyLink()"><div class="sh-ico-bg" style="background:rgba(255,255,255,.07)"><i class="fas fa-link" style="color:#aaa"></i></div><span>Copy</span></div>
+    </div>
+    <div class="ss-copy-msg" id="ssCopyMsg"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA — Full series catalogue (6 series)
+══════════════════════════════════════════════ */
+const SERIES_DB = {
+  's1': {
+    id: 's1',
+    title: "I came home early and caught my husband kissing my late sister's photograph",
+    cat: '💔 Betrayal',
+    status: 'ongoing',
+    isContest: false,
+    cover: 'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+    synopsis: `A Lagos woman returns home early, a surprise dinner planned, only to find her husband in a moment of grief-laden intimacy with a framed photograph of her late sister — Adaeze. What unfolds is not a simple tale of infidelity, but a slow uncovering of a love triangle that existed long before the marriage began. As Ada pieces together the timeline, she must decide: is staying a form of courage, or a slow forgetting of herself? Set against the backdrop of Lagos traffic, late-night candles, and family silences, this is a story about grief wearing the face of betrayal, and betrayal wearing the face of love.`,
+    writer: { id: 'w1', name: 'Ada_Writes', handle: '@ada_writes', avatar: 'https://i.pravatar.cc/100?img=32', followers: '12.4k', isFollowed: false },
+    stats: { reads: '1.1M', likes: '24.3k', comments: '4.1k', saves: '6.2k', shares: '18.9k' },
+    seasons: 2,
+    totalChapters: 14,
+    currentProgress: { season: 2, chapter: 4, chapterTitle: 'What she found in the wardrobe', percent: 60 },
+    genres: ['💔 Betrayal', '👑 Family', '✨ Twist', '🏙️ Urban'],
+    startDate: 'March 2024',
+    lastUpdated: '2 days ago',
+    completedDate: null,
+    avgReadTime: '4 min/chapter',
+    wordCount: '~62,000 words',
+    hasTeams: true,
+    teams: [
+      { id: 'a', icon: '💔', name: 'Team Ada', color: '#ff0050', count: 8400 },
+      { id: 'b', icon: '🕊️', name: 'Team Forgiveness', color: '#38bdf8', count: 3200 },
+      { id: 'c', icon: '🔥', name: 'Team Leave Him', color: '#34d399', count: 5100 },
+      { id: 'd', icon: '👀', name: 'Team Watching', color: '#a78bfa', count: 1800 },
+    ],
+    polls: [
+      {
+        id: 'p1', season: 1,
+        question: "Did Ada's husband truly love Adaeze, or was it obsession? ",
+        options: [
+          { text: '💔 True love — just buried', votes: 9200 },
+          { text: '🔒 Unhealthy obsession', votes: 4100 },
+          { text: '🌊 Complicated grief', votes: 7300 },
+        ],
+        voted: -1
+      },
+      {
+        id: 'p2', season: 2,
+        question: 'Should Ada confront the truth publicly or keep it within the marriage?',
+        options: [
+          { text: '📢 Speak out — she deserves the world to know', votes: 6800 },
+          { text: '🤫 Keep it private — protect the family', votes: 3200 },
+          { text: '🚪 Leave quietly, no confrontation', votes: 5400 },
+        ],
+        voted: -1
+      }
+    ],
+    predictions: [
+      {
+        id: 'pr1',
+        question: 'How does Season 2 end for Ada?',
+        options: [
+          { em: '💪', text: 'She rebuilds alone, stronger', sub: '9.4k predict this', votes: 9400, picked: false },
+          { em: '💍', text: 'They reconcile after therapy', sub: '4.2k predict this', votes: 4200, picked: false },
+          { em: '🔥', text: 'A major twist changes everything', sub: '7.8k predict this', votes: 7800, picked: false },
+          { em: '❓', text: 'Cliffhanger — season 3 needed', sub: '5.1k predict this', votes: 5100, picked: false },
+        ]
+      }
+    ],
+    debates: [
+      {
+        id: 'deb1',
+        motion: 'Ada should leave her husband immediately — emotional betrayal is still betrayal.',
+        forV: 14800, agV: 8200,
+        userVote: null,
+        comments: [
+          { id: 'dc1', name: 'Chiamaka_N', avatar: 'https://i.pravatar.cc/100?img=47', side: 'for', text: 'You cannot mourn someone in secret while lying next to their sister. That is not grief — that is a choice.', time: '2h', likes: 341, liked: false },
+          { id: 'dc2', name: 'Efe_O', avatar: 'https://i.pravatar.cc/100?img=22', side: 'against', text: 'Grief does not follow the rules we write in books. He never cheated with a living person. It deserves nuance.', time: '3h', likes: 212, liked: false },
+          { id: 'dc3', name: 'Kemi_A', avatar: 'https://i.pravatar.cc/100?img=28', side: 'for', text: 'The cruelty is that she placed the photograph herself. She loved her sister. And he used that grief against her without knowing it.', time: '4h', likes: 489, liked: false },
+        ]
+      },
+      {
+        id: 'deb2',
+        motion: 'The sister Adaeze is the true protagonist of this series.',
+        forV: 7600, agV: 9400,
+        userVote: null,
+        comments: [
+          { id: 'dc4', name: 'Ada_Writes', avatar: 'https://i.pravatar.cc/100?img=32', side: 'against', text: 'Adaeze exists in memory, not chapters. But I will say: she shapes every single decision Ada makes. 👀', time: '1h', likes: 1200, liked: false },
+          { id: 'dc5', name: 'Zara_M', avatar: 'https://i.pravatar.cc/100?img=16', side: 'for', text: 'The dead character controls all the living ones. She is absolutely the centre of this story.', time: '2h', likes: 341, liked: false },
+        ]
+      }
+    ],
+    seasonData: [
+      {
+        season: 1, title: 'The Photograph', status: 'complete',
+        chapters: [
+          { n:1, title:"The surprise dinner that wasn't", reads:'88k', time:'4 min', state:'done', badges:['free'] },
+          { n:2, title:'Six years and one photograph', reads:'79k', time:'3 min', state:'done', badges:[] },
+          { n:3, title:'The name she used to say', reads:'71k', time:'4 min', state:'done', badges:[] },
+          { n:4, title:"Adaeze's favourite dress", reads:'68k', time:'3 min', state:'done', badges:[] },
+          { n:5, title:'The night I stopped sleeping next to him', reads:'74k', time:'5 min', state:'done', badges:[] },
+          { n:6, title:'What my mother said when I called her at midnight', reads:'66k', time:'4 min', state:'done', badges:[] },
+          { n:7, title:"He wept in the car and thought I couldn't hear", reads:'81k', time:'4 min', state:'done', badges:[] },
+        ]
+      },
+      {
+        season: 2, title: 'The Truth Under the House', status: 'ongoing',
+        chapters: [
+          { n:1, title:'The first night she slept in the spare room', reads:'61k', time:'4 min', state:'done', badges:[] },
+          { n:2, title:'She found the letters he never sent Adaeze', reads:'58k', time:'5 min', state:'done', badges:[] },
+          { n:3, title:'Therapy — and the thing he admitted first', reads:'54k', time:'4 min', state:'done', badges:[] },
+          { n:4, title:'What she found in the wardrobe', reads:'49k', time:'4 min', state:'current', badges:['new'] },
+          { n:5, title:'Season finale — coming Friday', reads:'–', time:'–', state:'locked', badges:['new'] },
+          { n:6, title:'Season 3 teaser', reads:'–', time:'–', state:'locked', badges:[] },
+          { n:7, title:'[Unannounced]', reads:'–', time:'–', state:'locked', badges:[] },
+        ]
+      }
+    ]
+  },
+
+  's2': {
+    id: 's2',
+    title: "He proposed with my best friend's ring — and she giggled before he even knelt",
+    cat: '💔 Heartbreak',
+    status: 'ongoing',
+    isContest: true,
+    cover: 'https://i.postimg.cc/23WvkFLH/images-(2).jpg',
+    synopsis: `Three years of devotion. One restaurant. One unguarded giggle from a best friend before the ring box was even open. In that single sound, a woman hears the entire length and shape of a betrayal she never saw coming. What follows is not a breakdown — it is a reckoning. Kemi walks out of the restaurant, into her flat, and opens a novel she has not touched in eighteen months. The book becomes her witness, her therapy, her revenge — and eventually, her greatest achievement. A story about what happens when you stop performing grief and start performing for yourself.`,
+    writer: { id: 'w4', name: 'Kemi_A', handle: '@kemi_a', avatar: 'https://i.pravatar.cc/100?img=28', followers: '6.5k', isFollowed: true },
+    stats: { reads: '312k', likes: '19.2k', comments: '3.1k', saves: '4.8k', shares: '9.4k' },
+    seasons: 1,
+    totalChapters: 3,
+    currentProgress: { season: 1, chapter: 2, chapterTitle: 'The kitchen floor at midnight', percent: 40 },
+    genres: ['💔 Heartbreak', '✨ Twist', '✍️ Redemption'],
+    startDate: 'January 2025',
+    lastUpdated: '1 week ago',
+    completedDate: null,
+    avgReadTime: '3 min/chapter',
+    wordCount: '~12,000 words',
+    hasTeams: false,
+    teams: [],
+    polls: [
+      {
+        id: 'p3', season: 1,
+        question: 'Who was more wrong — the boyfriend or Bisi?',
+        options: [
+          { text: '💍 The boyfriend — he planned it', votes: 8400 },
+          { text: '😂 Bisi — the giggle sealed it', votes: 6200 },
+          { text: '🤝 Both equally', votes: 4100 },
+        ],
+        voted: -1
+      }
+    ],
+    predictions: [
+      {
+        id: 'pr2',
+        question: 'What does the novel she writes become?',
+        options: [
+          { em: '🏆', text: 'A bestseller that exposes them', sub: '6.1k predict', votes: 6100, picked: false },
+          { em: '💔', text: 'She never finishes it', sub: '1.2k predict', votes: 1200, picked: false },
+          { em: '🎬', text: 'It gets adapted — they see themselves', sub: '8.4k predict', votes: 8400, picked: false },
+          { em: '✨', text: 'Something better than revenge', sub: '4.9k predict', votes: 4900, picked: false },
+        ]
+      }
+    ],
+    debates: [
+      {
+        id: 'deb3',
+        motion: 'Walking out of the restaurant without a word was the bravest thing she did.',
+        forV: 11200, agV: 3400,
+        userVote: null,
+        comments: [
+          { id: 'dc6', name: 'Ada_Writes', avatar: 'https://i.pravatar.cc/100?img=32', side: 'for', text: "Kemi didn't give them the satisfaction of a scene. She preserved her dignity in the most dignified way possible. ICON. ", time: '3h', likes: 892, liked: false },
+          { id: 'dc7', name: 'Efe_O', avatar: 'https://i.pravatar.cc/100?img=22', side: 'against', text: 'She deserved to say more. Silence protected them from accountability.', time: '4h', likes: 144, liked: false },
+        ]
+      }
+    ],
+    seasonData: [
+      {
+        season: 1, title: 'The Giggle', status: 'ongoing',
+        chapters: [
+          { n:1, title:'The fairy lights and the ring box', reads:'98k', time:'3 min', state:'done', badges:['free'] },
+          { n:2, title:'The kitchen floor at midnight', reads:'76k', time:'3 min', state:'current', badges:[] },
+          { n:3, title:'The novel she opened at 11pm', reads:'–', time:'Coming soon', state:'locked', badges:['new'] },
+        ]
+      }
+    ]
+  },
+
+  's3': {
+    id: 's3',
+    title: "My uncle claimed the inheritance using my late mother's stolen will",
+    cat: '👑 Family',
+    status: 'ongoing',
+    isContest: false,
+    cover: 'https://i.postimg.cc/cgLZJNmC/8.jpg',
+    synopsis: `After her mother's burial in Onitsha, a young woman discovers that the will she has always known exists has been replaced — and her uncle has produced a different document, naming himself sole heir. What begins as a family dispute over land becomes a years-long legal and emotional battle to reclaim her mother's name, her inheritance, and the story of her own life. With a cast of aunts who choose silence, a lawyer who believes her, and a grandfather who knows more than he says, this is a series about the quiet violence of family corruption — and the loudness required to undo it.`,
+    writer: { id: 'w1', name: 'Ada_Writes', handle: '@ada_writes', avatar: 'https://i.pravatar.cc/100?img=32', followers: '12.4k', isFollowed: false },
+    stats: { reads: '138k', likes: '21k', comments: '2.8k', saves: '5.1k', shares: '11.2k' },
+    seasons: 3,
+    totalChapters: 21,
+    currentProgress: { season: 3, chapter: 7, chapterTitle: 'The grandfather finally speaks', percent: 75 },
+    genres: ['👑 Family', '⚖️ Justice', '🔥 Revenge'],
+    startDate: 'October 2023',
+    lastUpdated: '3 days ago',
+    completedDate: null,
+    avgReadTime: '4 min/chapter',
+    wordCount: '~88,000 words',
+    hasTeams: true,
+    teams: [
+      { id: 'a', icon: '⚖️', name: 'Team Justice', color: '#ff0050', count: 11200 },
+      { id: 'b', icon: '🕊️', name: 'Team Forgive & Move', color: '#38bdf8', count: 2100 },
+      { id: 'c', icon: '🔥', name: 'Team Burn It All', color: '#34d399', count: 4800 },
+    ],
+    polls: [
+      {
+        id: 'p4', season: 3,
+        question: 'Will the grandfather testify in court in Season 3 finale?',
+        options: [
+          { text: '✅ Yes — he will speak', votes: 7800 },
+          { text: '❌ No — fear keeps him silent', votes: 3200 },
+          { text: '💀 He dies before he can', votes: 2100 },
+        ],
+        voted: -1
+      }
+    ],
+    predictions: [
+      {
+        id: 'pr3',
+        question: 'How does the inheritance story end?',
+        options: [
+          { em: '🏆', text: 'She wins in court completely', sub: '8.8k predict', votes: 8800, picked: false },
+          { em: '🤝', text: 'Family compromises out of court', sub: '4.4k predict', votes: 4400, picked: false },
+          { em: '💸', text: 'She loses but rebuilds elsewhere', sub: '2.1k predict', votes: 2100, picked: false },
+          { em: '🔥', text: 'Uncle confesses — plot twist', sub: '5.6k predict', votes: 5600, picked: false },
+        ]
+      }
+    ],
+    debates: [
+      {
+        id: 'deb4',
+        motion: 'The aunts who stayed silent are more guilty than the uncle who acted.',
+        forV: 9800, agV: 6200,
+        userVote: null,
+        comments: [
+          { id: 'dc8', name: 'Chiamaka_N', avatar: 'https://i.pravatar.cc/100?img=47', side: 'for', text: 'Silence is always a vote. They chose the uncle by not choosing the truth.', time: '1h', likes: 445, liked: false },
+          { id: 'dc9', name: 'Dami_Cole', avatar: 'https://i.pravatar.cc/100?img=64', side: 'against', text: 'In many Nigerian families, women speaking out against male elders costs them everything. Fear is not the same as guilt.', time: '2h', likes: 312, liked: false },
+        ]
+      }
+    ],
+    seasonData: [
+      {
+        season: 1, title: 'The Burial and The Will', status: 'complete',
+        chapters: [
+          { n:1, title:'The burial — and the first lie', reads:'62k', time:'4 min', state:'done', badges:['free'] },
+          { n:2, title:"What my aunts wouldn't say at the table", reads:'54k', time:'3 min', state:'done', badges:[] },
+          { n:3, title:'The will my mother showed me once', reads:'51k', time:'4 min', state:'done', badges:[] },
+          { n:4, title:'The lawyer who believed me', reads:'48k', time:'4 min', state:'done', badges:[] },
+          { n:5, title:"What we found in uncle's house", reads:'56k', time:'5 min', state:'done', badges:[] },
+          { n:6, title:'Season 1 finale — the filing', reads:'59k', time:'4 min', state:'done', badges:[] },
+          { n:7, title:'A year of waiting', reads:'44k', time:'3 min', state:'done', badges:[] },
+        ]
+      },
+      {
+        season: 2, title: 'The Case Opens', status: 'complete',
+        chapters: [
+          { n:1, title:'First day in court', reads:'48k', time:'4 min', state:'done', badges:[] },
+          { n:2, title:'The witness they produced', reads:'44k', time:'4 min', state:'done', badges:[] },
+          { n:3, title:"My grandmother's deposition", reads:'51k', time:'5 min', state:'done', badges:[] },
+          { n:4, title:'The adjournment that broke me', reads:'41k', time:'3 min', state:'done', badges:[] },
+          { n:5, title:"My lawyer's secret", reads:'46k', time:'4 min', state:'done', badges:[] },
+          { n:6, title:'Season 2 finale — the ruling', reads:'53k', time:'4 min', state:'done', badges:[] },
+          { n:7, title:'The appeal they filed overnight', reads:'49k', time:'3 min', state:'done', badges:[] },
+        ]
+      },
+      {
+        season: 3, title: 'The Final Reckoning', status: 'ongoing',
+        chapters: [
+          { n:1, title:'Three years later — where we are', reads:'38k', time:'4 min', state:'done', badges:[] },
+          { n:2, title:'The grandfather contacts me', reads:'35k', time:'3 min', state:'done', badges:[] },
+          { n:3, title:'What the photograph proved', reads:'31k', time:'4 min', state:'done', badges:[] },
+          { n:4, title:'The night before the final hearing', reads:'29k', time:'4 min', state:'done', badges:[] },
+          { n:5, title:"My uncle's lawyer withdraws", reads:'26k', time:'3 min', state:'done', badges:[] },
+          { n:6, title:"She called me by my mother's name", reads:'24k', time:'4 min', state:'done', badges:[] },
+          { n:7, title:'The grandfather finally speaks', reads:'21k', time:'5 min', state:'current', badges:['new'] },
+        ]
+      }
+    ]
+  },
+};
+
+/* ══ PARAMS ══ */
+const params = new URLSearchParams(location.search);
+const seriesId = params.get('id') || 's1';
+const SERIES = SERIES_DB[seriesId] || SERIES_DB['s1'];
+
+/* ══ STATE ══ */
+let isSaved = false;
+let isFollowing = SERIES.writer.isFollowed;
+let synExpanded = false;
+const chPerPage = 25; // paginate when season has more than this many chapters
+const debateUserVotes = {}; // debateId → 'for'|'against'
+const debateCms = {}; // built from SERIES.debates
+
+/* ══ UTILS ══ */
+function toast(msg, dur=2400) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function fmtN(n) {
+  if (typeof n === 'string') return n;
+  return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n);
+}
+function switchTab(tab) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+/* ══ INIT ══ */
+function init() {
+  // Top bar
+  document.getElementById('tbSeriesName').textContent = SERIES.title;
+  document.getElementById('tbSeriesSub').textContent = `@${SERIES.writer.name} · ${SERIES.seasons} Season${SERIES.seasons > 1 ? 's' : ''} · ${SERIES.totalChapters} chapters`;
+
+  // Hero
+  document.getElementById('heroCover').style.backgroundImage = `url('${SERIES.cover}')`;
+  document.getElementById('heroTitle').textContent = SERIES.title;
+  document.getElementById('hwAv').src = SERIES.writer.avatar;
+  document.getElementById('hwName').textContent = `@${SERIES.writer.name}`;
+  const fBtn = document.getElementById('hwFollow');
+  fBtn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+  if (isFollowing) fBtn.classList.add('ing');
+
+  // Badges
+  const statusBadge = SERIES.status === 'ongoing'
+    ? `<span class="hbadge hb-ongoing">🔥 Ongoing</span>`
+    : `<span class="hbadge hb-complete">✓ Complete</span>`;
+  const contestBadge = SERIES.isContest ? `<span class="hbadge hb-contest">🏆 Contest</span>` : '';
+  document.getElementById('heroBadges').innerHTML = `
+    <span class="hbadge hb-cat">${SERIES.cat}</span>
+    ${statusBadge}
+    <span class="hbadge hb-complete">S${SERIES.seasons} · ${SERIES.totalChapters} chapters</span>
+    ${contestBadge}
+  `;
+
+  // Quick stats
+  const qs = [
+    { num: SERIES.stats.reads, label: 'Reads', cls: 'r' },
+    { num: SERIES.stats.likes, label: 'Likes', cls: 'r' },
+    { num: SERIES.stats.comments, label: 'Comments', cls: 'b' },
+    { num: SERIES.stats.saves, label: 'Saves', cls: 'g' },
+    { num: SERIES.stats.shares, label: 'Shares', cls: '' },
+  ];
+  document.getElementById('quickStats').innerHTML = qs.map(q =>
+    `<div class="qs-item"><div class="qs-num ${q.cls}">${q.num}</div><div class="qs-label">${q.label}</div></div>`
+  ).join('');
+
+  // Continue banner
+  const cp = SERIES.currentProgress;
+  document.getElementById('cbChName').textContent = `S${cp.season} · Ch${cp.chapter} — ${cp.chapterTitle}`;
+  document.getElementById('cbChMeta').textContent = `${cp.percent}% through this chapter`;
+  document.getElementById('cbProgress').style.width = cp.percent + '%';
+
+  // Teams tab visibility
+  if (SERIES.hasTeams && SERIES.teams.length > 0) {
+    document.getElementById('teamsTab').style.display = '';
+  }
+
+  // Render panels
+  renderChapters();
+  renderOverview();
+  if (SERIES.hasTeams) renderTeams();
+  renderPolls();
+  renderDebates();
+}
+
+/* ══ CHAPTERS ══ */
+function renderChapters() {
+  const container = document.getElementById('chaptersContent');
+  let html = '';
+
+  SERIES.seasonData.forEach((season, si) => {
+    const isLast = si === SERIES.seasonData.length - 1;
+    const isOpen = isLast; // last season open by default
+    const hasNew = season.chapters.some(c => c.state === 'current' || (c.badges && c.badges.includes('new')));
+    const doneCount = season.chapters.filter(c => c.state === 'done').length;
+    const statusBadge = season.status === 'ongoing'
+      ? `<span class="season-badge sb-new">🔥 Ongoing</span>`
+      : `<span class="season-badge sb-done">✓ Complete</span>`;
+
+    html += `
+      <div class="season-block" id="sb-${si}">
+        <div class="season-hdr" onclick="toggleSeason(${si})">
+          <div class="season-num">S${season.season}</div>
+          <div class="season-meta">
+            <div class="season-title">${season.title}</div>
+            <div class="season-sub">
+              ${season.chapters.length} chapters · ${doneCount} read
+              ${statusBadge}
+              ${hasNew ? '<span class="season-badge sb-new">NEW</span>' : ''}
+            </div>
+          </div>
+          <i class="fas fa-chevron-down season-arrow ${isOpen ? 'open' : ''}" id="sarr-${si}"></i>
+        </div>
+        <div class="season-body ${isOpen ? 'open' : ''}" id="sbody-${si}">
+          ${renderChapterList(season.chapters, si)}
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderChapterList(chapters, si) {
+  return chapters.map((ch, ci) => {
+    const numCls = ch.state === 'done' ? 'done' : ch.state === 'current' ? 'current' : 'locked';
+    const numIcon = ch.state === 'done'
+      ? `<i class="fas fa-check" style="font-size:9px"></i>`
+      : ch.state === 'locked'
+        ? `<i class="fas fa-lock" style="font-size:9px"></i>`
+        : ch.n;
+    const badges = (ch.badges || []).map(b => {
+      if (b === 'new') return `<span class="ch-badge crb-new">NEW</span>`;
+      if (b === 'free') return `<span class="ch-badge crb-free">FREE</span>`;
+      return '';
+    }).join('');
+    const rightEl = ch.state === 'current'
+      ? `<span class="ch-current-tag">Reading</span><button class="ch-read-btn" onclick="event.stopPropagation();toast('📖 Opening chapter…')">Continue</button>`
+      : ch.state === 'done'
+        ? `<i class="fas fa-check-circle ch-done-ico"></i>`
+        : `<i class="fas fa-lock ch-lock-ico"></i>`;
+
+    return `
+      <div class="ch-row${ch.state === 'current' ? ' current-ch' : ''}" onclick="${ch.state !== 'locked' ? "toast('📖 Reading chapter…')" : "toast('🔒 Not yet available')"}">
+        <div class="ch-num-badge ${numCls}">${numIcon}</div>
+        <div class="ch-info">
+          <div class="ch-title">Ch.${ch.n} — ${ch.title}</div>
+          <div class="ch-meta">
+            ${ch.reads !== '–' ? `<span><i class="far fa-eye" style="font-size:8px"></i> ${ch.reads}</span>` : ''}
+            <span>⏱ ${ch.time}</span>
+            ${badges}
+          </div>
+        </div>
+        <div class="ch-right">${rightEl}</div>
+      </div>`;
+  }).join('');
+}
+
+function toggleSeason(si) {
+  const body = document.getElementById('sbody-' + si);
+  const arr = document.getElementById('sarr-' + si);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arr.classList.toggle('open', !isOpen);
+}
+
+/* ══ OVERVIEW ══ */
+function renderOverview() {
+  document.getElementById('synopsisText').textContent = SERIES.synopsis;
+
+  const infoRows = [
+    { icon: '✍️', label: 'Author', val: `@${SERIES.writer.name} · ${SERIES.writer.followers} followers` },
+    { icon: '📅', label: 'Started', val: SERIES.startDate },
+    { icon: '🔄', label: 'Last updated', val: SERIES.lastUpdated },
+    { icon: '📺', label: 'Seasons', val: `${SERIES.seasons} season${SERIES.seasons > 1 ? 's' : ''}` },
+    { icon: '📖', label: 'Chapters', val: `${SERIES.totalChapters} total · ${SERIES.seasonData.map(s => s.chapters.filter(c => c.state !== 'locked').length).reduce((a,b) => a+b, 0)} published` },
+    { icon: '⏱', label: 'Read time', val: SERIES.avgReadTime },
+    { icon: '📝', label: 'Word count', val: SERIES.wordCount },
+    { icon: '🏷️', label: 'Genres', val: null, pills: SERIES.genres },
+  ];
+
+  document.getElementById('infoRows').innerHTML = infoRows.map(r => `
+    <div class="info-row">
+      <div class="info-icon">${r.icon}</div>
+      <div>
+        <div class="info-label">${r.label}</div>
+        ${r.val ? `<div class="info-val">${r.val}</div>` : ''}
+        ${r.pills ? `<div class="tag-row">${r.pills.map(p => `<span class="genre-pill">${p}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  // Stats deep
+  const topReads = SERIES.seasonData.flatMap(s => s.chapters).filter(c => c.reads !== '–').sort((a,b) => parseInt((b.reads||'0').replace('k','000')) - parseInt((a.reads||'0').replace('k','000'))).slice(0,3);
+  document.getElementById('statsDeep').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      ${[
+        { n: SERIES.stats.reads, l: 'Total Reads', c: '#ff0050' },
+        { n: SERIES.stats.likes, l: 'Total Likes', c: '#ff0050' },
+        { n: SERIES.stats.saves, l: 'Saves', c: '#38bdf8' },
+      ].map(s => `<div style="background:var(--l2);border:1px solid var(--bd);border-radius:11px;padding:10px;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:${s.c}">${s.n}</div><div style="font-size:8px;color:var(--tx-muted);margin-top:2px">${s.l}</div></div>`).join('')}
+    </div>
+    ${topReads.length ? `<div style="font-size:9px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">🏆 Most-read chapters</div>
+    ${topReads.map((c,i) => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd2)"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:${i===0?'#fbbf24':i===1?'#a0a0b0':'#a07040'};width:20px">${i+1}</div><div style="flex:1;font-size:11px;color:var(--tx-high);font-weight:600">${c.title}</div><div style="font-size:11px;font-weight:800;color:var(--acc)">${c.reads}</div></div>`).join('')}` : ''}`;
+}
+
+function toggleSynopsis() {
+  synExpanded = !synExpanded;
+  document.getElementById('synopsisText').classList.toggle('truncated', !synExpanded);
+  document.getElementById('synToggle').textContent = synExpanded ? 'Show less ‹' : 'Read more ›';
+}
+
+/* ══ TEAMS ══ */
+let teamPicked = null;
+
+function renderTeams() {
+  const container = document.getElementById('teamsSection');
+  const teams = SERIES.teams;
+  const tot = teams.reduce((a, t) => a + t.count, 0) || 1;
+
+  const colsClass = teams.length === 2 ? 'grid-template-columns:1fr 1fr' :
+                    teams.length === 3 ? 'grid-template-columns:1fr 1fr 1fr' :
+                    'grid-template-columns:1fr 1fr';
+
+  const teamBtns = teams.map(t => `
+    <div class="team-btn${teamPicked === t.id ? ' selected' : ''}" data-team="${t.id}" onclick="pickTeam('${t.id}')">
+      <div class="team-icon">${t.icon}</div>
+      <div class="team-info">
+        <div class="team-name">${t.name}</div>
+        <div class="team-count" id="tc-${t.id}">${fmtN(t.count)} readers</div>
+      </div>
+      <div class="team-check" id="tck-${t.id}">
+        <i class="${teamPicked === t.id ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
+      </div>
+    </div>`).join('');
+
+  const barSegs = teams.map(t =>
+    `<div class="team-bar-seg" data-team="${t.id}" style="width:${Math.round(t.count/tot*100)}%;background:${t.color}"></div>`
+  ).join('');
+
+  const barLabels = teams.map(t =>
+    `<div class="tbl-item"><span class="tbl-dot" style="background:${t.color}"></span><span style="color:${t.color}">${t.icon} ${Math.round(t.count/tot*100)}%</span></div>`
+  ).join('');
+
+  const topTeam = [...teams].sort((a,b) => b.count - a.count)[0];
+
+  container.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div class="sh" style="margin-bottom:4px">
+        <div class="sh-title">Choose Your Side</div>
+        <div style="font-size:9px;color:var(--tx-muted);font-weight:600">${fmtN(tot)} readers have picked</div>
+      </div>
+      <div style="font-size:11px;color:var(--tx-muted);margin-bottom:12px">
+        Leading: <strong style="color:${topTeam.color}">${topTeam.icon} ${topTeam.name}</strong> with ${Math.round(topTeam.count/tot*100)}%
+      </div>
+      <div class="team-grid" style="${colsClass}" id="teamBtnsWrap">${teamBtns}</div>
+      <div class="team-bars" id="teamBarsEl">${barSegs}</div>
+      <div class="team-bar-labels">${barLabels}</div>
+    </div>
+
+    ${teamPicked ? `
+    <div style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);border-radius:12px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--tx-body);line-height:1.6;text-align:center">
+      You're on <strong style="color:${teams.find(t=>t.id===teamPicked)?.color}">${teams.find(t=>t.id===teamPicked)?.icon} ${teams.find(t=>t.id===teamPicked)?.name}</strong>!
+      Head to Debates to argue your case 👇
+    </div>` : ''}
+
+    <div style="background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:14px">
+      <div class="sh-title" style="margin-bottom:10px">Team Breakdown</div>
+      ${teams.sort((a,b) => b.count-a.count).map((t,i) => {
+        const pct = Math.round(t.count/tot*100);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd2)">
+          <div style="font-size:18px;width:26px;text-align:center">${t.icon}</div>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700;color:${t.color};margin-bottom:3px">${t.name}</div>
+            <div style="height:3px;background:var(--bd);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${t.color};border-radius:3px;transition:width .5s ease"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:11px;font-weight:800;color:${t.color}">${pct}%</div>
+            <div style="font-size:9px;color:var(--tx-faint)">${fmtN(t.count)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function pickTeam(id) {
+  const teams = SERIES.teams;
+  if (teamPicked === id) return;
+  if (teamPicked) {
+    const prev = teams.find(t => t.id === teamPicked);
+    if (prev) prev.count--;
+  }
+  teamPicked = id;
+  const team = teams.find(t => t.id === id);
+  if (team) {
+    team.count++;
+    toast(`${team.icon} You're on ${team.name}!`);
+  }
+  renderTeams();
+}
+
+/* ══ POLLS & PREDICTIONS ══ */
+function renderPolls() {
+  const container = document.getElementById('pollsContent');
+  let html = '';
+
+  if (!SERIES.polls.length && !SERIES.predictions.length) {
+    html = `<div class="empty-state"><i class="fas fa-poll"></i><p>No polls yet for this series</p></div>`;
+  } else {
+    // Polls
+    if (SERIES.polls.length) {
+      html += `<div class="sh" style="margin-bottom:10px"><div class="sh-title">📊 Reader Polls</div></div>`;
+      SERIES.polls.forEach(poll => {
+        const tot = poll.options.reduce((a,o) => a + o.votes, 0) || 1;
+        html += `
+          <div class="poll-card">
+            <div class="poll-hdr">
+              <span class="poll-icon">📊</span>
+              <div class="poll-title">${poll.question}</div>
+              <span class="poll-season-tag">Season ${poll.season}</span>
+            </div>
+            <div class="poll-opts">
+              ${poll.options.map((opt, i) => {
+                const pct = Math.round(opt.votes / tot * 100);
+                return `<div class="poll-opt${poll.voted === i ? ' voted' : ''}" data-pollid="${poll.id}" data-oi="${i}" onclick="votePoll('${poll.id}',${i})">
+                  <div class="poll-bar" style="width:${pct}%"></div>
+                  <div class="poll-row">
+                    <span class="poll-opt-txt">${opt.text}</span>
+                    <span class="poll-pct">${pct}%</span>
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div class="poll-footer">
+              <span class="poll-total"><i class="fas fa-users" style="font-size:9px;margin-right:3px"></i>${fmtN(tot)} votes</span>
+              <span class="poll-share" onclick="toast('📤 Poll link copied!')"><i class="fas fa-share-alt" style="font-size:9px;margin-right:3px"></i>Share</span>
+            </div>
+          </div>`;
+      });
+    }
+
+    // Predictions
+    if (SERIES.predictions.length) {
+      html += `<div class="sh" style="margin:14px 0 10px"><div class="sh-title">🔮 Predictions</div></div>`;
+      SERIES.predictions.forEach(pred => {
+        const tot = pred.options.reduce((a,o) => a + o.votes, 0) || 1;
+        html += `
+          <div class="pred-card">
+            <div class="pred-hdr">
+              <div class="pred-label"><i class="fas fa-crystal-ball" style="font-size:8px"></i> Reader Prediction</div>
+              <div class="pred-question">${pred.question}</div>
+            </div>
+            <div class="pred-opts">
+              ${pred.options.map((opt, i) => {
+                const pct = Math.round(opt.votes / tot * 100);
+                return `<div class="pred-opt${opt.picked ? ' picked' : ''}" onclick="pickPrediction('${pred.id}',${i})">
+                  <div class="pred-opt-em">${opt.em}</div>
+                  <div class="pred-opt-body">
+                    <div class="pred-opt-txt">${opt.text}</div>
+                    <div class="pred-opt-sub">${opt.sub}</div>
+                  </div>
+                  <div class="pred-opt-pct">${pct}%</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div class="pred-footer"><i class="fas fa-users" style="font-size:9px"></i> ${fmtN(tot)} predictions · Reveals at series end</div>
+          </div>`;
+      });
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function votePoll(pollId, oi) {
+  const poll = SERIES.polls.find(p => p.id === pollId);
+  if (!poll || poll.voted >= 0) { toast('✅ Already voted!'); return; }
+  poll.options[oi].votes++;
+  poll.voted = oi;
+  toast('✅ Vote recorded!');
+  renderPolls();
+}
+
+let predPickedMap = {};
+function pickPrediction(predId, oi) {
+  const pred = SERIES.predictions.find(p => p.id === predId);
+  if (!pred) return;
+  if (predPickedMap[predId] === oi) {
+    pred.options[oi].votes--;
+    pred.options[oi].picked = false;
+    predPickedMap[predId] = null;
+  } else {
+    if (predPickedMap[predId] != null) {
+      pred.options[predPickedMap[predId]].votes--;
+      pred.options[predPickedMap[predId]].picked = false;
+    }
+    pred.options[oi].votes++;
+    pred.options[oi].picked = true;
+    predPickedMap[predId] = oi;
+    toast(`🔮 Prediction locked: "${pred.options[oi].text}"`);
+  }
+  renderPolls();
+}
+
+/* ══ DEBATES ══ */
+function renderDebates() {
+  const container = document.getElementById('debatesContent');
+  if (!SERIES.debates.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-comments"></i><p>No debates yet for this series</p></div>`;
+    return;
+  }
+
+  const userTeam = teamPicked ? SERIES.teams.find(t => t.id === teamPicked) : null;
+
+  let html = '';
+  if (userTeam) {
+    html += `<div style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--tx-body);display:flex;align-items:center;gap:8px">
+      <span style="font-size:18px">${userTeam.icon}</span>
+      Debating as <strong style="color:${userTeam.color}">${userTeam.name}</strong>
+    </div>`;
+  }
+
+  SERIES.debates.forEach(deb => {
+    if (!debateCms[deb.id]) debateCms[deb.id] = [...deb.comments.map(c => ({...c, liked: false}))];
+    const cms = debateCms[deb.id];
+    const uv = debateUserVotes[deb.id] || deb.userVote;
+    const tot = (deb.forV + deb.agV) || 1;
+    const fp = Math.round(deb.forV / tot * 100);
+    const ap = 100 - fp;
+
+    html += `
+      <div class="debate-card">
+        <div class="debate-hdr">
+          <div class="debate-live-tag"><div class="dlive-dot"></div>LIVE DEBATE · ${fmtN(deb.forV + deb.agV)} arguing</div>
+          <div class="debate-motion">${deb.motion}</div>
+        </div>
+        <div class="debate-sides">
+          <div class="deb-side for${uv === 'for' ? ' chosen' : ''}" data-debid="${deb.id}" data-side="for" onclick="voteDebate('${deb.id}','for')">
+            <div class="deb-em">✅</div>
+            <div class="deb-lbl">FOR</div>
+            <div class="deb-bar-wrap"><div class="deb-bar" style="width:${fp}%"></div></div>
+            <div class="deb-pct">${fp}%</div>
+            <div class="deb-cnt">${fmtN(deb.forV)}</div>
+          </div>
+          <div class="deb-side against${uv === 'against' ? ' chosen' : ''}" data-debid="${deb.id}" data-side="against" onclick="voteDebate('${deb.id}','against')">
+            <div class="deb-em">❌</div>
+            <div class="deb-lbl">AGAINST</div>
+            <div class="deb-bar-wrap"><div class="deb-bar" style="width:${ap}%"></div></div>
+            <div class="deb-pct">${ap}%</div>
+            <div class="deb-cnt">${fmtN(deb.agV)}</div>
+          </div>
+        </div>
+        <div class="debate-stats-row">
+          <i class="fas fa-fire" style="color:var(--acc);font-size:9px"></i>
+          ${fmtN(deb.forV + deb.agV)} readers debating · Tap a side to join
+        </div>
+        <div class="debate-comments">
+          <div class="deb-cm-label">💬 Arguments</div>
+          <div class="deb-cm-list" id="debcms-${deb.id}">
+            ${cms.map(c => renderDebCm(c)).join('')}
+          </div>
+        </div>
+        <div class="debate-input-row">
+          <input class="deb-inp" id="debinp-${deb.id}" placeholder="${uv ? 'Make your argument…' : 'Pick a side first…'}" ${!uv ? 'disabled' : ''}/>
+          <button class="deb-post-btn" onclick="postDebCm('${deb.id}')">Post</button>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+  attachDebateLikes();
+}
+
+function renderDebCm(c) {
+  const av = c.avatar
+    ? `<div class="deb-cm-av"><img src="${c.avatar}" loading="lazy"/></div>`
+    : `<div class="deb-cm-av">${(c.name||'?')[0]}</div>`;
+  return `
+    <div class="deb-cm-item" id="debcm-${c.id}">
+      ${av}
+      <div class="deb-cm-body">
+        <div class="deb-cm-name">
+          ${c.name}
+          <span class="deb-side-tag dst-${c.side}">${c.side === 'for' ? '✅ FOR' : '❌ AGAINST'}</span>
+        </div>
+        <div class="deb-cm-txt">${c.text}</div>
+        <div class="deb-cm-meta">
+          <span class="deb-cm-time">${c.time}</span>
+          <span class="deb-cm-like${c.liked ? ' liked' : ''}" data-cmid="${c.id}">
+            <i class="${c.liked ? 'fas' : 'far'} fa-heart"></i> ${c.likes}
+          </span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function voteDebate(debId, side) {
+  if (debateUserVotes[debId]) { toast('✅ Already voted!'); return; }
+  const deb = SERIES.debates.find(d => d.id === debId);
+  if (!deb) return;
+  debateUserVotes[debId] = side;
+  if (side === 'for') deb.forV++;
+  else deb.agV++;
+  toast(side === 'for' ? '✅ You\'re FOR!' : '❌ You\'re AGAINST!');
+  renderDebates();
+}
+
+function postDebCm(debId) {
+  const inp = document.getElementById('debinp-' + debId);
+  const text = inp?.value.trim();
+  if (!text) { toast('✍️ Write your argument!'); return; }
+  const uv = debateUserVotes[debId];
+  if (!uv) { toast('Pick a side first!'); return; }
+  const newCm = {
+    id: 'dc_' + Date.now(),
+    name: 'You',
+    avatar: null,
+    side: uv,
+    text,
+    time: 'Just now',
+    likes: 0,
+    liked: false
+  };
+  if (!debateCms[debId]) debateCms[debId] = [];
+  debateCms[debId].push(newCm);
+  inp.value = '';
+  const list = document.getElementById('debcms-' + debId);
+  if (list) list.insertAdjacentHTML('beforeend', renderDebCm(newCm));
+  attachDebateLikes();
+  toast('💬 Argument posted!');
+}
+
+function attachDebateLikes() {
+  document.querySelectorAll('.deb-cm-like').forEach(el => {
+    el.onclick = () => {
+      const cmId = el.dataset.cmid;
+      // find across all debates
+      for (const debId in debateCms) {
+        const c = debateCms[debId].find(x => x.id === cmId);
+        if (c) {
+          c.liked = !c.liked;
+          c.likes += c.liked ? 1 : -1;
+          el.classList.toggle('liked', c.liked);
+          el.innerHTML = `<i class="${c.liked ? 'fas' : 'far'} fa-heart"></i> ${c.likes}`;
+          return;
+        }
+      }
+    };
+  });
+}
+
+/* ══ SAVE / FOLLOW ══ */
+function toggleSave() {
+  isSaved = !isSaved;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.toggle('active', isSaved);
+  btn.innerHTML = `<i class="${isSaved ? 'fas' : 'far'} fa-bookmark"></i>`;
+  toast(isSaved ? '📌 Series saved to library!' : 'Removed from library');
+}
+function toggleFollow() {
+  isFollowing = !isFollowing;
+  const btn = document.getElementById('hwFollow');
+  btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', isFollowing);
+  toast(isFollowing ? `✅ Following @${SERIES.writer.name}` : `Unfollowed @${SERIES.writer.name}`);
+}
+
+/* ══ SHARE ══ */
+function openShare() {
+  document.getElementById('ssPreview').innerHTML = `
+    <div class="ss-prev-thumb" style="background-image:url('${SERIES.cover}')"></div>
+    <div>
+      <div class="ss-prev-title">${SERIES.title}</div>
+      <div class="ss-prev-sub">by @${SERIES.writer.name} · ${SERIES.stats.reads} reads</div>
+    </div>`;
+  document.getElementById('ssLink').value = `https://droboard.app/series/${SERIES.id}`;
+  document.getElementById('ssCopyMsg').textContent = '';
+  document.getElementById('shareOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeShare() {
+  document.getElementById('shareOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function copyLink() {
+  navigator.clipboard?.writeText(document.getElementById('ssLink').value).catch(() => {});
+  document.getElementById('ssCopyMsg').textContent = '✅ Link copied!';
+  toast('🔗 Link copied!');
+}
+function shareVia(platform) {
+  const url = encodeURIComponent(`https://droboard.app/series/${SERIES.id}`);
+  const text = encodeURIComponent(`📖 "${SERIES.title}" on Droboard!`);
+  const urls = {
+    whatsapp: `https://wa.me/?text=${text}%20${url}`,
+    twitter: `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+    telegram: `https://t.me/share/url?url=${url}&text=${text}`,
+    instagram: null
+  };
+  if (platform === 'instagram') { copyLink(); toast('📋 Copied for Instagram!'); return; }
+  if (urls[platform]) { window.open(urls[platform], '_blank'); closeShare(); }
+}
+
+/* ══ BOOT ══ */
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--glow:rgba(255,0,80,.3);
+  --dark:#000000;--card:#0a0a0a;--surface:#111;
+  --tx:#f0f0f0;--muted:#666;--bd:rgba(255,255,255,.08);
+  --bd2:rgba(255,0,80,.2);
+  --nav-h:60px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden}
+
+/* ══ TOP NAV ══ */
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,0) 0 0;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);transition:opacity .25s,transform .25s}
+.top-nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 14px 8px}
+.top-nav.ui-hidden{opacity:0;pointer-events:none;transform:translateY(-100%)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;line-height:1}
+.nav-tabs{display:flex;gap:2px;background:rgba(255,255,255,.05);border-radius:30px;padding:3px;border:1px solid var(--bd)}
+.nav-tab{font-size:11px;font-weight:600;color:#555;padding:5px 10px;border-radius:24px;cursor:pointer;transition:.2s;white-space:nowrap;letter-spacing:.01em}
+.nav-tab.active{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-bell-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#aaa;font-size:14px;transition:.2s;position:relative;flex-shrink:0}
+.nav-bell-btn:active{background:rgba(255,0,80,.15);color:var(--acc)}
+.bell-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:8px;background:var(--acc);font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid #000;line-height:1}
+.bell-badge.hidden{display:none}
+
+/* ══ STATUS ROW ══ */
+.status-wrap{position:fixed;top:52px;left:0;right:0;z-index:58;background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);padding:8px 0 10px;transition:opacity .25s,transform .25s}
+.status-wrap.ui-hidden{opacity:0;pointer-events:none;transform:translateY(-20px)}
+.status-row{display:flex;gap:12px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.status-row::-webkit-scrollbar{display:none}
+.s-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer}
+.s-item:active{opacity:.7}
+.s-ring{width:46px;height:46px;border-radius:50%;padding:2px;flex-shrink:0;transition:.2s}
+.s-ring.new{background:conic-gradient(var(--acc) 0%,var(--acc2) 50%,var(--acc) 100%);animation:spin 3s linear infinite}
+.s-ring.viewed{background:#222}
+.s-ring.none{background:rgba(255,255,255,.08);border:1.5px dashed rgba(255,255,255,.15)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.s-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
+.s-inner img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.s-add-icon{font-size:18px;color:#444}
+.s-name{font-size:9px;font-weight:600;color:#666;max-width:46px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+
+/* ══ CAT PILLS ══ */
+.cat-row{position:fixed;top:120px;left:0;right:0;z-index:57;padding:6px 12px 7px;overflow-x:auto;scrollbar-width:none;background:linear-gradient(to bottom,rgba(0,0,0,.97),rgba(0,0,0,0));transition:opacity .25s,transform .25s}
+.cat-row.ui-hidden{opacity:0;pointer-events:none;transform:translateY(-20px)}
+.cat-row::-webkit-scrollbar{display:none}
+.cat-pills-inner{display:flex;gap:5px;width:max-content}
+.pill{font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s;white-space:nowrap;user-select:none}
+.pill.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 0 10px var(--glow)}
+
+/* ══ FEED ══ */
+.feed{position:fixed;inset:0;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.feed::-webkit-scrollbar{display:none}
+.feed.gone{display:none}
+
+/* ══ STORY CARD ══ */
+.s-card{position:relative;height:100vh;width:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;justify-content:flex-end;background-size:cover;background-position:center 30%;overflow:hidden}
+.s-card.contest-card{box-shadow:inset 0 0 0 1px rgba(245,158,11,.3)}
+.s-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.98) 0%,rgba(0,0,0,.5) 40%,rgba(0,0,0,.1) 65%,rgba(0,0,0,.25) 100%);z-index:0}
+.s-body{position:relative;z-index:3;padding:0 70px 90px 16px;width:100%}
+.debate-live{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,0,80,.3);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--acc2);margin-bottom:8px;cursor:pointer}
+.debate-live-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:blink 1.2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.badge-cat{background:var(--acc);padding:4px 10px;border-radius:16px;font-size:10px;font-weight:700}
+.badge-ch{background:rgba(255,255,255,.1);backdrop-filter:blur(6px);padding:4px 10px;border-radius:16px;font-size:10px;font-weight:600;color:#ffb0c8;border:1px solid rgba(255,176,200,.15)}
+.badge-type{background:rgba(255,255,255,.08);padding:4px 10px;border-radius:16px;font-size:10px;font-weight:600;color:#d0c0ff;border:1px solid rgba(208,192,255,.12)}
+.badge-contest{background:rgba(245,158,11,.1);padding:4px 10px;border-radius:16px;font-size:10px;font-weight:700;color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.s-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1.18;letter-spacing:-.3px;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.9);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.s-preview{font-size:13px;line-height:1.5;color:rgba(255,255,255,.72);margin-bottom:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.writer-row{display:flex;align-items:center;gap:8px}
+.w-av-wrap{position:relative;width:34px;height:34px;flex-shrink:0;cursor:pointer}
+.w-av-ring{width:34px;height:34px;border-radius:50%;padding:2px}
+.w-av-ring.new{background:transparent;box-shadow:0 0 0 2px #00aaff,0 0 10px rgba(0,170,255,.3);animation:writerRing 2s ease-in-out infinite}
+.w-av-ring.viewed{background:#1a1a2a}
+.w-av-ring.none{background:rgba(80,80,100,.4)}
+@keyframes writerRing{0%,100%{box-shadow:0 0 0 2px #00aaff,0 0 8px rgba(0,170,255,.25)}50%{box-shadow:0 0 0 2px #00eeff,0 0 14px rgba(0,238,255,.45)}}
+.w-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111}
+.w-av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.w-name{font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:var(--tx)}
+.follow-btn{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:5px 14px;border-radius:24px;font-size:10px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0}
+.follow-btn.on{background:var(--acc);border-color:var(--acc)}
+
+/* ══ ACTION BAR (feed card) ══ */
+.act-bar{position:absolute;right:10px;bottom:90px;z-index:10;display:flex;flex-direction:column;align-items:center;gap:13px}
+.act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;user-select:none;position:relative}
+.act-ico{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;transition:.18s}
+.act:active .act-ico{transform:scale(.88)}
+.act-lbl{font-size:10px;font-weight:600;color:#ccc}
+.act.liked .act-ico{background:rgba(255,0,80,.25);border-color:rgba(255,0,80,.4)}
+.act.liked i{color:var(--acc)}
+.act.saved .act-ico{background:rgba(100,200,255,.15);border-color:rgba(100,200,255,.35)}
+.act.saved i{color:#7dd3fc}
+
+/* ══ REACTION POPUP (card-level, custom) ══ */
+.rx-pop{position:absolute;right:50px;bottom:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:36px;padding:8px 10px;display:none;flex-direction:row;gap:3px;z-index:50;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.9);animation:popIn .2s cubic-bezier(.34,1.56,.64,1)}
+.rx-pop.show{display:flex}
+@keyframes popIn{from{opacity:0;transform:scale(.7) translateX(10px)}to{opacity:1;transform:scale(1)}}
+.rx-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 6px;border-radius:12px;transition:.15s;user-select:none}
+.rx-btn:active{transform:scale(.88)}
+.rx-em{font-size:22px;line-height:1}
+.rx-ct{font-size:8px;font-weight:700;color:#888;min-width:16px;text-align:center}
+.rx-btn.reacted .rx-ct{color:var(--acc2)}
+
+/* ══ QUAD CARD (custom) ══ */
+.quad-card{position:relative;height:100vh;width:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;background:#000;overflow:hidden;padding:56px 8px 76px}
+.quad-label{font-size:9px;font-weight:700;color:var(--acc);padding:6px 0 8px;letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.quad-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;min-height:0}
+.qi{border-radius:12px;overflow:hidden;position:relative;background-size:cover;background-position:center;cursor:pointer}
+.qi-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.5) 100%)}
+.qi-body{position:absolute;inset:0;z-index:2;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}
+.qi-cat{background:var(--acc);padding:2px 7px;border-radius:9px;font-size:7px;font-weight:800}
+.qi-title{font-family:'Playfair Display',serif;font-size:10px;font-weight:900;line-height:1.2;text-shadow:0 1px 6px rgba(0,0,0,.9);max-width:95%;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.qi-writer{font-size:8px;color:#bbb;display:flex;align-items:center;gap:3px;justify-content:center}
+.qi-av{width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--acc)}
+.qi-acts{display:flex;justify-content:center;gap:7px;margin-top:3px}
+.qi-act{display:flex;align-items:center;gap:2px;cursor:pointer}
+.qi-ico{width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:9px}
+.qi-act.liked .qi-ico{background:rgba(255,0,80,.25);border-color:rgba(255,0,80,.4)}
+.qi-act.liked i{color:var(--acc)}
+.qi-lbl{font-size:7px;font-weight:600;color:#ccc}
+.qi-btn{background:var(--acc);color:#fff;border:none;border-radius:16px;padding:4px 9px;font-size:8px;font-weight:800;cursor:pointer;box-shadow:0 0 10px var(--glow);margin-top:2px}
+
+/* ══ EOF ══ */
+.eof{height:100vh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:40px}
+.eof-em{font-size:44px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.eof-h{font-family:'Playfair Display',serif;font-size:22px;font-weight:900}
+.eof-p{font-size:12px;color:var(--muted);line-height:1.6;max-width:230px}
+.eof-btn{background:var(--acc);color:#fff;border:none;padding:10px 24px;border-radius:24px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 0 16px var(--glow)}
+
+/* ══ EMPTY STATE ══ */
+.empty-st{height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px}
+.empty-st h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+.empty-st p{color:var(--muted);font-size:12px;line-height:1.5;max-width:240px}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active,.bn-item.on{color:var(--acc)}
+
+/* ══ ASK TAB (custom) ══ */
+.ask-tab{position:fixed;inset:0;overflow-y:auto;padding:54px 0 74px;scrollbar-width:none;display:none}
+.ask-tab::-webkit-scrollbar{display:none}
+.ask-tab.show{display:block}
+.ask-compose{padding:10px 14px 6px}
+.ask-box{background:#0a0a0a;border:1px solid var(--bd);border-radius:14px;padding:12px}
+.ask-box textarea{width:100%;background:transparent;border:none;color:#e0e0e0;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.5}
+.ask-box textarea::placeholder{color:#333}
+.ask-box-btm{display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px}
+.ask-anon{display:flex;align-items:center;gap:5px;font-size:10px;color:#555;cursor:pointer;user-select:none}
+.ask-anon input{accent-color:var(--acc);width:13px;height:13px}
+.ask-row2{display:flex;gap:6px}
+.ask-sel{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:8px;color:#aaa;font-family:'DM Sans',sans-serif;font-size:10px;padding:5px 8px;outline:none;cursor:pointer}
+.ask-sel option{background:#111}
+.ask-post-btn{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 0 12px var(--glow)}
+.ask-cats-bar{display:flex;gap:5px;padding:6px 14px;overflow-x:auto;scrollbar-width:none}
+.ask-cats-bar::-webkit-scrollbar{display:none}
+.ask-cat-btn{font-size:9px;font-weight:700;padding:4px 10px;border-radius:16px;white-space:nowrap;cursor:pointer;border:1px solid var(--bd);color:#555;transition:.2s;user-select:none}
+.ask-cat-btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.ask-list{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.ask-item{background:#080808;border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.ask-item-body{padding:12px 12px 8px}
+.ask-item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ask-item-av{width:26px;height:26px;border-radius:50%;background:rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;color:#fff}
+.ask-item-av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.ask-item-nm{font-size:11px;font-weight:700;color:#e0e0e0}
+.ask-item-time{font-size:9px;color:#444}
+.ask-item-cat{font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;background:rgba(255,0,80,.1);color:var(--acc);border:1px solid rgba(255,0,80,.15)}
+.ask-item-q{font-size:13px;font-weight:600;line-height:1.45;color:#e0e0e0;margin-bottom:8px}
+.ask-item-poll{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.ask-item-opt{position:relative;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:7px 10px;cursor:pointer;overflow:hidden;font-size:11px;font-weight:600;user-select:none}
+.ask-item-opt.voted{border-color:var(--acc)}
+.ask-item-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.1);z-index:0}
+.ask-item-opt-row{position:relative;z-index:1;display:flex;justify-content:space-between}
+.ask-item-pct{font-size:10px;color:var(--acc);font-weight:700}
+.ask-item-acts{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.04);padding:6px 12px 10px}
+.ask-item-act{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:600;color:#444;cursor:pointer;padding:4px 0;border-radius:7px}
+.ask-item-act:active{background:rgba(255,0,80,.08);color:var(--acc)}
+.ask-item-act.liked{color:var(--acc)}
+.ask-item-act i{font-size:12px}
+.ask-cm-area{display:none;padding:0 12px 10px}
+.ask-cm-area.open{display:block}
+.ask-cm-inp-row{display:flex;gap:6px;align-items:center;margin-bottom:7px}
+.ask-cm-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:14px;padding:6px 10px;color:#e0e0e0;font-family:inherit;font-size:11px;outline:none}
+.ask-cm-inp::placeholder{color:#333}
+.ask-cm-send{background:var(--acc);border:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#fff;flex-shrink:0}
+.ask-cm-send:disabled{background:#222;cursor:default}
+.ask-cm-list{display:flex;flex-direction:column;gap:6px}
+.ask-cm-item{display:flex;gap:6px}
+.ask-cm-av{width:22px;height:22px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;color:#888}
+.ask-cm-body{flex:1}
+.ask-cm-name{font-size:10px;font-weight:700;color:#aaa;margin-bottom:1px}
+.ask-cm-text{font-size:11px;color:#777;line-height:1.4}
+
+/* ══ COMMENTS SHEET (slim custom wrapper — content rendered by DroboardComments) ══ */
+.cm-sheet-bg{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.cm-sheet-bg.open{display:flex}
+.cm-sheet{width:100%;max-width:480px;max-height:88vh;background:#080808;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:cmSheetUp .28s ease}
+@keyframes cmSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cm-sheet-handle{width:32px;height:3px;background:rgba(255,255,255,.12);border-radius:3px;margin:10px auto 0}
+.cm-sheet-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px;flex-shrink:0}
+.cm-sheet-hdr h3{font-size:14px;font-weight:800;color:#e0e0e0}
+.cm-sheet-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#888;border:none;flex-shrink:0}
+.cm-sheet-body{flex:1;min-height:0;overflow-y:auto;padding:0 12px 6px;scrollbar-width:none}
+.cm-sheet-body::-webkit-scrollbar{display:none}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:#111;border:1px solid var(--bd);color:#e0e0e0;padding:8px 18px;border-radius:24px;font-size:12px;font-weight:600;z-index:1400;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav" id="topNav">
+  <div class="top-nav-inner">
+    <div class="nav-logo">D</div>
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-tab="foryou">For You</div>
+      <div class="nav-tab" data-tab="following">Following</div>
+      <div class="nav-tab" data-tab="trending">Trending</div>
+      <div class="nav-tab" data-tab="ask">Ask</div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-bell-btn" id="navBellBtn" onclick="openNotifications()">
+        <i class="fas fa-bell"></i>
+        <div class="bell-badge" id="bellBadge">7</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS ROW -->
+<div class="status-wrap" id="statusWrap">
+  <div class="status-row" id="statusRow"></div>
+</div>
+
+<!-- CAT PILLS -->
+<div class="cat-row" id="catRow">
+  <div class="cat-pills-inner" id="catPills">
+    <div class="pill on" data-cat="all">🔥 All</div>
+    <div class="pill" data-cat="heartbreak">💔 Heartbreak</div>
+    <div class="pill" data-cat="campus">🎓 Campus</div>
+    <div class="pill" data-cat="family">👑 Family</div>
+    <div class="pill" data-cat="revenge">🔥 Revenge</div>
+    <div class="pill" data-cat="love">🏙️ Love</div>
+    <div class="pill" data-cat="twist">✨ Twist</div>
+  </div>
+</div>
+
+<!-- FEED -->
+<div class="feed" id="feed"></div>
+
+<!-- ASK TAB -->
+<div class="ask-tab" id="askTab">
+  <div class="ask-compose">
+    <div class="ask-box">
+      <textarea id="askTa" rows="3" placeholder="Ask anything — anonymously or not…"></textarea>
+      <div class="ask-box-btm">
+        <label class="ask-anon"><input type="checkbox" id="anonChk" checked/> Post anonymously</label>
+        <div class="ask-row2">
+          <select class="ask-sel" id="askCatSel">
+            <option value="Relationships">💕 Relationships</option>
+            <option value="Family">👑 Family</option>
+            <option value="Campus">🎓 Campus</option>
+            <option value="Marriage">💍 Marriage</option>
+            <option value="Heartbreak">💔 Heartbreak</option>
+          </select>
+          <button class="ask-post-btn" id="askPostBtn">Post →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ask-cats-bar" id="askCatsBar">
+    <div class="ask-cat-btn on" data-cat="all">🔥 All</div>
+    <div class="ask-cat-btn" data-cat="Relationships">💕 Relationships</div>
+    <div class="ask-cat-btn" data-cat="Family">👑 Family</div>
+    <div class="ask-cat-btn" data-cat="Campus">🎓 Campus</div>
+    <div class="ask-cat-btn" data-cat="Marriage">💍 Marriage</div>
+    <div class="ask-cat-btn" data-cat="Heartbreak">💔 Heartbreak</div>
+  </div>
+  <div class="ask-list" id="askList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item active" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- COMMENTS SHEET (thin wrapper — content rendered by DroboardComments) -->
+<div class="cm-sheet-bg" id="cmSheetBg">
+  <div class="cm-sheet">
+    <div class="cm-sheet-handle"></div>
+    <div class="cm-sheet-hdr"><h3>Comments</h3><button class="cm-sheet-close" onclick="closeCmSheet()">✕</button></div>
+    <div class="cm-sheet-body" id="cmSheetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Load shared Droboard components (order matters: reaction-picker / status-viewer /
+     share-modal / save-modal / tip-picker before comment-section, and all of the
+     above before reader, since reader.js + comment-section.js auto-detect and bind
+     to whichever of these are already loaded) -->
+<script src="component/reaction-picker.js"></script>
+<script src="component/status-viewer.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/save-modal.js"></script>
+<script src="component/tip-picker.js"></script>
+<script src="component/comment-section.js"></script>
+<script src="component/ad-card.js"></script>
+<script src="component/post-card.js"></script>
+<script src="component/reader.js"></script>
+
+<!-- Data used by the components above -->
+<script src="data/comments-data.js"></script>
+<script src="data/ad-data.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA (page-specific — stories, writer statuses, engagement,
+   writer posts, ask feed — these belong to index.html, not to
+   the shared data/ files, which feed different pages)
+   ═══════════════════════════════════════════════════════════ */
+const COVERS={
+  wife3:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+  wife2:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+  wife:'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+  img2:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',
+  img8:'https://i.postimg.cc/cgLZJNmC/8.jpg',
+  img7:'https://i.postimg.cc/0MyxNqfz/7.jpg',
+  n6:'https://i.postimg.cc/WF1j4Pnh/6.jpg',
+  n5:'https://i.postimg.cc/N9jY0w4m/5.jpg',
+  n4:'https://i.postimg.cc/DJwFzKgd/4.jpg',
+  n3:'https://i.postimg.cc/ftRZbhKx/3.jpg',
+  n2:'https://i.postimg.cc/JDzmhWqj/2.jpg',
+  n1:'https://i.postimg.cc/YGCkSw-33/1.jpg',
+  wolf3:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',
+  wolf2:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',
+  wolf:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',
+  imgt:'https://i.postimg.cc/tY7KnJyr/images.jpg',
+};
+
+const WRITER_STATUS={
+  w1:{hasStatus:true,viewed:false,name:"Ada_Writes",avatar:"https://i.pravatar.cc/100?img=32",viewCount:342,statuses:[{bg:COVERS.wife2,quote:"Sometimes love is just grief wearing a familiar face.",caption:"Working on Chapter 5… 🖊️",time:"2h ago"},{bg:COVERS.wife3,quote:"New chapter dropping tonight 🌙",caption:"Can't wait for you to read this one",time:"1h ago"}]},
+  w2:{hasStatus:true,viewed:false,name:"CampusQueen",avatar:"https://i.pravatar.cc/100?img=12",viewCount:128,statuses:[{bg:COVERS.img8,quote:"He didn't see me until I stopped trying to be seen.",caption:"Chapter 8 almost done! 🎓",time:"4h ago"}]},
+  w3:{hasStatus:false,viewed:false,name:"Chiamaka_N",avatar:"https://i.pravatar.cc/100?img=47",viewCount:0,statuses:[]},
+  w4:{hasStatus:true,viewed:true,name:"Kemi_A",avatar:"https://i.pravatar.cc/100?img=28",viewCount:95,statuses:[{bg:COVERS.n2,quote:"Not every love story ends with a wedding. Some end with clarity.",caption:"Poll results were WILD 😂",time:"6h ago"}]},
+  w5:{hasStatus:true,viewed:false,name:"Ifeanyi_Story",avatar:"https://i.pravatar.cc/100?img=53",viewCount:874,statuses:[{bg:COVERS.wife3,quote:"I walked out in socked feet and found my actual life.",caption:"Bare Kitchen is real btw 🥐",time:"30m ago"}]},
+  w6:{hasStatus:false,viewed:false,name:"Zara_M",avatar:"https://i.pravatar.cc/100?img=16",viewCount:0,statuses:[]},
+  w7:{hasStatus:true,viewed:true,name:"Efe_O",avatar:"https://i.pravatar.cc/100?img=22",viewCount:412,statuses:[{bg:COVERS.img2,quote:"He carried the letter so it would reach me someday.",caption:"Writing this chapter broke me. 💔",time:"1d ago"}]},
+  w8:{hasStatus:true,viewed:false,name:"Dami_Cole",avatar:"https://i.pravatar.cc/100?img=64",viewCount:67,statuses:[{bg:COVERS.n1,quote:"Finally found the name for our dog and our love story.",caption:"She said yes to the dog name 😂",time:"3h ago"}]},
+};
+
+/* In-reader mid-scene sponsored slide — small, separate set kept here since
+   DroboardReader's ad-slide expects {brand,logo,headline,body,cta,url}
+   (note: body, not sub). The feed-level ad cards below use the shared
+   FULLSCREEN_ADS from data/ad-data.js instead, via DroboardAdCard. */
+const IN_ADS=[
+  {brand:"Konga",logo:"https://i.pravatar.cc/100?img=20",headline:"Shop smarter this season",body:"Thousands of deals on fashion and electronics.",cta:"Shop Now",url:"https://konga.com"},
+  {brand:"PiggyVest",logo:"https://i.pravatar.cc/100?img=23",headline:"Save money. Build your future.",body:"Join 4 million Nigerians saving smarter every day.",cta:"Start Saving",url:"https://piggyvest.com"}
+];
+
+// ══ STORIES — scenes ~140 words each ══
+const BASE_STORIES=[
+  {id:1,type:"series",cat:"💔 Betrayal",isContest:false,cover:COVERS.wife2,
+   title:"I came home early and caught my husband kissing my late sister's photograph",
+   preview:"My body froze. He held the frame like someone begging forgiveness from a ghost.",
+   synopsis:"A woman returns home early to find her husband in an intimate moment with a photograph of her deceased sister — revealing a love triangle she never knew existed.",
+   writer:{id:"w1",name:"Ada_Writes",avatar:"https://i.pravatar.cc/100?img=32",isFollowed:false},
+   stats:{likes:24300,comments:4100},saved:false,liked:false,season:2,chapter:4,tag:"heartbreak",
+   scenes:[
+"I opened the front door quietly.\n\nA surprise dinner was my plan — jollof rice, his favourite candles, that playlist we danced to at our wedding in Abuja three years ago. I had left the office at two. I had sent him a voice note at noon: 'Still at the meeting, won't be back till seven.' He believed me. Or — I thought he did.\n\nI walked through the entrance hall carrying two bags of groceries. The house was dim. I assumed he was asleep. But there was a sound from the sitting room. A low sound. Something between a sob and a prayer. I set the bags down on the kitchen counter without a sound.",
+"He was standing at the mantelpiece. Both hands wrapped around the photograph frame — the silver one I had picked out myself from the market in Onitsha. The one I placed there because she was my sister, and I loved her, and she deserved to be remembered.\n\nHis shoulders were shaking. He was whispering something I could not fully hear. But I heard her name.\n\nAdaeze.\n\nHe said it twice. Then a third time — softer, more broken than the last. I must have made a sound. Because he turned. The look on his face was not guilt in the way I understood guilt. This was grief. Raw, unguarded, three-years-old grief that had never been allowed to surface. He looked like a man who had finally, accidentally, come up for air — in front of the wrong person.",
+"He said: 'I loved her before I ever loved you.'\n\nHe did not say it to hurt me. He said it the way people say things they have carried so long they no longer know how heavy they are. I found the edge of the sofa. My legs had decided to sit down even before my mind agreed.\n\nThe groceries were still on the kitchen counter. I noticed the ceiling fan needed cleaning. My mind goes practical when the emotional part shuts down to protect me.\n\nI said: 'How long?' He said: 'Since before you.' I said: 'And after she died?' He said: 'I never stopped.'\n\nThe room was very quiet. Outside a motorcycle passed. A dog barked somewhere down the street.",
+"That night I slept on the couch. I did not cry. I thought about Adaeze — how she used to call me every Sunday and talk for an hour about nothing important. I thought about the fact that I had not known.\n\nI had looked at my husband and my memory of my sister every single day, and I had not known.\n\nBy morning something had settled in me. Not forgiveness — not yet. But a decision. A decision to not let the wound fester in silence.\n\nI knocked on the bedroom door at seven. He opened it immediately. I said: 'I need you to be honest. Not some of it. Everything.' He nodded. Therapy was not a question after that morning. It was the only road left.",
+"The therapist had a small office in Victoria Island with a plant in the corner that looked like it needed watering. We went every Thursday. We sat beside each other but not touching, which felt honest.\n\nHe told me things I had not asked to know and some things I was glad to finally understand. Adaeze had loved him too. They had decided — together — to let it go when she learned the diagnosis. She had asked him to look after me. He had agreed in the way people agree to things they cannot yet imagine carrying.\n\nI sat with that for several weeks. The idea that the last great act of my sister's love was to give me her person. A gift I had never asked for. A gift that had not arrived as a gift.",
+"There are things I understand now that I did not understand before that Tuesday afternoon.\n\nI understand that love does not have a simple shape. I understand that grief can live in a person like a second heartbeat — quiet, continuous, invisible to everyone except itself. I understand that my husband married me with full knowledge of what he felt and tried, sincerely, to make it true by making it real.\n\nI cannot tell you how the story ends. We are still in it. Some weeks are harder than others. Some Thursdays the plant in the corner gets watered and some Thursdays it does not.\n\nBut I can tell you this: I still make jollof rice on Tuesdays. And he still lights the candles. That means something. I have decided it means something.",
+"I found an old photograph of Adaeze last week. Not the silver-framed one — a different one, tucked into the back of a book she had lent me two years before she died.\n\nShe was laughing in it. Her eyes were completely closed the way they always were when she laughed properly. There was someone beside her whose arm was around her shoulder. I could not see the face — the photograph had been cut. Neatly. Deliberately.\n\nI know who was standing there. I did not need to see the face.\n\nI put the photograph in my own frame. Not silver — a plain wooden one. I placed it on the shelf beside the other. My husband saw it that evening. He did not say anything. Neither did I. But we both stood there looking at it for a long time before we went to bed."
+   ]},
+  {id:2,type:"series",cat:"🎓 Campus",isContest:true,cover:COVERS.img8,
+   title:"The richest boy in school suddenly started sitting beside me every morning",
+   preview:"Everyone assumed he liked me. They didn't know the secret he whispered first.",
+   synopsis:"When the most eligible heir on campus chooses a scholarship student as his daily companion, the entire school talks — but the truth behind his choice is nothing any of them guessed.",
+   writer:{id:"w2",name:"CampusQueen",avatar:"https://i.pravatar.cc/100?img=12",isFollowed:true},
+   stats:{likes:18100,comments:2300},saved:false,liked:false,season:1,chapter:7,tag:"campus",
+   scenes:[
+"Chidi Okafor was the kind of person who made a room rearrange itself when he walked in. People shifted. Sat straighter. Left more empty chairs in his orbit, just in case. He drove a car that cost more than the combined annual salaries of three lecturers. He wore clothes that looked casual until you got close enough to recognize what they were.\n\nI was a scholarship student from Enugu. My shoes had been resoled twice before first year ended. I ate lunch from a cooler I brought from the hostel because the cafeteria prices were designed for a different kind of student.\n\nWe did not exist in the same universe. I understood this clearly and had arranged my life around the understanding.",
+"And then one Monday, during the eight o'clock Constitutional Law class, Chidi Okafor walked in ten minutes late and sat beside me. Not beside his usual group in the back corner. Beside me. In the front row. People turned around. I felt their eyes like a temperature change in the room. I did not look at him. I kept my notebook open and my pen moving and my face arranged into an expression that said: this is normal and I have no feelings about it whatsoever.\n\nHe said nothing that first day. Or the second. On the third day he slid a folded piece of paper across the desk while the lecturer was writing on the board. It said: 'I need to be around someone who is here because they earned it. Not because of who their family is. Please don't make this weird.'",
+"I read it twice. Then I wrote on the outside: 'I came here to get a degree. If you can keep up in class, fine. Don't slow me down.' I slid it back. I heard him laugh — once, quietly — and kept my eyes on the board.\n\nFrom that day, he sat beside me every morning. He did not slow me down. He kept up. Some days he kept up better than I did, which annoyed me in a way I chose not to examine.\n\nAfter class we studied under the old neem tree behind the library. Nobody else liked it. We liked it precisely because nobody else did. He would read cases aloud in a voice that was actually quite good for reading aloud, and I would take notes and argue with his interpretations.",
+"One evening in second semester he told me the truth: his father's company was under investigation. Accounts frozen pending trial. The name that had made rooms rearrange themselves was now attached to headlines he had not written and could not erase.\n\nHe said: 'I needed one place where people treated me like a person, not a situation.' I said: 'You picked the front row for that?' He laughed. That same small laugh from the first week. Nothing performed about it.\n\nWe sat under the neem tree until the library closed. I lent him my red pen. He gave it back the next morning with his own notes in the margins — arguments I had not considered, cases I had not cited. The notes were better than mine. I did not tell him this. But I kept the pen.",
+"The trial ran for fourteen months. His father was acquitted on four counts and convicted on two. The company restructured. Chidi did not miss a single class during the entire period. He sat beside me every morning. He read cases aloud in that good voice. He argued interpretations. He kept up.\n\nIn our final year, during the week before exams, I found a note on my desk in the library where I always studied. It said: 'You made this bearable. Thank you.' No name. But his handwriting by then was as familiar to me as my own.\n\nI did not write back. Some things do not need a response. Some things are complete as they are.",
+"We graduated the same year. He rebuilt from a much smaller base than he had started from. He built well.\n\nI passed my bar exams on the first attempt. He called to say he had framed my result — not his own, mine — because he said it was the most honest thing he had witnessed in five years of watching people perform their qualifications.\n\nI still have those shoes. Resoled three more times since. They carry me just fine. I argued my first case in them on a Tuesday in October, in a Lagos courtroom, against a lawyer whose suit cost more than my monthly rent. I won the case.\n\nI thought of Chidi's laugh when the judge read the verdict. The one that was small and genuine and had nothing performed about it.",
+"I ran into him last year at a conference in Abuja. He was on a panel. I was in the audience. He spotted me before the session started and held up his phone to show me a photograph: the neem tree behind the library, still there, a little taller.\n\nDuring Q&A I asked him a question about corporate liability that was genuinely technical and had nothing to do with sentiment. He answered it correctly and precisely. Then he added: 'I had a good study partner.' Three hundred people in the room had no idea what that meant. I did.\n\nWe had dinner afterwards and argued for two hours about a landmark case we had first disagreed about in second year. Neither of us changed our position. It was one of the best evenings I have had in recent memory."
+   ]},
+  {id:3,type:"series",cat:"👑 Family",isContest:false,cover:COVERS.wife,
+   title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",
+   preview:"The lawyer said: 'You were adopted.' What came next broke me open.",
+   synopsis:"At the reading of a grandmother's will in Onitsha, a young woman discovers a truth that redefines her entire identity — and finds something more powerful than blood waiting at the end.",
+   writer:{id:"w3",name:"Chiamaka_N",avatar:"https://i.pravatar.cc/100?img=47",isFollowed:false},
+   stats:{likes:31000,comments:5700},saved:false,liked:false,season:3,chapter:12,tag:"family",
+   scenes:[
+"My grandmother raised me in a three-room house in Onitsha. She walked me to school until I was eleven. She plaited my hair every Saturday morning with a comb she had owned since before my mother was born. She made groundnut soup the same way every time — measured not by cups or spoons but by knowledge so deep it had become instinct.\n\nShe died on a Thursday in March, aged eighty-one, with her hand in mine. I had driven down from Lagos the previous weekend because something in me knew, though she had not said anything alarming. I held her hand until it went cold. Then I held it a little longer. I have never apologised for that extra time.",
+"The funeral was large. People came from parts of the extended family I had never met — uncles whose names I recognised only from stories, women who looked at me for just a fraction too long before looking away. I noticed but I did not understand. Not yet.\n\nThe lawyer came on the second Saturday after burial. He read three pages in a steady professional voice. Parcels of land. Bank accounts. The family house. And then he said: 'There is a separate clause regarding Miss Adanna Ngozi Obi.' That is my name. I straightened in my chair.\n\nHe said: 'Miss Obi was adopted at eleven days old from the Sisters of Mercy maternity home in Asaba in 1998.' The room went very quiet.",
+"I looked at my aunt across the table. She was looking at her hands. Her hands that looked nothing like mine. Nothing like my grandmother's. I had always known my hands were different. I had thought it was just how genetics skipped.\n\nI took the letter to the back veranda where we used to shell groundnuts on Sunday afternoons. The handwriting was hers — shaky in the last years but still hers, still the same loops I had watched form addresses on envelopes my entire childhood.\n\nShe had written: 'My Adanna. You were brought to me eleven days old, wrapped in a cloth that was too thin for October. Cold but not crying. I took one look at you and I knew I was going to spend the rest of my life making sure you were warm.'",
+"'I chose you. I have chosen you every day since. Blood is not the beginning of love and it is not the end of it. You are mine and I am yours and nothing written in a court document will ever change what we are to each other. Some people are given their family. I was given mine too — but I was given you, and there is a difference between a thing you receive and a thing you choose.'\n\nI sat on that veranda for a long time. Long after the light changed. Long after everyone else had gone inside. Long after the mosquitoes arrived and I stopped noticing them.\n\nShe left me the house. The land. The gold jewellery from three generations. And forty-seven journals she had kept since 1975.",
+"In the third journal from 1998 she had written, three days after I arrived: 'The baby slept through the night. I think she is going to be extraordinary. She has very serious eyes for someone who cannot yet focus them.'\n\nIn the journal from 2004 she had written: 'Adanna asked me today where babies come from. I told her the truth as I understand it — that they come from love, in whatever form love takes. She seemed satisfied with this. She went back to her drawing.'\n\nIn the journal from 2019 she had written: 'My Adanna passed her bar exams today. I am going to make groundnut soup. Not to celebrate — though I am celebrating — but because it is what I do when I feel something too large for words.'",
+"I have read all forty-seven journals. It took me three months. I read slowly because I did not want to finish.\n\nEvery ordinary day she had recorded the small evidence of a life she was building around the fact of me: what I ate, what I said, what I worried about, what made me laugh. It is the most comprehensive documentation of love I have ever encountered. More thorough than any academic study. More persuasive than any argument.\n\nI understand now that identity is not only a biological fact. It is also a practice. A repetition. A series of choices made daily by someone who did not have to make them but made them anyway, faithfully, for twenty-five years, without once letting me see the seams.",
+"I moved back to Onitsha. Not permanently — I kept my practice in Lagos — but enough. I sleep in the room I grew up in three or four nights a month. I make groundnut soup by instinct now, measured not by cups or spoons but by knowledge that has become, over time, something close to my own.\n\nI found a photograph of my biological mother last year through a research process I will not detail here. She is alive. She is a teacher in Delta State. She does not know I exist.\n\nI have not decided yet whether to reach out. I am in no hurry. I already know who raised me. I already know who chose me. That knowledge is not incomplete.\n\nIt is, in fact, the most complete thing I own."
+   ]},
+  {id:4,type:"series",cat:"💔 Heartbreak",isContest:true,cover:COVERS.n2,
+   title:"He proposed with my best friend's ring — and she giggled before he even knelt",
+   preview:"Three years together. One box. Her giggle gave everything away.",
+   synopsis:"Three years of devotion end in a single restaurant scene where one unguarded giggle reveals a betrayal that changes everything — and launches the woman into the rest of her life.",
+   writer:{id:"w4",name:"Kemi_A",avatar:"https://i.pravatar.cc/100?img=28",isFollowed:false},
+   stats:{likes:19200,comments:3100},saved:false,liked:false,season:1,chapter:3,tag:"heartbreak",
+   scenes:[
+"Three years and four months together. We had argued about furniture and agreed about dreams. We had met each other's parents, buried each other's relatives, sat in hospital waiting rooms at three in the morning holding terrible coffee and saying nothing because sometimes nothing is the right thing to say.\n\nOn a Tuesday in October, in a restaurant with fairy lights strung along exposed brick walls, he reached into his jacket pocket. I saw his hand go in. I saw his face arrange itself into something rehearsed. And Bisi — sitting to my left, my best friend of seven years — laughed. Not nervously. Not a reflex laugh. A laugh that said: I know exactly what is about to happen. She covered her mouth immediately. But the sound had already left the room and entered me.",
+"He pulled out the box. He began to kneel. I looked at the ring.\n\nSolitaire. Round cut. Simple band. The exact ring I had described to Bisi eight months ago at Mama Titi's restaurant over pepper soup and too much palm wine. I had described every detail. The moissanite — because I did not want a mined diamond. The plain band — because I did not like fussy things. The round cut — because it was the most honest shape. Bisi had been a very good listener that night. She had asked follow-up questions. She had nodded at the right moments. She had said: 'That sounds exactly like you.'",
+"I stood up from the table.\n\nI said, quietly enough that only our table heard: 'This is the ring I described to Bisi at Mama Titi's in October. The exact one. The moissanite. The plain band. The round cut.' The fairy lights kept doing what fairy lights do. His face had gone completely still. Bisi had gone completely still. I picked up my bag and I left.\n\nI walked out into the night air. It was one of those October Lagos nights that are actually cool, that remind you that other seasons exist. I stood by the road for a moment and just breathed. I had expected to feel crushed. Instead I felt very light. The way you feel when you have been carrying something heavy for so long that you do not realise it has become part of your posture.",
+"I took an okada back to my flat. I made tea. I sat on my kitchen floor for an hour. Not crying. Just thinking — thinking about how long they must have been in this together, thinking: I gave three years to something that was performing itself for me. That is a specific kind of loneliness. The kind where you look back and notice that all the warmth was real but most of the walls were not.\n\nThen I made a second cup of tea. And I opened a document I had been ignoring for eight months. A novel I had started and abandoned because I thought I did not have time, because I thought my real life was happening somewhere other than at my desk at midnight.",
+"The novel took eighteen months. I wrote it at night, after work, in the kitchen where I had sat on the floor and thought about performing and pretending and the difference between love and the appearance of love.\n\nI wrote the villain from memory. His face. His rehearsed expressions. The way he tilted his head when he was about to say something he believed I wanted to hear.\n\nI wrote the secondary villain from a single detail: a laugh that had been covered too late. I did not need more than that. One unguarded sound was enough to build an entire character from.",
+"The novel came out eighteen months later. The villain has his face. The secondary villain has her laugh. Neither of them knows this. I am told by people who have read it that the secondary villain is actually the more interesting character — that she is more fully realised, more three-dimensional, more human in her failures than the primary antagonist. I find this accurate and also slightly funny.\n\nI dedicated the book to myself. Not in an ironic way. In the way you dedicate things to the people who stayed with you through the hardest parts.\n\nI stayed. I always stay for myself. That is the thing I learned in the kitchen at midnight: that I am, reliably, the person who shows up.",
+"Bisi sent a message when the book came out. It said: 'I'm proud of you.' I stared at it for a long time. Then I put my phone face-down and went back to the draft of the second book.\n\nHe sent nothing. I appreciated this. Silence, in his case, was the most honest thing he had ever offered me.\n\nThe ring, I later learned from a mutual friend, was returned to the jeweller. Apparently it did not suit the person it was eventually intended for. She wanted something fussier. Something with more settings. More display.\n\nI hope they are very happy. I mean this without irony. I have enough material. I do not need their unhappiness too."
+   ]},
+  {id:5,type:"short",cat:"✨ Twist",isContest:false,cover:COVERS.wife3,
+   title:"The runaway bride — I left at the altar in my socked feet and found my actual life",
+   preview:"The pastor said 'speak now or forever hold your peace.' I chose to speak.",
+   synopsis:"In front of four hundred guests, a bride does the unthinkable — and discovers that the moment everyone thought would ruin her was actually the moment her real life began.",
+   writer:{id:"w5",name:"Ifeanyi_Story",avatar:"https://i.pravatar.cc/100?img=53",isFollowed:true},
+   stats:{likes:45000,comments:7400},saved:false,liked:false,tag:"twist",
+   scenes:[
+"Four hundred guests. A dress that cost four hundred and twenty thousand naira. A photographer who had flown in from Accra. My mother in the front row, crying before we had even begun — which is a habit of hers that I have never fully understood but have come to find oddly comforting.\n\nI stood at the altar in my socked feet. I had removed my heels during the vows because they were hurting me in a way that had moved past discomfort and into something I was now certain was structural damage. The pastor said: 'Speak now, or forever hold your peace.' He said it the way pastors say it when they are very confident nobody will speak. With a kind of pastoral confidence. A confidence built on years of uninterrupted vows.",
+"My mother was smiling so hard her eyes had disappeared into her face. My father had stood up when I walked down the aisle and had not sat back down. He was a person who stood for things he loved.\n\nI looked at Emeka — my soon-to-be husband, my six-year relationship, my plan — and I thought: I know about the other woman. I have known for eleven months. I stayed because I thought the knowing would become manageable. It did not become manageable. It became a permanent low-level grief that I had been carrying around my own engagement like a second guest who had not been invited but had attended every event anyway.",
+"I said: 'I know about the other woman.'\n\nFour hundred people heard it. The photographer heard it and — I am told — got the most used photograph of his career. My mother heard it and stopped smiling. My father heard it and sat down, which was the most terrifying thing he did that day because it meant he was no longer standing for me. He was sitting down to witness me.\n\nIn my socked feet I turned around and walked back down the aisle. The silence was enormous. Then it wasn't.\n\nMy father stepped into the aisle. I shook my head. He stepped back. I loved him so completely in that moment that I almost stopped walking. I kept walking.",
+"I flagged down the first taxi I could find. The driver looked at me — white dress, socked feet, full bridal makeup — and said nothing. He typed in the address I gave him and drove. For which I will always be grateful. Not every person, when confronted with an inexplicable situation, tries to explain it to you.\n\nI sat in the back seat and breathed. I was not crying. I was thinking, with extraordinary clarity, about the fact that I had just done the most dramatic thing I had ever done and the primary thing I felt was relief. Not shame. Not fear. Not grief, though grief would come later in the appropriate amounts. Relief. Clean and enormous.",
+"The video was recorded by seventeen different people. Four of them posted it before I got home. By Tuesday it had three million views. By the end of the week: four million. In the comments people were calling me brave and stupid and iconic and embarrassing and inspirational, sometimes all in the same sentence, which I found philosophically interesting.\n\nI read none of the comments. I was in my flat, in my old clothes, baking. Sourdough. Not because I was performing healing — I want to be very clear about this — but because my hands needed something to do and bread requires attention. Bread does not ask you how you are feeling. Bread simply requires that you be present.",
+"By the third week I had six orders from people who had seen the video and traced it to my old food account, which I had not updated in eight months. I posted a photograph of a sourdough. I wrote: 'Back. And baking.' That post got more engagement than everything I had ever posted combined.\n\nI understand that there is something uncomfortable about grief becoming content. I have thought about this. I have decided that the discomfort is manageable because the bakery is real and the bread is real and the six a.m. starts are absolutely real in a way that my former life was not always real. Discomfort I can work with. Performance I cannot.",
+"Six months after the wedding that did not happen, I opened Bare Kitchen. I named it Bare because I had stood in front of four hundred people with nothing hidden. No performance. No pretending. Just a woman in socked feet who had finally said the thing out loud.\n\nWe are fully booked every weekend. There is a three-month waiting list for the bread subscription. A woman came in last month who told me she had quit her job after watching the video. She didn't wait for my response. She bought two loaves of the sourdough and a cinnamon scroll and walked out.\n\nI think about that a lot. How sometimes the most useful thing you can do for another person is simply be visible doing the thing they also need to do. In socked feet if necessary."
+   ]},
+  {id:6,type:"series",cat:"🔥 Revenge",isContest:true,cover:COVERS.n3,
+   title:"My stepmother stole my university fund — so I quietly uncovered her entire secret life",
+   preview:"She thought I was a fool. She had no idea what I found under that wardrobe.",
+   synopsis:"After years of silent suffering, a girl discovers her stepmother is not who she says she is — and uses knowledge, patience, and the law to reclaim everything taken from her.",
+   writer:{id:"w6",name:"Zara_M",avatar:"https://i.pravatar.cc/100?img=16",isFollowed:false},
+   stats:{likes:28000,comments:3900},saved:false,liked:false,season:1,chapter:5,tag:"revenge",
+   scenes:[
+"I started working at fifteen. I braided hair on weekends in the salon three streets over — five hundred naira a head, sometimes seven if the style was complicated. I tutored junior students during every holiday. I kept a list in a small notebook of every naira I earned and every naira I spent, because I had understood since I was twelve that nobody was going to keep the list for me.\n\nBy the time my JAMB results came in I had saved two hundred and forty thousand naira in a tin I kept under a loose board beneath my wardrobe. I had counted it eleven times. I had imagined the registration fee, the acceptance fee, the first semester's accommodation.\n\nTwo weeks before the result announcement, the tin was empty.",
+"I checked three times. I pulled the loose board up and checked the space underneath. I looked under the wardrobe itself and inside both pillowcases and behind the mirror on the wall. Then I sat on the floor for an hour.\n\nThen I went downstairs. She was in the kitchen frying plantain. I asked her directly, looking at her face the way they had taught us in secondary school debate: maintain eye contact to assess truthfulness. She said she had not touched anything. Her eyes did not move when she said it. They stayed completely steady.\n\nEven at fifteen I understood: the most dangerous people are the ones who lie without needing to look away. The ones for whom deception has become a resting state.",
+"My father believed her. Not because he was a weak man. Because he loved her. Because love — the kind that comes late in life, after loss — has a particular quality of wanting to believe.\n\nI moved to my aunt's house in Aba. I started from zero. I worked every holiday. I deferred my admission by a year and took it back on my own terms. I did not spend energy on anger. Anger is expensive and I had a budget.\n\nAnd then — eighteen months after the empty tin — I found the folder. It was beneath the liner paper of the wardrobe floor. The same wardrobe. The same loose board. She had not changed anything. This told me something important about how she thought about me.",
+"Two laminated cards. Same photograph. Different names. Different dates of birth. I stood very still for a long time. I put the folder carefully back exactly where I had found it, replaced the liner paper precisely as it had been, and went downstairs and ate dinner.\n\nI spent the next eight months doing research. Quietly. Methodically. I typed law students' assignments for free in exchange for them explaining identity fraud statutes to me. I mapped timelines on a piece of paper I kept folded inside my copy of a chemistry textbook because nobody ever borrows chemistry textbooks.\n\nI learned that patience is not passivity. Patience is information gathering. Patience is proof so thorough that when you lay it on a table, the person across from you has nowhere left to turn.",
+"The case took fourteen months. A lawyer took it on contingency after reading the file I had assembled. He said in twenty years of practice he had never seen such a thoroughly prepared file from someone who was not a lawyer. I found this satisfying in a specific way: it meant that the years I spent being underestimated had produced something they had not intended to produce.\n\nThe marriage certificate was invalidated on the basis of the fraudulent identity. The assets she had transferred into accounts under her second name were identified and traced. The court ordered reparations.\n\nMy father aged ten years in those fourteen months. I watched it happen and felt something I could not name precisely — something between grief and a very old tiredness.",
+"He came to the final judgment. He sat two rows behind me. He did not sit beside me and I did not ask him to. Some distances need to be respected.\n\nAfterwards he said: 'I should have looked.' I said: 'You loved someone. That is not a crime.' He looked at me for a moment as if he was trying to decide whether I meant it as a kindness or an accusation. It was both. I have stopped pretending that things can be only one thing.\n\nI used the reparations to pay for my law degree in full. I graduated at the top of my year. The same lawyer who took my case on contingency offered me a position in his firm before I had even collected my certificate.",
+"The loose board is still there in that room. I have thought about what to do with it.\n\nOn my last visit I brought a hammer and a handful of nails and stood in front of the wardrobe for about ten minutes. Then I put the hammer and the nails back in my bag and went downstairs.\n\nI nailed it shut on my next visit. Not because I needed to close it. I had closed it a long time ago, in a courtroom, with fourteen months of documented evidence. But because I wanted to do one physical thing to that room that was mine — one deliberate act that marked the end of a chapter clearly and without ambiguity.\n\nSome places should stay closed. The ones that shaped you deserve at least that courtesy."
+   ]},
+  {id:7,type:"poem",cat:"🌙 Elegy",isContest:false,cover:COVERS.img2,
+   title:"The letter he never sent was folded inside the pocket of his old jacket",
+   preview:"He passed away a year before I found it. I almost didn't open it. I'm glad I did.",
+   synopsis:"A year after losing her first love, a woman discovers an unsent letter that explains the cruelty of his final months — and finds that some love stories heal you even from the other side of loss.",
+   writer:{id:"w7",name:"Efe_O",avatar:"https://i.pravatar.cc/100?img=22",isFollowed:false},
+   stats:{likes:36500,comments:5200},saved:false,liked:false,tag:"twist",
+   scenes:[
+"His name was Emeka. We met in our second year at the University of Lagos during a film screening that was advertised as a campus event and attended by two people: him, and me. We sat on opposite sides of the hall for the first forty minutes, watching a Malian film with French subtitles neither of us read fast enough, and by the end we were sitting next to each other, talking the way people talk when they suspect they have found someone who speaks the same internal language — quickly, and with the particular recklessness of people who do not yet know how much they have to lose.\n\nHe had a way of listening. Not politely. Actually. As if what you were saying was reorganising something inside him.",
+"The doctors found the tumour in January of our final year. Stage three. He did not tell me this. He told me instead — without warning, on a Tuesday in February — that he thought we should stop seeing each other. He said he had met someone else. He said it flatly, without detail, with a quality of steadiness that I now understand was the steadiness of a person who has already decided and is simply completing the mechanics.\n\nI knew immediately it was a lie. I did not know what kind of lie it was. I assumed it was the ordinary kind — the kind that means someone has found a different person more interesting. I gave him that version because the alternative versions I could construct were too terrible to sit with.",
+"He died in October. His mother called me in November the following year — eleven months after the funeral, which I had not attended because I had not known, because he had removed himself so completely that none of our shared people knew to call me.\n\nShe had found something going through his things for the second time. In the inside pocket of a jacket I had given him for his birthday. Handwritten. Folded into quarters. Addressed to me. Never sent.\n\nShe drove to my apartment and handed it to me through the car window. She said: 'He wrote this in March.' I said: 'Of which year.' She said: 'The year he got sick.' I held it in my lap the whole drive back up.",
+"I sat in the driveway of my building for twenty minutes. I held the letter the way you hold something you are not ready to open but cannot put down. Then I pressed it against my face and breathed in. It still smelled faintly of the jacket. Faintly of him — of whatever combination of laundry and skin made up his particular smell, which I had not thought about in a year and which arrived back to me now with a completeness that made my chest do something complicated.\n\nI opened it.\n\nHe had written: 'I did not tell you because I did not want you to watch me get smaller. That sounds like it is about me. I know. But it was also, in the only way I could manage, about you.'",
+"'You would have stayed. I know that about you absolutely. You would have rearranged yourself around my illness and then around my death and when it was over you would have been left with nothing except a version of me that I did not want to be the last version you knew.\n\nSo I was cruel instead. I gave you a reason to leave that had nothing to do with tumours or bad days in hospital rooms or the very specific humiliation of being managed by everyone around you because everyone around you can see what you cannot yet fully see.\n\nI have regretted it every day since. I am sorry. You deserved the truth. You always deserved the truth. Every version of it, even the ones I was afraid to say out loud.'",
+"'Live something enormous, please. All of it, always. The whole thing. Don't leave any of it unread.\n\n— E'\n\nThere was a postscript. He had written it smaller, in different ink, as if it had been added later: 'The film was good, wasn't it.'\n\nThat is when I started crying. Not the letter. The postscript. Because the letter I had been preparing to receive since the moment his mother handed it to me through the car window — I had been building walls on the drive home. The postscript I had not prepared for. The postscript was just him. Just his voice, unclouded, the way it had been that night in the empty screening room.",
+"I still have the letter in my bag. I have carried it for two years now. Not because I am holding on — I understand the difference between carrying and holding — but because it is a document of something I want to keep near: the evidence that love, even when it makes wrong choices, is trying to do something real.\n\nHis mother and I have dinner once a month. She tells me things about him I did not know. I tell her things about him she did not know. Between the two of us we are assembling a more complete version of him than either of us had alone.\n\nI think that is probably the most honest way to grieve someone: in company, with people who also knew him, building the whole picture from the pieces you were each given."
+   ]},
+  {id:8,type:"series",cat:"🏙️ Urban Love",isContest:false,cover:COVERS.n1,
+   title:"She rejected me 3 times. Now we share a mortgage and a dog named 'Finally'",
+   preview:"Three attempts. Three no's. I moved cities. Then fate sent her to my gallery opening.",
+   synopsis:"A man gets rejected three times by the same woman, rebuilds his life in Lagos, becomes an artist — and walks into a gallery opening to find her standing in front of the painting that was always about her.",
+   writer:{id:"w8",name:"Dami_Cole",avatar:"https://i.pravatar.cc/100?img=64",isFollowed:true},
+   stats:{likes:22400,comments:2600},saved:false,liked:false,season:2,chapter:9,tag:"love",
+   scenes:[
+"I asked Temi out three times.\n\nThe first time I was twenty-four, working in the same open-plan office in Ibadan, and I asked her at the coffee machine at eight forty-five on a Wednesday morning in what I believed was a casual and low-pressure way. She said: 'You're sweet, but no.' She said it kindly. That almost made it worse — the kindness, the precision of the 'sweet,' which is a word people use for things that are pleasant but not quite right.\n\nThe second time was at a colleague's wedding. I had had two glasses of palm wine and decided this was clarity rather than impairment. She said she valued me as a colleague.\n\nThe third time was at a departmental lunch. She said: 'Dami, please stop asking.'",
+"I took the advice. I also, in the same week, requested a transfer to the Lagos branch. I packed one bag and one duffel coat and I moved cities, which is either dramatic or practical depending on how you look at it. I prefer practical.\n\nLagos did what Lagos does. It took everything I thought I was and put it in a blender and handed me back something I did not recognise but found I could work with.\n\nI started painting at night because I could not sleep. Not because I had any particular skill or intention. Because the city outside my window was loud in a way that required a response, and the response I found was colour on canvas at two in the morning while listening to Fela.",
+"I painted for two years before I showed anyone anything. My flatmate saw the canvases stacked against the wall and said: 'What are these.' I said: 'Paintings.' He said: 'I know they're paintings. Why are there forty of them.' I said: 'I have a lot of feelings about Lagos.'\n\nA friend submitted three pieces to an open-call gallery without telling me. The gallery accepted all three. The opening night was a Thursday in September. I stood near the window with a glass of water and felt extraordinarily exposed, as if the paintings were not on the wall but on me.\n\nOne of them — a large abstract in reds and greys, which I had called 'October' — I had priced out of range on purpose. I did not want to sell it.",
+"I was standing by the window when I saw her.\n\nGreen dress. Same as the wedding eight years ago. Or similar enough that my body recognised it before my mind did. She was standing in front of October. She had been standing there for several minutes without moving, which is a particular kind of looking that means something.\n\nI stood by the window for ten minutes watching her look at the painting. Then I walked over. I said: 'You came.' She said: 'I didn't know it was your show. I saw it in a newsletter.' We both understood that this was true and also not the whole truth. That it was the kind of thing you say when the real sentence is not yet available to you.",
+"She said: 'Is this—?' and gestured at the painting. I said: 'Yes.' The painting was Ibadan in October. The coffee machine. The Wednesday morning. The kindness that was worse than the rejection.\n\nThen she said: 'I was terrified of how much I felt. I kept saying no because I didn't know how to be around it. I thought if I ignored it long enough it would stop being true.'\n\nI said: 'Did it?' She said: 'I'm standing in front of a painting you made about a Wednesday morning eight years ago, so no.'\n\nI asked if she wanted to get dinner. She said yes. We left the gallery before the event ended, which I am told was considered slightly rude. I have no regrets about this.",
+"We have been together four years now. We bought the apartment last year after several months of spreadsheets and honest conversations about money and values and what we each needed from a home. We split the mortgage fifty-fifty because we are both the kind of people who need to enter things as equals. This is something we established early and have not revisited, which is itself a sign that we established it correctly.\n\nNaming the dog was our first real disagreement. Not an argument exactly — we don't argue in the way some people argue — but a sustained three-week difference of opinion. I wanted something dignified. She wanted something that meant something. Neither of us would concede.",
+"Then one evening she said: 'Let's call him Finally.'\n\nI understood the whole eight years inside that one word. The coffee machine and the colleague's wedding and the departmental lunch and the transfer and the two years of painting at night and the gallery opening and the green dress and October on the wall and the dinner we left early and the four years since. All of it, compressed into one word that was also a name that was also a joke that was also not a joke at all.\n\nI said: 'Finally it is.'\n\nHe is a golden retriever. He is completely ridiculous. He sleeps between us and considers this an arrangement that benefits all parties. Some arrivals — long-awaited, detoured, improbable — deserve to be named honestly. He is named honestly. We are, I think, finally honest about everything."
+   ]},
+];
+
+const WRITER_POSTS=[
+  {id:"wp1",wid:"w1",name:"Ada_Writes",handle:"@ada_writes",avatar:"https://i.pravatar.cc/100?img=32",time:"2h ago",text:"Chapter 5 is the one I've been scared to write for three months.\n\nIt goes places I didn't plan.\n\nDropping tonight at midnight. Set your alarm. 🌙",storyRef:{id:1,title:"I came home early and caught my husband kissing my late sister's photograph",cover:COVERS.wife2},likes:892,liked:false,comments:234,shares:145},
+  {id:"wp2",wid:"w5",name:"Ifeanyi_Story",handle:"@ifeanyi_story",avatar:"https://i.pravatar.cc/100?img=53",time:"4h ago",text:"Bare Kitchen passed 45,000 likes last night while I was asleep.\n\nI wrote that story in 4 hours after a breakup in 2023. Never thought anyone would read it.\n\nThank you. Genuinely. 🙏🥐",storyRef:{id:5,title:"The runaway bride — I left at the altar in my socked feet",cover:COVERS.wife3},likes:3241,liked:false,comments:412,shares:891},
+  {id:"wp3",wid:"w3",name:"Chiamaka_N",handle:"@chiamaka_n",avatar:"https://i.pravatar.cc/100?img=47",time:"6h ago",text:"Should Adanna search for her biological parents in Season 4 — or close that chapter forever?\n\nYour answer will genuinely affect how I write it. 👇",storyRef:null,likes:1847,liked:false,comments:673,shares:229},
+];
+
+const ENG={
+  1:{poll:{q:"Who was truly wrong here?",opts:[{t:"🫀 Ada's husband — emotional betrayal",v:4812},{t:"💔 The situation — grief has no rules",v:2344},{t:"🤷 Nobody — love is complicated",v:1107}],voted:-1},debate:{motion:"Ada should stay and fight for her marriage, not leave.",forV:2341,agV:3819,comments:[{id:"dc1",name:"Chioma_R",avatar:"https://i.pravatar.cc/100?img=47",text:"Emotional betrayal is still betrayal. She owes him nothing.",side:"against",time:"2h",likes:142,liked:false,replies:[]}],userVote:null},hasNext:true},
+  2:{poll:{q:"Did she make the right call staying?",opts:[{t:"✅ Yes — it built character",v:3200},{t:"❌ No — she deserved better",v:1800},{t:"🤔 It's complicated",v:900}],voted:-1},debate:{motion:"Campus romances between different social classes never truly work.",forV:1800,agV:4200,comments:[{id:"dc10",name:"CampusQueen",avatar:"https://i.pravatar.cc/100?img=12",text:"This story literally disproves the motion 😂",side:"against",time:"3h",likes:220,liked:false,replies:[]}],userVote:null},hasNext:true},
+  5:{poll:{q:"Was she right to walk out?",opts:[{t:"👟 YES — in socked feet? ICONIC",v:12400},{t:"🤔 Should have confronted him first",v:3200},{t:"💔 Both deserved better",v:1800}],voted:-1},debate:{motion:"Walking out publicly was brave, not dramatic.",forV:9800,agV:2100,comments:[{id:"dc4",name:"Ada_Writes",avatar:"https://i.pravatar.cc/100?img=32",text:"Four hundred witnesses? She gave them a better story than the wedding 💅",side:"for",time:"1h",likes:234,liked:false,replies:[]}],userVote:null},hasNext:false},
+};
+
+const ASK_SEED=[
+  {id:"q1",anon:false,name:"Chioma_R",avatar:"https://i.pravatar.cc/100?img=47",cat:"Relationships",q:"My boyfriend still talks to his ex daily and says they're 'just friends'. Am I overreacting by feeling uncomfortable?",time:"2h ago",likes:142,liked:false,comments:[],hasPoll:true,pollOpts:[{text:"You're not overreacting",votes:348},{text:"Talk to him first",votes:201},{text:"Leave quietly",votes:89}],pollVoted:-1,open:false},
+  {id:"q2",anon:true,name:"Anonymous",avatar:null,cat:"Campus",q:"My lecturer gave me B+ when I clearly deserved A. I know it's because I rejected his advances last semester. How do I handle this?",time:"4h ago",likes:89,liked:false,comments:[],hasPoll:false,open:false},
+  {id:"q3",anon:false,name:"Emeka_T",avatar:"https://i.pravatar.cc/100?img=15",cat:"Marriage",q:"My wife earns 3x what I earn and has started treating me differently. Has anyone navigated this?",time:"6h ago",likes:204,liked:false,comments:[],hasPoll:true,pollOpts:[{text:"This is very common",votes:510},{text:"Counselling helped us",votes:188},{text:"We didn't recover",votes:43}],pollVoted:-1,open:false}
+];
+
+// Build story map + pad to 20
+const storyMap=new Map();BASE_STORIES.forEach(s=>storyMap.set(s.id,s));
+const allStories=[...BASE_STORIES];let _padId=200;
+while(allStories.length<20){const b=BASE_STORIES[allStories.length%BASE_STORIES.length];const c={...b,id:_padId++,liked:false,saved:false,stats:{likes:b.stats.likes,comments:b.stats.comments},writer:{...b.writer,isFollowed:b.writer.isFollowed}};allStories.push(c);storyMap.set(c.id,c);}
+function findStory(id){return storyMap.get(+id)||null;}
+// Attach engagement (poll/debate/hasNext) onto each story object directly, once,
+// so DroboardReader.open(story) can read story.engagement without any remapping.
+allStories.forEach(s=>{ if(ENG[s.id]) s.engagement=ENG[s.id]; });
+
+// STATE
+let curTab="foryou",catFilter="all";
+let askPosts=[...ASK_SEED],askFilter="all";
+let notifCount=7;
+
+// UTILS
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+"k":String(n||0);}
+function typeBadge(s){if(s.type==="poem")return`<span class="badge-type">🌙 Poem</span>`;if(s.type==="short")return`<span class="badge-type">✨ Short</span>`;return`<span class="badge-ch">S${s.season}·Ch${s.chapter}</span>`;}
+
+// REACTIONS (card-level hold-to-react popup — custom, unchanged)
+const REACTIONS=[{id:'crying',emoji:'😭',label:'Crying'},{id:'angry',emoji:'😡',label:'Angry'},{id:'shocked',emoji:'😱',label:'Shocked'},{id:'broken',emoji:'💔',label:'Heartbroken'},{id:'emotional',emoji:'🥹',label:'Emotional'},{id:'savage',emoji:'🔥',label:'Savage'},{id:'sus',emoji:'👀',label:'Suspicious'},{id:'twist',emoji:'🫢',label:'Plot Twist'}];
+const storyRx={};function getRx(sid){if(!storyRx[sid]){storyRx[sid]={crying:Math.floor(Math.random()*3000)+200,angry:Math.floor(Math.random()*1500)+50,shocked:Math.floor(Math.random()*2500)+100,broken:Math.floor(Math.random()*4000)+300,emotional:Math.floor(Math.random()*3500)+200,savage:Math.floor(Math.random()*2000)+80,sus:Math.floor(Math.random()*1200)+40,twist:Math.floor(Math.random()*1800)+60,userRx:null};}return storyRx[sid];}
+
+/* ═══════════════════════════════════════════════════════════
+   NOTIFICATION BELL (unrelated to the reading experience — kept custom)
+   ═══════════════════════════════════════════════════════════ */
+function updateBellBadge(count){
+  notifCount=count;
+  const badge=document.getElementById("bellBadge");
+  if(count<=0){badge.classList.add("hidden");}
+  else{badge.classList.remove("hidden");badge.textContent=count>99?"99+":String(count);}
+}
+function openNotifications(){
+  toast(`🔔 ${notifCount} new notification${notifCount===1?'':'s'}`);
+  updateBellBadge(0);
+}
+function initWebSocket(){
+  try{ setInterval(()=>{if(Math.random()>0.6){notifCount+=1;updateBellBadge(notifCount);}},8000); updateBellBadge(notifCount);}
+  catch(e){updateBellBadge(notifCount);}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UI show/hide on scroll (unchanged)
+   ═══════════════════════════════════════════════════════════ */
+function applyUI(cardType){
+  const showSC=["story","contest","eof"].includes(cardType);
+  document.getElementById("statusWrap").classList.toggle("ui-hidden",!showSC);
+  document.getElementById("catRow").classList.toggle("ui-hidden",!showSC);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATUS ROW — custom rings, opens via DroboardStatusViewer
+   ═══════════════════════════════════════════════════════════ */
+function peopleFromWriterStatus(){
+  return Object.entries(WRITER_STATUS).map(([wid,ws])=>({
+    id:wid, name:ws.name, avatar:ws.avatar, isLive:false,
+    ring: ws.hasStatus ? (ws.viewed?'ring-viewed':'ring-has') : 'ring-none',
+    likes: ws.viewCount||0, threads:0, statuses: ws.statuses||[],
+  }));
+}
+window.onStatusViewerChange=function(wid,ring){
+  const ws=WRITER_STATUS[wid];
+  if(ws) ws.viewed = (ring==='ring-viewed');
+  renderStatusRow();
+};
+function renderStatusRow(){
+  const row=document.getElementById("statusRow");
+  const writers=Object.entries(WRITER_STATUS);
+  let html=`<div class="s-item" onclick="toast('📸 Post your status!')"><div class="s-ring none"><div class="s-inner"><span class="s-add-icon"><i class="fas fa-plus"></i></span></div></div><div class="s-name">Add</div></div>`;
+  const sorted=[...writers].sort((a,b)=>{const av=a[1],bv=b[1];if(av.hasStatus&&!av.viewed&&(!bv.hasStatus||bv.viewed))return -1;if(bv.hasStatus&&!bv.viewed&&(!av.hasStatus||av.viewed))return 1;return 0;});
+  sorted.forEach(([wid,ws])=>{const cls=ws.hasStatus?(ws.viewed?"viewed":"new"):"none";const onclick=ws.hasStatus?`window.openStatusViewer(peopleFromWriterStatus(),'${wid}')`:`toast('No status yet')`;html+=`<div class="s-item" onclick="${onclick}"><div class="s-ring ${cls}"><div class="s-inner"><img src="${ws.avatar}" loading="lazy"/></div></div><div class="s-name">@${ws.name.split("_")[0]}</div></div>`;});
+  row.innerHTML=html;
+}
+renderStatusRow();
+
+/* ═══════════════════════════════════════════════════════════
+   COMMENTS SHEET — thin custom wrapper, content via DroboardComments
+   ═══════════════════════════════════════════════════════════ */
+const RX_ID_MAP={fire:'savage',cry:'crying',broken:'broken',shock:'shocked',mindblown:'twist',emo:'emotional',sus:'sus',clap:'laughing'};
+function mapRawCommentForSheet(raw){
+  const rx={userRx:null};
+  if(raw.reactions){
+    Object.keys(raw.reactions).forEach(k=>{
+      if(k==='userRx'){ rx.userRx = raw.reactions.userRx ? (RX_ID_MAP[raw.reactions.userRx]||raw.reactions.userRx) : null; return; }
+      const m=RX_ID_MAP[k]||k; rx[m]=(rx[m]||0)+(raw.reactions[k]||0);
+    });
+  }
+  let statuses=null;
+  if(raw.wid && WRITER_STATUS[raw.wid] && WRITER_STATUS[raw.wid].statuses) statuses=WRITER_STATUS[raw.wid].statuses;
+  return {
+    id:raw.id, name:raw.name, avatar:raw.avatar,
+    verified: raw.verified ? (raw.wid?'writer':'reader') : false,
+    team:null, statusRing: raw.statusRing==='ring-has'?'has':(raw.statusRing==='ring-viewed'?'viewed':'none'),
+    statuses, time:raw.time, text:raw.text, likes:raw.likes||0, liked:!!raw.liked, rx,
+    replies:(raw.replies||[]).map(mapRawCommentForSheet),
+  };
+}
+const cmSeedCache={};
+function seedCommentsFor(key){
+  if(!cmSeedCache[key]) cmSeedCache[key]=(typeof COMMENTS_DATA!=='undefined'?COMMENTS_DATA:[]).map(mapRawCommentForSheet);
+  return cmSeedCache[key];
+}
+let cmInstance=null;
+function openCommentsSheet(kind,id,bumpFn){
+  const key=kind+'_'+id;
+  const body=document.getElementById('cmSheetBody');
+  if(cmInstance) cmInstance.destroy();
+  cmInstance=DroboardComments.attach(body,{
+    title:'Comments', comments:seedCommentsFor(key),
+    currentUser:{name:'You',avatar:null}, collapsible:false, startOpen:true,
+    onPost:()=>{ bumpFn&&bumpFn(1); },
+    onReply:()=>{ bumpFn&&bumpFn(1); },
+    onDotsAction:(action)=>{ if(action==='delete') bumpFn&&bumpFn(-1); },
+    getCommentUrl:(c)=>`https://droboard.app/${kind}/${id}#comment-${c.id}`,
+  });
+  document.getElementById('cmSheetBg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCmSheet(){
+  if(cmInstance){cmInstance.destroy();cmInstance=null;}
+  document.getElementById('cmSheetBg').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('cmSheetBg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCmSheet();});
+
+/* ═══════════════════════════════════════════════════════════
+   WRITER POSTS — rendered via DroboardPostCard.render(), wired manually
+   (post-card.js's own delegated click-handling relies on setPosts()/update()
+   populating its internal _posts array, which doesn't fit our small,
+   hand-placed set of writer posts mixed into a custom snapped feed — so we
+   use its render() as a pure template/CSS source and wire interactions
+   ourselves, the same way every other custom card in this page is wired)
+   ═══════════════════════════════════════════════════════════ */
+// Trigger post-card.js's one-time CSS injection without adopting its
+// internal state (attach() is what injects '#dpc-style'; we attach to a
+// detached scratch element so it never receives real events).
+DroboardPostCard.attach(document.createElement('div'), {});
+// Same trick for reaction-picker.js CSS, in case a comment sheet with
+// reactions renders before DroboardReader ever gets opened.
+if (typeof DroboardReactionPicker !== 'undefined') DroboardReactionPicker.attach(document.body, {});
+
+function mapWriterPost(p){
+  const ws=WRITER_STATUS[p.wid];
+  return {
+    id:p.id, type:'post', name:p.name, avatar:p.avatar,
+    avatarRing: ws?(ws.hasStatus?(ws.viewed?'ring-viewed':'ring-has'):'ring-none'):'ring-none',
+    verified:true, badge:'writer', rank:null, time:p.time, pinned:false, mine:false,
+    likes:p.likes, liked:p.liked, comments:p.comments, text:p.text, image:null,
+    storyRef:p.storyRef?{cover:p.storyRef.cover,cat:'',title:p.storyRef.title,writer:p.name}:null,
+  };
+}
+function wpDotsMenuHtml(post){
+  return `<div class="dpc-dots-item" data-wpact="report" data-wpid="${post.id}"><i class="fas fa-flag"></i>Report post</div>
+    <div class="dpc-dots-item" data-wpact="less" data-wpid="${post.id}"><i class="fas fa-eye-slash"></i>See less of this</div>
+    <div class="dpc-dots-sep"></div>
+    <div class="dpc-dots-item" data-wpact="follow" data-wpid="${post.id}"><i class="fas fa-user-plus"></i>Follow @${post.name}</div>
+    <div class="dpc-dots-sep"></div>
+    <div class="dpc-dots-item" data-wpact="share" data-wpid="${post.id}"><i class="fas fa-share-nodes"></i>Share post</div>`;
+}
+let wpOpenMenuId=null;
+function wpCloseMenus(){
+  if(wpOpenMenuId){document.getElementById('wp-dm-'+wpOpenMenuId)?.remove();wpOpenMenuId=null;}
+  document.getElementById('wpMenuOverlay')?.classList.remove('on');
+}
+function wpOpenMenu(post,triggerEl){
+  if(wpOpenMenuId===post.id){wpCloseMenus();return;}
+  wpCloseMenus();
+  let overlay=document.getElementById('wpMenuOverlay');
+  if(!overlay){overlay=document.createElement('div');overlay.id='wpMenuOverlay';overlay.className='dpc-menu-overlay';overlay.addEventListener('click',wpCloseMenus);document.body.appendChild(overlay);}
+  overlay.classList.add('on');
+  const menu=document.createElement('div');
+  menu.className='dpc-dots-menu open'; menu.id='wp-dm-'+post.id;
+  menu.innerHTML=wpDotsMenuHtml(post);
+  document.body.appendChild(menu);
+  wpOpenMenuId=post.id;
+  const rect=triggerEl.getBoundingClientRect();
+  let top=rect.bottom+4, left=rect.right-175;
+  if(left<8)left=8; if(top+150>window.innerHeight) top=rect.top-155;
+  menu.style.top=top+'px'; menu.style.left=left+'px';
+  menu.querySelectorAll('.dpc-dots-item').forEach(item=>{
+    item.addEventListener('click',()=>{ wpDotsAction(item.dataset.wpact,post); wpCloseMenus(); });
+  });
+}
+function wpDotsAction(action,post){
+  if(action==='report') toast('🚩 Reported.');
+  else if(action==='less') toast("👁️ You'll see less of this.");
+  else if(action==='follow') toast(`✅ Following @${post.name}!`);
+  else if(action==='share') openShareModal({title:post.text.substring(0,60),sub:'@'+post.name,img:post.storyRef?.cover||'',url:`https://droboard.app/post/${post.id}`});
+}
+function refreshWriterPostCard(post){
+  const el=document.querySelector(`.dpc-card[data-pid="${post.id}"]`);
+  if(!el) return;
+  const tmp=document.createElement('div');
+  tmp.innerHTML=DroboardPostCard.render(mapWriterPost(post),0);
+  el.replaceWith(tmp.firstElementChild);
+  wireWriterPostCard(post);
+}
+function wireWriterPostCard(post){
+  const el=document.querySelector(`.dpc-card[data-pid="${post.id}"]`);
+  if(!el) return;
+  el.querySelector('.dpc-like')?.addEventListener('click',()=>{ post.liked=!post.liked; post.likes+=post.liked?1:-1; refreshWriterPostCard(post); });
+  el.querySelector('.dpc-comment')?.addEventListener('click',()=>{ openCommentsSheet('post',post.id,(d)=>{ post.comments+=d; refreshWriterPostCard(post); }); });
+  el.querySelector('.dpc-share')?.addEventListener('click',()=>{ openShareModal({title:post.text.substring(0,60),sub:'@'+post.name,img:post.storyRef?.cover||'',url:`https://droboard.app/post/${post.id}`}); });
+  el.querySelector('.dpc-dots')?.addEventListener('click',(e)=>{ e.stopPropagation(); wpOpenMenu(post,e.currentTarget); });
+  el.querySelector('[data-story-chip]')?.addEventListener('click',()=>{ if(post.storyRef){ const s=findStory(post.storyRef.id); if(s) DroboardReader.open(s); } });
+  el.querySelector('[data-avatar-for],[data-profile-for]')?.addEventListener('click',()=>{ const ws=WRITER_STATUS[post.wid]; if(ws&&ws.hasStatus) window.openStatusViewer(peopleFromWriterStatus(),post.wid); else location.href='profile.html'; });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABS / TIME FILTER (unchanged)
+   ═══════════════════════════════════════════════════════════ */
+document.querySelectorAll(".pill").forEach(p=>{p.addEventListener("click",()=>{catFilter=p.dataset.cat;document.querySelectorAll(".pill").forEach(x=>x.classList.toggle("on",x===p));renderFeed();});});
+
+function switchTab(tab){
+  curTab=tab;
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));
+  const feed=document.getElementById("feed"),ask=document.getElementById("askTab");
+  if(tab==="ask"){feed.classList.add("gone");ask.classList.add("show");ask.scrollTop=0;renderAskList();}
+  else{feed.classList.remove("gone");ask.classList.remove("show");feed.scrollTop=0;renderFeed();}
+}
+document.querySelectorAll(".nav-tab").forEach(t=>t.addEventListener("click",()=>{if(t.dataset.tab==="trending"){toast("📈 Trending coming soon!");return;}switchTab(t.dataset.tab);}));
+
+function getFeedStories(){
+  let list=[...allStories];
+  if(curTab==="following")list=list.filter(s=>s.writer.isFollowed);
+  if(catFilter!=="all")list=list.filter(s=>s.tag===catFilter);
+  return list;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEED BUILD — story cards + quad (custom) + writer posts
+   (DroboardPostCard.render) + ads (DroboardAdCard.renderFullscreen,
+   using FULLSCREEN_ADS from data/ad-data.js)
+   ═══════════════════════════════════════════════════════════ */
+function buildFeedItems(stories){
+  const items=[];let adIdx=0,since=0,i=0;
+  const sched=[2,3,3,3];let sp=0,nextAd=sched[0];
+  let writerPostIdx=0;let askDone=false;
+  while(i<stories.length){
+    if(i===3&&writerPostIdx<WRITER_POSTS.length){items.push({type:"single",story:stories[i]});items.push({type:"writerpost",post:WRITER_POSTS[writerPostIdx++]});since++;i++;}
+    else if(i===5&&!askDone){items.push({type:"single",story:stories[i]});items.push({type:"askcard",ask:ASK_SEED[0]});askDone=true;since++;i++;}
+    else if(i===7&&writerPostIdx<WRITER_POSTS.length){items.push({type:"single",story:stories[i]});items.push({type:"writerpost",post:WRITER_POSTS[writerPostIdx++]});since++;i++;}
+    else if((i===9||i===16)&&i+3<stories.length){items.push({type:"quad",stories:[stories[i],stories[i+1],stories[i+2],stories[i+3]]});since+=4;i+=4;}
+    else{items.push({type:"single",story:stories[i]});since++;i++;}
+    if(since>=nextAd){items.push({type:"ad",ad:FULLSCREEN_ADS[adIdx%FULLSCREEN_ADS.length]});adIdx++;since=0;sp=Math.min(sp+1,sched.length-1);nextAd=sched[sp];}
+  }
+  items.push({type:"eof"});
+  return items;
+}
+
+function setupScrollUI(){
+  const feed=document.getElementById("feed");if(!feed)return;
+  let ticking=false;
+  feed.addEventListener("scroll",()=>{if(!ticking){requestAnimationFrame(()=>{const cards=feed.querySelectorAll("[data-cardtype]");if(!cards.length){ticking=false;return;}const idx=Math.round(feed.scrollTop/window.innerHeight);const card=cards[Math.min(idx,cards.length-1)];if(card)applyUI(card.dataset.cardtype);ticking=false;});ticking=true;}},{passive:true});
+  const first=feed.querySelector("[data-cardtype]");if(first)applyUI(first.dataset.cardtype);
+}
+
+DroboardAdCard.attach(document.getElementById('feed'), {
+  onCta: (ad) => { if (ad.url) window.open(ad.url, '_blank'); },
+  onOpen: (ad) => { if (ad.url) window.open(ad.url, '_blank'); },
+});
+
+function renderFeed(){
+  const feed=document.getElementById("feed");
+  const stories=getFeedStories();
+  if(!stories.length){
+    feed.innerHTML=`<div style="height:156px;scroll-snap-align:none" data-spacer="top"></div><div class="empty-st" data-cardtype="story"><div style="font-size:42px">📭</div><h3>No stories here</h3><p>No stories match this filter.</p><button onclick="switchTab('foryou')" style="background:var(--acc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-weight:700;font-size:12px;cursor:pointer;margin-top:8px">Go to For You</button></div>`;
+    applyUI("story");setupScrollUI();return;
+  }
+  const items=buildFeedItems(stories);
+  feed.innerHTML=`<div style="height:156px;scroll-snap-align:none" data-spacer="top"></div>`+items.map(item=>{
+    if(item.type==="single")return renderStoryCard(item.story);
+    if(item.type==="writerpost")return DroboardPostCard.render(mapWriterPost(item.post),0);
+    if(item.type==="quad")return renderQuad(item.stories);
+    if(item.type==="ad")return DroboardAdCard.renderFullscreen(item.ad);
+    if(item.type==="askcard")return renderAskFeedCard(item.ask);
+    if(item.type==="eof")return`<div class="eof" data-cardtype="eof"><div class="eof-em">🍵</div><div class="eof-h">You're all caught up!</div><div class="eof-p">Writers are cooking up fresh chapters — check back soon.</div><button class="eof-btn" onclick="document.getElementById('feed').scrollTop=0">↑ Back to top</button></div>`;
+    return"";
+  }).join("");
+  attachFeedEvents();
+  WRITER_POSTS.forEach(wireWriterPostCard);
+  applyUI("story");
+  setupScrollUI();
+}
+
+// STORY CARD
+function renderStoryCard(s){
+  const isContest=!!s.isContest;
+  const cardType=isContest?"contest":"story";
+  const debTotal=(ENG[s.id]?.debate?.forV||0)+(ENG[s.id]?.debate?.agV||0);
+  const debBadge=debTotal>0?`<div class="debate-live" onclick="event.stopPropagation();openReaderDebate(${s.id})"><div class="debate-live-dot"></div>⚔️ ${fmtN(debTotal)} debating now</div>`:"";
+  return`<div class="${isContest?"s-card contest-card":"s-card"}" data-id="${s.id}" data-cardtype="${cardType}" style="background-image:url('${s.cover}')">
+    <div class="s-grad"></div>
+    <div class="s-body">
+      ${debBadge}
+      <div class="badges"><span class="badge-cat">${s.cat}</span>${typeBadge(s)}${isContest?'<span class="badge-contest">🏆 Contest</span>':''}</div>
+      <div class="s-title">${s.title}</div>
+      <div class="s-preview">${s.preview}</div>
+      <div class="writer-row">
+        ${renderWAvatar(s.writer.id,s.writer.avatar)}
+        <span class="w-name" onclick="event.stopPropagation();location.href='profile.html'">@${s.writer.name}</span>
+        <button class="follow-btn${s.writer.isFollowed?" on":""}" data-id="${s.id}" onclick="event.stopPropagation()">${s.writer.isFollowed?"✓ Following":"+ Follow"}</button>
+      </div>
+    </div>
+    <div class="act-bar">
+      <div class="act${s.liked?" liked":""} act-like" data-id="${s.id}">
+        ${buildRxPop(s.id)}
+        <div class="act-ico"><i class="${s.liked?"fas":"far"} fa-heart"></i></div>
+        <span class="act-lbl">${fmtN(s.stats.likes)}</span>
+      </div>
+      <div class="act act-cmt" data-id="${s.id}"><div class="act-ico"><i class="far fa-comment"></i></div><span class="act-lbl">${fmtN(s.stats.comments)}</span></div>
+      <div class="act${s.saved?" saved":""} act-save" data-id="${s.id}"><div class="act-ico"><i class="${s.saved?"fas":"far"} fa-bookmark"></i></div><span class="act-lbl">${s.saved?"Saved":"Save"}</span></div>
+      <div class="act act-share" data-id="${s.id}"><div class="act-ico"><i class="fas fa-share-alt"></i></div><span class="act-lbl">Share</span></div>
+    </div>
+  </div>`;
+}
+
+// QUAD (custom, unchanged)
+function renderQuad(stories){
+  return`<div class="quad-card" data-cardtype="quad">
+    <div class="quad-label">✨ You might also like</div>
+    <div class="quad-grid">
+      ${stories.map(s=>`<div class="qi" data-id="${s.id}" style="background-image:url('${s.cover}')">
+        <div class="qi-grad"></div>
+        <div class="qi-body">
+          <div class="qi-cat">${s.cat}</div>
+          <div class="qi-title">${s.title}</div>
+          <div class="qi-writer"><img class="qi-av" src="${s.writer.avatar}" loading="lazy"/>@${s.writer.name}</div>
+          <div class="qi-acts">
+            <div class="qi-act${s.liked?" liked":""} qi-like" data-id="${s.id}"><div class="qi-ico"><i class="${s.liked?"fas":"far"} fa-heart"></i></div><span class="qi-lbl">${fmtN(s.stats.likes)}</span></div>
+            <div class="qi-act qi-cmt" data-id="${s.id}"><div class="qi-ico"><i class="far fa-comment"></i></div></div>
+          </div>
+          <button class="qi-btn" data-id="${s.id}">Read →</button>
+        </div>
+      </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+// ASK FEED CARD (custom, unchanged)
+function renderAskFeedCard(p){
+  const tot=p.hasPoll?(p.pollOpts.reduce((s,o)=>s+o.votes,0)||1):1;
+  return`<div class="post-card" data-cardtype="post" style="background:linear-gradient(160deg,#050508 0%,#080512 100%);min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;justify-content:center;padding:56px 0 80px">
+    <div style="padding:20px 16px">
+      <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.2);color:var(--acc2);font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;margin-bottom:10px;letter-spacing:.05em">🔥 HOT IN ASK · ${p.cat.toUpperCase()}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:8px">${p.q}</div>
+      <div style="font-size:11px;color:#444;margin-bottom:14px">${p.anon?"Anonymous":p.name} · ${p.time} · ${fmtN(p.likes)} reactions</div>
+      ${p.hasPoll?`<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">${p.pollOpts.map((o,i)=>`<div style="position:relative;border-radius:12px;padding:12px 14px;cursor:pointer;overflow:hidden;border:1px solid ${p.pollVoted===i?"var(--acc)":"rgba(255,255,255,.07)"}"><div style="position:absolute;left:0;top:0;bottom:0;width:${Math.round(o.votes/tot*100)}%;background:rgba(255,0,80,.1);z-index:0"></div><div style="position:relative;z-index:1;display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:#e0e0e0">${o.text}</span><span style="font-size:12px;font-weight:800;color:var(--acc)">${Math.round(o.votes/tot*100)}%</span></div></div>`).join("")}</div>`:""}
+      <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,.05);padding-top:12px">
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;color:${p.liked?'var(--acc)':'#555'};cursor:pointer;padding:6px 0" id="afclike-${p.id}" onclick="toggleAskLike('${p.id}',this)"><i class="${p.liked?"fas":"far"} fa-heart"></i> ${fmtN(p.likes)}</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;color:#555;cursor:pointer;padding:6px 0" onclick="switchTab('ask')"><i class="far fa-comment"></i> Reply</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;color:#555;cursor:pointer;padding:6px 0" onclick="openShareModal({title:'Ask: ${p.q.substring(0,40).replace(/'/g,"\\'").replace(/"/g,'\\"')}…',sub:'on Droboard',img:'',url:'https://droboard.app/ask/${p.id}'})"><i class="fas fa-share-alt"></i></div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;color:#555;cursor:pointer;padding:6px 0" onclick="toast('🔖 Saved!')"><i class="far fa-bookmark"></i></div>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleAskLike(id,el){
+  const p=ASK_SEED.find(x=>x.id===id);if(!p)return;
+  p.liked=!p.liked;p.likes+=p.liked?1:-1;
+  el.style.color=p.liked?'var(--acc)':'#555';
+  el.innerHTML=`<i class="${p.liked?"fas":"far"} fa-heart"></i> ${fmtN(p.likes)}`;
+}
+
+// AVATAR (custom rings, opens via DroboardStatusViewer)
+function getWRing(wid){const ws=WRITER_STATUS[wid];if(!ws||!ws.hasStatus)return"none";return ws.viewed?"viewed":"new";}
+function renderWAvatar(wid,url){
+  const cls=getWRing(wid);const has=WRITER_STATUS[wid]?.hasStatus;const oc=has?`onclick="window.openStatusViewer(peopleFromWriterStatus(),'${wid}')"`:"";
+  return`<div class="w-av-wrap" ${oc}><div class="w-av-ring ${cls}"><div class="w-av-inner"><img src="${url}" loading="lazy"/></div></div></div>`;
+}
+
+// REACTION POPUP (card-level, custom, unchanged)
+function buildRxPop(sid){const rx=getRx(sid);return`<div class="rx-pop" id="rxpop-${sid}">${REACTIONS.map(r=>`<div class="rx-btn${rx.userRx===r.id?" reacted":""}" data-sid="${sid}" data-rid="${r.id}"><span class="rx-em">${r.emoji}</span><span class="rx-ct">${fmtN(rx[r.id])}</span></div>`).join("")}</div>`;}
+function hideAllRxPops(){document.querySelectorAll(".rx-pop").forEach(p=>p.classList.remove("show"));}
+
+// FEED EVENTS
+function attachFeedEvents(){
+  const feed=document.getElementById("feed");
+  feed.querySelectorAll(".follow-btn").forEach(btn=>{btn.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+btn.dataset.id);if(!s)return;s.writer.isFollowed=!s.writer.isFollowed;toast(s.writer.isFollowed?`Following @${s.writer.name}`:`Unfollowed @${s.writer.name}`);btn.textContent=s.writer.isFollowed?"✓ Following":"+ Follow";btn.classList.toggle("on",s.writer.isFollowed);});});
+  feed.querySelectorAll(".act-like").forEach(el=>{
+    const id=+el.dataset.id;let ht=null;
+    el.addEventListener("pointerdown",e=>{e.stopPropagation();ht=setTimeout(()=>{const p=document.getElementById(`rxpop-${id}`);if(p)p.classList.add("show");},380);},{passive:true});
+    el.addEventListener("pointerup",()=>clearTimeout(ht));
+    el.addEventListener("pointercancel",()=>clearTimeout(ht));
+    el.addEventListener("click",e=>{
+      const btn=e.target.closest(".rx-btn");
+      if(btn){e.stopPropagation();const rid=btn.dataset.rid,rx=getRx(id);if(rx.userRx===rid){rx[rid]--;rx.userRx=null;btn.classList.remove("reacted");}else{if(rx.userRx)rx[rx.userRx]--;rx[rid]++;rx.userRx=rid;btn.classList.add("reacted");}const ct=btn.querySelector(".rx-ct");if(ct)ct.textContent=fmtN(rx[rid]);toast(`${REACTIONS.find(r=>r.id===rid)?.emoji}`);const p=document.getElementById(`rxpop-${id}`);if(p)p.classList.remove("show");return;}
+      e.stopPropagation();const pop=document.getElementById(`rxpop-${id}`);if(pop&&pop.classList.contains("show")){pop.classList.remove("show");return;}
+      const s=findStory(id);if(!s)return;s.liked=!s.liked;s.stats.likes+=s.liked?1:-1;refreshActs(id);
+    });
+  });
+  feed.querySelectorAll(".act-save").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(!s)return;s.saved=!s.saved;toast(s.saved?"📌 Saved":"Removed");refreshActs(s.id);});});
+  feed.querySelectorAll(".act-cmt").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(s)openCommentsSheet('story',s.id,(d)=>{s.stats.comments+=d;refreshActs(s.id);});});});
+  feed.querySelectorAll(".act-share").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(s)openShareModal({title:s.title,sub:`by @${s.writer.name} · ${fmtN(s.stats.likes)} likes`,img:s.cover,url:`https://droboard.app/story/${s.id}`});});});
+  feed.querySelectorAll(".s-card").forEach(card=>{card.addEventListener("click",e=>{if(e.target.closest(".act")||e.target.closest(".follow-btn")||e.target.closest(".w-av-wrap")||e.target.closest(".w-name")||e.target.closest(".rx-pop")||e.target.closest(".debate-live"))return;hideAllRxPops();const s=findStory(+card.dataset.id);if(s)DroboardReader.open(s);});});
+  feed.querySelectorAll(".qi").forEach(el=>{el.addEventListener("click",e=>{if(e.target.closest(".qi-act")||e.target.closest(".qi-btn"))return;const s=findStory(+el.dataset.id);if(s)DroboardReader.open(s);});});
+  feed.querySelectorAll(".qi-btn").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(s)DroboardReader.open(s);});});
+  feed.querySelectorAll(".qi-like").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(!s)return;s.liked=!s.liked;s.stats.likes+=s.liked?1:-1;el.classList.toggle("liked",s.liked);const i=el.querySelector("i");if(i)i.className=s.liked?"fas fa-heart":"far fa-heart";const lbl=el.querySelector(".qi-lbl");if(lbl)lbl.textContent=fmtN(s.stats.likes);});});
+  feed.querySelectorAll(".qi-cmt").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const s=findStory(+el.dataset.id);if(s)openCommentsSheet('story',s.id,(d)=>{s.stats.comments+=d;refreshActs(s.id);});});});
+  feed.addEventListener("click",e=>{if(!e.target.closest(".act-like")&&!e.target.closest(".rx-pop"))hideAllRxPops();},{passive:true});
+}
+
+function refreshActs(id){const s=findStory(id);if(!s)return;document.querySelectorAll(`.act-like[data-id="${id}"]`).forEach(el=>{el.classList.toggle("liked",s.liked);const i=el.querySelector("i");if(i)i.className=s.liked?"fas fa-heart":"far fa-heart";const lbl=el.querySelector(".act-lbl");if(lbl)lbl.textContent=fmtN(s.stats.likes);});document.querySelectorAll(`.act-save[data-id="${id}"]`).forEach(el=>{el.classList.toggle("saved",s.saved);const i=el.querySelector("i");if(i)i.className=s.saved?"fas fa-bookmark":"far fa-bookmark";const lbl=el.querySelector(".act-lbl");if(lbl)lbl.textContent=s.saved?"Saved":"Save";});document.querySelectorAll(`.act-cmt[data-id="${id}"] .act-lbl`).forEach(lbl=>{lbl.textContent=fmtN(s.stats.comments);});}
+
+function openReaderDebate(sid){const s=findStory(sid);if(s)DroboardReader.open(s,{jumpTo:'debate'});}
+
+/* ═══════════════════════════════════════════════════════════
+   READER — fully delegated to DroboardReader
+   ═══════════════════════════════════════════════════════════ */
+DroboardReader.attach({
+  ads: IN_ADS,
+  onLike(story, rid){
+    const wasLiked = story.liked;
+    story.liked = !!rid;
+    if (story.liked && !wasLiked) story.stats.likes++;
+    else if (!story.liked && wasLiked) story.stats.likes--;
+    refreshActs(story.id);
+  },
+  onPollVote(story, oi){ /* engagement mutated internally on story.engagement */ },
+  onDebateVote(story, side){ /* engagement mutated internally on story.engagement */ },
+  onDebateComment(story, text, side){ /* stored internally on story.engagement.debate.comments */ },
+  onNotifyNext(story){ },
+  getStoryUrl(story){ return `https://droboard.app/story/${story.id}`; },
+  onReadFull(story){ location.href='bridge.html'; },
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ASK TAB (fully custom, unchanged)
+   ═══════════════════════════════════════════════════════════ */
+function renderAskList(){const filtered=askFilter==="all"?askPosts:askPosts.filter(p=>p.cat===askFilter);document.getElementById("askList").innerHTML=filtered.map(p=>{const av=p.anon||!p.avatar?`<div class="ask-item-av">${p.anon?"👤":p.name[0]}</div>`:`<div class="ask-item-av"><img src="${p.avatar}" loading="lazy"/></div>`;let poll="";if(p.hasPoll){const tot=p.pollOpts.reduce((s,o)=>s+o.votes,0)||1;poll=`<div class="ask-item-poll">`+p.pollOpts.map((o,i)=>`<div class="ask-item-opt${p.pollVoted===i?" voted":""}" data-qid="${p.id}" data-oi="${i}"><div class="ask-item-bar" style="width:${Math.round(o.votes/tot*100)}%"></div><div class="ask-item-opt-row"><span>${o.text}</span><span class="ask-item-pct">${Math.round(o.votes/tot*100)}%</span></div></div>`).join("")+`</div>`;}const cArea=p.open?renderAskCms(p):"";return`<div class="ask-item" data-qid="${p.id}"><div class="ask-item-body"><div class="ask-item-top">${av}<div style="flex:1"><div class="ask-item-nm">${p.anon?"Anonymous":p.name}</div><div class="ask-item-time">${p.time}</div></div><span class="ask-item-cat">${p.cat}</span></div><div class="ask-item-q">${p.q}</div>${poll}</div>
+    <div class="ask-item-acts">
+      <div class="ask-item-act${p.liked?" liked":""} ask-like" data-qid="${p.id}"><i class="${p.liked?"fas":"far"} fa-heart"></i> ${fmtN(p.likes)}</div>
+      <div class="ask-item-act ask-cmt" data-qid="${p.id}"><i class="far fa-comment"></i> ${p.comments.length}</div>
+      <div class="ask-item-act" onclick="openShareModal({title:'Ask: ${p.q.substring(0,40).replace(/'/g,"\\'").replace(/"/g,'\\"')}',sub:'Droboard Ask',img:'',url:'https://droboard.app/ask/${p.id}'})"><i class="fas fa-share-alt"></i></div>
+      <div class="ask-item-act" onclick="toast('🔖 Saved!')"><i class="far fa-bookmark"></i></div>
+    </div>
+    <div class="ask-cm-area${p.open?" open":""}" id="askcma-${p.id}">${cArea}</div></div>`;}).join("");attachAskEv();}
+function renderAskCms(p){return`<div class="ask-cm-inp-row"><div class="ask-cm-av">Y</div><input class="ask-cm-inp" id="askinp-${p.id}" placeholder="Write a reply…"/><button class="ask-cm-send" id="asksend-${p.id}" disabled><i class="fas fa-paper-plane"></i></button></div><div class="ask-cm-list">${p.comments.map(c=>`<div class="ask-cm-item"><div class="ask-cm-av">${c.anon?"👤":c.name[0]}</div><div class="ask-cm-body"><div class="ask-cm-name">${c.anon?"Anonymous":c.name}</div><div class="ask-cm-text">${c.text}</div></div></div>`).join("")}</div>`;}
+function attachAskEv(){
+  document.querySelectorAll(".ask-cat-btn").forEach(el=>{el.addEventListener("click",()=>{askFilter=el.dataset.cat;document.querySelectorAll(".ask-cat-btn").forEach(x=>x.classList.toggle("on",x===el));renderAskList();});});
+  document.querySelectorAll(".ask-like").forEach(btn=>{btn.addEventListener("click",e=>{e.stopPropagation();const p=askPosts.find(x=>x.id===btn.dataset.qid);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;renderAskList();});});
+  document.querySelectorAll(".ask-cmt").forEach(btn=>{btn.addEventListener("click",e=>{e.stopPropagation();const p=askPosts.find(x=>x.id===btn.dataset.qid);if(!p)return;p.open=!p.open;renderAskList();setTimeout(()=>{const inp=document.getElementById("askinp-"+p.id);const send=document.getElementById("asksend-"+p.id);if(inp&&send){inp.oninput=()=>{send.disabled=inp.value.trim().length===0;};send.onclick=()=>{const t=inp.value.trim();if(!t)return;p.comments.push({id:"ac_"+Date.now(),name:"You",anon:false,text:t});renderAskList();toast("💬 Reply posted!");};}},50);});});
+  document.querySelectorAll(".ask-item-opt[data-qid]").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const p=askPosts.find(x=>x.id===el.dataset.qid);if(!p||p.pollVoted>=0)return;const oi=+el.dataset.oi;p.pollOpts[oi].votes++;p.pollVoted=oi;renderAskList();toast("✅ Voted!");});});
+}
+document.getElementById("askPostBtn").addEventListener("click",()=>{const text=document.getElementById("askTa").value.trim();if(!text){toast("✍️ Write something first!");return;}const anon=document.getElementById("anonChk").checked;const cat=document.getElementById("askCatSel").value;askPosts.unshift({id:"q_"+Date.now(),anon,name:anon?"Anonymous":"You",avatar:anon?null:"https://i.pravatar.cc/100?img=1",cat,q:text,time:"Just now",likes:0,liked:false,comments:[],hasPoll:false,pollVoted:-1,open:false});document.getElementById("askTa").value="";renderAskList();toast("✅ Posted!");});
+
+// INIT
+initWebSocket();
+renderFeed();
+</script>
+</body>
+</html>

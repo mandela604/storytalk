@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · Ask</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.22);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;
+  --tx:#f5f5f7;--muted:#666;--muted2:#aaa;--bd:rgba(255,255,255,.09);
+  --gold:#f59e0b;--green:#10b981;--blue:#3b82f6;--purple:#8b5cf6;
+  --nav-h:66px;--top-h:56px;
+}
+html,body{min-height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--nav-h) + 8px)}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:200;background:rgba(7,7,11,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.top-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;gap:10px}
+.top-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;letter-spacing:-.5px;color:#fff}
+.top-actions{display:flex;gap:8px;align-items:center}
+.top-icon-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:.18s;flex-shrink:0}
+.top-icon-btn:active{transform:scale(.9)}
+.compose-btn{height:34px;padding:0 14px;border-radius:20px;background:var(--acc);border:none;color:#fff;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;box-shadow:0 0 12px var(--glow);transition:.18s}
+.compose-btn:active{transform:scale(.96)}
+
+/* CATEGORY TABS */
+.cat-tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd)}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{flex-shrink:0;padding:9px 14px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.18s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.cat-tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+.cat-tab .tab-ct{background:rgba(255,0,80,.15);color:var(--acc);font-size:8px;font-weight:800;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center}
+
+/* SORT BAR */
+.sort-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px}
+.sort-left{display:flex;gap:6px}
+.sort-btn{padding:4px 11px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--muted);background:transparent;transition:.15s;font-family:'DM Sans',sans-serif}
+.sort-btn.on{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.18)}
+.sort-right{font-size:10px;color:var(--muted);font-weight:600}
+
+/* AMA BANNER */
+.ama-banner{margin:0 16px 4px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;border:1px solid rgba(255,107,26,.3)}
+.ama-banner:active{opacity:.9}
+.ama-banner-bg{height:88px;background:linear-gradient(135deg,#1a0800,#2d1000 40%,#0a0400);position:relative;overflow:hidden}
+.ama-banner-content{position:absolute;inset:0;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.ama-live-badge{background:var(--acc);color:#fff;font-size:8px;font-weight:900;padding:3px 8px;border-radius:8px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ama-pulse{width:5px;height:5px;border-radius:50%;background:#fff;animation:amaPulse 1.2s ease-in-out infinite}
+@keyframes amaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.ama-info{flex:1;min-width:0}
+.ama-host-row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.ama-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,107,26,.5)}
+.ama-host{font-size:10px;font-weight:800;color:#ff9a4d}
+.ama-title{font-size:12px;font-weight:700;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ama-meta{font-size:9px;color:rgba(255,255,255,.45);margin-top:2px}
+.ama-join-btn{background:linear-gradient(135deg,#ff6b1a,#ff4400);color:#fff;border:none;padding:7px 13px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;box-shadow:0 0 10px rgba(255,100,0,.35)}
+
+/* UPCOMING AMA SCROLL */
+.ama-upcoming-row{display:flex;gap:8px;padding:0 16px 4px;overflow-x:auto;scrollbar-width:none}
+.ama-upcoming-row::-webkit-scrollbar{display:none}
+.ama-upcoming-card{flex-shrink:0;width:160px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;transition:.18s}
+.ama-upcoming-card:active{transform:scale(.97)}
+.auc-top{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.auc-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,107,26,.3)}
+.auc-name{font-size:10px;font-weight:700;color:#fff}
+.auc-genre{font-size:8px;color:var(--muted2)}
+.auc-time{font-size:9px;font-weight:800;color:#ff9a4d;margin-bottom:3px}
+.auc-topic{font-size:10px;color:#ccc;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.auc-notify{width:100%;margin-top:8px;background:rgba(255,107,26,.12);border:1px solid rgba(255,107,26,.25);color:#ff9a4d;font-size:9px;font-weight:800;padding:5px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* SECTION DIVIDER */
+.sec-div{display:flex;align-items:center;gap:10px;padding:14px 16px 8px}
+.sec-div-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;white-space:nowrap}
+.sec-div-line{flex:1;height:1px;background:var(--bd)}
+
+/* POST CARD */
+.post-card{border-bottom:1px solid rgba(255,255,255,.04);position:relative;overflow:hidden}
+.post-card.pinned::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
+.post-card-inner{padding:13px 16px 0}
+
+/* Post header */
+.post-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.post-av{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.post-av-init{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.post-meta{flex:1;min-width:0}
+.post-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.post-name{font-size:12px;font-weight:700;color:#fff}
+.post-badge{font-size:7px;font-weight:800;padding:2px 6px;border-radius:6px;text-transform:uppercase;letter-spacing:.04em}
+.pb-writer{background:rgba(255,0,80,.15);color:var(--acc2);border:1px solid rgba(255,0,80,.2)}
+.pb-verified{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
+.pb-mod{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.2)}
+.post-sub{font-size:9px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:4px}
+.post-time{color:var(--muted)}
+.post-cat-chip{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px}
+.pinned-icon{font-size:10px;color:var(--gold);margin-left:auto;flex-shrink:0}
+
+/* Post body */
+.post-cat-label{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;padding:3px 9px;border-radius:10px;margin-bottom:7px;letter-spacing:.04em}
+.post-title{font-size:13px;font-weight:700;color:#fff;line-height:1.42;margin-bottom:5px}
+.post-body{font-size:12px;color:#bbb;line-height:1.52;margin-bottom:0}
+.post-body.truncated{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.read-more-btn{font-size:11px;font-weight:700;color:var(--acc2);cursor:pointer;padding:3px 0 0;display:inline-block}
+
+/* Story ref */
+.story-ref-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:10px;padding:7px 10px;margin:8px 0 0;cursor:pointer}
+.story-ref-chip:active{background:rgba(255,255,255,.07)}
+.src-thumb{width:32px;height:36px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.src-info{flex:1;min-width:0}
+.src-cat{font-size:7px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.src-title{font-size:10px;font-weight:700;color:#fff;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-top:1px}
+.src-arrow{font-size:10px;color:var(--acc2);flex-shrink:0}
+
+/* Poll inside post */
+.poll-preview{margin:8px 0 0}
+.poll-opt-compact{position:relative;border-radius:8px;padding:7px 10px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);margin-bottom:5px;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.poll-opt-compact.voted{border-color:var(--acc)}
+.poll-opt-compact:last-child{margin-bottom:0}
+.poc-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.09);z-index:0;transition:width .5s ease}
+.poc-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.poc-txt{font-size:11px;font-weight:600;color:#ddd}
+.poc-pct{font-size:10px;font-weight:800;color:var(--acc)}
+.poll-meta-row{display:flex;align-items:center;justify-content:space-between;padding-top:5px}
+.poll-meta-txt{font-size:9px;color:var(--muted);font-weight:600}
+.expand-poll-btn{font-size:9px;font-weight:800;color:var(--acc2);cursor:pointer;display:flex;align-items:center;gap:3px}
+
+/* Post footer */
+.post-footer{display:flex;align-items:center;gap:0;padding:8px 0;margin-top:6px}
+.pf-act{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 10px;border-radius:10px;transition:.15s;user-select:none}
+.pf-act:active{background:rgba(255,255,255,.04)}
+.pf-act i{font-size:13px}
+.pf-act.liked{color:var(--acc)}
+.pf-act.liked i{color:var(--acc)}
+.pf-spacer{flex:1}
+.pf-share{font-size:12px;color:var(--muted);cursor:pointer;padding:5px 8px;border-radius:8px;transition:.15s}
+.pf-share:active{background:rgba(255,255,255,.04)}
+
+/* REPLY THREAD */
+.reply-thread{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.04);padding:10px 16px 6px;display:none}
+.reply-thread.open{display:block}
+.reply-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.reply-item:last-child{border-bottom:none}
+.r-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.r-av-init{width:26px;height:26px;border-radius:50%;background:rgba(255,0,80,.15);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0}
+.r-body{flex:1;min-width:0}
+.r-name{font-size:11px;font-weight:700;color:#ddd}
+.r-text{font-size:11px;color:#888;line-height:1.42;margin-top:1px}
+.r-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
+.r-time{font-size:9px;color:var(--muted)}
+.r-like{display:flex;align-items:center;gap:2px;font-size:10px;color:var(--muted);cursor:pointer}
+.r-like.liked{color:var(--acc)}
+.r-reply-lnk{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer}
+.more-replies-btn{font-size:11px;font-weight:700;color:var(--acc2);cursor:pointer;padding:5px 0;display:block}
+.reply-inp-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)}
+.r-inp-av{width:26px;height:26px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.r-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:18px;padding:7px 12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;outline:none}
+.r-inp::placeholder{color:#444}
+.r-send{background:var(--acc);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#fff;flex-shrink:0}
+.r-send:disabled{background:#2a2a2a;cursor:default}
+
+/* FULL POLL MODAL */
+.modal-bg{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.bottom-sheet{width:100%;background:#13131f;border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:90vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.bottom-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:34px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:10px auto 0}
+.sheet-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 10px}
+.sheet-hdr h3{font-size:14px;font-weight:800;color:#fff}
+.sheet-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.full-poll-q{font-size:14px;font-weight:700;color:#fff;padding:0 16px 12px;line-height:1.4}
+.full-poll-opts{padding:0 16px 12px;display:flex;flex-direction:column;gap:8px}
+.fpo{position:relative;border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);cursor:pointer;overflow:hidden;transition:border-color .2s}
+.fpo.voted{border-color:var(--acc);background:rgba(255,0,80,.05)}
+.fpo-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(255,0,80,.1);z-index:0;transition:width .6s ease}
+.fpo-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fpo-txt{font-size:13px;font-weight:600;color:#ddd;flex:1}
+.fpo-pct{font-size:13px;font-weight:800;color:var(--acc);min-width:40px;text-align:right}
+.fpo-bar-line{height:3px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:6px;position:relative;z-index:1}
+.fpo-bar-fill{height:100%;border-radius:3px;background:var(--acc);transition:width .6s ease}
+.poll-sheet-footer{display:flex;align-items:center;justify-content:space-between;padding:0 16px 4px}
+.psf-votes{font-size:11px;color:var(--muted);font-weight:600}
+.psf-share{font-size:11px;font-weight:700;color:var(--acc2);cursor:pointer;display:flex;align-items:center;gap:4px}
+
+/* COMPOSE MODAL */
+.compose-sheet{width:100%;background:#13131f;border-radius:20px 20px 0 0;animation:slideUp .28s ease;padding-bottom:env(safe-area-inset-bottom,20px);max-height:92vh;overflow-y:auto;scrollbar-width:none}
+.compose-sheet::-webkit-scrollbar{display:none}
+.compose-cat-row{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
+.compose-cat-row::-webkit-scrollbar{display:none}
+.ccat-btn{padding:5px 12px;border-radius:16px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--muted);background:transparent;transition:.15s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+.ccat-btn.on{color:#fff;border-color:transparent}
+.compose-type-row{display:flex;gap:8px;padding:0 16px 12px}
+.ctype-btn{flex:1;padding:8px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--muted);background:rgba(255,255,255,.03);transition:.15s;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px}
+.ctype-btn i{font-size:16px}
+.ctype-btn.on{background:rgba(255,0,80,.1);border-color:rgba(255,0,80,.3);color:var(--acc2)}
+.compose-textarea{width:calc(100% - 32px);margin:0 16px 10px;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.55;min-height:90px}
+.compose-textarea::placeholder{color:#333}
+.compose-poll-section{padding:0 16px;margin-bottom:12px}
+.poll-opt-inp-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.poll-opt-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;outline:none}
+.poll-opt-inp::placeholder{color:#333}
+.add-opt-btn{font-size:11px;font-weight:700;color:var(--acc2);cursor:pointer;padding:6px 0;display:flex;align-items:center;gap:4px}
+.compose-anon-row{display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px}
+.anon-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted2);cursor:pointer;user-select:none}
+.anon-label input{accent-color:var(--acc);width:14px;height:14px}
+.compose-submit{display:block;width:calc(100% - 32px);margin:0 16px;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 14px var(--glow)}
+
+/* STORY REF PICKER (in compose) */
+.story-search-wrap{padding:0 16px 12px}
+.story-search-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;outline:none}
+.story-search-inp::placeholder{color:#333}
+.story-pick-list{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.story-pick-item{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;cursor:pointer;transition:.15s}
+.story-pick-item:active{background:rgba(255,0,80,.07)}
+.spi-thumb{width:32px;height:36px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0}
+.spi-info{flex:1;min-width:0}
+.spi-cat{font-size:8px;font-weight:800;color:var(--acc);text-transform:uppercase}
+.spi-title{font-size:10px;font-weight:700;color:#fff;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.spi-check{font-size:14px;color:var(--acc2);flex-shrink:0;display:none}
+.story-pick-item.selected .spi-check{display:block}
+.story-pick-item.selected{border-color:rgba(255,0,80,.3);background:rgba(255,0,80,.05)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 10px);left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a28;border:1px solid rgba(255,255,255,.12);color:#fff;padding:9px 20px;border-radius:30px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.7)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,7,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,14px)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px;position:relative}
+.bn-item i{font-size:20px;display:block;margin-bottom:2px}
+.bn-item.active{color:var(--acc)}
+
+/* EMPTY STATE */
+.empty-state{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.es-emoji{font-size:40px}
+.es-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.es-sub{font-size:12px;color:var(--muted);line-height:1.6;max-width:220px}
+
+/* PIN BANNER */
+.pinned-row{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+
+/* CAT COLORS */
+.cat-review{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.18)}
+.cat-recommend{background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.18)}
+.cat-advice{background:rgba(139,92,246,.12);color:#c4b5fd;border:1px solid rgba(139,92,246,.2)}
+.cat-motivation{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.18)}
+.cat-confession{background:rgba(255,0,80,.1);color:var(--acc2);border:1px solid rgba(255,0,80,.2)}
+.cat-debate{background:rgba(255,107,26,.1);color:#ff9a4d;border:1px solid rgba(255,107,26,.2)}
+.cat-general{background:rgba(255,255,255,.06);color:#bbb;border:1px solid rgba(255,255,255,.1)}
+.cat-ama{background:rgba(255,100,0,.12);color:#ff9a4d;border:1px solid rgba(255,100,0,.2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.post-card{animation:fadeUp .22s ease both}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="top-title">Ask</div>
+    <div class="top-actions">
+      <div class="top-icon-btn" onclick="toast('🔍 Search coming soon')"><i class="fas fa-search"></i></div>
+      <button class="compose-btn" onclick="openCompose()"><i class="fas fa-pen"></i> Post</button>
+    </div>
+  </div>
+  <div class="cat-tabs" id="catTabs"></div>
+</div>
+
+<!-- FEED -->
+<div id="feedArea"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item" onclick="location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn-item" onclick="location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn-item" onclick="toast('✏️ Create — coming soon')"><i class="fas fa-plus-circle"></i>Create</div>
+  <div class="bn-item active"><i class="fas fa-comments"></i>Ask</div>
+  <div class="bn-item" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- FULL POLL MODAL -->
+<div class="modal-bg" id="pollModal">
+  <div class="bottom-sheet" id="pollSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3>📊 Full Poll</h3>
+      <button class="sheet-close" onclick="closePollModal()">✕</button>
+    </div>
+    <div class="full-poll-q" id="pollSheetQ"></div>
+    <div class="full-poll-opts" id="pollSheetOpts"></div>
+    <div class="poll-sheet-footer">
+      <span class="psf-votes" id="pollSheetVotes"></span>
+      <span class="psf-share" onclick="toast('🔗 Link copied!')"><i class="fas fa-share-alt"></i> Share poll</span>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSE MODAL -->
+<div class="modal-bg" id="composeModal">
+  <div class="compose-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3>New Post</h3>
+      <button class="sheet-close" onclick="closeCompose()">✕</button>
+    </div>
+    <div class="compose-cat-row" id="composeCats"></div>
+    <div class="compose-type-row">
+      <div class="ctype-btn on" data-type="post" onclick="setComposeType('post',this)"><i class="fas fa-align-left"></i>Post</div>
+      <div class="ctype-btn" data-type="poll" onclick="setComposeType('poll',this)"><i class="fas fa-chart-bar"></i>Poll</div>
+      <div class="ctype-btn" data-type="review" onclick="setComposeType('review',this)"><i class="fas fa-star"></i>Review</div>
+      <div class="ctype-btn" data-type="story" onclick="setComposeType('story',this)"><i class="fas fa-book-open"></i>+ Story</div>
+    </div>
+    <textarea class="compose-textarea" id="composeTa" placeholder="Share your thoughts, question, experience…" rows="4"></textarea>
+    <div class="compose-poll-section" id="composePollSec" style="display:none">
+      <div id="pollOptsList">
+        <div class="poll-opt-inp-row"><input class="poll-opt-inp" placeholder="Option 1…"/><span style="font-size:13px;color:var(--muted);cursor:pointer" onclick="removePollOpt(this)">✕</span></div>
+        <div class="poll-opt-inp-row"><input class="poll-opt-inp" placeholder="Option 2…"/><span style="font-size:13px;color:var(--muted);cursor:pointer" onclick="removePollOpt(this)">✕</span></div>
+      </div>
+      <div class="add-opt-btn" onclick="addPollOpt()"><i class="fas fa-plus" style="font-size:9px"></i> Add option</div>
+    </div>
+    <div class="story-search-wrap" id="storySearchSec" style="display:none">
+      <input class="story-search-inp" id="storySearchInp" placeholder="Search a story to reference…" oninput="searchStories(this.value)"/>
+      <div class="story-pick-list" id="storyPickList"></div>
+    </div>
+    <div class="compose-anon-row">
+      <label class="anon-label"><input type="checkbox" id="anonCheck"/> Post anonymously</label>
+      <span style="font-size:10px;color:var(--muted)">Visible to everyone</span>
+    </div>
+    <button class="compose-submit" onclick="submitPost()">Post to Forum</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<script>
+/* ── TOAST ── */
+let _tt;function toast(m){const e=document.getElementById('toastEl');e.textContent=m;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2500);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+/* ── CATEGORIES ── */
+const CATS=[
+  {id:'all',label:'🔥 All',color:'cat-confession'},
+  {id:'review',label:'⭐ Reviews',color:'cat-review'},
+  {id:'recommend',label:'💡 Recs',color:'cat-recommend'},
+  {id:'advice',label:'🫂 Advice',color:'cat-advice'},
+  {id:'motivation',label:'🌟 Motivation',color:'cat-motivation'},
+  {id:'confession',label:'💔 Confessions',color:'cat-confession'},
+  {id:'debate',label:'⚔️ Debate',color:'cat-debate'},
+  {id:'ama',label:'🎙 AMA',color:'cat-ama'},
+  {id:'general',label:'💬 General',color:'cat-general'},
+];
+const CAT_COLORS={review:'cat-review',recommend:'cat-recommend',advice:'cat-advice',motivation:'cat-motivation',confession:'cat-confession',debate:'cat-debate',ama:'cat-ama',general:'cat-general'};
+const CAT_LABELS={review:'⭐ Review',recommend:'💡 Recommend',advice:'🫂 Advice',motivation:'🌟 Motivation',confession:'💔 Confession',debate:'⚔️ Debate',ama:'🎙 AMA',general:'💬 General'};
+
+let currentCat='all';
+let currentSort='hot';
+
+/* ── DATA ── */
+const STORIES_REF=[
+  {id:1,cat:'💔 Betrayal',title:"I caught my husband kissing my late sister's photograph",cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300'},
+  {id:2,cat:'🎓 Campus',title:"The richest boy started sitting beside me every morning",cover:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300'},
+  {id:3,cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300'},
+  {id:5,cat:'✨ Twist',title:"I left at the altar in my socked feet and found my actual life",cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=300'},
+  {id:6,cat:'🔥 Revenge',title:"My stepmother stole my university fund",cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300'},
+  {id:7,cat:'🌙 Elegy',title:"The letter he never sent, folded in his jacket",cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300'},
+];
+
+
+const AMA_SESSIONS=[
+  {id:'ama1',host:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',genre:'💔 Betrayal',topic:'Writing emotional trauma: how I don\'t lose myself in dark chapters',live:true,viewers:847,time:'Live now'},
+  {id:'ama2',host:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',genre:'✨ Twist',topic:'How I built Bare Kitchen into a viral universe from one scene',live:false,time:'Tomorrow 8PM'},
+  {id:'ama3',host:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=47',genre:'👑 Family',topic:'Writing real family wounds without hurting real people',live:false,time:'Friday 7PM'},
+  {id:'ama4',host:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',genre:'🔥 Revenge',topic:'Revenge arcs: why justice matters more than satisfaction',live:false,time:'Sat 9PM'},
+];
+
+let POSTS=[
+  {id:1,cat:'review',type:'post',pinned:true,anon:false,name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',badge:'',
+   title:'She Rejected Me 3 Times is the most underrated story on this platform',
+   body:"I've read over 40 series here and nothing compares to Dami Cole's pacing. Chapter 9 physically made me put my phone down and breathe. The dog naming scene? I cried. Actual tears. This deserves 10x more readers.",
+   storyRef:{id:8,cat:'🏙️ Urban Love',title:"She rejected me 3 times. Now we share a mortgage and a dog named 'Finally'",cover:'https://images.unsplash.com/photo-1516557070061-cbf1d8ccf4d0?w=300'},
+   likes:342,liked:false,time:'2h ago',replies:[
+     {id:'r1',name:'Emeka_T',avatar:'https://i.pravatar.cc/100?img=15',text:'The dog naming scene destroyed me too 😭 Dami needs more visibility fr.',time:'1h',likes:45,liked:false},
+     {id:'r2',name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',text:"I can't believe how little hype it gets. Started it last night at 11pm, finished at 3am.",time:'55m',likes:28,liked:false},
+     {id:'r3',name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',text:'@Chioma_R which chapter should new readers START with if they want to be hooked immediately?',time:'30m',likes:12,liked:false},
+   ],repliesOpen:false,hasPoll:false},
+
+  {id:2,cat:'advice',type:'post',pinned:false,anon:false,name:'Emeka_Writes',avatar:'https://i.pravatar.cc/100?img=15',badge:'writer',
+   title:'Should I keep writing or take a break? Be honest.',
+   body:"I'm 8 chapters into my current series and I feel like the story is running away from me. My original plan was 12 chapters. Now I think it needs 20+. Readers are invested. But I'm exhausted and scared I'll ruin it by continuing burnt out.",
+   storyRef:null,
+   likes:189,liked:false,time:'4h ago',replies:[
+     {id:'r4',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',text:'Take a planned 2-week break. Tell readers. They will respect it. A burnt-out writer always shows in the prose.',time:'3h',likes:87,liked:false},
+     {id:'r5',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',text:'As a reader: please take the break. We would rather wait 2 weeks than get a rushed chapter.',time:'2h',likes:64,liked:false},
+   ],repliesOpen:false,
+   hasPoll:true,
+   poll:{q:'What should a writer do when they feel burnt out mid-series?',
+     opts:[{t:'Take a planned break and announce it',v:412},{t:'Keep pushing through — readers are waiting',v:89},{t:'Outline the rest first before continuing',v:231},{t:'Write ahead privately, release on schedule',v:167}],
+     voted:-1,total:899}},
+
+  {id:3,cat:'recommend',type:'post',pinned:false,anon:false,name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',badge:'writer',
+   title:'If you loved "The Letter He Never Sent" — read these next',
+   body:"Efe_O's elegy style is rare. If it broke you (it will), here are 3 stories with that same slow heartbreak energy:\n\n1. The Runaway Bride — different genre but the same emotional precision\n2. My Grandmother's Will — grief written with such dignity\n3. The Richest Boy — quieter pain, slower burn\n\nAll three will ruin your productivity for a day.",
+   storyRef:{id:7,cat:'🌙 Elegy',title:"The letter he never sent was folded inside the pocket of his old jacket",cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300'},
+   likes:524,liked:false,time:'5h ago',replies:[
+     {id:'r6',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',text:"Thank you for including The Runaway Bride 🙏 The emotional precision comment means everything.",time:'4h',likes:102,liked:false},
+   ],repliesOpen:false,hasPoll:false},
+
+  {id:4,cat:'confession',type:'post',pinned:false,anon:true,name:'Anonymous',avatar:null,badge:'',
+   title:'I read stories here instead of going to therapy and it might actually be working',
+   body:"I know this sounds unhinged but reading The Grandmother's Will helped me process losing my own grandmother more than 6 months of journaling. There's something about seeing your grief reflected in a story written by a stranger that cracks something open.",
+   storyRef:{id:3,cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300'},
+   likes:891,liked:false,time:'8h ago',replies:[
+     {id:'r7',name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=47',text:"This is exactly why I write. Not unhinged at all — this is why stories exist.",time:'7h',likes:234,liked:false},
+     {id:'r8',name:'Efe_O',avatar:'https://i.pravatar.cc/100?img=22',text:"I received a message very similar to this about The Letter. You are not alone in this. Stories are legitimate grief containers.",time:'6h',likes:189,liked:false},
+   ],repliesOpen:false,hasPoll:false},
+
+  {id:5,cat:'debate',type:'post',pinned:false,anon:false,name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',badge:'',
+   title:'HOT TAKE: Most "twist" stories on here are predictable by chapter 3',
+   body:"Change my mind. The formula is: nice girl, rich/powerful love interest, one big secret that we all figure out by chapter 2, dramatic confrontation, reconciliation. The Runaway Bride is an exception but it's rare. Where are the twists we actually don't see coming?",
+   storyRef:null,
+   likes:673,liked:false,time:'1d ago',replies:[
+     {id:'r9',name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',text:"Respectfully — readers WANT the formula. The comfort IS the point. Defamiliarising the expected is hard.",time:'23h',likes:145,liked:false},
+     {id:'r10',name:'CampusQueen',avatar:'https://i.pravatar.cc/100?img=12',text:'I agree but I also don\'t care. Sometimes I want predictable comfort and that\'s not a lesser form of reading.',time:'20h',likes:92,liked:false},
+   ],repliesOpen:false,
+   hasPoll:true,
+   poll:{q:'Do you prefer unpredictable twists or satisfying familiar formulas?',
+     opts:[{t:'🌀 Give me unpredictable twists always',v:1240},{t:'🛋 I love a comforting familiar formula',v:2100},{t:'🎯 Both — depends on my mood',v:890}],
+     voted:-1,total:4230}},
+
+  {id:6,cat:'motivation',type:'post',pinned:false,anon:false,name:'Chiamaka_N',avatar:'https://i.pravatar.cc/100?img=47',badge:'writer',
+   title:'To every writer scared to post their first chapter: post it anyway',
+   body:"My first chapter of Grandmother's Will got 12 reads in week one. I thought about deleting it. Chapter 3 went viral. If I had deleted it after week one — 204,000 readers would never have met Adanna.\n\nThe only chapter that definitely gets zero reads is the one you never post.",
+   storyRef:null,
+   likes:2341,liked:false,time:'2d ago',replies:[
+     {id:'r11',name:'Dami_Cole',avatar:'https://i.pravatar.cc/100?img=64',text:'I needed this today. Chapter 1 of my new series goes up tonight.',time:'1d',likes:334,liked:false},
+     {id:'r12',name:'CampusQueen',avatar:'https://i.pravatar.cc/100?img=12',text:"Posting at midnight when nobody's watching so the fear doesn't stop me 😭",time:'1d',likes:201,liked:false},
+   ],repliesOpen:false,hasPoll:false},
+
+  {id:7,cat:'advice',type:'post',pinned:false,anon:true,name:'Anonymous',avatar:null,badge:'',
+   title:"My husband reads my stories and thinks they're not about him. They are.",
+   body:"I've written three chapters about a couple going through what we went through last year. He thinks it's fiction. He actually praised the writing and said 'how do you come up with this stuff?' I don't know if I should tell him.",
+   storyRef:null,
+   likes:1102,liked:false,time:'2d ago',replies:[
+     {id:'r13',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',text:'Writing is one of the most legitimate ways to process lived experience. You owe him honesty but you also owe yourself the space to process. There\'s no rush.',time:'2d',likes:267,liked:false},
+   ],repliesOpen:false,
+   hasPoll:true,
+   poll:{q:'Should she tell him?',
+     opts:[{t:'Yes — honesty always',v:1890},{t:'No — the writing is yours, not his',v:2344},{t:'Only if the relationship is strong enough',v:567}],
+     voted:-1,total:4801}},
+];
+
+let _composeCat='general';
+let _composeType='post';
+let _selectedStory=null;
+
+/* ── RENDER TABS ── */
+function renderTabs(){
+  const counts={};CATS.forEach(c=>{counts[c.id]=c.id==='all'?POSTS.filter(p=>!p._deleted).length:POSTS.filter(p=>!p._deleted&&p.cat===c.id).length;});
+  document.getElementById('catTabs').innerHTML=CATS.map(c=>`<div class="cat-tab${c.id===currentCat?' active':''}" onclick="setCat('${c.id}')">${c.label}${counts[c.id]>0&&c.id!=='all'?`<span class="tab-ct">${counts[c.id]}</span>`:''}</div>`).join('');
+}
+function setCat(cat){currentCat=cat;renderTabs();renderFeed();}
+
+/* ── RENDER FEED ── */
+function getFilteredPosts(){
+  let list=POSTS.filter(p=>!p._deleted);
+  if(currentCat!=='all')list=list.filter(p=>p.cat===currentCat);
+  if(currentSort==='hot')list=[...list].sort((a,b)=>b.likes-a.likes);
+  else if(currentSort==='new')list=[...list].sort((a,b)=>b.id-a.id);
+  const pinned=list.filter(p=>p.pinned);const rest=list.filter(p=>!p.pinned);
+  return[...pinned,...rest];
+}
+
+function renderFeed(){
+  const container=document.getElementById('feedArea');
+  const filtered=getFilteredPosts();
+
+  let html=`<div class="sort-bar">
+    <div class="sort-left">
+      <button class="sort-btn${currentSort==='hot'?' on':''}" onclick="setSort('hot')">🔥 Hot</button>
+      <button class="sort-btn${currentSort==='new'?' on':''}" onclick="setSort('new')">🆕 New</button>
+      <button class="sort-btn${currentSort==='top'?' on':''}" onclick="setSort('top')">⭐ Top</button>
+    </div>
+    <div class="sort-right">${filtered.length} post${filtered.length!==1?'s':''}</div>
+  </div>`;
+
+  /* AMA section — shown in all/ama filter */
+  if(currentCat==='all'||currentCat==='ama'){
+    const live=AMA_SESSIONS.find(s=>s.live);
+    if(live){
+      html+=`<div class="ama-banner" onclick="location.href='ama-live.html?id=${live.id}'">
+        <div class="ama-banner-bg">
+          <div class="ama-banner-content">
+            <div class="ama-live-badge"><div class="ama-pulse"></div>LIVE</div>
+            <div class="ama-info">
+              <div class="ama-host-row"><img class="ama-av" src="${live.avatar}" loading="lazy"/><span class="ama-host">@${live.host}</span></div>
+              <div class="ama-title">${live.topic}</div>
+              <div class="ama-meta">🎙 AMA in progress · ${fmtN(live.viewers)} watching</div>
+            </div>
+            <button class="ama-join-btn">Join →</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    const upcoming=AMA_SESSIONS.filter(s=>!s.live);
+    if(upcoming.length){
+      html+=`<div class="sec-div"><div class="sec-div-label">Upcoming AMAs</div><div class="sec-div-line"></div></div>`;
+      html+=`<div class="ama-upcoming-row">${upcoming.map(s=>`<div class="ama-upcoming-card" onclick="location.href='ama-live.html?id=${s.id}'">
+        <div class="auc-top"><img class="auc-av" src="${s.avatar}" loading="lazy"/><div><div class="auc-name">@${s.host}</div><div class="auc-genre">${s.genre}</div></div></div>
+        <div class="auc-time"><i class="fas fa-clock" style="font-size:8px"></i> ${s.time}</div>
+        <div class="auc-topic">${s.topic}</div>
+        <button class="auc-notify" onclick="event.stopPropagation();notifyAMA(this,'${s.host}')"><i class="fas fa-bell" style="font-size:8px"></i> Notify me</button>
+      </div>`).join('')}</div>`;
+    }
+    if(currentCat==='ama'){container.innerHTML=html;return;}
+    html+=`<div class="sec-div"><div class="sec-div-label">Forum</div><div class="sec-div-line"></div></div>`;
+  }
+
+  /* Posts */
+  if(!filtered.length){
+    html+=`<div class="empty-state"><div class="es-emoji">💬</div><div class="es-title">No posts yet</div><div class="es-sub">Be the first to post in this category.</div></div>`;
+  }else{
+    html+=filtered.map((p,i)=>renderPost(p,i)).join('');
+  }
+  container.innerHTML=html;
+  attachPostEvents();
+}
+
+function setSort(s){currentSort=s;renderFeed();}
+
+/* ── RENDER POST ── */
+function renderPost(p,idx){
+  const catClass=CAT_COLORS[p.cat]||'cat-general';
+  const catLabel=CAT_LABELS[p.cat]||p.cat;
+  const av=p.avatar?`<img class="post-av" src="${p.avatar}" loading="lazy" alt=""/>`:`<div class="post-av-init" style="background:${getColor(p.name)}">${p.name[0]||'?'}</div>`;
+  const badgeHtml=p.badge==='writer'?`<span class="post-badge pb-writer">✍️ Writer</span>`:p.badge==='mod'?`<span class="post-badge pb-mod">🛡 Mod</span>`:'';
+
+  const bodyTrunc=p.body.length>180;
+  const bodyPreview=bodyTrunc?p.body.substring(0,180)+'…':p.body;
+
+  let extras='';
+  if(p.storyRef){extras+=`<div class="story-ref-chip" onclick="event.stopPropagation();toast('📖 Opening story…')"><div class="src-thumb" style="background-image:url('${p.storyRef.cover}')"></div><div class="src-info"><div class="src-cat">${p.storyRef.cat}</div><div class="src-title">${p.storyRef.title}</div></div><i class="fas fa-arrow-right src-arrow"></i></div>`;}
+
+  if(p.hasPoll&&p.poll){
+    const tot=p.poll.total||1;
+    const topTwo=p.poll.opts.slice(0,2);
+    extras+=`<div class="poll-preview">
+      ${topTwo.map((o,i)=>`<div class="poll-opt-compact${p.poll.voted===i?' voted':''}" data-pid="${p.id}" data-oi="${i}">
+        <div class="poc-bar" style="width:${Math.round(o.v/tot*100)}%"></div>
+        <div class="poc-row"><span class="poc-txt">${o.t}</span><span class="poc-pct">${Math.round(o.v/tot*100)}%</span></div>
+      </div>`).join('')}
+      <div class="poll-meta-row">
+        <span class="poll-meta-txt">${fmtN(tot)} votes · ${p.poll.opts.length} options</span>
+        <span class="expand-poll-btn" data-pid="${p.id}"><i class="fas fa-chart-bar" style="font-size:8px"></i> See full poll</span>
+      </div>
+    </div>`;
+  }
+
+  const replyCount=p.replies?p.replies.length:0;
+  const repliesHtml=p.repliesOpen?renderReplies(p):'';
+
+  return`<div class="post-card${p.pinned?' pinned':''}" data-pid="${p.id}" style="animation-delay:${idx*.04}s">
+    <div class="post-card-inner">
+      ${p.pinned?`<div class="pinned-row"><i class="fas fa-thumbtack"></i> Pinned</div>`:''}
+      <div class="post-hdr">
+        ${av}
+        <div class="post-meta">
+          <div class="post-name-row">
+            <span class="post-name">${p.name}</span>
+            ${badgeHtml}
+          </div>
+          <div class="post-sub">
+            <span class="post-time">${p.time}</span>
+            <span>·</span>
+            <span class="post-cat-chip ${catClass}">${catLabel}</span>
+          </div>
+        </div>
+        ${p.pinned?'<i class="fas fa-thumbtack pinned-icon"></i>':''}
+      </div>
+      <div class="post-title">${p.title}</div>
+      <div class="post-body${bodyTrunc?' truncated':''}" id="pbody-${p.id}">${bodyPreview.replace(/\n/g,'<br>')}</div>
+      ${bodyTrunc?`<span class="read-more-btn" data-pid="${p.id}">Read more</span>`:''}
+      ${extras}
+      <div class="post-footer">
+        <div class="pf-act${p.liked?' liked':''} pf-like" data-pid="${p.id}"><i class="${p.liked?'fas':'far'} fa-heart"></i> ${fmtN(p.likes)}</div>
+        <div class="pf-act pf-reply-btn" data-pid="${p.id}"><i class="far fa-comment"></i> ${replyCount>0?fmtN(replyCount):'Reply'}</div>
+        <div class="pf-spacer"></div>
+        <div class="pf-share" onclick="toast('🔗 Link copied!')"><i class="fas fa-share-alt"></i></div>
+      </div>
+    </div>
+    <div class="reply-thread${p.repliesOpen?' open':''}" id="rt-${p.id}">
+      ${repliesHtml}
+    </div>
+  </div>`;
+}
+
+function getColor(name){const colors=['#7c3aed','#0ea5e9','#10b981','#f97316','#ec4899','#8b5cf6'];let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length];}
+
+function renderReplies(p){
+  const repliesHtml=(p.replies||[]).map(r=>{
+    const rav=r.avatar?`<img class="r-av" src="${r.avatar}" loading="lazy"/>`:`<div class="r-av-init">${r.name[0]||'?'}</div>`;
+    return`<div class="reply-item" data-rid="${r.id}">
+      ${rav}
+      <div class="r-body">
+        <div class="r-name">${r.name}</div>
+        <div class="r-text">${r.text}</div>
+        <div class="r-meta">
+          <span class="r-time">${r.time}</span>
+          <span class="r-like${r.liked?' liked':''}" data-pid="${p.id}" data-rid="${r.id}"><i class="${r.liked?'fas':'far'} fa-heart"></i> ${r.likes}</span>
+          <span class="r-reply-lnk" onclick="focusReplyInp(${p.id},'@${r.name} ')">Reply</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return repliesHtml+`<div class="reply-inp-row">
+    <div class="r-inp-av">Y</div>
+    <input class="r-inp" id="rinp-${p.id}" placeholder="Add a reply…"/>
+    <button class="r-send" id="rsend-${p.id}" disabled><i class="fas fa-paper-plane"></i></button>
+  </div>`;
+}
+
+/* ── EVENTS ── */
+function attachPostEvents(){
+  /* Likes */
+  document.querySelectorAll('.pf-like').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;el.classList.toggle('liked',p.liked);el.innerHTML=`<i class="${p.liked?'fas':'far'} fa-heart"></i> ${fmtN(p.likes)}`;});});
+
+  /* Reply toggle */
+  document.querySelectorAll('.pf-reply-btn').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(!p)return;p.repliesOpen=!p.repliesOpen;const rt=document.getElementById('rt-'+p.id);if(rt){rt.classList.toggle('open',p.repliesOpen);rt.innerHTML=p.repliesOpen?renderReplies(p):'';if(p.repliesOpen)attachReplyEvents(p);}});});
+
+  /* Read more */
+  document.querySelectorAll('.read-more-btn').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(!p)return;const bodyEl=document.getElementById('pbody-'+p.id);if(bodyEl){bodyEl.classList.remove('truncated');bodyEl.innerHTML=p.body.replace(/\n/g,'<br>');}el.remove();});});
+
+  /* Poll compact vote */
+  document.querySelectorAll('.poll-opt-compact').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(!p||p.poll.voted>=0)return;const oi=+el.dataset.oi;p.poll.opts[oi].v++;p.poll.voted=oi;toast('✅ Voted!');renderFeed();});});
+
+  /* Expand full poll */
+  document.querySelectorAll('.expand-poll-btn').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(p&&p.poll)openPollModal(p);});});
+
+  /* Reply likes (delegated) */
+  document.querySelectorAll('.r-like').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const p=POSTS.find(x=>x.id===+el.dataset.pid);if(!p)return;const r=p.replies.find(x=>x.id===el.dataset.rid);if(!r)return;r.liked=!r.liked;r.likes+=r.liked?1:-1;el.classList.toggle('liked',r.liked);el.innerHTML=`<i class="${r.liked?'fas':'far'} fa-heart"></i> ${r.likes}`;});});
+
+  /* Reply input */
+  document.querySelectorAll('.r-inp').forEach(inp=>{const pid=inp.id.replace('rinp-','');const send=document.getElementById('rsend-'+pid);inp.addEventListener('input',()=>{if(send)send.disabled=inp.value.trim().length<2;});if(send)send.addEventListener('click',()=>submitReply(+pid));});
+}
+
+function attachReplyEvents(p){
+  const rt=document.getElementById('rt-'+p.id);if(!rt)return;
+  rt.querySelectorAll('.r-like').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const r=p.replies.find(x=>x.id===el.dataset.rid);if(!r)return;r.liked=!r.liked;r.likes+=r.liked?1:-1;el.classList.toggle('liked',r.liked);el.innerHTML=`<i class="${r.liked?'fas':'far'} fa-heart"></i> ${r.likes}`;});});
+  const inp=document.getElementById('rinp-'+p.id);
+  const send=document.getElementById('rsend-'+p.id);
+  if(inp&&send){inp.addEventListener('input',()=>{send.disabled=inp.value.trim().length<2;});send.addEventListener('click',()=>submitReply(p.id));}
+}
+
+function focusReplyInp(pid,prefix){const inp=document.getElementById('rinp-'+pid);if(!inp)return;inp.value=prefix||'';inp.focus();const send=document.getElementById('rsend-'+pid);if(send)send.disabled=(inp.value.trim().length<2);}
+
+function submitReply(pid){
+  const p=POSTS.find(x=>x.id===pid);const inp=document.getElementById('rinp-'+pid);if(!p||!inp)return;
+  const text=inp.value.trim();if(text.length<2)return;
+  if(!p.replies)p.replies=[];
+  p.replies.push({id:'r_'+Date.now(),name:'You',avatar:null,text,time:'Just now',likes:0,liked:false});
+  p.repliesOpen=true;toast('💬 Reply posted!');
+  const rt=document.getElementById('rt-'+pid);if(rt){rt.innerHTML=renderReplies(p);attachReplyEvents(p);}
+  const countEl=document.querySelector(`.pf-reply-btn[data-pid="${pid}"]`);if(countEl)countEl.innerHTML=`<i class="far fa-comment"></i> ${fmtN(p.replies.length)}`;
+}
+
+/* ── POLL MODAL ── */
+let _activePollId=null;
+function openPollModal(p){
+  _activePollId=p.id;
+  document.getElementById('pollSheetQ').textContent=p.poll.q;
+  document.getElementById('pollSheetVotes').textContent=`${fmtN(p.poll.total)} votes`;
+  const tot=p.poll.total||1;
+  document.getElementById('pollSheetOpts').innerHTML=p.poll.opts.map((o,i)=>{
+    const pct=Math.round(o.v/tot*100);
+    return`<div class="fpo${p.poll.voted===i?' voted':''}" data-oi="${i}">
+      <div class="fpo-bar" style="width:${pct}%"></div>
+      <div class="fpo-row"><span class="fpo-txt">${o.t}</span><span class="fpo-pct">${pct}%</span></div>
+      <div class="fpo-bar-line"><div class="fpo-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('pollSheetOpts').querySelectorAll('.fpo').forEach(el=>{el.addEventListener('click',()=>{
+    const p2=POSTS.find(x=>x.id===_activePollId);if(!p2||p2.poll.voted>=0)return;
+    const oi=+el.dataset.oi;p2.poll.opts[oi].v++;p2.poll.voted=oi;p2.poll.total++;
+    toast('✅ Voted!');openPollModal(p2);renderFeed();
+  });});
+  document.getElementById('pollModal').classList.add('open');
+}
+function closePollModal(){document.getElementById('pollModal').classList.remove('open');}
+document.getElementById('pollModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closePollModal();});
+
+/* ── COMPOSE ── */
+function openCompose(){
+  document.getElementById('composeCats').innerHTML=CATS.filter(c=>c.id!=='all'&&c.id!=='ama').map(c=>`<div class="ccat-btn${c.id===_composeCat?' on':''} ${c.color}" onclick="setComposeCat('${c.id}',this)">${c.label}</div>`).join('');
+  document.getElementById('composeModal').classList.add('open');
+  setTimeout(()=>document.getElementById('composeTa').focus(),200);
+}
+function closeCompose(){document.getElementById('composeModal').classList.remove('open');_selectedStory=null;}
+document.getElementById('composeModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCompose();});
+function setComposeCat(cat,el){_composeCat=cat;document.querySelectorAll('.ccat-btn').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+function setComposeType(type,el){
+  _composeType=type;
+  document.querySelectorAll('.ctype-btn').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  document.getElementById('composePollSec').style.display=type==='poll'?'block':'none';
+  document.getElementById('storySearchSec').style.display=(type==='review'||type==='story')&&type!=='post'&&type!=='poll'?'block':'none';
+  if(type==='review'||type==='story')renderStoryPicker('');
+}
+function addPollOpt(){const list=document.getElementById('pollOptsList');const n=list.children.length+1;const row=document.createElement('div');row.className='poll-opt-inp-row';row.innerHTML=`<input class="poll-opt-inp" placeholder="Option ${n}…"/><span style="font-size:13px;color:var(--muted);cursor:pointer" onclick="removePollOpt(this)">✕</span>`;list.appendChild(row);}
+function removePollOpt(el){const row=el.closest('.poll-opt-inp-row');if(document.getElementById('pollOptsList').children.length>2)row.remove();}
+function searchStories(q){renderStoryPicker(q);}
+function renderStoryPicker(q){const list=STORIES_REF.filter(s=>!q||s.title.toLowerCase().includes(q.toLowerCase()));document.getElementById('storyPickList').innerHTML=list.map(s=>`<div class="story-pick-item${_selectedStory?.id===s.id?' selected':''}" onclick="pickStory(${s.id})"><div class="spi-thumb" style="background-image:url('${s.cover}')"></div><div class="spi-info"><div class="spi-cat">${s.cat}</div><div class="spi-title">${s.title}</div></div><i class="fas fa-check spi-check"></i></div>`).join('');}
+function pickStory(id){_selectedStory=_selectedStory?.id===id?null:STORIES_REF.find(s=>s.id===id);renderStoryPicker(document.getElementById('storySearchInp')?.value||'');toast(_selectedStory?'📖 Story linked!':'Unlinked');}
+
+function submitPost(){
+  const text=document.getElementById('composeTa').value.trim();if(text.length<10){toast('✍️ Write a bit more!');return;}
+  const anon=document.getElementById('anonCheck').checked;
+  const poll=_composeType==='poll'?buildPollFromForm():null;
+  const newPost={id:Date.now(),cat:_composeCat,type:_composeType==='poll'?'poll':'post',pinned:false,anon,name:anon?'Anonymous':'You',avatar:anon?null:null,badge:'',title:text.split('\n')[0].substring(0,80),body:text,storyRef:_selectedStory||null,likes:0,liked:false,time:'Just now',replies:[],repliesOpen:false,hasPoll:!!poll,poll};
+  POSTS.unshift(newPost);closeCompose();currentCat='all';currentSort='new';renderTabs();renderFeed();toast('✅ Posted to forum!');
+}
+function buildPollFromForm(){const opts=[...document.querySelectorAll('.poll-opt-inp')].map(i=>i.value.trim()).filter(Boolean);if(opts.length<2)return null;return{q:document.getElementById('composeTa').value.trim().split('\n')[0],opts:opts.map(t=>({t,v:0})),voted:-1,total:0};}
+
+/* ── AMA NOTIFY ── */
+function notifyAMA(btn,host){btn.textContent='✓ Notified';btn.style.background='rgba(16,185,129,.12)';btn.style.borderColor='rgba(16,185,129,.25)';btn.style.color='#6ee7b7';toast(`🔔 You'll be notified when @${host} goes live!`);}
+
+/* ── INIT ── */
+renderTabs();
+renderFeed();
+</script>
+</body>
+</html>

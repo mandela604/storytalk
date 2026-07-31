@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Tip Component — Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  :root{--acc:#ff0050;--acc2:#ff4d7a;--acc-dim:rgba(255,0,80,.15);--acc-border:rgba(255,0,80,.3);--glow:rgba(255,0,80,.3);--bg3:#0a0a0d;--bd:rgba(255,255,255,.08);--tx:#e0e0e0;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#000;color:#e0e0e0;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .demo-card{max-width:380px;width:100%;background:#0a0a0d;border:1px solid var(--bd);border-radius:18px;padding:22px;text-align:center}
+  .demo-card h1{font-size:16px;margin:0 0 6px}
+  .demo-card p{font-size:12px;color:#777;margin:0 0 20px;line-height:1.5}
+  .demo-tip-btn{background:var(--acc);color:#fff;border:none;padding:12px 26px;border-radius:24px;font-size:13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 18px var(--glow);}
+  .demo-tip-btn:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+
+<div class="demo-card">
+  <h1>🪙 Tip Component Demo</h1>
+  <p>Tap the button below to open the tip sheet. Switch between 🪙 Coin and ₦ Cash, pick an amount, add an optional note, or tap the supporters row to see everyone who has tipped (no amounts shown — just who's shown up).</p>
+  <button class="demo-tip-btn" onclick="DroboardTip.open('story-5',{name:'Ifeanyi_Story',avatar:'https://i.pravatar.cc/100?img=53',handle:'@ifeanyi_story'})">
+    <i class="fas fa-coins"></i> Tip the Writer
+  </button>
+</div>
+
+<script src="tip-picker.js"></script>
+<script>
+  DroboardTip.attach({
+    // No hooks needed for the demo — runs entirely standalone with demo data.
+    // In your real app you'd wire these up, e.g.:
+    // getWriter: (id) => findStory(id)?.writer,
+    // getSupporters: (id) => tipStore[id] || [],
+    // onSend: (id, amount, note) => api.sendTip(id, amount, note),
+  });
+</script>
+</body>
+</html>

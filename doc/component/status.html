@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Collection Card · Demo</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ff0050;
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 800;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,.5);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+        
+        .section-label {
+            color: #ff0050;
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-label i {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        #collectionsGrid {
+            margin-bottom: 12px;
+        }
+        
+        .new-coll-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 13px;
+            background: rgba(255,255,255,.02);
+            border: 1px dashed rgba(255,255,255,.07);
+            color: #3f3f46;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: .15s;
+        }
+        
+        .new-coll-btn:hover {
+            background: rgba(255,0,80,.04);
+            border-color: rgba(255,0,80,.2);
+            color: #ff7a9a;
+        }
+        
+        .log {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255,255,255,.04);
+            border-radius: 10px;
+            font-size: 11px;
+            color: #888;
+            font-family: monospace;
+            border: 1px solid rgba(255,255,255,.06);
+        }
+        
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+        }
+        
+        .log-entry:last-child { border-bottom: none; }
+        
+        .info-box {
+            padding: 12px 14px;
+            background: rgba(56,189,248,.08);
+            border: 1px solid rgba(56,189,248,.2);
+            border-radius: 10px;
+            color: #a8b0ba;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .info-box strong { color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📂 Collection Card</h1>
+        <div class="subtitle">Reusable collection cards with privacy & share</div>
+        
+        <div class="info-box">
+            <strong>💡 Features:</strong> Click card → opens collection · Share button → share modal · New Collection → create
+        </div>
+        
+        <div class="section-label">
+            <i class="fas fa-folder"></i> My Collections
+        </div>
+        
+        <div id="collectionsGrid"></div>
+        
+        <button class="new-coll-btn" id="newCollBtn">
+            <i class="fas fa-plus-circle"></i> Create New Collection
+        </button>
+        
+        <div class="log">
+            <strong>📋 Activity:</strong>
+            <div id="logEntries">Loading collections...</div>
+        </div>
+    </div>
+    
+    <!-- Load component -->
+    <script src="collection-card.js"></script>
+    
+    <script>
+        // Toast helper
+        function toast(msg) {
+            const el = document.getElementById('logEntries');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            el.insertBefore(entry, el.firstChild);
+            while(el.children.length > 10) el.removeChild(el.lastChild);
+        }
+        
+        // ─── SAMPLE COLLECTIONS ──────────────────────────────────────
+        const sampleCollections = [
+            {
+                id: 'c1',
+                name: 'Best Betrayal Arcs',
+                count: 12,
+                privacy: 'public',
+                covers: [
+                    'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+                    'https://i.postimg.cc/N9jY0w4m/5.jpg',
+                    'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+                    'https://i.postimg.cc/23WvkFLH/images-(2).jpg'
+                ]
+            },
+            {
+                id: 'c2',
+                name: 'Plot Twists That Wrecked Me',
+                count: 8,
+                privacy: 'public',
+                covers: [
+                    'https://i.postimg.cc/WF1j4Pnh/6.jpg',
+                    'https://i.postimg.cc/vDn9YLx5/wife2.jpg'
+                ]
+            },
+            {
+                id: 'c3',
+                name: 'My Reading Drafts',
+                count: 4,
+                privacy: 'private',
+                covers: [
+                    'https://i.postimg.cc/cgLZJNmC/8.jpg'
+                ]
+            },
+            {
+                id: 'c4',
+                name: 'Must-Reads for Lagos Readers',
+                count: 9,
+                privacy: 'followers',
+                covers: [
+                    'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+                    'https://i.postimg.cc/0MyxNqfz/7.jpg',
+                    'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+                    'https://i.postimg.cc/N9jY0w4m/5.jpg'
+                ]
+            },
+            {
+                id: 'c5',
+                name: 'Empty Collection',
+                count: 0,
+                privacy: 'private',
+                covers: []
+            }
+        ];
+        
+        // ─── ATTACH COLLECTION CARD ──────────────────────────────────
+        const grid = document.getElementById('collectionsGrid');
+        const newBtn = document.getElementById('newCollBtn');
+        
+        DroboardCollectionCard.attach(grid, {
+            onOpen: (coll) => {
+                toast(`📂 Opening collection: ${coll.name} (${coll.count} stories)`);
+            },
+            
+            onShare: (coll) => {
+                toast(`🔗 Sharing collection: ${coll.name}`);
+                // In production: window.openShareModal({ title: coll.name, url: `...` })
+            },
+            
+            onCreateNew: () => {
+                toast('➕ Creating new collection...');
+                // In production: openNewCollectionModal()
+            },
+            
+            createButtonEl: newBtn
+        });
+        
+        // ─── RENDER ──────────────────────────────────────────────────
+        DroboardCollectionCard.setCollections(sampleCollections);
+        toast(`📂 ${sampleCollections.length} collections loaded`);
+        
+        console.log('✅ Collection Card demo ready!');
+    </script>
+</body>
+</html>

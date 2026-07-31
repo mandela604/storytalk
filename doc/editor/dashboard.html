@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Editor Dashboard — Platform Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  /* Page-specific styles only. Sidebar/topbar/theme tokens come from
+     shared/dashboard-shell.js — this page just uses the same var()s so
+     it stays in sync automatically. */
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Inter',system-ui,sans-serif}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,0,80,.25);border-radius:3px}
+
+  /* Extra tokens not provided by the shell but used on this page */
+  :root{
+    --accent-dim:rgba(255,0,80,.12);
+    --accent-hover:#ff4d7a;
+    --card-hover:#13141a;
+    --border-soft:rgba(255,255,255,.04);
+    --text-dim:#a0a8b2;
+    --shadow-md:0 8px 30px rgba(0,0,0,.5);
+    --yellow:#fbbf24;--yellow-bg:rgba(251,191,36,.12);
+    --purple:#a78bfa;--purple-bg:rgba(167,139,250,.12);
+  }
+  html[data-theme="dark"]{
+    --accent-dim:rgba(255,0,80,.16);
+    --card-hover:#1e1a38;
+    --border-soft:rgba(255,255,255,.04);
+    --text-dim:#a29fbf;
+    --shadow-md:0 8px 30px rgba(0,0,0,.5);
+  }
+  html[data-theme="light"]{
+    --accent-dim:rgba(255,0,80,.10);
+    --card-hover:#f7f6fd;
+    --border-soft:#f0eff7;
+    --text-dim:#71708a;
+    --shadow-md:0 4px 20px rgba(20,10,50,.08);
+  }
+
+  /* ── PAGE CONTENT ── */
+  .page{padding:24px 28px 60px;max-width:1500px}
+
+  /* ══════════════════════════════════════════════════════════════════
+     WELCOME BANNER
+     ══════════════════════════════════════════════════════════════════ */
+  .welcome-banner{background:linear-gradient(135deg,var(--accent),#cc0040);border-radius:18px;padding:24px 28px;margin-bottom:22px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .welcome-left{flex:1;min-width:240px}
+  .welcome-title{font-size:20px;font-weight:800;line-height:1.3}
+  .welcome-sub{font-size:13px;opacity:.85;margin-top:6px;line-height:1.5}
+  .welcome-stats{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap}
+  .welcome-stat{text-align:center}
+  .welcome-stat-num{font-size:22px;font-weight:800;line-height:1}
+  .welcome-stat-lbl{font-size:11px;opacity:.75;margin-top:3px}
+  .welcome-right{flex-shrink:0}
+  .welcome-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 22px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .welcome-btn:hover{background:rgba(255,255,255,.3)}
+
+  /* ══════════════════════════════════════════════════════════════════
+     STAT CARDS
+     ══════════════════════════════════════════════════════════════════ */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 18px 16px;transition:.2s;box-shadow:var(--shadow)}
+  .stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:14px}
+  .stat-icon.accent{background:var(--accent-dim);color:var(--accent)}
+  .stat-icon.green{background:var(--green-bg);color:var(--green)}
+  .stat-icon.yellow{background:var(--yellow-bg);color:var(--yellow)}
+  .stat-icon.blue{background:var(--blue-bg);color:var(--blue)}
+  .stat-icon.purple{background:var(--purple-bg);color:var(--purple)}
+  .stat-label{font-size:11.5px;color:var(--text-faint);font-weight:600;margin-bottom:6px}
+  .stat-value{font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.01em}
+  .stat-delta{font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:4px}
+  .stat-delta.up{color:var(--green)}
+  .stat-delta.down{color:var(--red)}
+  .stat-delta span{color:var(--text-faint);font-weight:500}
+
+  /* ══════════════════════════════════════════════════════════════════
+     QUICK ACTIONS GRID
+     ══════════════════════════════════════════════════════════════════ */
+  .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .qa-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+  .qa-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--accent)}
+  .qa-card:active{transform:translateY(0)}
+  .qa-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin:0 auto 10px}
+  .qa-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+  .qa-sub{font-size:10.5px;color:var(--text-faint);line-height:1.4}
+
+  /* ══════════════════════════════════════════════════════════════════
+     TWO COLUMN LAYOUT
+     ══════════════════════════════════════════════════════════════════ */
+  .two-col-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin-bottom:20px;align-items:start}
+
+  /* ── PANEL (shared card wrapper) ── */
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 4px}
+  .panel-title{font-size:13.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+  .panel-link{font-size:11.5px;font-weight:700;color:var(--accent);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px}
+  .panel-link:hover{color:var(--accent-hover)}
+
+  /* ── ACTIVITY LIST ── */
+  .activity-list{padding:6px 8px 4px}
+  .activity-row{display:flex;align-items:flex-start;gap:12px;padding:11px 12px;border-radius:12px;transition:.15s;cursor:pointer}
+  .activity-row:hover{background:var(--card-hover)}
+  .activity-icon{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .activity-icon.accent{background:var(--accent-dim);color:var(--accent)}
+  .activity-icon.green{background:var(--green-bg);color:var(--green)}
+  .activity-icon.yellow{background:var(--yellow-bg);color:var(--yellow)}
+  .activity-icon.blue{background:var(--blue-bg);color:var(--blue)}
+  .activity-icon.purple{background:var(--purple-bg);color:var(--purple)}
+  .activity-content{flex:1;min-width:0}
+  .activity-text{font-size:12px;color:var(--text);line-height:1.45;margin-bottom:2px}
+  .activity-text strong{font-weight:700}
+  .activity-text .highlight{color:var(--accent);font-weight:600}
+  .activity-time{font-size:10.5px;color:var(--text-faint)}
+  .activity-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px}
+
+  /* ── PENDING REVIEWS ── */
+  .pending-list{padding:6px 8px 4px}
+  .pending-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;transition:.15s;cursor:pointer}
+  .pending-row:hover{background:var(--card-hover)}
+  .pending-cover{width:36px;height:48px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .pending-info{flex:1;min-width:0}
+  .pending-title{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pending-meta{font-size:10.5px;color:var(--text-faint);margin-top:2px;display:flex;align-items:center;gap:6px}
+  .pending-status{font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .pending-status.pending{background:var(--yellow-bg);color:var(--yellow)}
+  .pending-status.reviewing{background:var(--blue-bg);color:var(--blue)}
+  .pending-status.approved{background:var(--green-bg);color:var(--green)}
+  .pending-right{text-align:right;flex-shrink:0}
+
+  /* ── PANEL FOOTER ── */
+  .panel-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 18px;border-top:1px solid var(--border-soft);margin-top:6px;flex-wrap:wrap;gap:10px}
+  .footer-note{font-size:11px;color:var(--text-faint)}
+  .footer-btn{font-size:11.5px;font-weight:700;color:var(--accent);cursor:pointer;background:var(--accent-dim);padding:8px 14px;border-radius:9px;transition:.15s;white-space:nowrap}
+  .footer-btn:hover{background:var(--accent);color:#fff}
+
+  /* ── NAVIGATION SHORTCUTS ── */
+  .nav-shortcuts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:4px 8px 8px}
+  .ns-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;transition:.15s;cursor:pointer;border:1px solid transparent}
+  .ns-item:hover{background:var(--card-hover);border-color:var(--border)}
+  .ns-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  .ns-info{flex:1;min-width:0}
+  .ns-name{font-size:11.5px;font-weight:700;color:var(--text)}
+  .ns-desc{font-size:9.5px;color:var(--text-faint);margin-top:1px}
+  .ns-arrow{color:var(--text-faint);font-size:10px;flex-shrink:0}
+
+  /* ══════════════════════════════════════════════════════════════════
+     RESPONSIVE
+     ══════════════════════════════════════════════════════════════════ */
+  @media (max-width: 1100px){
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .quick-actions{grid-template-columns:repeat(2,1fr)}
+    .two-col-grid{grid-template-columns:1fr}
+  }
+  @media (max-width: 900px){
+    .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .quick-actions{grid-template-columns:1fr 1fr;gap:10px}
+    .welcome-banner{padding:18px 16px}
+    .welcome-title{font-size:17px}
+    .welcome-right{width:100%}
+    .welcome-btn{justify-content:center}
+    .nav-shortcuts{grid-template-columns:1fr}
+  }
+  @media (max-width: 480px){
+    .stats-grid{grid-template-columns:1fr}
+    .quick-actions{grid-template-columns:1fr}
+    .stat-card{padding:14px}
+    .stat-value{font-size:18px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Everything inside this div is page-specific content only.
+     dashboard-shell.js wraps it with the sidebar + topbar at runtime. -->
+<div id="dashboardRoot">
+
+  <div class="page">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="welcome-left">
+        <div class="welcome-title">Welcome back, Reina 👋</div>
+        <div class="welcome-sub">You have <strong>8 pending reviews</strong> and <strong>3 contracts</strong> awaiting action. Stay on top of your editorial queue.</div>
+        <div class="welcome-stats">
+          <div class="welcome-stat"><div class="welcome-stat-num">142</div><div class="welcome-stat-lbl">Reviews This Month</div></div>
+          <div class="welcome-stat"><div class="welcome-stat-num">73%</div><div class="welcome-stat-lbl">Sign Rate</div></div>
+          <div class="welcome-stat"><div class="welcome-stat-num">38</div><div class="welcome-stat-lbl">Signed Stories</div></div>
+        </div>
+      </div>
+      <div class="welcome-right">
+        <button class="welcome-btn" onclick="location.href='book-review-center.html'">
+          <i class="fas fa-arrow-right"></i> Go to Reviews
+        </button>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon accent"><i class="fas fa-clock"></i></div>
+        <div class="stat-label">Pending Reviews</div>
+        <div class="stat-value" style="color:var(--accent)">8</div>
+        <div class="stat-delta up"><i class="fas fa-arrow-up" style="font-size:8px"></i> 3 new today <span>+60%</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-file-signature"></i></div>
+        <div class="stat-label">Signed This Month</div>
+        <div class="stat-value" style="color:var(--green)">12</div>
+        <div class="stat-delta up"><i class="fas fa-arrow-up" style="font-size:8px"></i> 2 this week <span>vs 8 last mo</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fas fa-file-contract"></i></div>
+        <div class="stat-label">Active Contracts</div>
+        <div class="stat-value" style="color:var(--yellow)">24</div>
+        <div class="stat-delta"><span style="color:var(--text-faint)">3 awaiting signature</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div class="stat-label">Active Authors</div>
+        <div class="stat-value" style="color:var(--blue)">31</div>
+        <div class="stat-delta up"><i class="fas fa-arrow-up" style="font-size:8px"></i> 4 new <span>this quarter</span></div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:800;color:var(--text)">Quick Actions</div>
+    </div>
+    <div class="quick-actions">
+      <div class="qa-card" onclick="location.href='book-review-center.html'">
+        <div class="qa-icon" style="background:var(--accent-dim);color:var(--accent)"><i class="fas fa-star-half-stroke"></i></div>
+        <div class="qa-title">Review Center</div>
+        <div class="qa-sub">Review & approve stories</div>
+      </div>
+      <div class="qa-card" onclick="location.href='contracts.html'">
+        <div class="qa-icon" style="background:var(--green-bg);color:var(--green)"><i class="fas fa-file-signature"></i></div>
+        <div class="qa-title">Send Contract</div>
+        <div class="qa-sub">Create & send new contracts</div>
+      </div>
+      <div class="qa-card" onclick="location.href='authors.html'">
+        <div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="fas fa-user-pen"></i></div>
+        <div class="qa-title">Manage Authors</div>
+        <div class="qa-sub">View & manage authors</div>
+      </div>
+      <div class="qa-card" onclick="location.href='announcements.html'">
+        <div class="qa-icon" style="background:var(--yellow-bg);color:var(--yellow)"><i class="fas fa-bullhorn"></i></div>
+        <div class="qa-title">Announcements</div>
+        <div class="qa-sub">Post platform updates</div>
+      </div>
+    </div>
+
+    <!-- TWO COLUMN: Recent Activity + Pending Reviews -->
+    <div class="two-col-grid">
+      <!-- Recent Activity -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title"><i class="fas fa-bolt" style="color:var(--accent);font-size:12px"></i> Recent Activity</div>
+          <div class="panel-link" onclick="location.href='author-messages.html'">View all <i class="fas fa-arrow-right" style="font-size:9px"></i></div>
+        </div>
+        <div class="activity-list" id="activityList"></div>
+        <div class="panel-footer">
+          <div class="footer-note">Showing latest 6 activities</div>
+          <div class="footer-btn" onclick="location.href='author-messages.html'">See all activity</div>
+        </div>
+      </div>
+
+      <!-- Pending Reviews -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title"><i class="fas fa-inbox" style="color:var(--yellow);font-size:12px"></i> Pending Reviews</div>
+          <div class="panel-link" onclick="location.href='book-review-center.html'">All reviews <i class="fas fa-arrow-right" style="font-size:9px"></i></div>
+        </div>
+        <div class="pending-list" id="pendingList"></div>
+        <div class="panel-footer">
+          <div class="footer-note"><span id="pendingCount">8</span> stories pending review</div>
+          <div class="footer-btn" onclick="location.href='book-review-center.html'">Start reviewing</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION SHORTCUTS -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-hdr">
+        <div class="panel-title"><i class="fas fa-compass" style="color:var(--accent);font-size:12px"></i> Editor Module Navigation</div>
+        <div class="panel-link" style="font-size:10.5px;color:var(--text-faint);cursor:default">Quick links to all editor pages</div>
+      </div>
+      <div class="nav-shortcuts" id="navShortcuts"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="shared/api.js"></script>
+<script src="shared/story-modal.js"></script>
+<script src="shared/dashboard-shell.js"></script>
+<script src="dashboard-enhanced.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ATTACH THE SHARED SHELL — sidebar + topbar wrap the content
+   already inside #dashboardRoot above.
+   ═══════════════════════════════════════════════════════════ */
+DroboardShell.attach('#dashboardRoot', {
+  activeFile: 'dashboard.html',
+  title: 'Editor Dashboard',
+  subtitle: "Welcome back, Reina! Here's your editorial overview.",
+  user: { name: 'Reina Morgan', role: 'General Editor', avatar: 'https://i.pravatar.cc/100?img=47' },
+  notifCount: 8,
+  searchPlaceholder: 'Search stories, authors, contracts…',
+  onBellClick: () => { location.href = 'notification-center.html'; },
+  onSearch: (value) => {
+    if (value) toast('Searching: ' + value);
+  },
+});
+
+/* ═══════════════════════════════════════════════════════════
+   LOAD DATA FROM API — fully interactive, falls back to demo
+   ═══════════════════════════════════════════════════════════ */
+async function loadDashboard() {
+  try {
+    const [stats, activities, pendingReviews, navItems] = await Promise.all([
+      window.DroboardAPI ? DroboardAPI.getDashboardStats() : Promise.resolve({}),
+      window.DroboardAPI ? DroboardAPI.getRecentActivity() : Promise.resolve([]),
+      window.DroboardAPI ? DroboardAPI.getPendingReviews() : Promise.resolve([]),
+      window.DroboardAPI ? DroboardAPI.getCategories() : Promise.resolve({ categories: [] }),
+    ]);
+
+    renderActivities(activities);
+    renderPending(pendingReviews);
+    renderNavShortcuts();
+  } catch (e) {
+    console.warn('API call failed, using inline data:', e);
+    renderActivities();
+    renderPending();
+    renderNavShortcuts();
+  }
+}
+
+function renderActivities(activities) {
+  const list = document.getElementById('activityList');
+  list.innerHTML = (activities || []).map(a => `
+    <div class="activity-row" onclick="toast('Opening activity…')">
+      <div class="activity-icon ${a.icon}">${a.emoji}</div>
+      <div class="activity-content">
+        <div class="activity-text">${a.text}</div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+      ${a.unread ? '<div class="activity-dot"></div>' : ''}
+    </div>`).join('');
+}
+
+function renderPending(pending) {
+  const list = document.getElementById('pendingList');
+  const statusLabels = { pending: 'Pending', reviewing: 'In Review', approved: 'Approved' };
+  list.innerHTML = (pending || []).map(r => `
+    <div class="pending-row" onclick="location.href='book-review-center.html'">
+      <div class="pending-cover" style="background:${r.cover}"><i class="fas fa-book" style="color:rgba(255,255,255,.7);font-size:14px"></i></div>
+      <div class="pending-info">
+        <div class="pending-title">${r.title}</div>
+        <div class="pending-meta">
+          <span>@${r.writer}</span>
+          <span>·</span>
+          <span>${r.time}</span>
+          <span>·</span>
+          <span>${r.reads} reads</span>
+        </div>
+      </div>
+      <div class="pending-right">
+        <span class="pending-status ${r.status}">${statusLabels[r.status]}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderNavShortcuts() {
+  const items = [
+    { name: 'Book Review Center', desc: 'Review & rate submitted books', href: 'book-review-center.html', icon: 'fa-star-half-stroke', color: 'var(--accent)', bg: 'var(--accent-dim)' },
+    { name: 'Book Management', desc: 'Manage all platform books', href: 'book-management.html', icon: 'fa-book', color: 'var(--blue)', bg: 'var(--blue-bg)' },
+    { name: 'Categories & Genres', desc: 'Organize content taxonomy', href: 'categories-genres.html', icon: 'fa-tags', color: 'var(--green)', bg: 'var(--green-bg)' },
+    { name: 'Authors', desc: 'View & manage author profiles', href: 'authors.html', icon: 'fa-user-pen', color: 'var(--purple)', bg: 'var(--purple-bg)' },
+    { name: 'Author Messages', desc: 'Internal communication with authors', href: 'author-messages.html', icon: 'fa-envelope', color: 'var(--yellow)', bg: 'var(--yellow-bg)' },
+    { name: 'Author Verification', desc: 'Verify author identities', href: 'author-verification.html', icon: 'fa-shield-halved', color: 'var(--green)', bg: 'var(--green-bg)' },
+    { name: 'Contracts', desc: 'Manage all contracts', href: 'contracts.html', icon: 'fa-file-contract', color: 'var(--accent)', bg: 'var(--accent-dim)' },
+    { name: 'Contract Templates', desc: 'Create & edit templates', href: 'contract-templates.html', icon: 'fa-file-lines', color: 'var(--blue)', bg: 'var(--blue-bg)' },
+    { name: 'Signed Contracts', desc: 'View signed agreements', href: 'signed-contracts.html', icon: 'fa-file-signature', color: 'var(--green)', bg: 'var(--green-bg)' },
+    { name: 'Promotions', desc: 'Manage promotional campaigns', href: 'promotions.html', icon: 'fa-bullhorn', color: 'var(--yellow)', bg: 'var(--yellow-bg)' },
+    { name: 'Announcements', desc: 'Post platform announcements', href: 'announcements.html', icon: 'fa-comment-dots', color: 'var(--red)', bg: 'var(--red-bg)' },
+  ];
+  const container = document.getElementById('navShortcuts');
+  container.innerHTML = items.map(n => `
+    <a class="ns-item" href="${n.href}">
+      <div class="ns-icon" style="background:${n.bg};color:${n.color}"><i class="fas ${n.icon}"></i></div>
+      <div class="ns-info">
+        <div class="ns-name">${n.name}</div>
+        <div class="ns-desc">${n.desc}</div>
+      </div>
+      <div class="ns-arrow"><i class="fas fa-chevron-right"></i></div>
+    </a>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT — load from API (falls back to inline data)
+   ═══════════════════════════════════════════════════════════ */
+loadDashboard();
+</script>
+</body>
+</html>
+</arg_value>
+</write_to_file>

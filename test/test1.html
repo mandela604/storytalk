@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+</style>
+</head>
+<body>
+    
+ <div>
+    <input type="text" id="num" class="num-input"><button id="button">check</button>
+ </div>
+
+ <p id="result"></p>
+ <p id="result2"></p>
+<script>
+
+console.log(isPrime(7));
+
+ function isPrime(num){
+        //return num < 2 && false;
+        if(num < 2) return false ;
+        for(let i = 2; i < num; i++){
+            if(num % i === 0){
+             console.log('not a prime number' + num);  
+             return false;
+            }
+            console.log(`valid prime number ${num}`);
+        }
+    }
+
+console.log(isPrime(7));
+
+</script>
+</body>
+</html>

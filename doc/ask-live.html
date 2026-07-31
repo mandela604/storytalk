@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · AMA Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff6b8a;--glow:rgba(255,0,80,.22);
+  --orange:#ff6b1a;--orange2:#ff9a4d;--oglow:rgba(255,107,26,.3);
+  --dark:#07070b;--card:#111118;--surface:#0e0e1c;
+  --tx:#f5f5f7;--muted:#555;--muted2:#888;--bd:rgba(255,255,255,.08);
+  --green:#10b981;--gold:#f59e0b;
+  --nav-h:60px;
+}
+html,body{height:100%;background:var(--dark);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden}
+
+/* SHELL */
+.shell{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;position:relative}
+
+/* ══ HEADER ══ */
+.ama-header{flex-shrink:0;background:rgba(7,7,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,107,26,.15);padding:env(safe-area-inset-top,0) 0 0;z-index:100}
+.ama-header-inner{display:flex;align-items:center;gap:10px;padding:10px 14px 10px}
+.back-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted2);cursor:pointer;flex-shrink:0;transition:.18s}
+.back-btn:active{transform:scale(.9)}
+.ama-hdr-info{flex:1;min-width:0}
+.ama-hdr-host{display:flex;align-items:center;gap:7px}
+.ama-hdr-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex-shrink:0}
+.ama-hdr-name{font-size:13px;font-weight:800;color:#fff}
+.ama-hdr-meta{font-size:10px;color:var(--muted2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ama-hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.live-badge{display:flex;align-items:center;gap:4px;background:var(--acc);color:#fff;font-size:9px;font-weight:900;padding:4px 9px;border-radius:10px;letter-spacing:.06em}
+.live-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:livepulse 1.2s ease-in-out infinite}
+.upcoming-badge{background:rgba(255,107,26,.15);border:1px solid rgba(255,107,26,.3);color:var(--orange2);font-size:9px;font-weight:800;padding:4px 9px;border-radius:10px}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
+.viewer-count{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--muted2)}
+.share-btn-sm{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted2);cursor:pointer}
+
+/* TOPIC STRIP */
+.topic-strip{background:rgba(255,107,26,.07);border-bottom:1px solid rgba(255,107,26,.12);padding:9px 14px;display:flex;align-items:flex-start;gap:8px}
+.topic-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.topic-text{font-size:11px;font-weight:600;color:#ffb86b;line-height:1.42;flex:1}
+.topic-genre{font-size:8px;font-weight:800;background:rgba(255,107,26,.15);color:var(--orange2);padding:2px 7px;border-radius:8px;margin-top:4px;display:inline-block}
+
+/* TABS */
+.ama-tabs{display:flex;background:rgba(255,255,255,.03);border-bottom:1px solid var(--bd)}
+.atab{flex:1;padding:10px;text-align:center;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.18s;position:relative}
+.atab.on{color:var(--orange2);border-bottom-color:var(--orange)}
+.atab .atab-ct{position:absolute;top:6px;right:calc(50% - 22px);background:var(--acc);color:#fff;font-size:7px;font-weight:900;padding:1px 4px;border-radius:6px;min-width:14px;text-align:center}
+
+/* ══ BODY AREA ══ */
+.ama-body{flex:1;overflow:hidden;position:relative}
+
+/* ── ANSWERS PANEL ── */
+.answers-panel{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding-bottom:140px}
+.answers-panel::-webkit-scrollbar{display:none}
+
+/* Answered Q card */
+.qa-card{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.qa-q-row{display:flex;gap:9px;margin-bottom:10px}
+.qa-q-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.qa-q-body{flex:1;min-width:0}
+.qa-q-name{font-size:11px;font-weight:700;color:#ddd;margin-bottom:2px}
+.qa-q-text{font-size:13px;color:#ccc;line-height:1.45;font-weight:500}
+.qa-q-meta{font-size:9px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
+.qa-q-upvotes{display:flex;align-items:center;gap:3px;cursor:pointer;font-weight:700}
+.qa-q-upvotes.upvoted{color:var(--orange2)}
+.qa-answer-block{background:rgba(255,107,26,.07);border-left:3px solid var(--orange);border-radius:0 12px 12px 0;padding:11px 12px;margin-left:14px}
+.qa-answer-host{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.qa-answer-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid var(--orange)}
+.qa-answer-name{font-size:10px;font-weight:800;color:var(--orange2)}
+.qa-answer-badge{font-size:7px;font-weight:900;background:var(--orange);color:#fff;padding:1px 5px;border-radius:5px;letter-spacing:.04em}
+.qa-answer-text{font-size:13px;color:#e8d8c0;line-height:1.55;font-style:italic}
+.qa-answer-meta{font-size:9px;color:rgba(255,107,26,.4);margin-top:5px;display:flex;align-items:center;gap:8px}
+.qa-react-row{display:flex;gap:6px;margin-top:8px;margin-left:14px;flex-wrap:wrap}
+.qa-react{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:3px 8px;border-radius:10px;cursor:pointer;user-select:none;transition:.15s}
+.qa-react.reacted{color:var(--orange2);border-color:rgba(255,107,26,.3);background:rgba(255,107,26,.08)}
+.qa-react-em{font-size:12px}
+.qa-share{font-size:9px;font-weight:700;color:var(--muted);cursor:pointer;margin-left:auto;padding:3px 8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+
+/* ANSWERING NOW card */
+.answering-now{margin:12px 14px;background:rgba(255,107,26,.08);border:1px solid rgba(255,107,26,.2);border-radius:14px;padding:12px;animation:answerGlow 2s ease-in-out infinite}
+@keyframes answerGlow{0%,100%{border-color:rgba(255,107,26,.2)}50%{border-color:rgba(255,107,26,.45)}}
+.an-label{font-size:9px;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.an-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:livepulse 1.2s ease-in-out infinite}
+.an-q-text{font-size:13px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:4px}
+.an-asker{font-size:10px;color:var(--muted2)}
+.writer-typing{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:rgba(255,107,26,.6);font-weight:600}
+.typing-dots span{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--orange);animation:typingDot 1.2s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,80%,100%{transform:scale(0.7);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+/* ── QUESTIONS QUEUE PANEL ── */
+.queue-panel{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding-bottom:140px;display:none}
+.queue-panel::-webkit-scrollbar{display:none}
+.queue-panel.on{display:block}
+
+.queue-header-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px}
+.qhb-label{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em}
+.qhb-sort{display:flex;gap:5px}
+.qhbs{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;border:1px solid var(--bd);color:var(--muted);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif}
+.qhbs.on{background:rgba(255,107,26,.12);border-color:rgba(255,107,26,.25);color:var(--orange2)}
+
+.q-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
+.q-item:active{background:rgba(255,255,255,.025)}
+.q-item.answered{opacity:.45}
+.q-item-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.q-item-body{flex:1;min-width:0}
+.q-item-name{font-size:11px;font-weight:700;color:#ddd;margin-bottom:2px}
+.q-item-text{font-size:12px;color:#bbb;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.q-item-meta{display:flex;align-items:center;gap:8px;margin-top:5px}
+.q-item-time{font-size:9px;color:var(--muted)}
+.q-item-upvotes{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--muted2);cursor:pointer;user-select:none}
+.q-item-upvotes.upvoted{color:var(--orange2)}
+.q-item-status{font-size:8px;font-weight:800;padding:2px 7px;border-radius:7px;flex-shrink:0}
+.qs-pending{background:rgba(255,255,255,.06);color:var(--muted2)}
+.qs-answering{background:rgba(255,107,26,.15);color:var(--orange2);border:1px solid rgba(255,107,26,.25)}
+.qs-answered{background:rgba(16,185,129,.1);color:#6ee7b7}
+
+/* ── ABOUT PANEL ── */
+.about-panel{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding:14px 14px calc(140px + env(safe-area-inset-bottom,0px));display:none}
+.about-panel::-webkit-scrollbar{display:none}
+.about-panel.on{display:block}
+.about-writer-card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+.awc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.awc-av{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2.5px solid var(--orange)}
+.awc-info{flex:1}
+.awc-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff}
+.awc-handle{font-size:11px;color:var(--muted2);margin-top:2px}
+.awc-follow{background:var(--acc);color:#fff;border:none;padding:7px 16px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 10px var(--glow)}
+.awc-stats{display:flex;gap:8px;margin-bottom:10px}
+.awc-stat{flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:8px;text-align:center;border:1px solid var(--bd)}
+.awc-stat-n{font-size:14px;font-weight:900;color:#fff}
+.awc-stat-l{font-size:9px;color:var(--muted2)}
+.awc-bio{font-size:12px;color:#999;line-height:1.55;font-style:italic;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px}
+.about-topic-card{background:rgba(255,107,26,.06);border:1px solid rgba(255,107,26,.18);border-radius:14px;padding:14px;margin-bottom:14px}
+.atc-label{font-size:9px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.atc-topic{font-size:13px;font-weight:700;color:#ffb86b;line-height:1.4}
+.about-stories{margin-bottom:14px}
+.as-label{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.as-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.as-scroll::-webkit-scrollbar{display:none}
+.story-mini-card{flex-shrink:0;width:110px;cursor:pointer}
+.smc-cover{width:110px;height:130px;border-radius:10px;background-size:cover;background-position:center;position:relative}
+.smc-cat{position:absolute;bottom:5px;left:5px;font-size:7px;font-weight:800;background:var(--acc);color:#fff;padding:2px 6px;border-radius:5px}
+.smc-title{font-size:9px;font-weight:700;color:#ddd;line-height:1.3;margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rules-card{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--muted2);line-height:1.6}
+.rules-card strong{color:#ddd;display:block;margin-bottom:5px;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.rules-card li{margin-left:14px;margin-bottom:3px}
+
+/* ══ BOTTOM COMPOSE ══ */
+.ama-compose{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(7,7,11,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,107,26,.12);padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 10px);max-width:480px;margin:0 auto}
+.compose-inner{display:flex;align-items:flex-end;gap:8px}
+.compose-av{width:32px;height:32px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0}
+.compose-inp-wrap{flex:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:18px;padding:9px 13px;transition:border-color .2s}
+.compose-inp-wrap:focus-within{border-color:rgba(255,107,26,.4)}
+.compose-inp{width:100%;background:transparent;border:none;outline:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;resize:none;max-height:80px;min-height:20px;line-height:1.45;overflow-y:auto;scrollbar-width:none}
+.compose-inp::-webkit-scrollbar{display:none}
+.compose-inp::placeholder{color:#444}
+.compose-inp-hint{font-size:9px;color:var(--muted);margin-top:3px;display:flex;align-items:center;justify-content:space-between}
+.anon-toggle{display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none}
+.anon-toggle input{accent-color:var(--orange);width:12px;height:12px}
+.char-count{font-size:9px;color:var(--muted)}
+.compose-send-btn{width:40px;height:40px;border-radius:50%;background:var(--orange);border:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer;flex-shrink:0;box-shadow:0 0 12px var(--oglow);transition:.18s}
+.compose-send-btn:active{transform:scale(.92)}
+.compose-send-btn:disabled{background:#2a2a2a;box-shadow:none;cursor:default}
+
+/* UPCOMING STATE */
+.upcoming-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:12px;flex:1}
+.us-icon{font-size:48px;margin-bottom:4px}
+.us-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff}
+.us-time{font-size:24px;font-weight:900;color:var(--orange);font-variant-numeric:tabular-nums;letter-spacing:-.5px;margin:4px 0}
+.us-sub{font-size:12px;color:var(--muted2);line-height:1.6;max-width:240px}
+.us-notify-btn{background:var(--orange);color:#fff;border:none;padding:11px 24px;border-radius:24px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 14px var(--oglow)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(70px + env(safe-area-inset-bottom,0px) + 8px);left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a28;border:1px solid rgba(255,255,255,.12);color:#fff;padding:9px 20px;border-radius:30px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.7)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* SLIDE IN FOR NEW Q */
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.q-item.new-item{animation:slideInRight .3s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.qa-card.new-card{animation:fadeIn .4s ease both}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HEADER -->
+  <div class="ama-header">
+    <div class="ama-header-inner">
+      <div class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></div>
+      <div class="ama-hdr-info">
+        <div class="ama-hdr-host">
+          <img class="ama-hdr-av" id="hostAv" src="" alt=""/>
+          <div class="ama-hdr-name" id="hostName"></div>
+        </div>
+        <div class="ama-hdr-meta" id="hostMeta"></div>
+      </div>
+      <div class="ama-hdr-right">
+        <div class="viewer-count" id="viewerCount"><i class="fas fa-eye" style="font-size:10px"></i> 0</div>
+        <div id="statusBadge"></div>
+        <div class="share-btn-sm" onclick="toast('🔗 Link copied!')"><i class="fas fa-share-alt"></i></div>
+      </div>
+    </div>
+    <div class="topic-strip" id="topicStrip"></div>
+    <div class="ama-tabs">
+      <div class="atab on" id="tab-answers" onclick="switchTab('answers')">Answered <span class="atab-ct" id="ct-answers">0</span></div>
+      <div class="atab" id="tab-queue" onclick="switchTab('queue')">Queue <span class="atab-ct" id="ct-queue">0</span></div>
+      <div class="atab" id="tab-about" onclick="switchTab('about')">About</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="ama-body" id="amaBody">
+    <!-- Answers panel -->
+    <div class="answers-panel" id="answersPanel"></div>
+    <!-- Queue panel -->
+    <div class="queue-panel" id="queuePanel"></div>
+    <!-- About panel -->
+    <div class="about-panel" id="aboutPanel"></div>
+  </div>
+
+  <!-- COMPOSE -->
+  <div class="ama-compose" id="amaCompose">
+    <div class="compose-inner">
+      <div class="compose-av">Y</div>
+      <div class="compose-inp-wrap">
+        <textarea class="compose-inp" id="qInp" placeholder="Ask @Ada_Writes anything…" rows="1" maxlength="280" oninput="onQInput()"></textarea>
+        <div class="compose-inp-hint">
+          <label class="anon-toggle"><input type="checkbox" id="anonQ"/> Ask anonymously</label>
+          <span class="char-count" id="charCount">0/280</span>
+        </div>
+      </div>
+      <button class="compose-send-btn" id="sendQBtn" disabled onclick="submitQuestion()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+/* ── TOAST ── */
+let _tt;function toast(m){const e=document.getElementById('toastEl');e.textContent=m;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2500);}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+/* ── AMA DATA ── */
+const AMA_DATA={
+  'ama1':{
+    id:'ama1',live:true,
+    host:{name:'Ada_Writes',handle:'@ada_writes',avatar:'https://i.pravatar.cc/100?img=32',genre:'💔 Betrayal',followers:'48.2k',stories:12,totalReads:'1.2M',bio:'"I write the stories I needed when I was falling apart. Hoping they help someone else stay together." — Ada Writes.'},
+    topic:'Writing emotional trauma: how I don\'t lose myself in dark chapters',
+    viewers:847,
+    stories:[
+      {cat:'💔 Betrayal',title:'I caught my husband kissing my late sister\'s photograph',cover:'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300'},
+      {cat:'💔 Betrayal',title:'She blocked him on everything. He read between the lines.',cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=300'},
+      {cat:'🌙 Elegy',title:'The last voicemail I never deleted',cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300'},
+    ],
+    answered:[
+      {id:'qa1',asker:'Chioma_R',askerColor:'#7c3aed',anon:false,q:'How do you write grief without making it feel melodramatic? My chapters always end up feeling over the top.',time:'12m ago',upvotes:142,upvoted:false,
+       answer:'The trick I use: whenever I feel a scene getting too big, I zoom in on one tiny physical detail. Not "her heart shattered" but "she kept folding and unfolding the same receipt in her pocket for twenty minutes." Grief is specific. Melodrama is vague.',
+       reactions:[{em:'🔥',ct:89,reacted:false},{em:'😭',ct:234,reacted:false},{em:'🙏',ct:67,reacted:false},{em:'💡',ct:45,reacted:false}]},
+      {id:'qa2',asker:'Anonymous',askerColor:'#888',anon:true,q:'Do you ever cry while writing your own stories? Is that normal?',time:'18m ago',upvotes:201,upvoted:false,
+       answer:'Every single time I wrote the anniversary dinner chapter. Chapter 4 took me three sessions because I kept having to stop. It is not only normal — I think it\'s a sign that the story is true enough to matter. If it doesn\'t move you, it won\'t move anyone else.',
+       reactions:[{em:'🥹',ct:312,reacted:false},{em:'❤️',ct:189,reacted:false},{em:'😭',ct:156,reacted:false}]},
+      {id:'qa3',asker:'Emeka_Writes',askerColor:'#0ea5e9',anon:false,q:'How long does it take you to write a chapter? Do you outline first or just write?',time:'24m ago',upvotes:88,upvoted:false,
+       answer:'Outline first, always. Otherwise I\'ll write a beautiful scene that belongs in a different story. Then I draft fast and ugly — usually 2 hours for the rough draft. Editing takes longer than writing. Always. The first draft is just me telling myself the story.',
+       reactions:[{em:'💡',ct:77,reacted:false},{em:'🔥',ct:44,reacted:false}]},
+    ],
+    answering:{asker:'Kemi_A',askerColor:'#ec4899',anon:false,q:'Your stories always have a moment where the protagonist does something unexpected that feels completely in character. How do you find those moments?',time:'Just now'},
+    queue:[
+      {id:'q1',asker:'Dami_Cole',askerColor:'#f97316',anon:false,q:'What\'s the hardest scene you\'ve ever written and why?',time:'2m ago',upvotes:67,upvoted:false,status:'pending'},
+      {id:'q2',asker:'Anonymous',askerColor:'#666',anon:true,q:'Do you ever worry that your characters become too personal? Like you lose the line between you and them?',time:'4m ago',upvotes:134,upvoted:false,status:'pending'},
+      {id:'q3',asker:'Zara_M',askerColor:'#8b5cf6',anon:false,q:'Which came first for Chapter 1 — the husband\'s grief or Ada\'s discovery? Which character did you understand first?',time:'6m ago',upvotes:98,upvoted:false,status:'pending'},
+      {id:'q4',asker:'CampusQueen',askerColor:'#10b981',anon:false,q:'Would you ever write a story where the "villain" is actually the narrator and we don\'t find out until the end?',time:'8m ago',upvotes:211,upvoted:false,status:'pending'},
+      {id:'q5',asker:'Ifeanyi_Story',askerColor:'#ff6b1a',anon:false,q:'Fellow writer here — how do you handle readers who feel personally attacked by something in your story that was completely fictional?',time:'10m ago',upvotes:155,upvoted:false,status:'pending'},
+      {id:'q6',asker:'Anonymous',askerColor:'#666',anon:true,q:'Have you ever had to stop writing a story because it was too close to real life?',time:'11m ago',upvotes:89,upvoted:false,status:'pending'},
+    ]
+  },
+  'ama2':{
+    id:'ama2',live:false,
+    host:{name:'Ifeanyi_Story',handle:'@ifeanyi_story',avatar:'https://i.pravatar.cc/100?img=53',genre:'✨ Twist',followers:'72.1k',stories:8,totalReads:'2.1M',bio:'"The twist you never saw coming is always the one you planted in chapter 1." — Ifeanyi Story.'},
+    topic:'How I built Bare Kitchen into a viral universe from one scene',
+    countdown:'Tomorrow · 8:00 PM',
+    viewers:0,stories:[],answered:[],queue:[]
+  },
+  'ama3':{
+    id:'ama3',live:false,
+    host:{name:'Chiamaka_N',handle:'@chiamaka_n',avatar:'https://i.pravatar.cc/100?img=47',genre:'👑 Family',followers:'61.4k',stories:15,totalReads:'1.8M',bio:'"Family stories are the only stories. Everything else is just context." — Chiamaka N.'},
+    topic:'Writing real family wounds without hurting real people',
+    countdown:'Friday · 7:00 PM',
+    viewers:0,stories:[],answered:[],queue:[]
+  },
+  'ama4':{
+    id:'ama4',live:false,
+    host:{name:'Zara_M',handle:'@zara_m',avatar:'https://i.pravatar.cc/100?img=16',genre:'🔥 Revenge',followers:'55.8k',stories:10,totalReads:'1.4M',bio:'"A good revenge arc isn\'t about punishment. It\'s about reclaiming what was taken." — Zara M.'},
+    topic:'Revenge arcs: why justice matters more than satisfaction',
+    countdown:'Saturday · 9:00 PM',
+    viewers:0,stories:[],answered:[],queue:[]
+  }
+};
+
+/* ── LOAD SESSION ── */
+const params=new URLSearchParams(window.location.search);
+const sessionId=params.get('id')||'ama1';
+const session=AMA_DATA[sessionId]||AMA_DATA['ama1'];
+const isLive=session.live;
+
+/* ── RENDER HEADER ── */
+document.getElementById('hostAv').src=session.host.avatar;
+document.getElementById('hostName').textContent=session.host.name;
+document.getElementById('hostMeta').textContent=`${session.host.followers} followers · ${session.host.genre}`;
+document.getElementById('statusBadge').innerHTML=isLive?`<div class="live-badge"><div class="live-dot"></div>LIVE</div>`:`<div class="upcoming-badge">🕐 Upcoming</div>`;
+document.getElementById('viewerCount').innerHTML=isLive?`<i class="fas fa-eye" style="font-size:10px"></i> ${fmtN(session.viewers)}`:'';
+document.getElementById('topicStrip').innerHTML=`<span class="topic-icon">🎙</span><div><div class="topic-text">${session.topic}</div><div class="topic-genre">${session.host.genre}</div></div>`;
+
+/* Placeholder for the compose input */
+document.getElementById('qInp').placeholder=`Ask @${session.host.name} anything…`;
+
+/* ── UPCOMING STATE ── */
+let countdownInterval=null;
+function renderUpcomingState(){
+  document.getElementById('answersPanel').innerHTML=`<div class="upcoming-state">
+    <div class="us-icon">🎙</div>
+    <div class="us-title">Session hasn't started yet</div>
+    <div class="us-time" id="countdownDisplay">${session.countdown||''}</div>
+    <div class="us-sub">@${session.host.name} will answer questions live. Submit yours early and get upvoted.</div>
+    <button class="us-notify-btn" id="notifyBtn" onclick="setNotified()"><i class="fas fa-bell" style="font-size:10px;margin-right:4px"></i> Notify me when live</button>
+  </div>`;
+  document.getElementById('amaCompose').style.opacity='1';
+}
+function setNotified(){const btn=document.getElementById('notifyBtn');if(btn){btn.textContent='✓ You\'ll be notified';btn.style.background='rgba(16,185,129,.15)';btn.style.boxShadow='none';btn.style.border='1px solid rgba(16,185,129,.3)';btn.style.color='#6ee7b7';}toast(`🔔 We'll notify you when @${session.host.name} goes live!`);}
+
+/* ── LIVE STATE ── */
+function renderAnswersPanel(){
+  const ans=session.answered||[];
+  const answ=session.answering;
+  let html='';
+  if(answ){
+    html+=`<div class="answering-now">
+      <div class="an-label"><div class="an-dot"></div> Answering now</div>
+      <div class="an-q-text">"${answ.q}"</div>
+      <div class="an-asker">— ${answ.anon?'Anonymous':'@'+answ.asker}</div>
+      <div class="writer-typing"><img src="${session.host.avatar}" style="width:18px;height:18px;border-radius:50%;border:1.5px solid var(--orange)" loading="lazy"/> ${session.host.name} is typing <div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>`;
+  }
+  if(!ans.length&&!answ){html+=`<div style="padding:40px 24px;text-align:center;color:var(--muted);font-size:13px">No answers yet — questions are being collected</div>`;}
+  html+=ans.map(a=>renderQA(a)).join('');
+  document.getElementById('answersPanel').innerHTML=html;
+  document.getElementById('ct-answers').textContent=ans.length;
+  attachAnswerEvents();
+}
+
+function renderQA(a){
+  const avBg=`background:${a.askerColor}`;
+  const avInit=a.asker[0]||'?';
+  return`<div class="qa-card" id="qac-${a.id}">
+    <div class="qa-q-row">
+      <div class="qa-q-av" style="${avBg}">${a.anon?'👤':avInit}</div>
+      <div class="qa-q-body">
+        <div class="qa-q-name">${a.anon?'Anonymous':'@'+a.asker}</div>
+        <div class="qa-q-text">${a.q}</div>
+        <div class="qa-q-meta">
+          <span>${a.time}</span>
+          <span class="qa-q-upvotes${a.upvoted?' upvoted':''}" data-aid="${a.id}"><i class="${a.upvoted?'fas':'far'} fa-arrow-up"></i> ${fmtN(a.upvotes)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="qa-answer-block">
+      <div class="qa-answer-host">
+        <img class="qa-answer-av" src="${session.host.avatar}" loading="lazy"/>
+        <span class="qa-answer-name">@${session.host.name}</span>
+        <span class="qa-answer-badge">WRITER</span>
+      </div>
+      <div class="qa-answer-text">${a.answer}</div>
+      <div class="qa-answer-meta">
+        <span>${a.time}</span>
+        <span>·</span>
+        <span style="cursor:pointer" onclick="toast('🔗 Answer copied!')">Share answer</span>
+      </div>
+    </div>
+    <div class="qa-react-row">
+      ${a.reactions.map((r,i)=>`<div class="qa-react${r.reacted?' reacted':''}" data-aid="${a.id}" data-ri="${i}"><span class="qa-react-em">${r.em}</span> ${r.ct}</div>`).join('')}
+      <div class="qa-share" onclick="toast('📋 Copied!')"><i class="fas fa-share-alt"></i> Share</div>
+    </div>
+  </div>`;
+}
+
+function attachAnswerEvents(){
+  document.querySelectorAll('.qa-q-upvotes').forEach(el=>{el.addEventListener('click',()=>{const a=session.answered.find(x=>x.id===el.dataset.aid);if(!a)return;a.upvoted=!a.upvoted;a.upvotes+=a.upvoted?1:-1;el.classList.toggle('upvoted',a.upvoted);el.innerHTML=`<i class="${a.upvoted?'fas':'far'} fa-arrow-up"></i> ${fmtN(a.upvotes)}`;});});
+  document.querySelectorAll('.qa-react').forEach(el=>{el.addEventListener('click',()=>{const a=session.answered.find(x=>x.id===el.dataset.aid);if(!a)return;const ri=+el.dataset.ri;const r=a.reactions[ri];r.reacted=!r.reacted;r.ct+=r.reacted?1:-1;el.classList.toggle('reacted',r.reacted);el.innerHTML=`<span class="qa-react-em">${r.em}</span> ${r.ct}`;});});
+}
+
+/* ── QUEUE PANEL ── */
+let queueSort='top';
+function renderQueuePanel(){
+  const q=[...session.queue];
+  if(queueSort==='top')q.sort((a,b)=>b.upvotes-a.upvotes);
+  else q.sort((a,b)=>0);
+  document.getElementById('ct-queue').textContent=q.filter(x=>x.status==='pending').length;
+  document.getElementById('queuePanel').innerHTML=`
+    <div class="queue-header-bar">
+      <span class="qhb-label">${q.length} question${q.length!==1?'s':''}</span>
+      <div class="qhb-sort">
+        <button class="qhbs${queueSort==='top'?' on':''}" onclick="setQSort('top')">Top</button>
+        <button class="qhbs${queueSort==='new'?' on':''}" onclick="setQSort('new')">New</button>
+      </div>
+    </div>
+    ${q.length?q.map(qi=>renderQItem(qi)).join(''):`<div style="padding:40px 24px;text-align:center;color:var(--muted);font-size:13px">No questions yet — be the first to ask!</div>`}
+  `;
+  attachQueueEvents();
+}
+
+function renderQItem(qi){
+  const avBg=`background:${qi.askerColor}`;
+  const statusCls={pending:'qs-pending',answering:'qs-answering',answered:'qs-answered'};
+  const statusLabel={pending:'Waiting',answering:'Answering…',answered:'Answered ✓'};
+  return`<div class="q-item${qi.status==='answered'?' answered':''}" id="qi-${qi.id}">
+    <div class="q-item-av" style="${avBg}">${qi.anon?'👤':qi.asker[0]}</div>
+    <div class="q-item-body">
+      <div class="q-item-name">${qi.anon?'Anonymous':'@'+qi.asker}</div>
+      <div class="q-item-text">${qi.q}</div>
+      <div class="q-item-meta">
+        <span class="q-item-time">${qi.time}</span>
+        <span class="q-item-upvotes${qi.upvoted?' upvoted':''}" data-qid="${qi.id}"><i class="${qi.upvoted?'fas':'far'} fa-arrow-up"></i> ${fmtN(qi.upvotes)} Upvote</span>
+      </div>
+    </div>
+    <span class="q-item-status ${statusCls[qi.status]}">${statusLabel[qi.status]}</span>
+  </div>`;
+}
+
+function setQSort(s){queueSort=s;renderQueuePanel();}
+
+function attachQueueEvents(){
+  document.querySelectorAll('.q-item-upvotes').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const qi=session.queue.find(x=>x.id===el.dataset.qid);if(!qi)return;qi.upvoted=!qi.upvoted;qi.upvotes+=qi.upvoted?1:-1;el.classList.toggle('upvoted',qi.upvoted);el.innerHTML=`<i class="${qi.upvoted?'fas':'far'} fa-arrow-up"></i> ${fmtN(qi.upvotes)} Upvote`;toast(qi.upvoted?'⬆️ Upvoted!':'Removed upvote');});});
+}
+
+/* ── ABOUT PANEL ── */
+function renderAboutPanel(){
+  const h=session.host;
+  const stories=session.stories||[];
+  document.getElementById('aboutPanel').innerHTML=`
+    <div class="about-writer-card">
+      <div class="awc-top">
+        <img class="awc-av" src="${h.avatar}" loading="lazy"/>
+        <div class="awc-info">
+          <div class="awc-name">${h.name}</div>
+          <div class="awc-handle">${h.handle} · ${h.genre}</div>
+        </div>
+        <button class="awc-follow" onclick="toast('✅ Following @${h.name}!')">+ Follow</button>
+      </div>
+      <div class="awc-stats">
+        <div class="awc-stat"><div class="awc-stat-n">${h.followers}</div><div class="awc-stat-l">Followers</div></div>
+        <div class="awc-stat"><div class="awc-stat-n">${h.stories}</div><div class="awc-stat-l">Stories</div></div>
+        <div class="awc-stat"><div class="awc-stat-n">${h.totalReads}</div><div class="awc-stat-l">Total reads</div></div>
+      </div>
+      <div class="awc-bio">${h.bio}</div>
+    </div>
+    <div class="about-topic-card">
+      <div class="atc-label">🎙 Today's topic</div>
+      <div class="atc-topic">"${session.topic}"</div>
+    </div>
+    ${stories.length?`<div class="about-stories"><div class="as-label">Stories by @${h.name}</div><div class="as-scroll">${stories.map(s=>`<div class="story-mini-card" onclick="toast('📖 Opening…')"><div class="smc-cover" style="background-image:url('${s.cover}')"><div class="smc-cat">${s.cat}</div></div><div class="smc-title">${s.title}</div></div>`).join('')}</div></div>`:''}
+    <div class="rules-card">
+      <strong>Community Guidelines</strong>
+      <ul>
+        <li>Keep questions respectful and on-topic</li>
+        <li>Don't ask personal or identifying questions</li>
+        <li>One question per person per session</li>
+        <li>Upvote the questions you want answered most</li>
+        <li>Anonymous questions are allowed — no abuse</li>
+      </ul>
+    </div>
+  `;
+}
+
+/* ── TABS ── */
+let currentTab='answers';
+function switchTab(tab){
+  currentTab=tab;
+  ['answers','queue','about'].forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.toggle('on',t===tab);
+    const panel=document.getElementById(t+'Panel');
+    if(panel)panel.classList.toggle('on',t===tab);
+  });
+  document.getElementById('answersPanel').style.display=tab==='answers'?'block':'none';
+  document.getElementById('queuePanel').style.display=tab==='queue'?'block':'none';
+  document.getElementById('aboutPanel').style.display=tab==='about'?'block':'none';
+  // Only render on demand
+  if(tab==='queue')renderQueuePanel();
+  if(tab==='about')renderAboutPanel();
+}
+// Init visibility
+document.getElementById('answersPanel').style.display='block';
+document.getElementById('queuePanel').style.display='none';
+document.getElementById('aboutPanel').style.display='none';
+
+/* ── COMPOSE ── */
+function onQInput(){
+  const v=document.getElementById('qInp').value;
+  document.getElementById('charCount').textContent=`${v.length}/280`;
+  document.getElementById('sendQBtn').disabled=v.trim().length<8;
+  // Auto-resize
+  const ta=document.getElementById('qInp');ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';
+}
+
+let _submitting=false;
+function submitQuestion(){
+  const ta=document.getElementById('qInp');const text=ta.value.trim();
+  if(text.length<8||_submitting)return;
+  _submitting=true;
+  const anon=document.getElementById('anonQ').checked;
+  const newQ={id:'uq_'+Date.now(),asker:anon?'Anonymous':'You',askerColor:'#ff0050',anon,q:text,time:'Just now',upvotes:0,upvoted:false,status:'pending'};
+  session.queue.unshift(newQ);
+  ta.value='';document.getElementById('charCount').textContent='0/280';document.getElementById('sendQBtn').disabled=true;ta.style.height='auto';
+  document.getElementById('ct-queue').textContent=session.queue.filter(x=>x.status==='pending').length;
+  toast('✅ Question submitted! Upvote it to move it up.');
+  _submitting=false;
+  // If on queue tab, re-render
+  if(currentTab==='queue')renderQueuePanel();
+  // Simulate auto-answer after delay (live effect)
+  simulateLiveActivity();
+}
+
+/* ── LIVE SIMULATION ── */
+let _simRunning=false;
+function simulateLiveActivity(){
+  if(_simRunning||!isLive)return;
+  // Tick viewer count
+  const vcEl=document.getElementById('viewerCount');
+  const viewerTick=setInterval(()=>{
+    session.viewers+=Math.floor(Math.random()*5)-1;
+    session.viewers=Math.max(500,session.viewers);
+    if(vcEl)vcEl.innerHTML=`<i class="fas fa-eye" style="font-size:10px"></i> ${fmtN(session.viewers)}`;
+  },4000);
+  // Simulate a new answer appearing after 8s (demo)
+  setTimeout(()=>{
+    if(currentTab==='answers'){
+      const newA={id:'qa_'+Date.now(),asker:'Dami_Cole',askerColor:'#f97316',anon:false,q:"What's the hardest scene you've ever written and why?",time:'Just now',upvotes:1,upvoted:false,
+        answer:"The moment Ada reaches for the wall and doesn't fall. That moment of not-falling. I wrote and deleted it eleven times. You want the reader to feel the floor going soft but her staying standing. That balance took me longer than the whole chapter.",
+        reactions:[{em:'🔥',ct:0,reacted:false},{em:'😭',ct:0,reacted:false},{em:'💡',ct:0,reacted:false}]};
+      session.answered.unshift(newA);
+      // Remove from queue
+      const qi=session.queue.find(x=>x.id==='q1');if(qi)qi.status='answered';
+      if(currentTab==='answers'){
+        const ap=document.getElementById('answersPanel');
+        const card=document.createElement('div');
+        card.innerHTML=renderQA(newA);
+        const first=card.firstElementChild;first.classList.add('new-card');
+        // Insert after answering-now block
+        const an=ap.querySelector('.answering-now');
+        if(an)an.after(first);else ap.prepend(first);
+        document.getElementById('ct-answers').textContent=session.answered.length;
+        attachAnswerEvents();
+        toast('🆕 @'+session.host.name+' just answered a question!');
+      }
+    }
+  },8000);
+}
+
+/* ── INIT ── */
+if(isLive){
+  renderAnswersPanel();
+  simulateLiveActivity();
+}else{
+  renderUpcomingState();
+}
+renderAboutPanel();
+
+// Render queue silently
+renderQueuePanel();
+document.getElementById('ct-queue').textContent=session.queue.filter(x=>x.status==='pending').length;
+document.getElementById('ct-answers').textContent=(session.answered||[]).length;
+</script>
+</body>
+</html>

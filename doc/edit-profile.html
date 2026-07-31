@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Edit Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e8e8e8;--tx-body:#c8c8c8;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --nav-h:60px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.top-back{width:34px;height:34px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#ccc;flex-shrink:0;transition:.15s}
+.top-back:active{transform:scale(.9)}
+.top-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--tx-high);flex:1}
+.top-save-btn{background:var(--acc);color:#fff;border:none;padding:7px 16px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 12px var(--glow-sm);transition:.2s;flex-shrink:0}
+.top-save-btn:active{transform:scale(.96)}
+.top-save-btn.saved{background:rgba(52,211,153,.15);color:var(--green);box-shadow:none;border:1px solid rgba(52,211,153,.25)}
+
+/* ROLE TOGGLE */
+.role-toggle-wrap{padding:14px 14px 0}
+.role-toggle{display:flex;background:var(--l1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:2px}
+.role-btn{flex:1;padding:9px 10px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--tx-faint);font-family:'DM Sans',sans-serif;transition:.2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.role-btn.active{background:rgba(255,0,80,.1);color:var(--tx-high);border-bottom:2px solid var(--acc)}
+.role-hint{font-size:9px;color:var(--tx-faint);padding:0 2px 14px;margin-top:4px}
+
+/* AVATAR HERO */
+.avatar-hero{position:relative;margin:0}
+.cover-area{height:130px;position:relative;overflow:hidden;background:var(--l1);border-bottom:1px solid var(--bd)}
+.cover-img{width:100%;height:100%;object-fit:cover;display:block}
+.cover-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.cover-overlay:hover{background:rgba(0,0,0,.6)}
+.cover-change-btn{background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+.avatar-row{display:flex;align-items:flex-end;gap:12px;padding:0 14px;margin-top:-28px;position:relative;z-index:5;margin-bottom:12px}
+.av-wrap{position:relative;flex-shrink:0}
+.av-ring-edit{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:3px;box-shadow:0 0 20px var(--glow);cursor:pointer;transition:.15s}
+.av-ring-edit:hover{box-shadow:0 0 28px var(--glow)}
+.av-inner-edit{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;position:relative}
+.av-inner-edit img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.av-change-icon{position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s}
+.av-ring-edit:hover .av-change-icon{opacity:1}
+.av-change-icon i{font-size:16px;color:#fff}
+.av-label{font-size:9px;font-weight:700;color:var(--tx-muted);margin-top:4px;text-align:center}
+.av-meta{flex:1;padding-bottom:2px}
+.av-meta-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--tx-high);line-height:1.2;margin-bottom:2px}
+.av-meta-handle{font-size:11px;color:var(--tx-muted)}
+.av-meta-type{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:800;padding:2px 8px;border-radius:8px;margin-top:4px}
+.type-writer{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc3)}
+.type-reader{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--blue)}
+
+/* SECTION */
+.section{padding:0 14px;margin-bottom:20px}
+.section-label{font-size:9px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-label i{font-size:10px}
+
+/* FIELD GROUP */
+.field-group{background:var(--l1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:8px}
+.field-row{display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--bd2);min-height:52px;gap:10px;transition:.2s}
+.field-row:last-child{border-bottom:none}
+.field-row:focus-within{background:rgba(255,0,80,.02);border-color:var(--bd-acc)}
+.field-row.no-input{cursor:pointer}
+.field-row.no-input:active{background:rgba(255,255,255,.02)}
+.field-icon{width:28px;height:28px;border-radius:8px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.field-icon.blue{background:rgba(56,189,248,.07);border-color:rgba(56,189,248,.15)}
+.field-icon.green{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.15)}
+.field-icon.gold{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.15)}
+.field-icon.purple{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.15)}
+.field-inner{flex:1;min-width:0}
+.field-label{font-size:9px;font-weight:700;color:var(--tx-muted);margin-bottom:2px;letter-spacing:.03em}
+.field-input{width:100%;background:transparent;border:none;outline:none;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:2px 0;line-height:1.4}
+.field-input::placeholder{color:var(--tx-faint)}
+.field-textarea{resize:none;min-height:60px;line-height:1.6}
+.field-select{width:100%;background:transparent;border:none;outline:none;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:2px 0;cursor:pointer;-webkit-appearance:none;appearance:none}
+.field-select option{background:#111}
+.field-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.field-arrow{font-size:11px;color:var(--tx-faint)}
+.char-count{font-size:9px;color:var(--tx-faint);flex-shrink:0}
+.char-count.warn{color:var(--orange)}
+.char-count.over{color:var(--acc)}
+
+/* USERNAME CHECK */
+.username-status{font-size:9px;font-weight:700;display:flex;align-items:center;gap:3px;flex-shrink:0}
+.username-status.ok{color:var(--green)}
+.username-status.taken{color:var(--acc)}
+.username-status.checking{color:var(--tx-faint)}
+
+/* GENRE / TAG PILLS */
+.pill-wrap{padding:10px 14px 12px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;margin-bottom:8px}
+.pill-wrap-label{font-size:9px;font-weight:700;color:var(--tx-muted);margin-bottom:8px;letter-spacing:.03em;display:flex;align-items:center;justify-content:space-between}
+.pills-area{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;min-height:24px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;transition:.15s;user-select:none;border:1px solid}
+.pill.active{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.pill.inactive{background:rgba(255,255,255,.04);border-color:var(--bd);color:var(--tx-faint)}
+.pill.active:active{transform:scale(.95)}
+.pill .pill-x{font-size:8px;opacity:.6;margin-left:2px}
+.pill-add{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,.03);border:1px dashed var(--bd);color:var(--tx-faint);cursor:pointer;transition:.2s}
+.pill-add:hover{border-color:var(--bd-acc);color:var(--acc3)}
+.pill-hint{font-size:9px;color:var(--tx-faint);margin-top:2px}
+
+/* SOCIAL LINKS */
+.social-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd2)}
+.social-row:last-child{border-bottom:none}
+.social-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid var(--bd)}
+.si-ig{background:rgba(224,100,100,.1);border-color:rgba(224,100,100,.2)}
+.si-x{background:rgba(255,255,255,.05);border-color:var(--bd)}
+.si-tiktok{background:rgba(105,201,208,.07);border-color:rgba(105,201,208,.2)}
+.si-website{background:rgba(56,189,248,.07);border-color:rgba(56,189,248,.15)}
+.social-input{flex:1;background:transparent;border:none;outline:none;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12px;padding:2px 0}
+.social-input::placeholder{color:var(--tx-faint)}
+
+/* WRITER-ONLY SECTION */
+.writer-section{animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* PAYOUT CARD */
+.payout-card{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,0,80,.03));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:13px 14px;margin-bottom:8px}
+.payout-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.payout-icon{width:36px;height:36px;border-radius:10px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.payout-info{flex:1}
+.payout-label{font-size:9px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.payout-sub{font-size:11px;color:var(--tx-muted);margin-top:1px}
+.payout-status{font-size:8px;font-weight:800;padding:2px 8px;border-radius:7px;flex-shrink:0}
+.payout-status.linked{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.payout-status.unlinked{background:rgba(255,0,80,.08);color:var(--acc3);border:1px solid var(--bd-acc)}
+.payout-input-row{display:flex;gap:8px;align-items:center}
+.payout-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:.2s}
+.payout-input:focus{border-color:rgba(251,191,36,.35)}
+.payout-input::placeholder{color:var(--tx-faint)}
+.payout-link-btn{background:var(--gold);color:#000;border:none;padding:8px 14px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+
+/* WRITING SETTINGS */
+.toggle-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1;min-width:0}
+.toggle-title{font-size:12px;font-weight:700;color:var(--tx-high)}
+.toggle-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.tog{width:38px;height:20px;border-radius:12px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0;border:none}
+.tog.on{background:var(--acc)}
+.tog.off{background:rgba(255,255,255,.1)}
+.tog::after{content:'';position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{right:2px}
+.tog.off::after{left:2px}
+
+/* PRIVACY SETTINGS */
+.privacy-option{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2);cursor:pointer;transition:.15s}
+.privacy-option:last-child{border-bottom:none}
+.privacy-option:active{background:rgba(255,255,255,.02)}
+.privacy-option-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:.2s}
+.privacy-option-radio.selected{border-color:var(--acc);background:var(--acc)}
+.privacy-option-radio.selected::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+.privacy-option-info{flex:1}
+.privacy-option-title{font-size:12px;font-weight:700;color:var(--tx-high)}
+.privacy-option-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+
+/* VERIFICATION BADGE */
+.verify-card{background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.18);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.verify-icon{width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0}
+.verify-info{flex:1}
+.verify-title{font-size:12px;font-weight:800;color:var(--tx-high)}
+.verify-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+.verify-btn{background:var(--blue);color:#fff;border:none;padding:7px 13px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
+.verify-btn.verified{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+
+/* DANGER ZONE */
+.danger-card{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.12);border-radius:14px;overflow:hidden;margin-bottom:8px}
+.danger-item{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(248,113,113,.07);transition:.15s}
+.danger-item:last-child{border-bottom:none}
+.danger-item:active{background:rgba(248,113,113,.05)}
+.danger-item-icon{width:30px;height:30px;border-radius:8px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.danger-item-title{font-size:12px;font-weight:700;color:#f87171}
+.danger-item-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+
+/* SAVE FOOTER BAR */
+.save-footer{position:sticky;bottom:calc(var(--safe-b) + var(--nav-h));z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(16px);border-top:1px solid var(--bd);padding:10px 14px;display:flex;gap:8px}
+.save-footer-btn{flex:1;padding:12px;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s}
+.save-footer-btn:active{transform:scale(.98)}
+.sfb-cancel{background:rgba(255,255,255,.05);color:var(--tx-muted);border:1px solid var(--bd)}
+.sfb-save{background:var(--acc);color:#fff;box-shadow:0 0 16px var(--glow-sm)}
+.sfb-save.pulse{animation:savePulse .4s ease}
+@keyframes savePulse{0%{transform:scale(1)}50%{transform:scale(.97)}100%{transform:scale(1)}}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:99;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* OVERLAYS */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.overlay-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
+.overlay-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:7px}
+.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* PHOTO PICKER SHEET */
+.photo-options{padding:0 16px 14px;display:flex;flex-direction:column;gap:7px}
+.photo-opt{display:flex;align-items:center;gap:12px;padding:13px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;cursor:pointer;transition:.15s}
+.photo-opt:active{background:rgba(255,255,255,.06)}
+.photo-opt-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.photo-opt-title{font-size:13px;font-weight:700;color:var(--tx-high)}
+.photo-opt-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
+
+/* GENRE PICKER SHEET */
+.genre-picker-body{padding:0 16px 14px}
+.genre-picker-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.gp-chip{padding:6px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:rgba(255,255,255,.03);color:var(--tx-faint);transition:.2s;user-select:none}
+.gp-chip.sel{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc3)}
+.gp-done-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* CONFIRM OVERLAY */
+.confirm-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--l2);border:1px solid var(--bd);border-radius:18px;padding:22px 20px;width:100%;max-width:320px;text-align:center;animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.confirm-icon{font-size:28px;margin-bottom:10px}
+.confirm-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--tx-high);margin-bottom:6px}
+.confirm-sub{font-size:12px;color:var(--tx-muted);line-height:1.5;margin-bottom:18px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btn{flex:1;padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s}
+.confirm-btn:active{transform:scale(.97)}
+.cb-cancel{background:rgba(255,255,255,.06);color:#ccc}
+.cb-delete{background:#ef4444;color:#fff}
+.cb-discard{background:var(--acc);color:#fff}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* UNSAVED BADGE */
+.unsaved-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);margin-left:5px;vertical-align:middle;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* divider */
+.sdiv{height:1px;background:var(--bd);margin:4px 0}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-back" onclick="handleBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="top-title">Edit Profile</div>
+  <button class="top-save-btn" id="topSaveBtn" onclick="saveProfile()">Save</button>
+</div>
+
+<!-- ROLE TOGGLE -->
+<div class="role-toggle-wrap">
+  <div class="role-toggle">
+    <button class="role-btn active" id="roleWriterBtn" onclick="setRole('writer')">
+      <i class="fas fa-pen" style="font-size:10px;color:var(--acc)"></i> Writer
+    </button>
+    <button class="role-btn" id="roleReaderBtn" onclick="setRole('reader')">
+      <i class="fas fa-book-open" style="font-size:10px;color:var(--blue)"></i> Reader
+    </button>
+  </div>
+  <div class="role-hint" id="roleHint">Editing as a <strong style="color:var(--acc3)">Writer</strong> — writer-specific settings visible below</div>
+</div>
+
+<!-- AVATAR & COVER -->
+<div class="avatar-hero">
+  <div class="cover-area" id="coverArea">
+    <img class="cover-img" id="coverImg" src="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80" alt=""/>
+    <div class="cover-overlay" onclick="openPhotoPicker('cover')">
+      <div class="cover-change-btn"><i class="fas fa-camera"></i> Change Cover</div>
+    </div>
+  </div>
+  <div class="avatar-row">
+    <div class="av-wrap">
+      <div class="av-ring-edit" onclick="openPhotoPicker('avatar')">
+        <div class="av-inner-edit">
+          <img id="avatarImg" src="https://i.pravatar.cc/100?img=32" alt=""/>
+          <div class="av-change-icon"><i class="fas fa-camera"></i></div>
+        </div>
+      </div>
+      <div class="av-label">Tap to change</div>
+    </div>
+    <div class="av-meta">
+      <div class="av-meta-name" id="previewName">Ada_Writes</div>
+      <div class="av-meta-handle" id="previewHandle">@ada_writes</div>
+      <div class="av-meta-type type-writer" id="previewType">✍️ Writer</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BASIC INFO ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-user" style="color:var(--acc)"></i> Basic Info</div>
+  <div class="field-group">
+    <div class="field-row">
+      <div class="field-icon"><i class="fas fa-user" style="color:var(--acc3)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Display Name</div>
+        <input class="field-input" id="fieldName" value="Ada_Writes" maxlength="40" placeholder="Your display name" oninput="onFieldChange()"/>
+      </div>
+      <div class="char-count" id="nameCount">10/40</div>
+    </div>
+    <div class="field-row">
+      <div class="field-icon blue"><i class="fas fa-at" style="color:var(--blue)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Username</div>
+        <input class="field-input" id="fieldUsername" value="ada_writes" maxlength="25" placeholder="username" oninput="checkUsername()"/>
+      </div>
+      <div class="username-status ok" id="usernameStatus"><i class="fas fa-check"></i> Available</div>
+    </div>
+    <div class="field-row">
+      <div class="field-icon green"><i class="fas fa-envelope" style="color:var(--green)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Email Address</div>
+        <input class="field-input" id="fieldEmail" value="ada@writes.ng" type="email" placeholder="your@email.com" oninput="onFieldChange()"/>
+      </div>
+      <div class="field-right"><i class="fas fa-lock" style="font-size:10px;color:var(--tx-faint)" title="Private"></i></div>
+    </div>
+    <div class="field-row">
+      <div class="field-icon gold"><i class="fas fa-map-marker-alt" style="color:var(--gold)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Location</div>
+        <input class="field-input" id="fieldLocation" value="Lagos, Nigeria 🇳🇬" maxlength="50" placeholder="City, Country" oninput="onFieldChange()"/>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-icon purple"><i class="fas fa-birthday-cake" style="color:var(--purple)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Date of Birth (private)</div>
+        <input class="field-input" id="fieldDob" value="1998-04-11" type="date" oninput="onFieldChange()" style="color-scheme:dark"/>
+      </div>
+      <div class="field-right"><i class="fas fa-lock" style="font-size:10px;color:var(--tx-faint)"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BIO ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-pen-nib" style="color:var(--acc)"></i> About You</div>
+  <div class="field-group">
+    <div class="field-row" style="align-items:flex-start;padding-top:12px;padding-bottom:12px">
+      <div class="field-icon" style="margin-top:2px"><i class="fas fa-quote-left" style="color:var(--acc3)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Bio</div>
+        <textarea class="field-input field-textarea" id="fieldBio" maxlength="180" placeholder="Tell your story in 180 characters…" oninput="updateBioCount()">The writer who makes Lagos cry on their commute. Betrayal, family and the love you didn't see coming. 5 ongoing series. Write at 2am, publish at 5am. 🖊️</textarea>
+      </div>
+      <div class="char-count" id="bioCount" style="margin-top:2px">152/180</div>
+    </div>
+    <div class="field-row" style="align-items:flex-start;padding-top:12px;padding-bottom:12px">
+      <div class="field-icon" style="margin-top:2px"><i class="fas fa-align-left" style="color:var(--acc3)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Extended About (shown on About tab)</div>
+        <textarea class="field-input field-textarea" id="fieldAbout" maxlength="600" placeholder="A longer bio for your About section…" oninput="onFieldChange()" style="min-height:80px">Lagos-based fiction writer. Started writing at 19, published first story on Droboard in 2021 and never stopped. Known for the kind of betrayal plots that make readers delete their own DMs out of suspicion.</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GENRES / INTERESTS ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-tags" style="color:var(--acc)"></i> Genres & Interests</div>
+  <div class="pill-wrap">
+    <div class="pill-wrap-label">
+      <span>Your genres <span style="color:var(--tx-faint)">(tap to remove)</span></span>
+      <span style="font-size:9px;color:var(--tx-faint)" id="genreCountLabel">5 selected</span>
+    </div>
+    <div class="pills-area" id="genrePillsArea"></div>
+    <div class="pill-add" onclick="openGenrePicker()"><i class="fas fa-plus" style="font-size:8px"></i> Add Genre</div>
+    <div class="pill-hint">These appear on your profile and shape your recommended feed.</div>
+  </div>
+</div>
+
+<!-- ═══ SOCIAL LINKS ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-link" style="color:var(--blue)"></i> Social Links</div>
+  <div class="field-group">
+    <div class="social-row">
+      <div class="social-icon si-ig"><i class="fab fa-instagram" style="color:#e1306c"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Instagram</div>
+        <input class="social-input" id="linkIg" value="@ada_writes_ng" placeholder="@username" oninput="onFieldChange()"/>
+      </div>
+    </div>
+    <div class="social-row">
+      <div class="social-icon si-x"><i class="fab fa-x-twitter" style="color:#ccc"></i></div>
+      <div class="field-inner">
+        <div class="field-label">X (Twitter)</div>
+        <input class="social-input" id="linkX" value="@ada_writes" placeholder="@username" oninput="onFieldChange()"/>
+      </div>
+    </div>
+    <div class="social-row">
+      <div class="social-icon si-tiktok"><i class="fab fa-tiktok" style="color:#69c9d0"></i></div>
+      <div class="field-inner">
+        <div class="field-label">TikTok</div>
+        <input class="social-input" id="linkTt" value="" placeholder="@username" oninput="onFieldChange()"/>
+      </div>
+    </div>
+    <div class="social-row" style="border-bottom:none">
+      <div class="social-icon si-website"><i class="fas fa-globe" style="color:var(--blue)"></i></div>
+      <div class="field-inner">
+        <div class="field-label">Website / Blog</div>
+        <input class="social-input" id="linkWeb" value="" placeholder="https://yoursite.com" type="url" oninput="onFieldChange()"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WRITER-ONLY SECTIONS ═══ -->
+<div id="writerSections">
+
+  <!-- WRITING PREFERENCES -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-pen" style="color:var(--acc)"></i> Writing Preferences</div>
+    <div class="field-group">
+      <div class="field-row">
+        <div class="field-icon"><i class="fas fa-layer-group" style="color:var(--acc3)"></i></div>
+        <div class="field-inner">
+          <div class="field-label">Primary Writing Style</div>
+          <select class="field-select field-input" id="fieldStyle" onchange="onFieldChange()">
+            <option value="fiction">Literary Fiction</option>
+            <option value="series" selected>Serialised Drama</option>
+            <option value="short">Short Stories</option>
+            <option value="romance">Romance</option>
+            <option value="thriller">Thriller / Suspense</option>
+          </select>
+        </div>
+        <div class="field-right"><i class="fas fa-chevron-down field-arrow"></i></div>
+      </div>
+      <div class="field-row">
+        <div class="field-icon"><i class="fas fa-clock" style="color:var(--acc3)"></i></div>
+        <div class="field-inner">
+          <div class="field-label">Typical Publish Time</div>
+          <select class="field-select field-input" id="fieldPublishTime" onchange="onFieldChange()">
+            <option>Early Morning (4–7am)</option>
+            <option>Morning (7–10am)</option>
+            <option>Afternoon (12–3pm)</option>
+            <option>Evening (6–9pm)</option>
+            <option selected>Late Night (10pm–2am)</option>
+          </select>
+        </div>
+        <div class="field-right"><i class="fas fa-chevron-down field-arrow"></i></div>
+      </div>
+      <div class="field-row">
+        <div class="field-icon"><i class="fas fa-calendar-check" style="color:var(--acc3)"></i></div>
+        <div class="field-inner">
+          <div class="field-label">Chapter Drop Frequency</div>
+          <select class="field-select field-input" id="fieldFreq" onchange="onFieldChange()">
+            <option>Daily</option>
+            <option selected>2–3x per week</option>
+            <option>Weekly</option>
+            <option>Bi-weekly</option>
+            <option>Whenever it's ready</option>
+          </select>
+        </div>
+        <div class="field-right"><i class="fas fa-chevron-down field-arrow"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WRITING TOGGLES -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-sliders" style="color:var(--acc)"></i> Writer Settings</div>
+    <div class="field-group">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Accept Tips from Readers</div>
+          <div class="toggle-sub">Readers can tip you with their wallet balance</div>
+        </div>
+        <button class="tog on" id="togTips" onclick="toggleSetting('togTips')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Show Chapter Drop Countdown</div>
+          <div class="toggle-sub">Display a countdown when your next chapter is scheduled</div>
+        </div>
+        <button class="tog on" id="togCountdown" onclick="toggleSetting('togCountdown')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Allow DMs from Anyone</div>
+          <div class="toggle-sub">Non-followers can send you direct messages</div>
+        </div>
+        <button class="tog off" id="togDms" onclick="toggleSetting('togDms')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Chapter Comments Open by Default</div>
+          <div class="toggle-sub">New chapters allow comments immediately on publish</div>
+        </div>
+        <button class="tog on" id="togComments" onclick="toggleSetting('togComments')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Show Reader Count on Stories</div>
+          <div class="toggle-sub">Display live read counts on your story cards</div>
+        </div>
+        <button class="tog on" id="togReadCount" onclick="toggleSetting('togReadCount')"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYOUT -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-coins" style="color:var(--gold)"></i> Payout Details</div>
+    <div class="payout-card">
+      <div class="payout-top">
+        <div class="payout-icon">💳</div>
+        <div class="payout-info">
+          <div class="payout-label">Bank Account</div>
+          <div class="payout-sub">Receive your tips and earnings here</div>
+        </div>
+        <div class="payout-status linked" id="payoutStatus">✓ Linked</div>
+      </div>
+      <div class="payout-input-row">
+        <input class="payout-input" id="fieldAccountName" value="Ada Nwosu" placeholder="Account name"/>
+      </div>
+      <div class="payout-input-row" style="margin-top:7px">
+        <input class="payout-input" id="fieldAccountNum" value="0123456789" placeholder="Account number" maxlength="10" style="flex:1"/>
+        <select class="payout-input" id="fieldBank" style="max-width:130px">
+          <option selected>GTBank</option>
+          <option>First Bank</option>
+          <option>Access Bank</option>
+          <option>UBA</option>
+          <option>Zenith Bank</option>
+          <option>Opay</option>
+          <option>Palmpay</option>
+          <option>Kuda</option>
+        </select>
+      </div>
+      <div style="font-size:9px;color:var(--tx-faint);margin-top:7px;display:flex;align-items:center;gap:4px"><i class="fas fa-shield-alt" style="color:var(--green)"></i> Details are encrypted and never shown publicly</div>
+    </div>
+  </div>
+
+  <!-- VERIFICATION -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-badge-check" style="color:var(--blue)"></i> Verification</div>
+    <div class="verify-card">
+      <div class="verify-icon"><i class="fas fa-check"></i></div>
+      <div class="verify-info">
+        <div class="verify-title">✓ Verified Writer</div>
+        <div class="verify-sub">Your account is verified. Blue checkmark is active.</div>
+      </div>
+      <div class="verify-btn verified">Verified</div>
+    </div>
+  </div>
+
+</div><!-- /writerSections -->
+
+<!-- ═══ READER-ONLY SECTIONS ═══ -->
+<div id="readerSections" style="display:none">
+
+  <!-- READING PREFERENCES -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-book-open" style="color:var(--blue)"></i> Reading Preferences</div>
+    <div class="field-group">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Reading Progress Visible to Writers</div>
+          <div class="toggle-sub">Writers can see when you've read their chapters</div>
+        </div>
+        <button class="tog on" id="togReadProgress" onclick="toggleSetting('togReadProgress')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">New Chapter Notifications</div>
+          <div class="toggle-sub">Get notified when series you follow drop new chapters</div>
+        </div>
+        <button class="tog on" id="togChNotif" onclick="toggleSetting('togChNotif')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Show Reading Streak on Profile</div>
+          <div class="toggle-sub">Display your reading streak publicly</div>
+        </div>
+        <button class="tog on" id="togStreak" onclick="toggleSetting('togStreak')"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Public Reactions</div>
+          <div class="toggle-sub">Others can see what you've reacted to</div>
+        </div>
+        <button class="tog off" id="togReactions" onclick="toggleSetting('togReactions')"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div class="section writer-section">
+    <div class="section-label"><i class="fas fa-coins" style="color:var(--gold)"></i> Wallet & Tipping</div>
+    <div class="payout-card">
+      <div class="payout-top">
+        <div class="payout-icon">💰</div>
+        <div class="payout-info">
+          <div class="payout-label">Droboard Balance</div>
+          <div class="payout-sub" style="font-size:14px;font-weight:800;color:#fff;margin-top:2px">₦4,250</div>
+        </div>
+        <button class="payout-link-btn" onclick="toast('💳 Opening fund wallet…')">+ Fund</button>
+      </div>
+      <div style="font-size:10px;color:var(--tx-muted);line-height:1.5">Use your balance to tip writers you love. Tips go directly to the writer.</div>
+    </div>
+  </div>
+
+</div><!-- /readerSections -->
+
+<!-- ═══ SHARED: PRIVACY ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-user-shield" style="color:var(--blue)"></i> Privacy</div>
+  <div class="field-group" id="privacyGroup">
+    <div class="privacy-option selected" id="priv-public" onclick="setPrivacy('public')">
+      <div class="privacy-option-radio selected" id="pr-public"></div>
+      <div class="privacy-option-info">
+        <div class="privacy-option-title">🌍 Public Profile</div>
+        <div class="privacy-option-sub">Anyone can view your profile, stories and feed</div>
+      </div>
+    </div>
+    <div class="privacy-option" id="priv-followers" onclick="setPrivacy('followers')">
+      <div class="privacy-option-radio" id="pr-followers"></div>
+      <div class="privacy-option-info">
+        <div class="privacy-option-title">👥 Followers Only</div>
+        <div class="privacy-option-sub">Only people you approve can see your full profile</div>
+      </div>
+    </div>
+    <div class="privacy-option" id="priv-private" onclick="setPrivacy('private')">
+      <div class="privacy-option-radio" id="pr-private"></div>
+      <div class="privacy-option-info">
+        <div class="privacy-option-title">🔒 Private</div>
+        <div class="privacy-option-sub">Your profile is hidden. Only you can see it</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SHARED: NOTIFICATIONS ═══ -->
+<div class="section">
+  <div class="section-label"><i class="fas fa-bell" style="color:var(--orange)"></i> Notifications</div>
+  <div class="field-group">
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">New Followers</div>
+        <div class="toggle-sub">Notify me when someone follows me</div>
+      </div>
+      <button class="tog on" id="togNFollow" onclick="toggleSetting('togNFollow')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Comments & Replies</div>
+        <div class="toggle-sub">Notify me when someone comments on my posts</div>
+      </div>
+      <button class="tog on" id="togNComments" onclick="toggleSetting('togNComments')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Likes & Reactions</div>
+        <div class="toggle-sub">Notify me when my content gets reactions</div>
+      </div>
+      <button class="tog off" id="togNLikes" onclick="toggleSetting('togNLikes')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Direct Messages</div>
+        <div class="toggle-sub">Notify me for new DMs</div>
+      </div>
+      <button class="tog on" id="togNDms" onclick="toggleSetting('togNDms')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Weekly Digest Email</div>
+        <div class="toggle-sub">Summary of your week on Droboard</div>
+      </div>
+      <button class="tog on" id="togNDigest" onclick="toggleSetting('togNDigest')"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DANGER ZONE ═══ -->
+<div class="section">
+  <div class="section-label" style="color:rgba(248,113,113,.6)"><i class="fas fa-triangle-exclamation" style="color:#f87171"></i> Danger Zone</div>
+  <div class="danger-card">
+    <div class="danger-item" onclick="toast('🔐 Password reset email sent to ada@writes.ng')">
+      <div class="danger-item-icon"><i class="fas fa-key" style="color:#f87171"></i></div>
+      <div>
+        <div class="danger-item-title">Change Password</div>
+        <div class="danger-item-sub">We'll email you a reset link</div>
+      </div>
+      <i class="fas fa-chevron-right" style="font-size:10px;color:var(--tx-faint);margin-left:auto"></i>
+    </div>
+    <div class="danger-item" onclick="confirmDeactivate()">
+      <div class="danger-item-icon"><i class="fas fa-eye-slash" style="color:#f87171"></i></div>
+      <div>
+        <div class="danger-item-title">Deactivate Account</div>
+        <div class="danger-item-sub">Hide your profile temporarily</div>
+      </div>
+      <i class="fas fa-chevron-right" style="font-size:10px;color:var(--tx-faint);margin-left:auto"></i>
+    </div>
+    <div class="danger-item" onclick="confirmDelete()">
+      <div class="danger-item-icon"><i class="fas fa-trash" style="color:#f87171"></i></div>
+      <div>
+        <div class="danger-item-title">Delete Account</div>
+        <div class="danger-item-sub">Permanently delete everything</div>
+      </div>
+      <i class="fas fa-chevron-right" style="font-size:10px;color:var(--tx-faint);margin-left:auto"></i>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE FOOTER -->
+<div class="save-footer" id="saveFooter">
+  <button class="save-footer-btn sfb-cancel" onclick="handleBack()">Discard</button>
+  <button class="save-footer-btn sfb-save" id="footSaveBtn" onclick="saveProfile()">Save Changes</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item active" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- PHOTO PICKER SHEET -->
+<div class="overlay-bg" id="photoPickerOv" onclick="if(event.target===this)closePhotoPicker()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3 id="photoPickerTitle"><i class="fas fa-camera" style="color:var(--acc);font-size:13px"></i> Change Photo</h3>
+      <button class="overlay-close" onclick="closePhotoPicker()">✕</button>
+    </div>
+    <div class="photo-options">
+      <div class="photo-opt" onclick="choosePhoto('camera')">
+        <div class="photo-opt-icon" style="background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)"><i class="fas fa-camera" style="color:var(--acc3)"></i></div>
+        <div>
+          <div class="photo-opt-title">Take a Photo</div>
+          <div class="photo-opt-sub">Use your camera to take a new photo right now</div>
+        </div>
+      </div>
+      <div class="photo-opt" onclick="choosePhoto('gallery')">
+        <div class="photo-opt-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15)"><i class="fas fa-images" style="color:var(--blue)"></i></div>
+        <div>
+          <div class="photo-opt-title">Choose from Gallery</div>
+          <div class="photo-opt-sub">Pick an existing photo from your device</div>
+        </div>
+      </div>
+      <div class="photo-opt" onclick="choosePhoto('url')">
+        <div class="photo-opt-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.15)"><i class="fas fa-link" style="color:var(--green)"></i></div>
+        <div>
+          <div class="photo-opt-title">Use Image URL</div>
+          <div class="photo-opt-sub">Paste a link to an image from the web</div>
+        </div>
+      </div>
+      <div class="photo-opt" id="removePhotoOpt" onclick="choosePhoto('remove')">
+        <div class="photo-opt-icon" style="background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.15)"><i class="fas fa-trash" style="color:#f87171"></i></div>
+        <div>
+          <div class="photo-opt-title" style="color:#f87171">Remove Photo</div>
+          <div class="photo-opt-sub">Reset to default avatar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GENRE PICKER SHEET -->
+<div class="overlay-bg" id="genrePickerOv" onclick="if(event.target===this)closeGenrePicker()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-tags" style="color:var(--acc);font-size:13px"></i> Pick Genres</h3>
+      <button class="overlay-close" onclick="closeGenrePicker()">✕</button>
+    </div>
+    <div class="genre-picker-body">
+      <div style="font-size:11px;color:var(--tx-muted);margin-bottom:12px">Select up to 8 genres. These show on your profile.</div>
+      <div class="genre-picker-grid" id="genrePickerGrid"></div>
+      <button class="gp-done-btn" onclick="applyGenres()">Done ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM OVERLAY -->
+<div class="confirm-overlay" id="confirmOv">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-sub" id="confirmSub">This action can't be undone.</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirm-btn cb-delete" id="confirmOkBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── UTILS ── */
+function toast(msg, dur=2600) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+/* ── STATE ── */
+let currentRole = 'writer';
+let hasUnsavedChanges = false;
+let currentPhotoTarget = 'avatar'; // 'avatar' | 'cover'
+let _confirmCb = null;
+
+const ALL_GENRES = [
+  '💔 Betrayal','👑 Family','✨ Twist','🏙️ Urban','💍 Marriage',
+  '🔥 Revenge','🎓 Campus','🌙 Elegy','💔 Heartbreak','😂 Comedy',
+  '😱 Thriller','🤝 Friendship','🔍 Mystery','✨ Inspirational','🙏 Faith',
+  '🖤 Dark Romance','⚔️ Action','🌍 Pan-African','💼 Work Drama','🏡 Domestic',
+];
+let selectedGenres = new Set(['💔 Betrayal','👑 Family','✨ Twist','🏙️ Urban','💍 Marriage']);
+
+/* ── ROLE TOGGLE ── */
+function setRole(role) {
+  currentRole = role;
+  document.getElementById('roleWriterBtn').classList.toggle('active', role === 'writer');
+  document.getElementById('roleReaderBtn').classList.toggle('active', role === 'reader');
+  document.getElementById('writerSections').style.display = role === 'writer' ? 'block' : 'none';
+  document.getElementById('readerSections').style.display = role === 'reader' ? 'block' : 'none';
+  const hint = document.getElementById('roleHint');
+  const previewType = document.getElementById('previewType');
+  if (role === 'writer') {
+    hint.innerHTML = `Editing as a <strong style="color:var(--acc3)">Writer</strong> — writer-specific settings visible below`;
+    previewType.className = 'av-meta-type type-writer';
+    previewType.textContent = '✍️ Writer';
+  } else {
+    hint.innerHTML = `Editing as a <strong style="color:var(--blue)">Reader</strong> — reader-specific settings visible below`;
+    previewType.className = 'av-meta-type type-reader';
+    previewType.textContent = '📖 Reader';
+  }
+  markUnsaved();
+}
+
+/* ── FIELD CHANGE TRACKING ── */
+function onFieldChange() {
+  markUnsaved();
+  // Live-update preview name/handle
+  const name = document.getElementById('fieldName').value.trim();
+  const user = document.getElementById('fieldUsername').value.trim();
+  document.getElementById('previewName').textContent = name || 'Your Name';
+  document.getElementById('previewHandle').textContent = '@' + (user || 'username');
+  // Char counts
+  const nameEl = document.getElementById('fieldName');
+  const nc = document.getElementById('nameCount');
+  nc.textContent = nameEl.value.length + '/40';
+  nc.className = 'char-count' + (nameEl.value.length >= 38 ? ' warn' : '');
+}
+
+function updateBioCount() {
+  const bio = document.getElementById('fieldBio');
+  const cnt = document.getElementById('bioCount');
+  const n = bio.value.length;
+  cnt.textContent = n + '/180';
+  cnt.className = 'char-count' + (n >= 170 ? (n >= 180 ? ' over' : ' warn') : '');
+  markUnsaved();
+}
+
+function markUnsaved() {
+  hasUnsavedChanges = true;
+  const btn = document.getElementById('topSaveBtn');
+  if (!btn.classList.contains('saved')) {
+    btn.textContent = 'Save •';
+  }
+}
+
+/* ── USERNAME CHECK ── */
+let _usernameTimer = null;
+const TAKEN_NAMES = ['droboard','admin','superuser','test'];
+
+function checkUsername() {
+  const el = document.getElementById('fieldUsername');
+  const status = document.getElementById('usernameStatus');
+  onFieldChange();
+  clearTimeout(_usernameTimer);
+  status.className = 'username-status checking';
+  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking';
+  _usernameTimer = setTimeout(() => {
+    const val = el.value.trim().toLowerCase();
+    if (!val) { status.innerHTML = ''; return; }
+    if (val.length < 3) {
+      status.className = 'username-status taken';
+      status.innerHTML = '<i class="fas fa-times"></i> Too short';
+    } else if (TAKEN_NAMES.includes(val)) {
+      status.className = 'username-status taken';
+      status.innerHTML = '<i class="fas fa-times"></i> Taken';
+    } else {
+      status.className = 'username-status ok';
+      status.innerHTML = '<i class="fas fa-check"></i> Available';
+    }
+  }, 600);
+}
+
+/* ── GENRE PILLS ── */
+function renderGenrePills() {
+  const area = document.getElementById('genrePillsArea');
+  area.innerHTML = [...selectedGenres].map(g => `
+    <div class="pill active" onclick="removeGenre('${g.replace(/'/g,"\\'")}')">
+      ${g} <span class="pill-x">✕</span>
+    </div>
+  `).join('');
+  document.getElementById('genreCountLabel').textContent = selectedGenres.size + ' selected';
+}
+
+function removeGenre(g) {
+  selectedGenres.delete(g);
+  renderGenrePills();
+  markUnsaved();
+}
+
+/* ── PHOTO PICKER ── */
+function openPhotoPicker(target) {
+  currentPhotoTarget = target;
+  const title = document.getElementById('photoPickerTitle');
+  title.innerHTML = `<i class="fas fa-camera" style="color:var(--acc);font-size:13px"></i> ${target === 'avatar' ? 'Change Avatar' : 'Change Cover Photo'}`;
+  document.getElementById('removePhotoOpt').style.display = target === 'avatar' ? 'flex' : 'none';
+  document.getElementById('photoPickerOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePhotoPicker() {
+  document.getElementById('photoPickerOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function choosePhoto(method) {
+  closePhotoPicker();
+  if (method === 'url') {
+    const url = prompt('Paste image URL:');
+    if (url && url.startsWith('http')) {
+      if (currentPhotoTarget === 'avatar') {
+        document.getElementById('avatarImg').src = url;
+      } else {
+        document.getElementById('coverImg').src = url;
+      }
+      markUnsaved();
+      toast('✅ Photo updated!');
+    }
+  } else if (method === 'remove') {
+    document.getElementById('avatarImg').src = 'https://i.pravatar.cc/100?img=1';
+    markUnsaved();
+    toast('🗑️ Avatar removed');
+  } else {
+    // camera/gallery — in real app would open file picker
+    const randomId = Math.floor(Math.random() * 70) + 1;
+    if (currentPhotoTarget === 'avatar') {
+      document.getElementById('avatarImg').src = `https://i.pravatar.cc/100?img=${randomId}`;
+    } else {
+      const covers = [
+        'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80',
+        'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900&q=80',
+        'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=900&q=80',
+        'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&q=80',
+      ];
+      document.getElementById('coverImg').src = covers[Math.floor(Math.random() * covers.length)];
+    }
+    markUnsaved();
+    toast(`📸 ${method === 'camera' ? 'Camera opening' : 'Gallery opening'}…`);
+  }
+}
+
+/* ── GENRE PICKER ── */
+function openGenrePicker() {
+  const grid = document.getElementById('genrePickerGrid');
+  grid.innerHTML = ALL_GENRES.map(g => `
+    <div class="gp-chip${selectedGenres.has(g) ? ' sel' : ''}" data-genre="${g}" onclick="toggleGenreChip(this,'${g.replace(/'/g,"\\'")}')">
+      ${g}
+    </div>
+  `).join('');
+  document.getElementById('genrePickerOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function toggleGenreChip(el, g) {
+  if (el.classList.contains('sel')) {
+    el.classList.remove('sel');
+  } else {
+    if (selectedGenres.size >= 8) { toast('⚠️ Max 8 genres'); return; }
+    el.classList.add('sel');
+  }
+}
+
+function applyGenres() {
+  selectedGenres = new Set([...document.querySelectorAll('.gp-chip.sel')].map(el => el.dataset.genre));
+  closeGenrePicker();
+  renderGenrePills();
+  markUnsaved();
+  toast('✅ Genres updated!');
+}
+
+function closeGenrePicker() {
+  document.getElementById('genrePickerOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── PRIVACY ── */
+let currentPrivacy = 'public';
+function setPrivacy(val) {
+  currentPrivacy = val;
+  ['public','followers','private'].forEach(p => {
+    const opt = document.getElementById('priv-' + p);
+    const radio = document.getElementById('pr-' + p);
+    const isActive = p === val;
+    radio.className = 'privacy-option-radio' + (isActive ? ' selected' : '');
+    // clear/set inner dot
+    radio.innerHTML = isActive ? '' : '';
+    opt.className = 'privacy-option' + (isActive ? ' selected' : '');
+    if (isActive) radio.classList.add('selected');
+    else radio.classList.remove('selected');
+  });
+  markUnsaved();
+  const labels = {public:'🌍 Profile set to Public', followers:'👥 Profile set to Followers only', private:'🔒 Profile set to Private'};
+  toast(labels[val]);
+}
+
+/* ── TOGGLES ── */
+function toggleSetting(id) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.toggle('on');
+  btn.classList.toggle('off');
+  markUnsaved();
+}
+
+/* ── SAVE ── */
+function saveProfile() {
+  // Validate
+  const name = document.getElementById('fieldName').value.trim();
+  const user = document.getElementById('fieldUsername').value.trim();
+  if (!name) { toast('✍️ Display name is required!'); return; }
+  if (!user || user.length < 3) { toast('⚠️ Username must be 3+ characters!'); return; }
+  const statusEl = document.getElementById('usernameStatus');
+  if (statusEl.classList.contains('taken')) { toast('⚠️ Username already taken!'); return; }
+
+  // Animate save btn
+  const topBtn = document.getElementById('topSaveBtn');
+  const footBtn = document.getElementById('footSaveBtn');
+  footBtn.textContent = 'Saving…';
+  footBtn.disabled = true;
+
+  setTimeout(() => {
+    hasUnsavedChanges = false;
+    topBtn.textContent = '✓ Saved';
+    topBtn.classList.add('saved');
+    footBtn.textContent = '✓ Saved!';
+    footBtn.disabled = false;
+    footBtn.classList.add('pulse');
+    toast('✅ Profile saved!');
+    setTimeout(() => {
+      topBtn.textContent = 'Save';
+      topBtn.classList.remove('saved');
+      footBtn.textContent = 'Save Changes';
+      footBtn.classList.remove('pulse');
+    }, 2500);
+  }, 900);
+}
+
+/* ── BACK / DISCARD ── */
+function handleBack() {
+  if (hasUnsavedChanges) {
+    openConfirm(
+      '⚠️',
+      'Discard Changes?',
+      'You have unsaved changes. If you leave now, they will be lost.',
+      () => { history.back(); },
+      'Discard',
+      'cb-discard'
+    );
+  } else {
+    history.back();
+  }
+}
+
+/* ── DANGER ZONE ── */
+function confirmDeactivate() {
+  openConfirm(
+    '👁️',
+    'Deactivate Account?',
+    'Your profile will be hidden and you won\'t appear in searches. You can reactivate anytime by logging in.',
+    () => { toast('Account deactivated. Log in to reactivate.'); },
+    'Deactivate',
+    'cb-delete'
+  );
+}
+
+function confirmDelete() {
+  openConfirm(
+    '🗑️',
+    'Delete Account Forever?',
+    'All your stories, series, collections and data will be permanently deleted. This CANNOT be undone.',
+    () => { toast('Account deletion requested. You\'ll receive a confirmation email.'); },
+    'Delete Forever',
+    'cb-delete'
+  );
+}
+
+/* ── CONFIRM OVERLAY ── */
+function openConfirm(icon, title, sub, cb, btnLabel='Confirm', btnClass='cb-delete') {
+  _confirmCb = cb;
+  document.getElementById('confirmIcon').textContent = icon;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmSub').textContent = sub;
+  const btn = document.getElementById('confirmOkBtn');
+  btn.textContent = btnLabel;
+  btn.className = 'confirm-btn ' + btnClass;
+  document.getElementById('confirmOv').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirmOv').classList.remove('open');
+  _confirmCb = null;
+}
+document.getElementById('confirmOkBtn').addEventListener('click', () => {
+  if (_confirmCb) _confirmCb();
+  closeConfirm();
+});
+
+/* ── INIT ── */
+renderGenrePills();
+updateBioCount();
+onFieldChange();
+// Set initial char count
+document.getElementById('nameCount').textContent = document.getElementById('fieldName').value.length + '/40';
+</script>
+</body>
+</html>

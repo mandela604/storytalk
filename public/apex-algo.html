@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Algo — AI Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c0f;--bg2:#111318;--bg3:#181b22;--bg4:#1e222b;
+  --border:#ffffff0f;--border2:#ffffff18;--border3:#ffffff28;
+  --text:#e8eaf0;--text2:#8b90a0;--text3:#555b6e;
+  --green:#00d48a;--green2:#00a86b;--green-dim:#00d48a22;
+  --red:#ff4d6d;--red-dim:#ff4d6d22;
+  --gold:#f0c040;--gold-dim:#f0c04022;
+  --blue:#4d9fff;--blue-dim:#4d9fff18;
+  --purple:#a78bfa;--purple-dim:#a78bfa18;
+  font-size:14px;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;overflow:hidden;height:100vh}
+h1,h2,h3,h4,.nav-brand,.screen-title{font-family:'Syne',sans-serif}
+a{color:var(--green);text-decoration:none}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-top{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.nav-brand{font-size:17px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.nav-brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.nav-sub{font-size:11px;color:var(--text3);margin-top:3px;letter-spacing:0.5px}
+.nav-section{padding:16px 8px 4px;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;transition:all 0.15s;margin:1px 0;white-space:nowrap;border:1px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--green-dim);color:var(--green);border-color:#00d48a22}
+.nav-item i{font-size:16px;width:18px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700}
+.sidebar-body{flex:1;overflow-y:auto;padding:8px}
+.sidebar-body::-webkit-scrollbar{width:3px}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sidebar-bottom{padding:12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg3);cursor:pointer}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;flex-shrink:0}
+.user-name{font-size:12px;font-weight:500;font-family:'Syne',sans-serif}
+.user-role{font-size:10px;color:var(--text3)}
+
+/* ── TOPBAR ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
+.screen-title{font-size:16px;font-weight:700;flex:1}
+.topbar-action{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;transition:all 0.15s}
+.topbar-action:hover{border-color:var(--border3);color:var(--text)}
+.topbar-action.primary{background:var(--green);border-color:var(--green);color:#000;font-weight:500}
+.topbar-action.primary:hover{background:var(--green2)}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:var(--green-dim);padding:4px 10px;border-radius:20px;border:1px solid #00d48a33;white-space:nowrap}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:0}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
+
+/* ── GRID ── */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+
+/* ── METRIC ── */
+.metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px}
+.metric-label{font-size:10px;color:var(--text3);letter-spacing:0.8px;margin-bottom:8px;font-family:'Syne',sans-serif;text-transform:uppercase}
+.metric-value{font-size:24px;font-weight:700;font-family:'Syne',sans-serif;line-height:1}
+.metric-change{font-size:11px;margin-top:5px}
+.up{color:var(--green)}
+.dn{color:var(--red)}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;color:var(--text3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;letter-spacing:0.8px;text-transform:uppercase;font-weight:700}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--text)}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;font-family:'Syne',sans-serif}
+.badge-green{background:var(--green-dim);color:var(--green);border:1px solid #00d48a33}
+.badge-red{background:var(--red-dim);color:var(--red);border:1px solid #ff4d6d33}
+.badge-gold{background:var(--gold-dim);color:var(--gold);border:1px solid #f0c04033}
+.badge-blue{background:var(--blue-dim);color:var(--blue);border:1px solid #4d9fff33}
+.badge-gray{background:var(--bg4);color:var(--text3);border:1px solid var(--border2)}
+
+/* ── FORM ── */
+.form-group{margin-bottom:16px}
+.form-label{font-size:10px;color:var(--text3);margin-bottom:6px;display:block;font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:0.8px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;transition:border-color 0.15s;-webkit-appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#00d48a66}
+.form-select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555b6e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── BUTTON ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:all 0.15s;text-decoration:none}
+.btn:hover{border-color:var(--border3);color:var(--text)}
+.btn-primary{background:var(--green);border-color:var(--green);color:#000;font-weight:500}
+.btn-primary:hover{background:var(--green2);border-color:var(--green2)}
+.btn-danger{border-color:#ff4d6d44;color:var(--red);background:transparent}
+.btn-danger:hover{background:var(--red-dim)}
+.btn-sm{padding:6px 11px;font-size:11px;border-radius:6px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── TOGGLE ── */
+.toggle{position:relative;display:inline-block;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;transition:0.2s}
+.toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:0.2s}
+.toggle input:checked+.toggle-slider{background:var(--green-dim);border-color:var(--green)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);background:var(--green)}
+
+/* ── PROGRESS ── */
+.progress-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width 0.4s}
+
+/* ── SECTION HEAD ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+
+/* ── STRATEGY CARD ── */
+.strat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color 0.15s}
+.strat-card:hover{border-color:var(--border2)}
+.strat-card-active{border-color:#00d48a33}
+.strat-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px}
+.strat-meta{font-size:11px;color:var(--text3);margin-bottom:12px}
+.strat-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.strat-stat{background:var(--bg3);border-radius:6px;padding:8px;text-align:center}
+.strat-stat-v{font-size:14px;font-weight:600;font-family:'Syne',sans-serif}
+.strat-stat-l{font-size:10px;color:var(--text3);margin-top:2px}
+.strat-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── RULE BUILDER ── */
+.rule-block{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.rule-num{width:22px;height:22px;border-radius:50%;background:var(--green-dim);border:1px solid #00d48a33;color:var(--green);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Syne',sans-serif;font-weight:700}
+.rule-text{flex:1;font-size:12px;color:var(--text2)}
+.add-rule{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);font-size:12px;cursor:pointer;transition:all 0.15s}
+.add-rule:hover{border-color:#00d48a55;color:var(--green)}
+
+/* ── SIGNAL ── */
+.signal-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.signal-row:last-child{border-bottom:none}
+.signal-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:2px}
+.sig-buy{background:var(--green-dim);color:var(--green)}
+.sig-sell{background:var(--red-dim);color:var(--red)}
+.signal-pair{font-weight:600;font-family:'Syne',sans-serif;font-size:13px}
+.signal-detail{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
+.signal-time{margin-left:auto;font-size:10px;color:var(--text3);white-space:nowrap;text-align:right}
+
+/* ── NOTIFICATION ── */
+.notif-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.notif-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.notif-msg{font-size:12px;line-height:1.6;flex:1}
+.notif-time{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* ── PAIR CHIPS ── */
+.pair-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pair-chip{padding:5px 11px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all 0.15s;font-family:'DM Mono',monospace;user-select:none}
+.pair-chip.selected{background:var(--green-dim);border-color:#00d48a44;color:var(--green)}
+.pair-chip:hover:not(.selected){border-color:var(--border2);color:var(--text2)}
+
+/* ── DEPLOY ── */
+.deploy-step{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border)}
+.deploy-step:last-child{border-bottom:none}
+.step-num{width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);flex-shrink:0;font-family:'Syne',sans-serif;font-weight:700}
+.step-num.done{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.step-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:3px}
+.step-desc{font-size:11px;color:var(--text3)}
+
+/* ── MT5 ── */
+.mt5-status{display:flex;align-items:center;gap:12px;padding:14px;background:var(--green-dim);border:1px solid #00d48a33;border-radius:10px;margin-bottom:16px}
+.mt5-icon{width:40px;height:40px;border-radius:8px;background:#00d48a22;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--green)}
+.mt5-connected{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.mt5-detail{font-size:11px;color:var(--text3);margin-top:2px}
+.account-stat{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.account-stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--green)}
+.account-stat-label{font-size:10px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* ── RESULT METRICS ── */
+.result-metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.result-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.result-label{font-size:10px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:0.8px}
+
+/* ── SETTINGS ── */
+.settings-section-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-label{font-size:13px;font-family:'Syne',sans-serif;font-weight:500}
+.setting-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── SCROLL ── */
+.scroll-y{overflow-y:auto;max-height:300px}
+.scroll-y::-webkit-scrollbar{width:3px}
+.scroll-y::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── AUTH ── */
+#auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px}
+#auth-page.hidden{display:none}
+.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-tab{display:flex;gap:0;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:24px;border:1px solid var(--border)}
+.auth-tab-item{flex:1;text-align:center;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text3);font-family:'Syne',sans-serif;transition:all 0.15s}
+.auth-tab-item.active{background:var(--bg2);color:var(--text);border:1px solid var(--border2)}
+.auth-link{color:var(--green);cursor:pointer;font-size:12px}
+
+/* ── EQUITY SVG ── */
+.equity-svg{width:100%;height:130px}
+
+/* ── LOG ── */
+.log-line{font-size:11px;font-family:'DM Mono',monospace;padding:3px 0;display:flex;gap:10px}
+.log-time{color:var(--text3);flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     AUTH PAGE
+════════════════════════════════════ -->
+<div id="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="nav-brand" style="justify-content:center;font-size:20px">
+        <span class="dot"></span> APEX ALGO
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;letter-spacing:2px">AI-POWERED TRADING SYSTEM</div>
+    </div>
+
+    <div class="auth-tab">
+      <div class="auth-tab-item active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab-item" id="tab-register" onclick="switchAuthTab('register')">Register</div>
+    </div>
+
+    <!-- Login -->
+    <div id="auth-login">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" placeholder="trader@example.com" value="trader@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="••••••••" value="password123">
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+          <input type="checkbox" checked style="accent-color:var(--green)"> Remember me
+        </label>
+        <span class="auth-link" onclick="showForgot()">Forgot password?</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="enterApp()">
+        <i class="ti ti-login"></i> Sign In
+      </button>
+    </div>
+
+    <!-- Register -->
+    <div id="auth-register" style="display:none">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" placeholder="John"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" placeholder="Doe"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="trader@example.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Min 8 characters"></div>
+      <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" placeholder="Repeat password"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="enterApp()">
+        <i class="ti ti-user-plus"></i> Create Account
+      </button>
+    </div>
+
+    <!-- Forgot Password -->
+    <div id="auth-forgot" style="display:none">
+      <div style="margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.6">Enter your email address and we'll send you a link to reset your password.</div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="trader@example.com"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">
+        <i class="ti ti-mail"></i> Send Reset Link
+      </button>
+      <div style="text-align:center;margin-top:16px">
+        <span class="auth-link" onclick="showLogin()">← Back to login</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MAIN APP
+════════════════════════════════════ -->
+<div class="app" id="main-app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="nav-brand"><span class="dot"></span> APEX ALGO</div>
+      <div class="nav-sub">AI TRADING SYSTEM</div>
+    </div>
+    <div class="sidebar-body">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="nav-item" onclick="nav('live',this)"><i class="ti ti-activity"></i> Live Trading <span class="nav-badge">3</span></div>
+      <div class="nav-section">Strategies</div>
+      <div class="nav-item" onclick="nav('strategies',this)"><i class="ti ti-list"></i> Strategy Manager</div>
+      <div class="nav-item" onclick="nav('builder',this)"><i class="ti ti-tools"></i> Strategy Builder</div>
+      <div class="nav-item" onclick="nav('deploy',this)"><i class="ti ti-rocket"></i> Deploy Strategy</div>
+      <div class="nav-section">Analysis</div>
+      <div class="nav-item" onclick="nav('backtest',this)"><i class="ti ti-history"></i> Backtesting</div>
+      <div class="nav-item" onclick="nav('results',this)"><i class="ti ti-chart-bar"></i> Backtest Results</div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" onclick="nav('mt5',this)"><i class="ti ti-plug-connected"></i> MT5 Connection</div>
+      <div class="nav-item" onclick="nav('notifications',this)"><i class="ti ti-bell"></i> Notifications <span class="nav-badge">5</span></div>
+      <div class="nav-item" onclick="nav('settings',this)"><i class="ti ti-settings"></i> Settings</div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Pro Trader</div>
+        </div>
+        <i class="ti ti-logout" style="margin-left:auto;color:var(--text3);font-size:15px;cursor:pointer" onclick="logout()" title="Logout"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="screen-title" id="page-title">Dashboard</div>
+      <div class="status-pill"><span class="status-dot"></span> MT5 Connected</div>
+      <div class="topbar-action" onclick="nav('mt5',null)"><i class="ti ti-database"></i> ICMarkets #824710</div>
+      <div class="topbar-action primary" onclick="nav('builder',null)"><i class="ti ti-plus"></i> New Strategy</div>
+    </div>
+
+    <!-- SCREENS -->
+    <div class="content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="screen active" id="screen-dashboard">
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Account Balance</div>
+            <div class="metric-value up">$24,381</div>
+            <div class="metric-change up"><i class="ti ti-trending-up"></i> +$1,240 today</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Active Strategies</div>
+            <div class="metric-value">4</div>
+            <div class="metric-change" style="color:var(--text3)">All running</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Open Trades</div>
+            <div class="metric-value">7</div>
+            <div class="metric-change up">+$340 unrealised</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Win Rate (30d)</div>
+            <div class="metric-value up">68.4%</div>
+            <div class="metric-change up">+3.2% vs last month</div>
+          </div>
+        </div>
+
+        <div class="grid-2-1">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Equity Curve</div>
+              <svg class="equity-svg" viewBox="0 0 600 120" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#00d48a" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="#00d48a" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,95 L40,90 L80,86 L120,80 L160,87 L200,72 L240,63 L280,58 L320,66 L360,50 L400,42 L440,36 L480,28 L520,20 L560,14 L600,10" fill="none" stroke="#00d48a" stroke-width="2"/>
+                <path d="M0,95 L40,90 L80,86 L120,80 L160,87 L200,72 L240,63 L280,58 L320,66 L360,50 L400,42 L440,36 L480,28 L520,20 L560,14 L600,10 L600,120 L0,120Z" fill="url(#g1)"/>
+              </svg>
+            </div>
+            <div class="card">
+              <div class="section-head"><div class="section-label">Open Trades</div><span class="badge badge-blue">7 active</span></div>
+              <table>
+                <tr><th>Pair</th><th>Type</th><th>Lots</th><th>Entry</th><th>P&amp;L</th><th>Strategy</th></tr>
+                <tr><td><b style="color:var(--text)">EURUSD</b></td><td><span class="badge badge-green">BUY</span></td><td>0.50</td><td>1.08422</td><td class="up">+$128.40</td><td>MA Cross</td></tr>
+                <tr><td><b style="color:var(--text)">GBPJPY</b></td><td><span class="badge badge-red">SELL</span></td><td>0.30</td><td>189.240</td><td class="up">+$84.10</td><td>RSI Scalper</td></tr>
+                <tr><td><b style="color:var(--text)">USDJPY</b></td><td><span class="badge badge-green">BUY</span></td><td>0.20</td><td>149.850</td><td class="dn">-$22.60</td><td>Trend Follow</td></tr>
+                <tr><td><b style="color:var(--text)">XAUUSD</b></td><td><span class="badge badge-green">BUY</span></td><td>0.10</td><td>2041.30</td><td class="up">+$150.00</td><td>Gold Scalper</td></tr>
+              </table>
+            </div>
+            <div class="card">
+              <div class="section-head"><div class="section-label">Closed Trades (Recent)</div><span style="font-size:12px;color:var(--text3)">Last 10</span></div>
+              <table>
+                <tr><th>Pair</th><th>Type</th><th>Open</th><th>Close</th><th>Lots</th><th>P&amp;L</th><th>Duration</th></tr>
+                <tr><td><b style="color:var(--text)">EURUSD</b></td><td><span class="badge badge-green">BUY</span></td><td>1.07840</td><td>1.08220</td><td>0.50</td><td class="up">+$190.00</td><td>4h 22m</td></tr>
+                <tr><td><b style="color:var(--text)">GBPUSD</b></td><td><span class="badge badge-red">SELL</span></td><td>1.26100</td><td>1.25780</td><td>0.30</td><td class="up">+$96.00</td><td>1h 10m</td></tr>
+                <tr><td><b style="color:var(--text)">USDJPY</b></td><td><span class="badge badge-red">SELL</span></td><td>150.400</td><td>150.720</td><td>0.20</td><td class="dn">-$42.60</td><td>2h 48m</td></tr>
+                <tr><td><b style="color:var(--text)">XAUUSD</b></td><td><span class="badge badge-green">BUY</span></td><td>2028.50</td><td>2041.20</td><td>0.10</td><td class="up">+$127.00</td><td>35m</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Active Strategies</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                  <span class="status-dot"></span>
+                  <div style="flex:1"><div style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">MA Cross v2</div><div style="font-size:10px;color:var(--text3)">EURUSD · H1</div></div>
+                  <span class="badge badge-green">+12.4%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                  <span class="status-dot"></span>
+                  <div style="flex:1"><div style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">RSI Scalper</div><div style="font-size:10px;color:var(--text3)">GBPJPY · M15</div></div>
+                  <span class="badge badge-green">+8.7%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                  <span class="status-dot"></span>
+                  <div style="flex:1"><div style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">Trend Follow Pro</div><div style="font-size:10px;color:var(--text3)">USDJPY · H4</div></div>
+                  <span class="badge badge-gold">+2.1%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                  <span class="status-dot"></span>
+                  <div style="flex:1"><div style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">Gold Scalper</div><div style="font-size:10px;color:var(--text3)">XAUUSD · M5</div></div>
+                  <span class="badge badge-green">+19.3%</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Running Backtests</div>
+              <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px">Breakout Alpha</span><span style="font-size:11px;color:var(--green)">74%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:74%"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:5px">EURUSD · Jan–Dec 2023</div>
+              </div>
+              <div style="padding:10px 0">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px">Vol Squeeze</span><span style="font-size:11px;color:var(--gold)">23%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:23%;background:var(--gold)"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:5px">GBPUSD · 6 months</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STRATEGY MANAGER ══ -->
+      <div class="screen" id="screen-strategies">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+          <div class="btn-group">
+            <div class="btn btn-sm"><i class="ti ti-search"></i> Search</div>
+            <div class="btn btn-sm btn-primary" onclick="nav('builder',null)"><i class="ti ti-plus"></i> New Strategy</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="strat-card strat-card-active">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+              <div><div class="strat-name">MA Cross v2</div><div class="strat-meta">Moving Average Crossover · EURUSD · H1</div></div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="strat-stats">
+              <div class="strat-stat"><div class="strat-stat-v up">68%</div><div class="strat-stat-l">Win Rate</div></div>
+              <div class="strat-stat"><div class="strat-stat-v up">+12.4%</div><div class="strat-stat-l">Return</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">1.8</div><div class="strat-stat-l">Prof. Factor</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">142</div><div class="strat-stat-l">Trades</div></div>
+            </div>
+            <div class="strat-actions">
+              <div class="btn btn-sm btn-danger"><i class="ti ti-player-pause"></i> Deactivate</div>
+              <div class="btn btn-sm" onclick="nav('builder',null)"><i class="ti ti-edit"></i> Edit</div>
+              <div class="btn btn-sm"><i class="ti ti-copy"></i> Clone</div>
+              <div class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></div>
+            </div>
+          </div>
+          <div class="strat-card strat-card-active">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+              <div><div class="strat-name">RSI Scalper</div><div class="strat-meta">RSI Mean Reversion · GBPJPY · M15</div></div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="strat-stats">
+              <div class="strat-stat"><div class="strat-stat-v up">72%</div><div class="strat-stat-l">Win Rate</div></div>
+              <div class="strat-stat"><div class="strat-stat-v up">+8.7%</div><div class="strat-stat-l">Return</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">2.1</div><div class="strat-stat-l">Prof. Factor</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">89</div><div class="strat-stat-l">Trades</div></div>
+            </div>
+            <div class="strat-actions">
+              <div class="btn btn-sm btn-danger"><i class="ti ti-player-pause"></i> Deactivate</div>
+              <div class="btn btn-sm"><i class="ti ti-edit"></i> Edit</div>
+              <div class="btn btn-sm"><i class="ti ti-copy"></i> Clone</div>
+              <div class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></div>
+            </div>
+          </div>
+          <div class="strat-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+              <div><div class="strat-name">Breakout Alpha</div><div class="strat-meta">S/R Breakout · EURUSD · H1</div></div>
+              <span class="badge badge-gray">Inactive</span>
+            </div>
+            <div class="strat-stats">
+              <div class="strat-stat"><div class="strat-stat-v">61%</div><div class="strat-stat-l">Win Rate</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">+5.2%</div><div class="strat-stat-l">Return</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">1.4</div><div class="strat-stat-l">Prof. Factor</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">58</div><div class="strat-stat-l">Trades</div></div>
+            </div>
+            <div class="strat-actions">
+              <div class="btn btn-sm btn-primary"><i class="ti ti-player-play"></i> Activate</div>
+              <div class="btn btn-sm"><i class="ti ti-edit"></i> Edit</div>
+              <div class="btn btn-sm"><i class="ti ti-copy"></i> Clone</div>
+              <div class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></div>
+            </div>
+          </div>
+          <div class="strat-card strat-card-active">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+              <div><div class="strat-name">Gold Scalper</div><div class="strat-meta">XAUUSD Momentum · M5</div></div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="strat-stats">
+              <div class="strat-stat"><div class="strat-stat-v up">76%</div><div class="strat-stat-l">Win Rate</div></div>
+              <div class="strat-stat"><div class="strat-stat-v up">+19.3%</div><div class="strat-stat-l">Return</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">2.8</div><div class="strat-stat-l">Prof. Factor</div></div>
+              <div class="strat-stat"><div class="strat-stat-v">211</div><div class="strat-stat-l">Trades</div></div>
+            </div>
+            <div class="strat-actions">
+              <div class="btn btn-sm btn-danger"><i class="ti ti-player-pause"></i> Deactivate</div>
+              <div class="btn btn-sm"><i class="ti ti-edit"></i> Edit</div>
+              <div class="btn btn-sm"><i class="ti ti-copy"></i> Clone</div>
+              <div class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STRATEGY BUILDER ══ -->
+      <div class="screen" id="screen-builder">
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Strategy Info</div>
+              <div class="form-group"><label class="form-label">Strategy Name</label><input class="form-input" value="MA Cross v3" placeholder="e.g. RSI Mean Reversion"></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Timeframe</label>
+                  <select class="form-select">
+                    <option>M1</option><option>M5</option><option>M15</option><option>M30</option>
+                    <option selected>H1</option><option>H4</option><option>D1</option><option>W1</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Strategy Type</label>
+                  <select class="form-select">
+                    <option>Trend Following</option><option>Mean Reversion</option><option>Breakout</option><option>Scalping</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group"><label class="form-label">Description (optional)</label><textarea class="form-textarea" placeholder="Describe your strategy logic...">Fast MA crossing slow MA triggers entry. Uses ATR-based stop loss.</textarea></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Risk Rules</div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Risk per Trade (%)</label><input class="form-input" value="1.5"></div>
+                <div class="form-group"><label class="form-label">Max Daily Loss (%)</label><input class="form-input" value="3.0"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Max Open Trades</label><input class="form-input" value="3"></div>
+                <div class="form-group"><label class="form-label">Max Drawdown (%)</label><input class="form-input" value="10"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Entry Rules</div>
+              <div class="rule-block"><div class="rule-num">1</div><div class="rule-text">Fast MA (10) crosses above Slow MA (50)</div><i class="ti ti-x" style="color:var(--text3);cursor:pointer;font-size:14px"></i></div>
+              <div class="rule-block"><div class="rule-num">2</div><div class="rule-text">RSI(14) is above 50 — bullish confirmation</div><i class="ti ti-x" style="color:var(--text3);cursor:pointer;font-size:14px"></i></div>
+              <div class="rule-block"><div class="rule-num">3</div><div class="rule-text">Price is above 200 EMA — trend filter</div><i class="ti ti-x" style="color:var(--text3);cursor:pointer;font-size:14px"></i></div>
+              <div class="add-rule"><i class="ti ti-plus"></i> Add entry rule</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Exit Rules</div>
+              <div class="rule-block"><div class="rule-num">1</div><div class="rule-text">Fast MA crosses below Slow MA</div><i class="ti ti-x" style="color:var(--text3);cursor:pointer;font-size:14px"></i></div>
+              <div class="add-rule"><i class="ti ti-plus"></i> Add exit rule</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Stop Loss &amp; Take Profit</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Stop Loss Type</label>
+                  <select class="form-select"><option>ATR Multiple</option><option>Fixed Pips</option><option>Swing Low/High</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">ATR Multiple</label><input class="form-input" value="1.5"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Take Profit Type</label>
+                  <select class="form-select"><option>Risk/Reward Ratio</option><option>Fixed Pips</option><option>ATR Multiple</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">R:R Ratio</label><input class="form-input" value="2.0"></div>
+              </div>
+            </div>
+            <div class="btn-group">
+              <div class="btn btn-primary"><i class="ti ti-device-floppy"></i> Save Strategy</div>
+              <div class="btn" onclick="nav('backtest',null)"><i class="ti ti-history"></i> Backtest It</div>
+              <div class="btn" onclick="nav('deploy',null)"><i class="ti ti-rocket"></i> Deploy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DEPLOY STRATEGY ══ -->
+      <div class="screen" id="screen-deploy">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Configure Deployment</div>
+            <div class="form-group">
+              <label class="form-label">Select Strategy</label>
+              <select class="form-select"><option>MA Cross v2</option><option>RSI Scalper</option><option>Breakout Alpha</option><option>Gold Scalper</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Select Markets / Pairs</label>
+              <div class="pair-grid">
+                <div class="pair-chip selected" onclick="togglePair(this)">EURUSD</div>
+                <div class="pair-chip selected" onclick="togglePair(this)">GBPUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">USDJPY</div>
+                <div class="pair-chip" onclick="togglePair(this)">USDCHF</div>
+                <div class="pair-chip" onclick="togglePair(this)">AUDUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">NZDUSD</div>
+                <div class="pair-chip selected" onclick="togglePair(this)">GBPJPY</div>
+                <div class="pair-chip" onclick="togglePair(this)">EURJPY</div>
+                <div class="pair-chip" onclick="togglePair(this)">XAUUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">XAGUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">US30</div>
+                <div class="pair-chip" onclick="togglePair(this)">NAS100</div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <div class="form-group"><label class="form-label">Risk Per Trade (%)</label><input class="form-input" value="1.5"></div>
+              <div class="form-group"><label class="form-label">Max Lot Size</label><input class="form-input" value="2.00"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Broker Account</label>
+              <div style="background:var(--bg3);border:1px solid #00d48a33;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px">
+                <i class="ti ti-plug-connected" style="color:var(--green);font-size:18px"></i>
+                <div>
+                  <div style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">ICMarkets — MT5 #824710</div>
+                  <div style="font-size:10px;color:var(--text3)">Connected · Balance: $24,381</div>
+                </div>
+                <span class="badge badge-green" style="margin-left:auto">Ready</span>
+              </div>
+            </div>
+            <div class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;margin-top:4px">
+              <i class="ti ti-rocket"></i> Activate Strategy
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Deployment Checklist</div>
+              <div class="deploy-step"><div class="step-num done"><i class="ti ti-check" style="font-size:12px"></i></div><div><div class="step-title">MT5 Account Connected</div><div class="step-desc">ICMarkets #824710 is live and synced</div></div></div>
+              <div class="deploy-step"><div class="step-num done"><i class="ti ti-check" style="font-size:12px"></i></div><div><div class="step-title">Strategy Selected</div><div class="step-desc">MA Cross v2 (tested, validated)</div></div></div>
+              <div class="deploy-step"><div class="step-num done"><i class="ti ti-check" style="font-size:12px"></i></div><div><div class="step-title">Pairs Selected</div><div class="step-desc">EURUSD, GBPUSD, GBPJPY</div></div></div>
+              <div class="deploy-step"><div class="step-num done"><i class="ti ti-check" style="font-size:12px"></i></div><div><div class="step-title">Risk Configured</div><div class="step-desc">1.5% per trade · Max 2.00 lots</div></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Risk Summary</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Max risk per trade</span><span>1.5% · ~$365</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Max simultaneous trades</span><span>3 per pair</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Max daily loss</span><span>3.0% · ~$731</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Max drawdown limit</span><span>10% · ~$2,438</span></div>
+                <div style="height:1px;background:var(--border)"></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Account balance</span><span style="color:var(--green);font-weight:600">$24,381</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BACKTESTING ══ -->
+      <div class="screen" id="screen-backtest">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Backtest Configuration</div>
+            <div class="form-group">
+              <label class="form-label">Strategy</label>
+              <select class="form-select"><option>MA Cross v2</option><option>RSI Scalper</option><option>Breakout Alpha</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pairs to Test</label>
+              <div class="pair-grid">
+                <div class="pair-chip selected" onclick="togglePair(this)">EURUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">GBPUSD</div>
+                <div class="pair-chip selected" onclick="togglePair(this)">USDJPY</div>
+                <div class="pair-chip" onclick="togglePair(this)">XAUUSD</div>
+                <div class="pair-chip" onclick="togglePair(this)">GBPJPY</div>
+                <div class="pair-chip" onclick="togglePair(this)">AUDUSD</div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <div class="form-group"><label class="form-label">Start Date</label><input class="form-input" type="date" value="2023-01-01"></div>
+              <div class="form-group"><label class="form-label">End Date</label><input class="form-input" type="date" value="2023-12-31"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Initial Capital ($)</label><input class="form-input" value="10000"></div>
+              <div class="form-group"><label class="form-label">Spread (pips)</label><input class="form-input" value="1.2"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data Quality</label>
+              <select class="form-select"><option>Tick Data (High accuracy)</option><option>1-minute OHLC</option><option>H1 OHLC</option></select>
+            </div>
+            <div class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="nav('results',null)">
+              <i class="ti ti-player-play"></i> Run Backtest
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Recent Backtests</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="nav('results',null)">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                    <span style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">MA Cross v2 — EURUSD</span>
+                    <span class="badge badge-green">+24.8%</span>
+                  </div>
+                  <div style="font-size:10px;color:var(--text3)">Jan 2023 – Dec 2023 · 142 trades · WR 68%</div>
+                </div>
+                <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="nav('results',null)">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                    <span style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">RSI Scalper — GBPJPY</span>
+                    <span class="badge badge-green">+18.2%</span>
+                  </div>
+                  <div style="font-size:10px;color:var(--text3)">Jul 2023 – Dec 2023 · 89 trades · WR 72%</div>
+                </div>
+                <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                    <span style="font-size:12px;font-weight:600;font-family:'Syne',sans-serif">Breakout Alpha — EURUSD</span>
+                    <span class="badge badge-gold">74% done</span>
+                  </div>
+                  <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Jan 2023 – Dec 2023 · Running...</div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:74%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Tips</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:10px;font-size:12px;color:var(--text2);line-height:1.5"><i class="ti ti-bulb" style="color:var(--gold);flex-shrink:0;margin-top:1px"></i> Use at least 2 years of data for statistically significant results.</div>
+                <div style="display:flex;gap:10px;font-size:12px;color:var(--text2);line-height:1.5"><i class="ti ti-bulb" style="color:var(--gold);flex-shrink:0;margin-top:1px"></i> Include realistic spread costs to avoid curve-fitting.</div>
+                <div style="display:flex;gap:10px;font-size:12px;color:var(--text2);line-height:1.5"><i class="ti ti-bulb" style="color:var(--gold);flex-shrink:0;margin-top:1px"></i> Test across multiple pairs to confirm robustness.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BACKTEST RESULTS ══ -->
+      <div class="screen" id="screen-results">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--text2)">MA Cross v2 · EURUSD · Jan–Dec 2023</div>
+          <div class="btn btn-sm"><i class="ti ti-download"></i> Export Report</div>
+          <div class="btn btn-sm btn-primary" onclick="nav('deploy',null)"><i class="ti ti-rocket"></i> Deploy This Strategy</div>
+        </div>
+        <div class="grid-6">
+          <div class="result-metric"><div class="result-val up">68.4%</div><div class="result-label">Win Rate</div></div>
+          <div class="result-metric"><div class="result-val up">+24.8%</div><div class="result-label">Total Return</div></div>
+          <div class="result-metric"><div class="result-val dn">-8.2%</div><div class="result-label">Max Drawdown</div></div>
+          <div class="result-metric"><div class="result-val">1.84</div><div class="result-label">Profit Factor</div></div>
+          <div class="result-metric"><div class="result-val">142</div><div class="result-label">Total Trades</div></div>
+          <div class="result-metric"><div class="result-val">2.4</div><div class="result-label">Sharpe Ratio</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Equity Curve</div>
+          <svg viewBox="0 0 700 130" style="width:100%;height:130px" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00d48a" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#00d48a" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,105 L40,100 L80,96 L120,90 L160,98 L200,82 L240,70 L280,63 L320,72 L360,55 L400,46 L440,38 L480,30 L520,22 L560,16 L600,12 L660,8 L700,6" fill="none" stroke="#00d48a" stroke-width="2"/>
+            <path d="M0,105 L40,100 L80,96 L120,90 L160,98 L200,82 L240,70 L280,63 L320,72 L360,55 L400,46 L440,38 L480,30 L520,22 L560,16 L600,12 L660,8 L700,6 L700,130 L0,130Z" fill="url(#g2)"/>
+            <path d="M120,90 L160,98" fill="none" stroke="#ff4d6d" stroke-width="2.5"/>
+            <path d="M280,63 L320,72" fill="none" stroke="#ff4d6d" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="card">
+          <div class="section-head"><div class="section-label">Trade History</div><span style="font-size:12px;color:var(--text3)">142 trades</span></div>
+          <div class="scroll-y">
+            <table>
+              <tr><th>#</th><th>Open Time</th><th>Type</th><th>Entry</th><th>Exit</th><th>Pips</th><th>P&amp;L</th><th>Result</th></tr>
+              <tr><td style="color:var(--text3)">142</td><td>Dec 28, 14:00</td><td><span class="badge badge-green">BUY</span></td><td>1.10840</td><td>1.11280</td><td class="up">+44</td><td class="up">+$220</td><td><span class="badge badge-green">Win</span></td></tr>
+              <tr><td style="color:var(--text3)">141</td><td>Dec 26, 09:00</td><td><span class="badge badge-red">SELL</span></td><td>1.11340</td><td>1.11020</td><td class="up">+32</td><td class="up">+$160</td><td><span class="badge badge-green">Win</span></td></tr>
+              <tr><td style="color:var(--text3)">140</td><td>Dec 22, 16:00</td><td><span class="badge badge-green">BUY</span></td><td>1.09880</td><td>1.09600</td><td class="dn">-28</td><td class="dn">-$140</td><td><span class="badge badge-red">Loss</span></td></tr>
+              <tr><td style="color:var(--text3)">139</td><td>Dec 20, 10:00</td><td><span class="badge badge-green">BUY</span></td><td>1.09140</td><td>1.09780</td><td class="up">+64</td><td class="up">+$320</td><td><span class="badge badge-green">Win</span></td></tr>
+              <tr><td style="color:var(--text3)">138</td><td>Dec 18, 13:00</td><td><span class="badge badge-red">SELL</span></td><td>1.09920</td><td>1.09680</td><td class="up">+24</td><td class="up">+$120</td><td><span class="badge badge-green">Win</span></td></tr>
+              <tr><td style="color:var(--text3)">137</td><td>Dec 15, 09:30</td><td><span class="badge badge-green">BUY</span></td><td>1.08640</td><td>1.08900</td><td class="up">+26</td><td class="up">+$130</td><td><span class="badge badge-green">Win</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ LIVE TRADING ══ -->
+      <div class="screen" id="screen-live">
+        <div class="grid-3">
+          <div class="metric"><div class="metric-label">Active Strategies</div><div class="metric-value">4</div></div>
+          <div class="metric"><div class="metric-label">Open Trades</div><div class="metric-value up">7</div><div class="metric-change up">+$339.90 floating</div></div>
+          <div class="metric"><div class="metric-label">Today's P&amp;L</div><div class="metric-value up">+$1,240</div><div class="metric-change up">+5.1% of balance</div></div>
+        </div>
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="section-head"><div class="section-label">Open Trades</div><span class="badge badge-blue">7 open</span></div>
+              <table>
+                <tr><th>Pair</th><th>Dir</th><th>Lots</th><th>Entry</th><th>Current</th><th>P&amp;L</th></tr>
+                <tr><td><b style="color:var(--text)">EURUSD</b></td><td><span class="badge badge-green">B</span></td><td>0.50</td><td>1.08422</td><td>1.08690</td><td class="up">+$134</td></tr>
+                <tr><td><b style="color:var(--text)">GBPJPY</b></td><td><span class="badge badge-red">S</span></td><td>0.30</td><td>189.240</td><td>188.910</td><td class="up">+$74</td></tr>
+                <tr><td><b style="color:var(--text)">USDJPY</b></td><td><span class="badge badge-green">B</span></td><td>0.20</td><td>149.850</td><td>149.620</td><td class="dn">-$31</td></tr>
+                <tr><td><b style="color:var(--text)">XAUUSD</b></td><td><span class="badge badge-green">B</span></td><td>0.10</td><td>2041.30</td><td>2053.80</td><td class="up">+$125</td></tr>
+              </table>
+            </div>
+            <div class="card">
+              <div class="section-head"><div class="section-label">Closed Today</div><span style="font-size:12px;color:var(--text3)">12 trades</span></div>
+              <table>
+                <tr><th>Pair</th><th>Dir</th><th>P&amp;L</th><th>Strategy</th><th>Close Time</th></tr>
+                <tr><td>GBPUSD</td><td><span class="badge badge-green">B</span></td><td class="up">+$96</td><td style="color:var(--text3)">RSI Scalper</td><td>10:42</td></tr>
+                <tr><td>EURUSD</td><td><span class="badge badge-red">S</span></td><td class="up">+$142</td><td style="color:var(--text3)">MA Cross</td><td>09:18</td></tr>
+                <tr><td>USDJPY</td><td><span class="badge badge-red">S</span></td><td class="dn">-$44</td><td style="color:var(--text3)">Trend Follow</td><td>08:55</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Current Signals</div>
+            <div class="signal-row">
+              <div class="signal-icon sig-buy"><i class="ti ti-trending-up"></i></div>
+              <div style="flex:1"><div class="signal-pair">EURUSD</div><div class="signal-detail">MA Cross · H1 · Entry: 1.0869 · SL: 1.0824 · TP: 1.0960</div></div>
+              <div style="text-align:right"><div class="signal-time">just now</div><span class="badge badge-green" style="margin-top:4px">BUY</span></div>
+            </div>
+            <div class="signal-row">
+              <div class="signal-icon sig-sell"><i class="ti ti-trending-down"></i></div>
+              <div style="flex:1"><div class="signal-pair">GBPJPY</div><div class="signal-detail">RSI Scalper · M15 · Entry: 188.95 · SL: 189.40 · TP: 187.90</div></div>
+              <div style="text-align:right"><div class="signal-time">4m ago</div><span class="badge badge-red" style="margin-top:4px">SELL</span></div>
+            </div>
+            <div class="signal-row">
+              <div class="signal-icon sig-buy"><i class="ti ti-trending-up"></i></div>
+              <div style="flex:1"><div class="signal-pair">XAUUSD</div><div class="signal-detail">Gold Scalper · M5 · Entry: 2053.80 · SL: 2041.00 · TP: 2079.00</div></div>
+              <div style="text-align:right"><div class="signal-time">12m ago</div><span class="badge badge-green" style="margin-top:4px">BUY</span></div>
+            </div>
+            <div class="signal-row">
+              <div class="signal-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="ti ti-clock"></i></div>
+              <div style="flex:1"><div class="signal-pair">AUDUSD</div><div class="signal-detail">Trend Follow · H4 · Watching for breakout above 0.6590</div></div>
+              <div style="text-align:right"><div class="signal-time">38m ago</div><span class="badge badge-blue" style="margin-top:4px">WATCH</span></div>
+            </div>
+            <div class="signal-row">
+              <div class="signal-icon sig-sell"><i class="ti ti-trending-down"></i></div>
+              <div style="flex:1"><div class="signal-pair">USDJPY</div><div class="signal-detail">MA Cross · H1 · Entry: 149.85 · SL: 150.40 · TP: 148.70</div></div>
+              <div style="text-align:right"><div class="signal-time">1h ago</div><span class="badge badge-red" style="margin-top:4px">SELL</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MT5 CONNECTION ══ -->
+      <div class="screen" id="screen-mt5">
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="mt5-status">
+                <div class="mt5-icon"><i class="ti ti-plug-connected"></i></div>
+                <div style="flex:1">
+                  <div class="mt5-connected">MT5 Connected</div>
+                  <div class="mt5-detail">Last synced 2 seconds ago</div>
+                </div>
+                <span class="badge badge-green">Live</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+                <div class="account-stat"><div class="account-stat-val">$24,381</div><div class="account-stat-label">Balance</div></div>
+                <div class="account-stat"><div class="account-stat-val" style="color:var(--blue)">$24,721</div><div class="account-stat-label">Equity</div></div>
+                <div class="account-stat"><div class="account-stat-val up">+$340</div><div class="account-stat-label">Floating P&amp;L</div></div>
+                <div class="account-stat"><div class="account-stat-val" style="color:var(--gold)">1:500</div><div class="account-stat-label">Leverage</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3)">Account Number</span><span style="font-family:'Syne',sans-serif;font-weight:700">#824710</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3)">Broker</span><span>IC Markets</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3)">Server</span><span>ICMarketsSC-MT5-2</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3)">Account Type</span><span>Raw Spread</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;font-size:12px"><span style="color:var(--text3)">Base Currency</span><span>USD</span></div>
+              </div>
+              <div class="btn-group" style="margin-top:14px">
+                <div class="btn btn-sm"><i class="ti ti-refresh"></i> Sync Now</div>
+                <div class="btn btn-sm btn-danger"><i class="ti ti-plug-x"></i> Disconnect</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Connect New MT5 Account</div>
+              <div class="form-group"><label class="form-label">Account Number / Login</label><input class="form-input" placeholder="e.g. 824710"></div>
+              <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="MT5 investor or master password"></div>
+              <div class="form-group">
+                <label class="form-label">Broker Server</label>
+                <select class="form-select">
+                  <option>ICMarketsSC-MT5-2</option>
+                  <option>ICMarketsSC-MT5-1</option>
+                  <option>Pepperstone-MT5</option>
+                  <option>FusionMarkets-MT5</option>
+                  <option>Custom server...</option>
+                </select>
+              </div>
+              <div class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">
+                <i class="ti ti-plug-connected"></i> Connect Account
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Connection Log</div>
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <div class="log-line"><span class="log-time">14:32:01</span><span style="color:var(--green)">✓</span><span style="color:var(--text2)">Heartbeat OK — latency 28ms</span></div>
+                <div class="log-line"><span class="log-time">14:31:31</span><span style="color:var(--green)">✓</span><span style="color:var(--text2)">Account data synced</span></div>
+                <div class="log-line"><span class="log-time">14:30:48</span><span style="color:var(--green)">✓</span><span style="color:var(--text2)">Order #112481 confirmed BUY XAUUSD</span></div>
+                <div class="log-line"><span class="log-time">14:22:10</span><span style="color:var(--gold)">⚠</span><span style="color:var(--text2)">Reconnected after brief timeout</span></div>
+                <div class="log-line"><span class="log-time">14:18:00</span><span style="color:var(--green)">✓</span><span style="color:var(--text2)">MT5 session started</span></div>
+                <div class="log-line"><span class="log-time">14:17:58</span><span style="color:var(--green)">✓</span><span style="color:var(--text2)">Authenticated — account #824710</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ NOTIFICATIONS ══ -->
+      <div class="screen" id="screen-notifications">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="section-label">Recent Notifications</div>
+          <div class="btn btn-sm">Mark all read</div>
+        </div>
+        <div class="card">
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--green-dim);color:var(--green)"><i class="ti ti-trending-up"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">Trade Opened</b> — BUY EURUSD 0.50 lots @ 1.08422<br>Strategy: MA Cross v2 · SL: 1.0797 · TP: 1.0930</div>
+              <div class="notif-time">2 minutes ago</div>
+            </div>
+            <span class="badge badge-blue" style="flex-shrink:0">New</span>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--green-dim);color:var(--green)"><i class="ti ti-check"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">Trade Closed</b> — SELL GBPUSD 0.30 lots — Profit: <span class="up">+$96.00</span><br>Strategy: RSI Scalper · Duration: 1h 10m</div>
+              <div class="notif-time">18 minutes ago</div>
+            </div>
+            <span class="badge badge-blue" style="flex-shrink:0">New</span>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--green-dim);color:var(--green)"><i class="ti ti-player-play"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">Strategy Started</b> — Gold Scalper activated on XAUUSD<br>Risk: 1.5% per trade · Max lots: 2.00</div>
+              <div class="notif-time">1 hour ago</div>
+            </div>
+            <span class="badge badge-blue" style="flex-shrink:0">New</span>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--red-dim);color:var(--red)"><i class="ti ti-x"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">Trade Closed</b> — BUY USDJPY 0.20 lots — Loss: <span class="dn">-$44.60</span><br>Hit stop loss · Strategy: Trend Follow Pro</div>
+              <div class="notif-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="ti ti-alert-triangle"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">Risk Warning</b> — Daily loss approaching limit (2.4% of 3.0% limit)<br>Review active positions to manage exposure.</div>
+              <div class="notif-time">3 hours ago</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="ti ti-plug-connected"></i></div>
+            <div style="flex:1">
+              <div class="notif-msg"><b style="color:var(--text)">MT5 Reconnected</b> — Connection restored after brief interruption<br>IC Markets · Latency: 28ms</div>
+              <div class="notif-time">4 hours ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SETTINGS ══ -->
+      <div class="screen" id="screen-settings">
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="settings-section-title">Account Settings</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Display Name</div></div>
+                <input class="form-input" value="John Doe" style="width:160px">
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Email</div></div>
+                <input class="form-input" value="trader@example.com" style="width:200px">
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Time Zone</div></div>
+                <select class="form-select" style="width:180px">
+                  <option>Africa/Lagos (WAT)</option><option>UTC</option><option>America/New_York</option><option>Europe/London</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Theme</div></div>
+                <select class="form-select" style="width:120px"><option>Dark</option><option>Light</option><option>System</option></select>
+              </div>
+              <div style="margin-top:14px"><div class="btn btn-sm btn-primary"><i class="ti ti-device-floppy"></i> Save Changes</div></div>
+            </div>
+            <div class="card">
+              <div class="settings-section-title">Risk Limits</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Global Max Risk per Trade</div><div class="setting-desc">Hard limit across all strategies</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input class="form-input" value="2.0" style="width:70px"> <span style="font-size:12px;color:var(--text3)">%</span></div>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Daily Loss Limit</div><div class="setting-desc">Pause all strategies if exceeded</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input class="form-input" value="5.0" style="width:70px"> <span style="font-size:12px;color:var(--text3)">%</span></div>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Max Drawdown</div><div class="setting-desc">Halt trading if balance drops by this</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><input class="form-input" value="15" style="width:70px"> <span style="font-size:12px;color:var(--text3)">%</span></div>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Max Simultaneous Trades</div></div>
+                <input class="form-input" value="10" style="width:70px">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="settings-section-title">Notification Preferences</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Trade Opened</div><div class="setting-desc">Alert when a new trade is executed</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Trade Closed</div><div class="setting-desc">Alert on trade closure (win or loss)</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Strategy Started / Stopped</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Risk Warnings</div><div class="setting-desc">Alert when approaching risk limits</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">MT5 Disconnection</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Email Notifications</div></div>
+                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Daily Summary Report</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+            <div class="card">
+              <div class="settings-section-title">Security</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Two-Factor Authentication</div><div class="setting-desc">Extra security for your account</div></div>
+                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Session Timeout</div></div>
+                <select class="form-select" style="width:140px"><option>4 hours</option><option>8 hours</option><option>24 hours</option><option>Never</option></select>
+              </div>
+              <div style="margin-top:14px"><div class="btn btn-sm btn-danger"><i class="ti ti-key"></i> Change Password</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+const titles = {
+  dashboard:'Dashboard', strategies:'Strategy Manager', builder:'Strategy Builder',
+  deploy:'Deploy Strategy', backtest:'Backtesting', results:'Backtest Results',
+  live:'Live Trading', mt5:'MT5 Connection', notifications:'Notifications', settings:'Settings'
+};
+
+function nav(id, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('page-title').textContent = titles[id] || id;
+
+  if (el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  // scroll content to top
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function switchAuthTab(tab) {
+  ['login','register','forgot'].forEach(t => {
+    document.getElementById('auth-' + t).style.display = 'none';
+  });
+  document.getElementById('auth-' + tab).style.display = 'block';
+  document.querySelectorAll('.auth-tab-item').forEach(t => t.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('active');
+}
+
+function showForgot() {
+  document.getElementById('auth-login').style.display = 'none';
+  document.getElementById('auth-forgot').style.display = 'block';
+}
+
+function showLogin() {
+  document.getElementById('auth-forgot').style.display = 'none';
+  document.getElementById('auth-login').style.display = 'block';
+}
+
+function enterApp() {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+}
+
+function logout() {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+}
+
+function togglePair(el) {
+  el.classList.toggle('selected');
+}
+</script>
+</body>
+</html>

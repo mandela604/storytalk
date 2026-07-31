@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070b"/>
+<title>Droboard · Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   CSS VARIABLES — same naming convention as reader.html so a light
+   theme is just a body class away (see body.theme-white below).
+   Light-mode values are tuned to match discover.html's [data-theme=
+   "light"] palette so the two pages feel like one product.
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;
+  --acc-dim:rgba(255,0,80,.1);--acc-light:rgba(255,0,80,.08);--acc-mid:rgba(255,0,80,.14);
+  --acc-border:rgba(255,0,80,.3);--glow:rgba(255,0,80,.22);
+  --bg:#07070b;--bg2:#0e0e1c;--bg3:#111118;--card:#111118;--surface:#0e0e1c;
+  --tx:#f5f5f7;--tx2:#aaa;--muted:#888;--muted2:#555;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.05);
+  --green:#16a34a;--green-s:rgba(22,163,74,.1);
+  --blue:#1a6ce8;--blue-s:rgba(26,108,232,.1);
+  --gold:#d97706;--gold-s:rgba(217,119,6,.1);
+  --purple:#7c3aed;--purple-s:rgba(124,58,237,.1);
+  --r:14px;--r-sm:9px;--r-pill:999px;
+  --font-d:'Playfair Display',serif;--font-b:'DM Sans',sans-serif;
+  --safe-b:env(safe-area-inset-bottom,16px);
+  --topbar:52px;--dock:68px;
+}
+/* Light theme — toggle by setting <body class="theme-white"> (persisted
+   via localStorage, toggled from the topbar sun/moon button below). */
+body.theme-white{
+  --bg:#f5f5f5;--bg2:#ececec;--bg3:#e5e5e5;--card:#ffffff;--surface:#f0f0f0;
+  --tx:#1a1a1a;--tx2:#555555;--muted:#888888;--muted2:#aaaaaa;
+  --bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.04);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+img{display:block;user-select:none}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+
+/* ── TOP BAR ── */
+.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;padding:0 14px;height:var(--topbar);background:rgba(7,7,11,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--bd);}
+body.theme-white .topbar{background:rgba(255,255,255,.94)}
+.tb-back{width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx2);cursor:pointer;flex-shrink:0;transition:.15s;}
+.tb-back:active{transform:scale(.93)}
+.tb-title{flex:1;font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .25s;}
+.tb-title.vis{opacity:1}
+.tb-actions{display:flex;gap:7px;align-items:center}
+.tb-btn{width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);cursor:pointer;transition:.15s;}
+.tb-btn:active{transform:scale(.93)}
+.tb-btn.saved{background:var(--blue-s);border-color:rgba(26,108,232,.2);color:var(--blue)}
+/* Reaction-picker trigger squeezed into a topbar circle */
+#tbLikeWrap .drp-trigger{width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);justify-content:center;padding:0;gap:0}
+#tbLikeWrap .drp-trigger.liked{background:var(--acc-light);border-color:rgba(255,0,80,.3)}
+#tbLikeWrap .drp-like-count,#tbLikeWrap .drp-top3{display:none}
+
+/* ── SCROLL BODY ── */
+.scroll-body{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(var(--dock) + var(--safe-b));height:calc(100vh - var(--topbar));}
+.scroll-body::-webkit-scrollbar{display:none}
+
+/* ── HERO ── */
+.hero{position:relative;height:280px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 25%;}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,8,18,.98) 0%,rgba(10,8,18,.55) 42%,rgba(10,8,18,.12) 100%);}
+body.theme-white .hero-scrim{background:linear-gradient(0deg,rgba(255,255,255,.98) 0%,rgba(255,255,255,.55) 42%,rgba(255,255,255,.1) 100%);}
+.hero-top{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:5px;flex-wrap:wrap;z-index:4}
+.hbadge{font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:var(--r-pill);display:inline-flex;align-items:center;gap:3px;letter-spacing:.03em;}
+.hb-cat{background:var(--acc);color:#fff}
+.hb-type{background:rgba(255,255,255,.16);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.22)}
+.hb-series{background:rgba(26,108,232,.85);color:#fff}
+.hero-body{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:14px 14px 18px}
+.hero-title{font-family:var(--font-d);font-size:20px;font-weight:900;line-height:1.22;color:var(--tx);text-shadow:0 2px 14px rgba(0,0,0,.15);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.hero-writer{display:flex;align-items:center;gap:9px}
+.hw-av-ring{width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--acc),#ff6b8a,var(--acc2),var(--acc));padding:2px;flex-shrink:0;cursor:pointer;}
+.hw-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000}
+.hw-av-inner img{width:100%;height:100%;object-fit:cover}
+.hw-info{flex:1;min-width:0}
+.hw-name{font-size:12px;font-weight:700;color:var(--tx);cursor:pointer}
+.hw-handle{font-size:10px;color:var(--tx2)}
+.hw-follow{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:var(--tx);padding:5px 13px;border-radius:var(--r-pill);font-size:10px;font-weight:700;transition:.2s;white-space:nowrap;}
+body.theme-white .hw-follow{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18)}
+.hw-follow.ing{background:var(--acc);border-color:var(--acc);color:#fff}
+.hw-follow:active{transform:scale(.96)}
+
+/* ── STATS STRIP ── */
+.stats-strip{display:flex;background:var(--card);border-bottom:1px solid var(--bd);}
+.stat-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 6px;border-right:1px solid var(--bd);cursor:pointer;transition:.15s;gap:2px;}
+.stat-cell:last-child{border-right:none}
+.stat-cell:active{background:var(--bg)}
+.sn{font-size:14px;font-weight:800;line-height:1;color:var(--tx)}
+.sn.acc{color:var(--acc)}
+.sn.gold{color:var(--gold)}
+.sl{font-size:8.5px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+
+/* ── SECTION ── */
+.sec{padding:20px 14px 0}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:7px;}
+.sec-icon{width:27px;height:27px;border-radius:8px;background:var(--acc-light);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.sec-more{font-size:10px;font-weight:700;color:var(--acc);background:var(--acc-light);padding:4px 10px;border-radius:var(--r-pill);cursor:pointer;}
+.divider{height:1px;background:var(--bd2);margin:20px 14px 0}
+
+/* ── CONTINUE READING ── */
+.rp-card{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;}
+.rp-card:active{transform:scale(.99)}
+.rp-icon{width:40px;height:40px;border-radius:var(--r-sm);background:var(--acc-light);border:1px solid rgba(255,0,80,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.rp-body{flex:1;min-width:0}
+.rp-lbl{font-size:8.5px;font-weight:800;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.rp-title{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-bar{height:3px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.rp-bar-fill{height:100%;background:var(--acc);border-radius:3px}
+.rp-meta{font-size:9px;color:var(--muted);display:flex;justify-content:space-between}
+.rp-btn{background:var(--bg2);color:var(--tx);padding:7px 13px;border-radius:var(--r-pill);font-size:10px;font-weight:800;flex-shrink:0;}
+
+/* ── SYNOPSIS (plain text, not italic) ── */
+.synopsis-box{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 15px;}
+.synopsis-text{font-size:13.5px;line-height:1.7;color:var(--tx2);font-style:normal;}
+.synopsis-more{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--acc);margin-top:8px;cursor:pointer;}
+
+/* ── ENGAGEMENT ── */
+.eng-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.eng-row::-webkit-scrollbar{display:none}
+.eng-pill{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:var(--r);cursor:pointer;border:1.5px solid var(--bd);background:var(--card);transition:all .18s;}
+.eng-pill:active{transform:scale(.97)}
+.eng-pill.active-poll{border-color:rgba(26,108,232,.35);background:var(--blue-s)}
+.eng-pill.active-debate{border-color:rgba(255,0,80,.35);background:var(--acc-light)}
+.eng-pill.active-pred{border-color:rgba(124,58,237,.3);background:var(--purple-s)}
+.ep-emoji{font-size:18px}
+.ep-body{display:flex;flex-direction:column;gap:1px}
+.ep-label{font-size:10px;font-weight:800;color:var(--tx)}
+.ep-sub{font-size:9px;color:var(--muted);font-weight:600}
+.eng-card{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-top:10px;display:none;}
+.eng-card.open{display:block}
+.ec-header{padding:12px 14px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:8px;}
+.ec-badge{font-size:8px;font-weight:800;padding:2px 8px;border-radius:var(--r-pill);flex-shrink:0;margin-top:2px;}
+.ec-badge.poll{background:var(--blue-s);color:var(--blue);border:1px solid rgba(26,108,232,.2)}
+.ec-badge.debate{background:var(--acc-light);color:var(--acc);border:1px solid rgba(255,0,80,.2)}
+.ec-badge.pred{background:var(--purple-s);color:var(--purple);border:1px solid rgba(124,58,237,.18)}
+.ec-q{font-size:13px;font-weight:700;color:var(--tx);line-height:1.38;flex:1}
+.ec-opts{padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.ec-opt{position:relative;border-radius:var(--r-sm);padding:10px 12px;cursor:pointer;overflow:hidden;border:1.5px solid var(--bd);background:var(--surface);transition:border-color .2s;}
+.ec-opt.voted{border-color:var(--acc)}
+.ec-opt-bar{position:absolute;left:0;top:0;bottom:0;background:var(--acc-light);transition:width .5s ease;z-index:0}
+.ec-opt-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ec-opt-text{font-size:12px;font-weight:600;color:var(--tx)}
+.ec-opt-pct{font-size:11px;font-weight:800;color:var(--acc)}
+.ec-footer{padding:8px 14px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+.ec-total{font-size:10px;color:var(--muted);font-weight:600}
+.ec-share{font-size:10px;font-weight:700;color:var(--acc);cursor:pointer;display:flex;align-items:center;gap:3px}
+.debate-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px}
+.d-side{border-radius:var(--r-sm);padding:12px 10px;cursor:pointer;border:1.5px solid var(--bd);background:var(--surface);text-align:center;transition:all .2s;}
+.d-side.for.chosen{border-color:rgba(22,163,74,.4);background:var(--green-s)}
+.d-side.against.chosen{border-color:rgba(255,0,80,.35);background:var(--acc-light)}
+.d-emoji{font-size:18px;margin-bottom:4px}
+.d-label{font-size:10px;font-weight:800;margin-bottom:5px}
+.d-side.for .d-label{color:var(--green)}
+.d-side.against .d-label{color:var(--acc)}
+.d-bar-bg{height:3px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.d-bar{height:100%;border-radius:3px}
+.d-side.for .d-bar{background:var(--green)}
+.d-side.against .d-bar{background:var(--acc)}
+.d-pct{font-size:12px;font-weight:900;color:var(--tx2)}
+.d-count{font-size:8.5px;color:var(--muted);margin-top:1px}
+.d-total{padding:0 14px 7px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:livep 1.3s ease-in-out infinite;flex-shrink:0}
+@keyframes livep{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+
+/* ── TIP LINE ── */
+.tip-line{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r-pill);padding:9px 15px;cursor:pointer;font-size:11.5px;font-weight:700;color:var(--tx2);transition:.15s;}
+.tip-line:active{transform:scale(.98)}
+.tip-line i{color:var(--gold);font-size:13px}
+.tip-line b{color:var(--tx)}
+
+/* ── CHAPTERS ── */
+.season-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.season-tabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;padding:5px 13px;border-radius:var(--r-pill);font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);color:var(--muted);background:var(--card);transition:.18s;}
+.stab.active{background:var(--bg2);border-color:var(--bd);color:var(--tx);box-shadow:0 2px 8px var(--glow)}
+.ch-list{display:flex;flex-direction:column;gap:7px}
+.ch-item{display:flex;align-items:center;gap:11px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r-sm);padding:11px 13px;cursor:pointer;transition:border-color .18s;}
+.ch-item.is-locked{opacity:.72}
+.ch-item:active{transform:scale(.99);border-color:rgba(255,0,80,.3)}
+.ch-num{width:32px;height:32px;border-radius:50%;background:var(--bg);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;}
+.ch-num.done{background:var(--green-s);color:var(--green);border-color:rgba(22,163,74,.2)}
+.ch-num.current{background:var(--acc-light);color:var(--acc);border-color:rgba(255,0,80,.3)}
+.ch-num.locked{background:var(--bg2);color:var(--muted2)}
+.ch-body{flex:1;min-width:0}
+.ch-title{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3}
+.ch-meta{font-size:9.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ch-tag{font-size:7.5px;font-weight:800;padding:1.5px 6px;border-radius:var(--r-pill);display:inline-flex;align-items:center;}
+.ch-tag.new{background:var(--acc-light);color:var(--acc);border:1px solid rgba(255,0,80,.2)}
+.ch-tag.free{background:var(--green-s);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+.ch-tag.locked{background:var(--bg2);color:var(--muted);border:1px solid var(--bd)}
+.ch-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.ch-progress{height:3px;width:46px;border-radius:3px;background:var(--bg2);overflow:hidden}
+.ch-progress-fill{height:100%;background:var(--acc);border-radius:3px}
+.ch-btn{background:var(--bg2);color:var(--tx);border:none;padding:5px 12px;border-radius:var(--r-pill);font-size:9px;font-weight:800;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px;}
+.ch-btn:active{transform:scale(.94)}
+.ch-btn.resume{background:var(--acc)}
+.ch-btn.locked-btn{background:var(--bg2);color:var(--muted)}
+.ch-pg{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px 0 6px;}
+.cpg-btn{width:30px;height:30px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;transition:.15s;}
+.cpg-btn:active{transform:scale(.9)}
+.cpg-btn.active{background:var(--bg2);border-color:var(--acc);color:var(--tx);box-shadow:0 2px 8px var(--glow)}
+.cpg-btn.disabled{opacity:.35;pointer-events:none}
+.cpg-info{font-size:11px;font-weight:700;color:var(--muted);padding:0 4px}
+
+/* ── REACTIONS — STAT DISPLAY ONLY ──
+   This grid is a read-only breakdown of how people reacted; it mirrors
+   the shared reaction-picker state so the numbers can never drift from
+   the Likes stat above, but tapping a tile does nothing — reacting
+   happens through the heart button in the topbar/dock, same as any
+   other Droboard page. No note/caption underneath (removed per design). */
+.rx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.rx-card{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r-sm);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default;}
+.rx-card.picked{border-color:rgba(255,0,80,.35);background:var(--acc-light)}
+.rx-e{font-size:20px;line-height:1}
+.rx-l{font-size:8px;font-weight:700;color:var(--muted)}
+.rx-n{font-size:10px;font-weight:800;color:var(--tx)}
+.rx-card.picked .rx-n{color:var(--acc)}
+
+/* ── JOIN HUBS (genre hub + author's inner circle) ── */
+.hub-card{display:flex;align-items:center;gap:11px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px;cursor:pointer;transition:.15s;margin-bottom:9px;}
+.hub-card:active{transform:scale(.99)}
+.hub-icon{width:44px;height:44px;border-radius:12px;background:var(--acc-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.hub-icon.circle-icon{border-radius:50%;overflow:hidden;background:var(--bg2);border:2px solid var(--gold);padding:0}
+.hub-icon.circle-icon img{width:100%;height:100%;object-fit:cover}
+.hub-body{flex:1;min-width:0}
+.hub-name{font-size:12.5px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:5px}
+.hub-sub{font-size:10px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:4px}
+.hub-join-btn{flex-shrink:0;background:var(--bg2);color:var(--tx);border:1.5px solid var(--bd);padding:8px 14px;border-radius:var(--r-pill);font-size:10.5px;font-weight:800;transition:.18s;}
+.hub-join-btn.joined{background:var(--green-s);border-color:rgba(22,163,74,.3);color:var(--green)}
+.hub-join-btn.circle-btn{background:var(--acc);border-color:var(--acc);color:#fff;}
+.hub-join-btn.circle-btn.joined{background:var(--gold-s);border-color:rgba(217,119,6,.35);color:var(--gold)}
+.hub-join-btn:active{transform:scale(.94)}
+
+/* ── AUTHOR CARD ── */
+.writer-card{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.wc-banner{height:60px;background:linear-gradient(120deg,#1a0010,#2a0025,#0d0020);position:relative;overflow:hidden;}
+body.theme-white .wc-banner{background:linear-gradient(120deg,#ffe1ec,#ffd0e0,#ffe8ef);}
+.wc-body{padding:0 14px 14px}
+.wc-av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-22px;margin-bottom:10px}
+.wc-av-ring{width:48px;height:48px;border-radius:50%;background:conic-gradient(var(--acc),#ff6b8a,var(--acc2),var(--acc));padding:2.5px;box-shadow:0 0 12px var(--glow);cursor:pointer;}
+.wc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111118}
+.wc-av-inner img{width:100%;height:100%;object-fit:cover}
+.wc-follow{background:var(--bg2);color:var(--tx);padding:6px 15px;border-radius:var(--r-pill);font-size:10px;font-weight:800;cursor:pointer;transition:.2s;}
+.wc-follow.ing{background:var(--bg2);border:1.5px solid var(--bd);color:var(--muted);}
+.wc-follow:active{transform:scale(.95)}
+.wc-name{font-family:var(--font-d);font-size:15px;font-weight:900;color:var(--tx);margin-bottom:1px}
+.wc-handle{font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.wc-vbadge{font-size:8px;font-weight:800;padding:1px 6px;border-radius:var(--r-pill);background:var(--blue-s);color:var(--blue);border:1px solid rgba(26,108,232,.2)}
+.wc-bio{font-size:12px;color:var(--tx2);line-height:1.55;margin-bottom:10px}
+.wc-stats{display:flex;border:1px solid var(--bd);border-radius:var(--r-sm);overflow:hidden}
+.ws{flex:1;text-align:center;padding:9px 4px;border-right:1px solid var(--bd)}
+.ws:last-child{border-right:none}
+.ws-n{font-size:13px;font-weight:800;color:var(--tx);line-height:1}
+.ws-l{font-size:8px;font-weight:600;color:var(--muted);margin-top:2px}
+.wc-view-btn{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:700;color:var(--acc);margin-top:11px;cursor:pointer;}
+
+/* ── COMMENTS — component mounts here as a collapsed accordion ── */
+.cm-view-all{width:100%;padding:10px;border-radius:var(--r-sm);background:var(--card);border:1.5px solid var(--bd);font-size:12px;font-weight:700;color:var(--tx2);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-top:10px;transition:.15s;}
+.cm-view-all:active{background:var(--bg)}
+
+/* ── DETAILS TABLE ── */
+.details-tbl{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+.dt-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--bd2)}
+.dt-row:last-child{border-bottom:none}
+.dt-icon{width:28px;height:28px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.dt-lbl{font-size:9.5px;color:var(--muted);font-weight:600;width:72px;flex-shrink:0}
+.dt-val{font-size:12px;font-weight:700;color:var(--tx);flex:1}
+.dt-val.acc{color:var(--acc)}
+
+/* ── TAGS ── */
+.tags-row{display:flex;gap:6px;flex-wrap:wrap}
+.tag{padding:5px 11px;border-radius:var(--r-pill);font-size:10px;font-weight:700;background:var(--bg2);border:1.5px solid var(--bd);color:var(--tx2);cursor:pointer;transition:.15s;}
+.tag:active{background:var(--acc-light);border-color:rgba(255,0,80,.3);color:var(--acc)}
+
+/* ── SIMILAR ── */
+.sim-scroll{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.sim-scroll::-webkit-scrollbar{display:none}
+.sim-card{flex-shrink:0;width:128px;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:.18s;}
+.sim-card:active{transform:scale(.97)}
+.sim-thumb{width:100%;height:86px;background-size:cover;background-position:center;position:relative}
+.sim-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.5),transparent 55%)}
+.sim-body{padding:7px 8px 9px}
+.sim-cat{font-size:7.5px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.sim-title{font-size:10px;font-weight:700;line-height:1.3;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sim-author{font-size:9px;color:var(--muted);margin-top:3px}
+
+/* ── BOTTOM DOCK ── */
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(7,7,11,.96);backdrop-filter:blur(18px);border-top:1px solid var(--bd);padding:10px 14px calc(10px + var(--safe-b));display:flex;gap:9px;align-items:center;}
+body.theme-white .dock{background:rgba(255,255,255,.95)}
+.dock-read{flex:1;padding:13px;border-radius:var(--r-sm);background:var(--acc);color:#fff;font-size:14px;font-weight:800;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 2px 12px var(--glow);}
+.dock-read:active{transform:scale(.97)}
+.dock-icon{width:48px;height:48px;border-radius:var(--r-sm);background:var(--card);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;transition:.15s;flex-shrink:0;color:var(--tx2);}
+.dock-icon:active{transform:scale(.93)}
+.dock-icon.saved{background:var(--blue-s);border-color:rgba(26,108,232,.2);color:var(--blue)}
+/* Reaction-picker trigger squeezed into the dock's like square */
+#dockLikeWrap{width:48px;height:48px;border-radius:var(--r-sm);background:var(--card);border:1.5px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+#dockLikeWrap.liked-outer{background:var(--acc-light);border-color:rgba(255,0,80,.3)}
+#dockLikeWrap .drp-trigger{flex-direction:column;gap:2px;padding:2px}
+#dockLikeWrap .drp-trigger i{font-size:15px}
+#dockLikeWrap .drp-like-count{font-size:8px}
+#dockLikeWrap .drp-top3{display:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--card);color:var(--tx);padding:8px 16px;border-radius:var(--r-pill);font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px);border:1px solid var(--bd);box-shadow:0 4px 20px rgba(0,0,0,.35);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .3s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
+.d4{animation-delay:.2s}.d5{animation-delay:.25s}.d6{animation-delay:.3s}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-back" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-title" id="tbTitle"></div>
+  <div class="tb-actions">
+    <div id="tbLikeWrap"></div>
+    <div class="tb-btn" id="themeBtn" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></div>
+    <div class="tb-btn" id="tbSave" onclick="openSave()"><i class="far fa-bookmark"></i></div>
+    <div class="tb-btn" onclick="openShare()"><i class="fas fa-share-alt"></i></div>
+  </div>
+</div>
+
+<!-- SCROLL BODY -->
+<div class="scroll-body" id="scrollBody">
+
+  <!-- HERO -->
+  <div class="hero fu d1" id="heroSec"></div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip fu d1" id="statsStrip"></div>
+
+  <!-- CONTINUE READING -->
+  <div class="sec fu d2">
+    <div class="rp-card" id="continueCard" onclick="goToReader()">
+      <div class="rp-icon">📖</div>
+      <div class="rp-body">
+        <div class="rp-lbl">Continue Reading</div>
+        <div class="rp-title" id="rpTitle">—</div>
+        <div class="rp-bar"><div class="rp-bar-fill" id="rpBarFill" style="width:0%"></div></div>
+        <div class="rp-meta"><span id="rpPct">0% complete</span><span id="rpLeft">—</span></div>
+      </div>
+      <div class="rp-btn">Resume →</div>
+    </div>
+  </div>
+
+  <!-- SYNOPSIS -->
+  <div class="sec fu d2">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon">📖</div>Synopsis</div></div>
+    <div class="synopsis-box">
+      <div class="synopsis-text" id="synText"></div>
+      <div class="synopsis-more" id="synBtn" onclick="toggleSyn()"><i class="fas fa-chevron-down" style="font-size:9px"></i> Read more</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ENGAGEMENT -->
+  <div class="sec fu d3">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(255,0,80,.08)">⚡</div>Reader Engagement</div></div>
+    <div class="eng-row">
+      <div class="eng-pill" id="pill-poll" onclick="toggleEng('poll')">
+        <div class="ep-emoji">📊</div><div class="ep-body"><div class="ep-label">Poll</div><div class="ep-sub" id="pollSub">— votes</div></div>
+      </div>
+      <div class="eng-pill" id="pill-debate" onclick="toggleEng('debate')">
+        <div class="ep-emoji">⚔️</div><div class="ep-body"><div class="ep-label">Debate</div><div class="ep-sub" id="debateSub">— live</div></div>
+      </div>
+      <div class="eng-pill" id="pill-pred" onclick="toggleEng('pred')">
+        <div class="ep-emoji">🔮</div><div class="ep-body"><div class="ep-label">Prediction</div><div class="ep-sub" id="predSub">— locked</div></div>
+      </div>
+    </div>
+    <div class="eng-card" id="card-poll">
+      <div class="ec-header"><span class="ec-badge poll">📊 Poll</span><div class="ec-q" id="pollQ"></div></div>
+      <div class="ec-opts" id="pollOpts"></div>
+      <div class="ec-footer"><span class="ec-total" id="pollTotal"></span><span class="ec-share" onclick="toast('📤 Share poll…')"><i class="fas fa-share-alt" style="font-size:9px"></i> Share</span></div>
+    </div>
+    <div class="eng-card" id="card-debate">
+      <div class="ec-header"><span class="ec-badge debate"><span class="live-dot"></span> Live Debate</span><div class="ec-q" id="debateQ"></div></div>
+      <div class="debate-sides">
+        <div class="d-side for" id="dFor" onclick="voteDebate('for')">
+          <div class="d-emoji">✅</div><div class="d-label">FOR</div>
+          <div class="d-bar-bg"><div class="d-bar" id="forBar"></div></div>
+          <div class="d-pct" id="forPct"></div><div class="d-count" id="forCnt"></div>
+        </div>
+        <div class="d-side against" id="dAg" onclick="voteDebate('against')">
+          <div class="d-emoji">❌</div><div class="d-label">AGAINST</div>
+          <div class="d-bar-bg"><div class="d-bar" id="agBar"></div></div>
+          <div class="d-pct" id="agPct"></div><div class="d-count" id="agCnt"></div>
+        </div>
+      </div>
+      <div class="d-total"><span class="live-dot"></span> <span id="debateLiveTotal"></span> readers debating live right now</div>
+      <div class="ec-footer"><span class="ec-total" id="debateVoicesTotal"></span><span class="ec-share" onclick="toast('⚔️ Full debate…')"><i class="fas fa-gavel" style="font-size:9px"></i> Full Debate</span></div>
+    </div>
+    <div class="eng-card" id="card-pred">
+      <div class="ec-header"><span class="ec-badge pred">🔮 Prediction</span><div class="ec-q" id="predQ"></div></div>
+      <div class="ec-opts" id="predOpts"></div>
+      <div class="ec-footer"><span class="ec-total" id="predTotal"></span><span class="ec-share" onclick="toast('📤 Share…')"><i class="fas fa-share-alt" style="font-size:9px"></i> Share</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TIP LINE — moved here: after Engagement, before Chapters -->
+  <div class="sec fu d3">
+    <div class="tip-line" onclick="openTip()">
+      <i class="fas fa-coins"></i> <b id="tipCountLbl">— tips</b> · Tap to support this writer
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CHAPTERS -->
+  <div class="sec fu d3">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(26,108,232,.08)">📚</div>Chapters</div></div>
+    <div class="season-tabs" id="seasonTabs"></div>
+    <div class="ch-list" id="chList"></div>
+    <div class="ch-pg" id="chPg"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REACTIONS — read-only stat breakdown; tap the heart (topbar/dock) to react -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(236,72,153,.08)">😭</div>Reactions</div></div>
+    <div class="rx-grid" id="rxGrid"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- JOIN HUBS: genre hub + author's inner circle (non-negotiable) -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(217,119,6,.08)">🧿</div>Communities</div></div>
+    <div id="hubsWrap"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT THE WRITER -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(245,158,11,.08)">✍️</div>About the Writer</div></div>
+    <div class="writer-card">
+      <div class="wc-banner"></div>
+      <div class="wc-body" id="writerBody"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMENTS — the real DroboardComments component, rendered as a
+       collapsed accordion with no comments preloaded. The component
+       supplies its own toggle header/count, so nothing custom lives
+       here besides the mount point and a "view full thread" link. -->
+  <div class="sec fu d5" id="commentsSection">
+    <div id="commentsPlaceholder"></div>
+    <button class="cm-view-all" onclick="goToAllComments()">
+      <i class="fas fa-comment" style="font-size:11px;color:var(--acc)"></i> <span id="cmViewAllLbl">View full comment thread</span>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DETAILS -->
+  <div class="sec fu d5">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon">ℹ️</div>Details</div></div>
+    <div class="details-tbl" id="detailsTbl"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TAGS -->
+  <div class="sec fu d6">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(124,58,237,.08)">#</div>Tags</div></div>
+    <div class="tags-row" id="tagsRow"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SIMILAR -->
+  <div class="sec fu d6">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(124,58,237,.08)">✨</div>More Like This</div></div>
+    <div class="sim-scroll" id="simScroll"></div>
+  </div>
+
+  <div style="height:12px"></div>
+</div>
+
+<!-- BOTTOM DOCK -->
+<div class="dock">
+  <div id="dockLikeWrap"></div>
+  <button class="dock-read" onclick="goToReader()">
+    <i class="fas fa-book-open" style="font-size:14px"></i> Read Now
+  </button>
+  <div class="dock-icon" id="dockSave" onclick="openSave()"><i class="far fa-bookmark"></i></div>
+  <div class="dock-icon" onclick="openShare()"><i class="fas fa-share-alt"></i></div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- ═══ Shared Droboard components — same load order convention as full-reader.html ═══ -->
+<script src="component/reaction-picker.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/save-modal.js"></script>
+<script src="component/tip-picker.js"></script>
+<script src="component/comment-section.js"></script>
+
+<!-- ═══ Seed data — same convention as full-reader.html ═══ -->
+<script src="data/comments-data.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   UTILS
+   ══════════════════════════════════════════════════════════════════ */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+function fmtN(n){n=+n||0;return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ══════════════════════════════════════════════════════════════════
+   STORY ID (from querystring, so this page + full-reader.html + the
+   API all agree on which story is being viewed)
+   ══════════════════════════════════════════════════════════════════ */
+const params = new URLSearchParams(location.search);
+const STORY_ID = params.get('story') || 'story-5';
+
+/* ══════════════════════════════════════════════════════════════════
+   TEAMS — passed straight into DroboardComments (same convention as
+   full-reader.html's "pick your side" siding) so comment tags line up
+   with this story's live debate above.
+   ══════════════════════════════════════════════════════════════════ */
+const TEAMS = [
+  { id:'a', icon:'💔', name:'Team Leave',   col:'#ff0050' },
+  { id:'b', icon:'🕊️', name:'Team Forgive', col:'#34d399' },
+  { id:'c', icon:'🤍', name:'Team Neither', col:'#60a5fa' },
+  { id:'d', icon:'👀', name:'Team Watching',col:'#a78bfa' },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA LAYER — loads from window.DroboardStoryAPI if defined,
+   otherwise falls back to DEMO_STORY below. To go to production,
+   define window.DroboardStoryAPI.getStory(id) before this script
+   runs — nothing else on this page needs to change.
+   ══════════════════════════════════════════════════════════════════ */
+const DEMO_STORY = {
+  id: STORY_ID,
+  title: "I came home early and caught my husband kissing my late sister's photograph",
+  cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&q=85',
+  category: { emoji:'💔', name:'Betrayal' },
+  type: 'Series',
+  seasonChapterLabel: 'S2 · Ch 4',
+  writer: {
+    name:'Ada_Writes', handle:'@ada_writes', avatar:'https://i.pravatar.cc/100?img=32',
+    followers: 12400, following:false, verified:true, stories:8, reads:171000, rating:4.7,
+    bio:"Telling stories that live in your chest long after you close the tab. Betrayal · Family · Redemption. Lagos-based, always online at 2am."
+  },
+  stats: { comments: 4100, reads: 171000, shares: 34000, rating: 4.7 },
+  continue: { chapterId: 4, chapterTitle:'Chapter 4 — The night she asked him to be honest', progress: 62, timeLeft:'~3 min left' },
+  synopsis: {
+    short: "A woman returns home early to find her husband in an intimate moment with a photograph of her deceased sister. What follows is not a fight — it is the slow unravelling of a marriage built on two griefs that never met.",
+    more: " Ada_Writes' most read series explores betrayal, grief, and the love that hides inside silence. Season 2 picks up a year after Ada moved back home — the husband has a new therapist, and Ada has a new question. Neither of them is ready for the answers."
+  },
+  engagement: {
+    poll: { q:'Who was truly at fault in this situation?', opts:[
+      {t:"💔 His grief doesn't excuse the betrayal", v:4812},
+      {t:'🕊️ He was grieving — it\'s complicated', v:2344},
+      {t:'🤷 Nobody is fully right here', v:1044},
+    ]},
+    debate: { q:'"Ada should stay and fight for her marriage, not leave."', dFor:2341, dAg:3819 },
+    pred: { q:'What happens in Chapter 5?', opts:[
+      {t:'💔 Ada confronts him and leaves', v:2201},
+      {t:'🕊️ They start couples therapy', v:1888},
+      {t:'📸 A secret about the sister is revealed', v:987},
+      {t:'🏠 Ada moves out quietly', v:574},
+    ]},
+  },
+  seasons: [
+    { label:'Season 1', chs:[
+      {n:1,title:'The knock on the door',meta:'3 min · 640 words',badge:'free',state:'done'},
+      {n:2,title:'The photograph he kept',meta:'4 min · 820 words',badge:null,state:'done'},
+      {n:3,title:'She asked him nothing that night',meta:'3 min · 700 words',badge:null,state:'done'},
+      {n:4,title:'The anniversary dinner',meta:'4 min · 790 words',badge:null,state:'done'},
+      {n:5,title:'What the neighbours heard',meta:'4 min · 810 words',badge:null,state:'done'},
+      {n:6,title:"Her mother knew",meta:'3 min · 670 words',badge:null,state:'done'},
+      {n:7,title:'Two sleepless mornings',meta:'4 min · 830 words',badge:null,state:'done'},
+      {n:8,title:'She packed the small bag first',meta:'5 min · 960 words',badge:null,state:'done'},
+      {n:9,title:'The last Sunday meal',meta:'4 min · 800 words',badge:null,state:'done'},
+      {n:10,title:'She left the key under the mat',meta:'5 min · 980 words',badge:null,state:'done'},
+      {n:11,title:'One year later',meta:'6 min · 1100 words',badge:null,state:'done'},
+    ]},
+    { label:'Season 2', chs:[
+      {n:1,title:'New apartment, same nightmares',meta:'4 min · 800 words',badge:null,state:'done'},
+      {n:2,title:'He texted. She waited.',meta:'3 min · 650 words',badge:null,state:'done'},
+      {n:3,title:"The therapist asked about her sister",meta:'4 min · 820 words',badge:null,state:'done'},
+      {n:4,title:'The night she asked him to be honest',meta:'5 min · 940 words',badge:'new',state:'current',progress:62},
+      {n:5,title:'What he finally told her',meta:'5 min · 950 words',badge:null,state:'locked'},
+      {n:6,title:'The choice she almost made',meta:'4 min · 880 words',badge:null,state:'locked'},
+    ]},
+  ],
+  // Reaction seed — this must equal the "Likes" stat exactly; the grid and
+  // the heart triggers in the topbar/dock all read from this same object,
+  // so however people react (via the heart button), the total can never
+  // drift past it. The grid itself is stat-only and has no click handlers.
+  reactions: { userRx:null, love:9000, crying:6000, angry:0, shocked:2000, broken:4000, emotional:1500, savage:900, sus:500, twist:400, laughing:0 },
+  hubs: {
+    genre: { name:'Betrayal Hub', icon:'💔', members: 84200, joined:false },
+    circle: { name:"Ada_Writes' Inner Circle", members: 3200, joined:false, perks:'Early chapters, behind-the-scenes, live Q&As' },
+  },
+  details: [
+    { icon:'📚', lbl:'Type', val:'Series · Ongoing' },
+    { icon:'🏷️', lbl:'Category', val:'💔 Betrayal', acc:true },
+    { icon:'📅', lbl:'Seasons', val:'2 Seasons · 17 Chapters' },
+    { icon:'⏱️', lbl:'Read time', val:'~4 min/chapter' },
+    { icon:'📅', lbl:'Started', val:'Jan 2025' },
+    { icon:'✅', lbl:'Status', val:'Ongoing · Ch5 soon', acc:true },
+  ],
+  tags: ['#betrayal','#grief','#marriage','#secrets','#redemption','#nigeria'],
+  similar: [
+    {cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=75',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",author:'Kemi_A'},
+    {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',cat:'🔥 Revenge',title:'My stepmother stole my university fund',author:'Zara_M'},
+    {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',cat:'👑 Family',title:"Grandmother's will revealed I wasn't blood",author:'Chiamaka_N'},
+    {cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=75',cat:'🌙 Elegy',title:'The letter he never sent',author:'Efe_O'},
+    {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',cat:'✨ Twist',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story'},
+  ],
+  tipCount: 1240,
+};
+
+let DATA = null;
+
+async function loadStory(){
+  let data = null;
+  try{
+    if (window.DroboardStoryAPI && typeof window.DroboardStoryAPI.getStory === 'function'){
+      data = await window.DroboardStoryAPI.getStory(STORY_ID);
+    }
+  }catch(err){ console.warn('[Droboard] Story API failed, falling back to demo data', err); }
+  DATA = data || DEMO_STORY;
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════════ */
+const S = { heroFollow:false, wcFollow:false, debateVote:null, pollVoted:-1, predVoted:-1, synExp:false, engOpen:null, activeSeason:1, chPage:0 };
+const CH_PER_PAGE = 6;
+const RX_KEY = 'story::' + STORY_ID; // shared registry key read by reaction-picker via comment-section's binding
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER: everything
+   ══════════════════════════════════════════════════════════════════ */
+function renderAll(){
+  document.getElementById('tbTitle').textContent = DATA.title;
+  renderHero();
+  renderStats();
+  renderContinue();
+  renderSynopsis();
+  renderEngagement();
+  document.getElementById('tipCountLbl').textContent = fmtN(DATA.tipCount) + ' tips';
+  S.activeSeason = DATA.seasons.length - 1;
+  renderSeasonTabs(); renderChapters();
+  renderReactionsAndTriggers();
+  renderHubs();
+  renderWriter();
+  renderComments();
+  renderDetails();
+  renderTags();
+  renderSimilar();
+
+  const sb=document.getElementById('scrollBody');
+  const tbT=document.getElementById('tbTitle');
+  sb.addEventListener('scroll',()=>tbT.classList.toggle('vis',sb.scrollTop>240),{passive:true});
+}
+
+function renderHero(){
+  const d=DATA;
+  document.getElementById('heroSec').innerHTML = `
+    <div class="hero-bg" style="background-image:url('${d.cover}')"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-top">
+      <span class="hbadge hb-cat">${d.category.emoji} ${esc(d.category.name)}</span>
+      ${d.type==='Series' ? '<span class="hbadge hb-series">Series</span>' : ''}
+      <span class="hbadge hb-type">${esc(d.seasonChapterLabel)}</span>
+    </div>
+    <div class="hero-body">
+      <div class="hero-title">${esc(d.title)}</div>
+      <div class="hero-writer">
+        <div class="hw-av-ring" onclick="toast('👤 @${esc(d.writer.handle.replace('@',''))}')"><div class="hw-av-inner"><img src="${d.writer.avatar}" loading="lazy" alt=""/></div></div>
+        <div class="hw-info">
+          <div class="hw-name">${esc(d.writer.name)}</div>
+          <div class="hw-handle">${esc(d.writer.handle)} · ${fmtN(d.writer.followers)} followers</div>
+        </div>
+        <button class="hw-follow" id="heroFollow" onclick="toggleHeroFollow()">+ Follow</button>
+      </div>
+    </div>`;
+}
+
+function renderStats(){
+  const d=DATA;
+  document.getElementById('statsStrip').innerHTML = `
+    <div class="stat-cell" onclick="toast('❤️ '+document.getElementById('likesStatN').textContent+' likes')"><div class="sn acc" id="likesStatN">0</div><div class="sl">Likes</div></div>
+    <div class="stat-cell" onclick="scrollToComments()"><div class="sn">${fmtN(d.stats.comments)}</div><div class="sl">Comments</div></div>
+    <div class="stat-cell" onclick="toast('👁 '+fmtN(d.stats.reads)+' reads')"><div class="sn">${fmtN(d.stats.reads)}</div><div class="sl">Reads</div></div>
+    <div class="stat-cell" onclick="toast('📤 '+fmtN(d.stats.shares)+' shares')"><div class="sn">${fmtN(d.stats.shares)}</div><div class="sl">Shares</div></div>
+    <div class="stat-cell"><div class="sn gold">${d.stats.rating}★</div><div class="sl">Rating</div></div>`;
+}
+
+function renderContinue(){
+  const c=DATA.continue;
+  document.getElementById('rpTitle').textContent = c.chapterTitle;
+  document.getElementById('rpBarFill').style.width = c.progress + '%';
+  document.getElementById('rpPct').textContent = c.progress + '% complete';
+  document.getElementById('rpLeft').textContent = c.timeLeft;
+}
+function goToReader(){
+  const ch = DATA.continue ? DATA.continue.chapterId : 1;
+  window.location.href = `full-reader.html?story=${encodeURIComponent(STORY_ID)}&ch=${encodeURIComponent(ch)}`;
+}
+function goToAllComments(){
+  window.location.href = `full-reader.html?story=${encodeURIComponent(STORY_ID)}#comments`;
+}
+
+function renderSynopsis(){
+  document.getElementById('synText').innerHTML = `${esc(DATA.synopsis.short)}<span id="synExt" style="display:none">${esc(DATA.synopsis.more)}</span>`;
+}
+function toggleSyn(){
+  S.synExp=!S.synExp;
+  document.getElementById('synExt').style.display=S.synExp?'inline':'none';
+  document.getElementById('synBtn').innerHTML=S.synExp
+    ?'<i class="fas fa-chevron-up" style="font-size:9px"></i> Show less'
+    :'<i class="fas fa-chevron-down" style="font-size:9px"></i> Read more';
+}
+
+function toggleHeroFollow(){
+  S.heroFollow=!S.heroFollow;
+  const b=document.getElementById('heroFollow');
+  b.textContent=S.heroFollow?'✓ Following':'+ Follow';
+  b.classList.toggle('ing',S.heroFollow);
+  const wc=document.getElementById('wcFollow'); if(wc){wc.textContent=S.heroFollow?'✓ Following':'+ Follow';wc.classList.toggle('ing',S.heroFollow);}
+  toast(S.heroFollow?`✅ Following ${DATA.writer.handle}`:'Unfollowed');
+}
+function toggleWcFollow(){
+  S.heroFollow=!S.heroFollow;
+  const wc=document.getElementById('wcFollow');
+  wc.textContent=S.heroFollow?'✓ Following':'+ Follow';
+  wc.classList.toggle('ing',S.heroFollow);
+  const hf=document.getElementById('heroFollow'); if(hf){hf.textContent=S.heroFollow?'✓ Following':'+ Follow';hf.classList.toggle('ing',S.heroFollow);}
+  toast(S.heroFollow?`✅ Following ${DATA.writer.handle}`:'Unfollowed');
+}
+
+/* ── ENGAGEMENT ── */
+function renderEngagement(){
+  const e=DATA.engagement;
+  document.getElementById('pollSub').textContent = fmtN(e.poll.opts.reduce((s,o)=>s+o.v,0))+' votes';
+  document.getElementById('debateSub').textContent = fmtN(e.debate.dFor+e.debate.dAg)+' live';
+  document.getElementById('predSub').textContent = fmtN(e.pred.opts.reduce((s,o)=>s+o.v,0))+' locked';
+  document.getElementById('pollQ').textContent = e.poll.q;
+  document.getElementById('debateQ').textContent = e.debate.q;
+  document.getElementById('predQ').textContent = e.pred.q;
+  renderPoll(); renderDebate(); renderPred();
+}
+function renderPoll(){
+  const opts=DATA.engagement.poll.opts;
+  const tot=opts.reduce((s,o)=>s+o.v,0)||1;
+  document.getElementById('pollOpts').innerHTML=opts.map((o,i)=>{
+    const pct=Math.round(o.v/tot*100);
+    return `<div class="ec-opt${S.pollVoted===i?' voted':''}" onclick="votePoll(${i})"><div class="ec-opt-bar" style="width:${pct}%"></div><div class="ec-opt-inner"><span class="ec-opt-text">${esc(o.t)}</span><span class="ec-opt-pct">${pct}%</span></div></div>`;
+  }).join('');
+  document.getElementById('pollTotal').textContent=fmtN(opts.reduce((s,o)=>s+o.v,0))+' votes';
+}
+function votePoll(i){ if(S.pollVoted>=0) return; DATA.engagement.poll.opts[i].v++; S.pollVoted=i; renderPoll(); toast('✅ Voted!'); }
+function renderDebate(){
+  const db=DATA.engagement.debate, tot=db.dFor+db.dAg||1, fp=Math.round(db.dFor/tot*100), ap=100-fp;
+  document.getElementById('forBar').style.width=fp+'%'; document.getElementById('agBar').style.width=ap+'%';
+  document.getElementById('forPct').textContent=fp+'%'; document.getElementById('agPct').textContent=ap+'%';
+  document.getElementById('forCnt').textContent=fmtN(db.dFor)+' readers'; document.getElementById('agCnt').textContent=fmtN(db.dAg)+' readers';
+  document.getElementById('debateLiveTotal').textContent=fmtN(db.dFor+db.dAg);
+  document.getElementById('debateVoicesTotal').textContent=fmtN(db.dFor+db.dAg)+' voices';
+}
+function voteDebate(side){
+  if(S.debateVote) return; S.debateVote=side;
+  const db=DATA.engagement.debate; if(side==='for')db.dFor++; else db.dAg++;
+  document.getElementById(side==='for'?'dFor':'dAg').classList.add('chosen');
+  renderDebate(); toast(side==='for'?"✅ You're FOR this!":"❌ You're AGAINST this!");
+}
+function renderPred(){
+  const opts=DATA.engagement.pred.opts, tot=opts.reduce((s,o)=>s+o.v,0)||1;
+  document.getElementById('predOpts').innerHTML=opts.map((o,i)=>{
+    const pct=Math.round(o.v/tot*100);
+    return `<div class="ec-opt${S.predVoted===i?' voted':''}" onclick="votePred(${i})"><div class="ec-opt-bar" style="width:${pct}%"></div><div class="ec-opt-inner"><span class="ec-opt-text">${esc(o.t)}</span><span class="ec-opt-pct">${pct}%</span></div></div>`;
+  }).join('');
+  document.getElementById('predTotal').textContent=fmtN(opts.reduce((s,o)=>s+o.v,0))+' predictions';
+}
+function votePred(i){ if(S.predVoted>=0) return; DATA.engagement.pred.opts[i].v++; S.predVoted=i; renderPred(); toast('🔮 Prediction locked!'); }
+function toggleEng(type){
+  const cards={poll:'card-poll',debate:'card-debate',pred:'card-pred'};
+  const pills={poll:'pill-poll',debate:'pill-debate',pred:'pill-pred'};
+  const activeClass={poll:'active-poll',debate:'active-debate',pred:'active-pred'};
+  const isOpen=S.engOpen===type;
+  Object.keys(cards).forEach(k=>{ document.getElementById(cards[k]).classList.remove('open'); document.getElementById(pills[k]).classList.remove('active-poll','active-debate','active-pred'); });
+  if(!isOpen){ document.getElementById(cards[type]).classList.add('open'); document.getElementById(pills[type]).classList.add(activeClass[type]); S.engOpen=type; }
+  else S.engOpen=null;
+}
+
+/* ── CHAPTERS (all shown; future ones are locked, not hidden) ── */
+function renderSeasonTabs(){
+  document.getElementById('seasonTabs').innerHTML = DATA.seasons.map((s,i)=>`<div class="stab${i===S.activeSeason?' active':''}" onclick="setSeason(${i})">${esc(s.label)}</div>`).join('');
+}
+function setSeason(i){ S.activeSeason=i; S.chPage=0; renderSeasonTabs(); renderChapters(); }
+function renderChapters(){
+  const chs = DATA.seasons[S.activeSeason].chs;
+  const totalPages = Math.ceil(chs.length/CH_PER_PAGE);
+  const slice = chs.slice(S.chPage*CH_PER_PAGE, (S.chPage+1)*CH_PER_PAGE);
+  document.getElementById('chList').innerHTML = slice.map(c=>{
+    const isLocked = c.state==='locked';
+    const numEl = c.state==='done'
+      ? `<div class="ch-num done"><i class="fas fa-check" style="font-size:10px"></i></div>`
+      : c.state==='current'
+      ? `<div class="ch-num current">${c.n}</div>`
+      : `<div class="ch-num locked"><i class="fas fa-lock" style="font-size:10px"></i></div>`;
+    const tagEl = c.badge==='new' ? `<span class="ch-tag new">NEW</span>` : c.badge==='free' ? `<span class="ch-tag free">FREE</span>` : (isLocked ? `<span class="ch-tag locked"><i class="fas fa-lock" style="font-size:6px"></i> LOCKED</span>` : '');
+    const rightEl = c.state==='current'
+      ? `<div class="ch-right"><div class="ch-progress"><div class="ch-progress-fill" style="width:${c.progress}%"></div></div><div class="ch-btn resume">Resume</div></div>`
+      : c.state==='done'
+      ? `<div class="ch-right"><div style="font-size:9px;color:var(--green);font-weight:700">Done ✓</div></div>`
+      : `<div class="ch-right"><div class="ch-btn locked-btn"><i class="fas fa-lock" style="font-size:8px"></i> Locked</div></div>`;
+    const clickAction = isLocked ? `toast('🔒 Complete previous chapters to unlock')` : `goChapterFromList(${c.n})`;
+    return `<div class="ch-item${isLocked?' is-locked':''}" onclick="${clickAction}">
+      ${numEl}
+      <div class="ch-body"><div class="ch-title">Ch.${c.n} — ${esc(c.title)}</div><div class="ch-meta">${esc(c.meta)} ${tagEl}</div></div>
+      ${rightEl}
+    </div>`;
+  }).join('');
+
+  if(totalPages<=1){ document.getElementById('chPg').innerHTML=''; return; }
+  const pages=[];
+  if(totalPages<=5){ for(let i=0;i<totalPages;i++) pages.push(i); }
+  else{ pages.push(0); if(S.chPage>1) pages.push('…'); for(let i=Math.max(1,S.chPage-1);i<=Math.min(totalPages-2,S.chPage+1);i++) pages.push(i); if(S.chPage<totalPages-2) pages.push('…'); pages.push(totalPages-1); }
+  document.getElementById('chPg').innerHTML = `
+    <div class="cpg-btn${S.chPage===0?' disabled':''}" onclick="goChPage(${S.chPage-1})"><i class="fas fa-chevron-left" style="font-size:10px"></i></div>
+    ${pages.map(p=>p==='…'?`<span class="cpg-info">…</span>`:`<div class="cpg-btn${p===S.chPage?' active':''}" onclick="goChPage(${p})">${p+1}</div>`).join('')}
+    <div class="cpg-btn${S.chPage===totalPages-1?' disabled':''}" onclick="goChPage(${S.chPage+1})"><i class="fas fa-chevron-right" style="font-size:10px"></i></div>`;
+}
+function goChPage(p){ const total=Math.ceil(DATA.seasons[S.activeSeason].chs.length/CH_PER_PAGE); if(p<0||p>=total) return; S.chPage=p; renderChapters(); document.getElementById('chList').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function goChapterFromList(n){ window.location.href = `full-reader.html?story=${encodeURIComponent(STORY_ID)}&ch=${n}`; }
+
+/* ── REACTIONS (read-only grid) + shared like triggers (topbar / dock) ──
+   Uses the SAME global registry that comment-section.js wires
+   reaction-picker.js to, so all surfaces (topbar heart, dock heart, and
+   this grid) read one shared state object. The grid only ever *displays*
+   that state — reacting itself happens exclusively through the heart
+   triggers, so the numbers below can never be nudged directly. */
+const RX_LABELS = { love:'Love', crying:'Crying', angry:'Angry', shocked:'Shocked', broken:'Heartbroken', emotional:'Emotional', savage:'Savage', sus:'Suspicious', twist:'Plot Twist', laughing:'Laughing' };
+const RX_EMOJI  = { love:'❤️', crying:'😭', angry:'😡', shocked:'😱', broken:'💔', emotional:'🥹', savage:'🔥', sus:'👀', twist:'🫢', laughing:'😂' };
+
+function rxTotal(){ return Object.keys(DATA.reactions).filter(k=>k!=='userRx').reduce((s,k)=>s+(DATA.reactions[k]||0),0); }
+
+function renderReactionsAndTriggers(){
+  // Register into reaction-picker's shared registry so its own delegated
+  // tap/hold handling (bound once by comment-section.js) drives the
+  // topbar/dock heart triggers — the only actionable surface.
+  window.__dcsRPRegistry = window.__dcsRPRegistry || {};
+  window.__dcsRPRegistry[RX_KEY] = {
+    comment: { rx: DATA.reactions },
+    onReact: () => { syncAfterReaction(); },
+  };
+
+  document.getElementById('tbLikeWrap').innerHTML = window.DroboardReactionPicker ? window.DroboardReactionPicker.renderTrigger(RX_KEY, {icon:'heart'}) : '';
+  document.getElementById('dockLikeWrap').innerHTML = window.DroboardReactionPicker ? window.DroboardReactionPicker.renderTrigger(RX_KEY, {icon:'heart'}) : '';
+  document.getElementById('dockLikeWrap').classList.toggle('liked-outer', !!DATA.reactions.userRx);
+
+  renderReactionsGrid();
+  document.getElementById('likesStatN').textContent = fmtN(rxTotal());
+}
+function renderReactionsGrid(){
+  // Stat-only: no onclick, no cursor:pointer — purely a read-out of
+  // where the reaction total (== Likes stat) currently breaks down.
+  document.getElementById('rxGrid').innerHTML = Object.keys(RX_LABELS).map(id=>`
+    <div class="rx-card${DATA.reactions.userRx===id?' picked':''}">
+      <div class="rx-e">${RX_EMOJI[id]}</div>
+      <div class="rx-l">${RX_LABELS[id]}</div>
+      <div class="rx-n">${fmtN(DATA.reactions[id]||0)}</div>
+    </div>`).join('');
+}
+function syncAfterReaction(){
+  renderReactionsGrid();
+  document.getElementById('likesStatN').textContent = fmtN(rxTotal());
+  document.getElementById('dockLikeWrap').classList.toggle('liked-outer', !!DATA.reactions.userRx);
+  if (window.DroboardReactionPicker) window.DroboardReactionPicker.update(RX_KEY, {});
+}
+
+/* ── COMMUNITIES: genre hub + author's inner circle ── */
+function renderHubs(){
+  const h = DATA.hubs;
+  document.getElementById('hubsWrap').innerHTML = `
+    <div class="hub-card" onclick="toggleHubJoin('genre')">
+      <div class="hub-icon">${h.genre.icon}</div>
+      <div class="hub-body">
+        <div class="hub-name">${esc(h.genre.name)}</div>
+        <div class="hub-sub"><i class="fas fa-users"></i> <span id="genreMembers">${fmtN(h.genre.members)}</span> members · Genre community</div>
+      </div>
+      <button class="hub-join-btn${h.genre.joined?' joined':''}" id="genreJoinBtn" onclick="event.stopPropagation();toggleHubJoin('genre')">${h.genre.joined?'✓ Joined':'Join'}</button>
+    </div>
+    <div class="hub-card" onclick="toggleHubJoin('circle')">
+      <div class="hub-icon circle-icon"><img src="${DATA.writer.avatar}" loading="lazy" alt=""/></div>
+      <div class="hub-body">
+        <div class="hub-name">${esc(h.circle.name)} <i class="fas fa-crown" style="color:var(--gold);font-size:10px"></i></div>
+        <div class="hub-sub"><i class="fas fa-users"></i> <span id="circleMembers">${fmtN(h.circle.members)}</span> members · ${esc(h.circle.perks)}</div>
+      </div>
+      <button class="hub-join-btn circle-btn${h.circle.joined?' joined':''}" id="circleJoinBtn" onclick="event.stopPropagation();toggleHubJoin('circle')">${h.circle.joined?'✓ In Circle':'Join Circle'}</button>
+    </div>`;
+}
+function toggleHubJoin(kind){
+  const h = kind==='genre' ? DATA.hubs.genre : DATA.hubs.circle;
+  h.joined = !h.joined;
+  h.members += h.joined ? 1 : -1;
+  renderHubs();
+  toast(h.joined ? `🧿 Joined ${h.name}!` : `Left ${h.name}`);
+}
+
+/* ── ABOUT THE WRITER ── */
+function renderWriter(){
+  const w = DATA.writer;
+  document.getElementById('writerBody').innerHTML = `
+    <div class="wc-av-row">
+      <div class="wc-av-ring" onclick="window.location.href='profile.html?u='+encodeURIComponent('${w.handle}')"><div class="wc-av-inner"><img src="${w.avatar}" loading="lazy" alt=""/></div></div>
+      <button class="wc-follow" id="wcFollow" onclick="toggleWcFollow()">+ Follow</button>
+    </div>
+    <div class="wc-name">${esc(w.name)}</div>
+    <div class="wc-handle">${esc(w.handle)} ${w.verified?'<span class="wc-vbadge"><i class="fas fa-check" style="font-size:7px"></i> Verified</span>':''}</div>
+    <div class="wc-bio">${esc(w.bio)}</div>
+    <div class="wc-stats">
+      <div class="ws"><div class="ws-n" style="color:var(--acc)">${fmtN(w.followers)}</div><div class="ws-l">Followers</div></div>
+      <div class="ws"><div class="ws-n">${w.stories}</div><div class="ws-l">Stories</div></div>
+      <div class="ws"><div class="ws-n">${fmtN(w.reads)}</div><div class="ws-l">Reads</div></div>
+      <div class="ws"><div class="ws-n" style="color:var(--gold)">${w.rating}★</div><div class="ws-l">Rating</div></div>
+    </div>
+    <div class="wc-view-btn" onclick="window.location.href='profile.html?u='+encodeURIComponent('${w.handle}')">View profile <i class="fas fa-chevron-right" style="font-size:9px"></i></div>`;
+}
+
+/* ── COMMENTS — real DroboardComments component, seeded from the shared
+     data/comments-data.js file (same source full-reader.html uses),
+     rendered as a collapsed accordion so nothing shows until the reader
+     taps it open. Teams are passed through so tags line up with the
+     live debate above, same as full-reader.html's siding. ── */
+function mapSeedComment(c){
+  return Object.assign({}, c, {
+    // comments-data.js uses 'ring-has'/'ring-viewed'/'ring-none' — the
+    // component expects the prefix stripped ('has'/'viewed'/'none').
+    statusRing: (c.statusRing || 'none').replace('ring-', ''),
+    replies: (c.replies || []).map(mapSeedComment),
+  });
+}
+const SEED_COMMENTS = (typeof COMMENTS_DATA !== 'undefined' ? COMMENTS_DATA : []).map(mapSeedComment);
+
+function renderComments(){
+  document.getElementById('cmViewAllLbl').textContent = `View full comment thread (${fmtN(DATA.stats.comments)})`;
+  if (!window.DroboardComments) return;
+  DroboardComments.attach('#commentsPlaceholder', {
+    storyId: STORY_ID,
+    title: 'Comments',
+    comments: SEED_COMMENTS,
+    teams: TEAMS,
+    currentUser: { name:'You', avatar:null, team:null },
+    requireTeam: false,
+    collapsible: true,
+    startOpen: false,
+    getCommentUrl: (c) => `https://droboard.app/story/${STORY_ID}#comment-${c.id}`,
+    onPost: (c) => console.log('posted', c),
+    onReply: (parentId,c) => console.log('replied', parentId, c),
+    onEdit: (c,oldT,newT) => console.log('edited', c.id, oldT, '->', newT),
+  });
+}
+function scrollToComments(){ document.getElementById('commentsSection').scrollIntoView({behavior:'smooth'}); }
+
+/* ── DETAILS / TAGS / SIMILAR ── */
+function renderDetails(){
+  document.getElementById('detailsTbl').innerHTML = DATA.details.map(r=>`
+    <div class="dt-row"><div class="dt-icon">${r.icon}</div><div class="dt-lbl">${esc(r.lbl)}</div><div class="dt-val${r.acc?' acc':''}">${esc(r.val)}</div></div>`).join('');
+}
+function renderTags(){
+  document.getElementById('tagsRow').innerHTML = DATA.tags.map(t=>`<div class="tag" onclick="toast('${esc(t)}')">${esc(t)}</div>`).join('');
+}
+function renderSimilar(){
+  document.getElementById('simScroll').innerHTML = DATA.similar.map(s=>`
+    <div class="sim-card" onclick="toast('📖 Opening…')">
+      <div class="sim-thumb" style="background-image:url('${s.cover}')"><div class="sim-scrim"></div></div>
+      <div class="sim-body"><div class="sim-cat">${esc(s.cat)}</div><div class="sim-title">${esc(s.title)}</div><div class="sim-author">@${esc(s.author)}</div></div>
+    </div>`).join('');
+}
+
+/* ── SAVE / SHARE / TIP — wired to the shared components ── */
+function openSave(){
+  window.openSaveModal({ title: DATA.title, sub: 'by '+DATA.writer.handle, img: DATA.cover, storyId: STORY_ID });
+}
+function openShare(){
+  window.openShareModal({ title: DATA.title, sub: `by ${DATA.writer.handle} · ${fmtN(rxTotal())} likes`, img: DATA.cover, url: `https://droboard.app/story/${STORY_ID}` });
+}
+window.onDroboardSaveChange = function(storyId, saved){
+  ['tbSave','dockSave'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.classList.toggle('saved', saved);
+    el.innerHTML = `<i class="${saved?'fas':'far'} fa-bookmark"></i>`;
+  });
+};
+DroboardTip.attach({
+  getWriter: () => ({ name: DATA.writer.name, avatar: DATA.writer.avatar, handle: `${DATA.writer.handle} · ${fmtN(DATA.writer.followers)} followers` }),
+  onSend: (id, amount, note, mode) => {
+    DATA.tipCount++;
+    document.getElementById('tipCountLbl').textContent = fmtN(DATA.tipCount) + ' tips';
+  },
+});
+function openTip(){
+  DroboardTip.open(STORY_ID, { name: DATA.writer.name, avatar: DATA.writer.avatar, handle: `${DATA.writer.handle} · ${fmtN(DATA.writer.followers)} followers` });
+}
+
+/* ── THEME TOGGLE — light mode tuned to discover.html's palette,
+     persisted via localStorage, same pattern as discover.html's
+     sun/moon button. Uses the body.theme-white class already defined
+     in :root above so every existing component keeps working as-is. ── */
+(function(){
+  const saved = localStorage.getItem('droboard-theme') || 'dark';
+  document.body.classList.toggle('theme-white', saved === 'light');
+  const btn = document.getElementById('themeBtn');
+  const icon = document.getElementById('themeIcon');
+  function paint(theme){ icon.className = theme==='dark' ? 'fas fa-moon' : 'fas fa-sun'; }
+  paint(saved);
+  btn.addEventListener('click', ()=>{
+    const next = document.body.classList.contains('theme-white') ? 'dark' : 'light';
+    document.body.classList.toggle('theme-white', next==='light');
+    localStorage.setItem('droboard-theme', next);
+    paint(next);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════════ */
+loadStory();
+</script>
+</body>
+</html>

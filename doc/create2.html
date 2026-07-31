@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Story Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.25);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000;--l1:#07070b;--l2:#0d0e12;--l3:#131418;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx:#f2f2f4;--tx2:#a1a1aa;--tx3:#71717a;--tx4:#3f3f46;
+  --green:#34d399;--blue:#38bdf8;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
+  --topbar-h:52px;--toolbar-h:46px;--dock-h:64px;
+  --font-d:'Playfair Display',serif;--font-b:'DM Sans',sans-serif;--font-story:'Lora',serif;
+}
+
+/* ── RESET ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow:hidden}
+img{display:block;user-select:none}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.18);border-radius:2px}
+
+/* ── SHELL ── */
+.shell{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+
+/* ══════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════ */
+.topbar{
+  flex-shrink:0;height:var(--topbar-h);
+  display:flex;align-items:center;gap:8px;
+  padding:0 12px;
+  background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);z-index:200;
+}
+.tb-back{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx2);flex-shrink:0;cursor:pointer;transition:.15s;
+}
+.tb-back:active{transform:scale(.9)}
+.tb-meta{flex:1;min-width:0}
+.tb-series-name{
+  font-family:var(--font-d);font-size:12px;font-weight:700;color:var(--tx2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.2;
+}
+.tb-doc-title{
+  font-size:11px;color:var(--tx3);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tb-save-status{
+  font-size:9px;font-weight:700;color:var(--tx4);
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+}
+.tb-save-status.saving{color:var(--gold)}
+.tb-save-status.saved{color:var(--green)}
+.tb-save-status.unsaved{color:var(--acc)}
+.autosave-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.tb-actions{display:flex;gap:6px}
+.tb-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx2);cursor:pointer;transition:.15s;flex-shrink:0;
+}
+.tb-btn:active{transform:scale(.9)}
+.tb-btn.accent{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 0 12px var(--glow-sm)}
+.tb-publish-btn{
+  background:var(--acc);color:#fff;border:none;
+  padding:0 14px;height:34px;border-radius:20px;
+  font-size:11px;font-weight:800;cursor:pointer;
+  font-family:var(--font-b);white-space:nowrap;flex-shrink:0;
+  box-shadow:0 0 12px var(--glow-sm);transition:.15s;
+  display:flex;align-items:center;gap:5px;
+}
+.tb-publish-btn:active{transform:scale(.97)}
+
+/* ══════════════════════════════════════
+   FORMAT TOOLBAR
+══════════════════════════════════════ */
+.toolbar{
+  flex-shrink:0;height:var(--toolbar-h);
+  display:flex;align-items:center;gap:0;
+  background:var(--l1);border-bottom:1px solid var(--bd);
+  overflow-x:auto;scrollbar-width:none;
+  padding:0 8px;
+}
+.toolbar::-webkit-scrollbar{display:none}
+.tool{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--tx2);cursor:pointer;transition:.15s;
+  flex-shrink:0;user-select:none;
+}
+.tool:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.tool:active{background:rgba(255,0,80,.08);color:var(--acc)}
+.tool.active{background:rgba(255,0,80,.1);color:var(--acc);border:1px solid var(--bd-acc)}
+.tool-div{width:1px;height:22px;background:var(--bd);margin:0 3px;flex-shrink:0}
+.tool-label{font-size:10px;font-weight:700;padding:0 8px;color:var(--tx3);white-space:nowrap;cursor:pointer;flex-shrink:0;border-radius:6px;height:36px;display:flex;align-items:center;transition:.15s}
+.tool-label:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.tool-label:active{background:rgba(255,0,80,.08);color:var(--acc)}
+
+/* Word count pill */
+.wc-pill{
+  margin-left:auto;flex-shrink:0;
+  font-size:9px;font-weight:700;color:var(--tx4);
+  background:var(--l2);border:1px solid var(--bd);
+  padding:3px 9px;border-radius:20px;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   MAIN: SIDEBAR + EDITOR
+══════════════════════════════════════ */
+.main{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* ── LEFT PANEL (story structure) ── */
+.left-panel{
+  width:0;overflow:hidden;flex-shrink:0;
+  background:var(--l1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+}
+.left-panel.open{width:220px}
+.lp-hdr{
+  flex-shrink:0;padding:12px 12px 8px;
+  border-bottom:1px solid var(--bd);
+}
+.lp-title{font-size:10px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em}
+.lp-body{flex:1;overflow-y:auto;scrollbar-width:none;padding:8px 0}
+.lp-body::-webkit-scrollbar{display:none}
+
+/* Story type selector */
+.type-sel{padding:0 10px 8px;display:flex;flex-direction:column;gap:4px}
+.type-btn{
+  display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;
+  font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;transition:.15s;
+}
+.type-btn:hover{background:rgba(255,255,255,.04)}
+.type-btn.active{background:rgba(255,0,80,.08);color:var(--acc2);border:1px solid var(--bd-acc)}
+.type-btn i{font-size:12px;width:16px;text-align:center;flex-shrink:0}
+.type-btn-icon{font-size:14px;flex-shrink:0}
+
+.lp-section-label{
+  font-size:9px;font-weight:800;color:var(--tx4);text-transform:uppercase;
+  letter-spacing:.1em;padding:8px 12px 4px;
+}
+
+/* Chapter list in sidebar */
+.ch-item{
+  display:flex;align-items:center;gap:7px;padding:7px 10px;
+  cursor:pointer;transition:.15s;border-radius:8px;margin:1px 6px;
+}
+.ch-item:hover{background:rgba(255,255,255,.04)}
+.ch-item.active{background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)}
+.ch-item-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--l3);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:var(--tx3);flex-shrink:0;
+}
+.ch-item.active .ch-item-num{background:var(--acc);border-color:var(--acc);color:#fff}
+.ch-item-body{flex:1;min-width:0}
+.ch-item-title{font-size:10.5px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-item.active .ch-item-title{color:var(--acc)}
+.ch-item-meta{font-size:8.5px;color:var(--tx4);margin-top:1px;display:flex;align-items:center;gap:4px}
+.ch-item-status{font-size:7px;font-weight:800;padding:1px 5px;border-radius:4px}
+.cis-pub{background:rgba(52,211,153,.1);color:var(--green)}
+.cis-draft{background:rgba(251,191,36,.08);color:var(--gold)}
+
+.add-ch-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 10px;
+  margin:4px 6px;border-radius:9px;border:1.5px dashed rgba(52,211,153,.2);
+  background:rgba(52,211,153,.04);color:var(--green);
+  font-size:10px;font-weight:700;cursor:pointer;transition:.15s;
+}
+.add-ch-btn:hover{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.35)}
+
+/* Series metadata in sidebar */
+.meta-fields{padding:6px 10px;display:flex;flex-direction:column;gap:6px}
+.mf-label{font-size:8.5px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.mf-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:7px;padding:6px 9px;color:var(--tx);
+  font-family:var(--font-b);font-size:11px;outline:none;transition:.2s;
+}
+.mf-input:focus{border-color:var(--bd-acc)}
+.mf-input::placeholder{color:var(--tx4)}
+.mf-select{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:7px;padding:6px 9px;color:var(--tx);
+  font-family:var(--font-b);font-size:11px;outline:none;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+}
+.mf-select option{background:#0d0e12}
+.mf-textarea{resize:none;min-height:64px;line-height:1.5}
+
+/* ── EDITOR AREA ── */
+.editor-wrap{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;
+}
+.editor-scroll{
+  flex:1;overflow-y:auto;scrollbar-width:thin;
+  padding-bottom:calc(var(--dock-h) + var(--safe-b) + 24px);
+}
+
+/* Chapter header in editor */
+.ch-header{
+  padding:24px 18px 14px;
+  border-bottom:1px solid var(--bd2);
+  position:relative;
+}
+.ch-type-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.ctb-pill{
+  font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--bd);background:transparent;color:var(--tx3);
+  font-family:var(--font-b);transition:.15s;
+}
+.ctb-pill.active{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc3)}
+
+/* Cover image zone */
+.cover-zone{
+  position:relative;border-radius:12px;overflow:hidden;
+  background:var(--l2);border:1.5px dashed rgba(255,255,255,.1);
+  margin-bottom:14px;cursor:pointer;transition:.2s;
+  min-height:120px;display:flex;align-items:center;justify-content:center;
+}
+.cover-zone:hover{border-color:rgba(255,0,80,.3);background:rgba(255,0,80,.04)}
+.cover-zone img{width:100%;height:180px;object-fit:cover;display:block;border-radius:12px}
+.cover-zone-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;
+  color:var(--tx4);font-size:11px;font-weight:600;
+}
+.cover-zone-placeholder i{font-size:22px}
+.cover-zone-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.2s;border-radius:12px;
+}
+.cover-zone:hover .cover-zone-overlay{opacity:1}
+.cover-change-btn{
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);
+  color:#fff;padding:5px 13px;border-radius:10px;font-size:10px;font-weight:700;
+  font-family:var(--font-b);
+}
+
+/* Chapter title input */
+.ch-title-input{
+  width:100%;background:transparent;border:none;outline:none;
+  font-family:var(--font-d);font-size:22px;font-weight:900;
+  color:var(--tx);line-height:1.2;resize:none;
+  overflow:hidden;min-height:36px;
+}
+.ch-title-input::placeholder{color:rgba(255,255,255,.15);font-style:italic}
+.ch-title-input:focus{color:var(--tx)}
+
+/* Chapter meta row (season, chapter num, etc.) */
+.ch-meta-edit{
+  display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;
+}
+.cme-item{
+  display:flex;align-items:center;gap:5px;
+  background:var(--l2);border:1px solid var(--bd);border-radius:8px;
+  padding:4px 8px;
+}
+.cme-label{font-size:8.5px;font-weight:700;color:var(--tx4)}
+.cme-input{
+  background:transparent;border:none;outline:none;
+  font-family:var(--font-b);font-size:10px;font-weight:700;color:var(--tx2);
+  width:60px;
+}
+.cme-sel{
+  background:transparent;border:none;outline:none;
+  font-family:var(--font-b);font-size:10px;font-weight:700;color:var(--tx2);
+  cursor:pointer;
+}
+.cme-sel option{background:#0d0e12}
+
+/* ── CONTENT EDITOR ── */
+.content-editor{
+  padding:18px 18px 0;position:relative;
+  min-height:60vh;
+}
+.author-note-zone{
+  background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);
+  border-radius:10px;padding:10px 12px;margin-bottom:14px;
+  display:none;
+}
+.author-note-zone.show{display:block}
+.an-label{font-size:8.5px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.author-note-inp{
+  width:100%;background:transparent;border:none;outline:none;
+  font-family:var(--font-b);font-size:11.5px;color:rgba(251,191,36,.8);
+  resize:none;line-height:1.55;min-height:36px;
+}
+.author-note-inp::placeholder{color:rgba(251,191,36,.3)}
+
+/* SCENE divider insert */
+.scene-divider{
+  display:flex;align-items:center;gap:12px;padding:12px 0;cursor:default;
+  opacity:.4;transition:.2s;
+}
+.scene-divider:hover{opacity:1}
+.scene-divider::before,.scene-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.scene-div-icon{font-size:12px;color:var(--tx4)}
+
+/* Writing area */
+.writing-area{
+  min-height:50vh;padding-bottom:40px;
+  outline:none;
+  font-family:var(--font-story);
+  font-size:15px;line-height:1.85;
+  color:#e4e4e8;
+  caret-color:var(--acc);
+  word-break:break-word;
+  white-space:pre-wrap;
+}
+.writing-area:empty::before{
+  content:attr(data-placeholder);
+  color:rgba(255,255,255,.15);
+  font-style:italic;pointer-events:none;
+}
+.writing-area:focus{outline:none}
+
+/* Drop cap on first paragraph */
+.writing-area p:first-child::first-letter{
+  font-family:var(--font-d);font-size:3.4em;font-weight:900;
+  float:left;line-height:.78;margin-right:.09em;margin-top:.05em;
+  color:var(--acc);
+}
+
+/* Formatting */
+.writing-area h1{font-family:var(--font-d);font-size:22px;font-weight:900;margin:20px 0 10px;color:var(--tx)}
+.writing-area h2{font-family:var(--font-d);font-size:18px;font-weight:700;margin:16px 0 8px;color:var(--tx)}
+.writing-area h3{font-size:15px;font-weight:700;margin:14px 0 6px;color:var(--tx2)}
+.writing-area blockquote{
+  border-left:3px solid var(--acc);padding:4px 0 4px 14px;
+  font-style:italic;color:var(--tx2);margin:12px 0;
+}
+.writing-area hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
+.writing-area strong{color:var(--tx);font-weight:700}
+.writing-area em{color:var(--tx2);font-style:italic}
+.writing-area a{color:var(--acc2);text-decoration:underline}
+
+/* Poem mode */
+.writing-area.poem-mode{
+  font-family:var(--font-d);font-size:17px;line-height:2.1;
+  text-align:center;color:#e8e8f2;
+}
+.writing-area.poem-mode p:first-child::first-letter{
+  float:none;font-size:inherit;color:inherit;margin:0;
+}
+
+/* ══════════════════════════════════════
+   RIGHT PANEL (settings, metadata)
+══════════════════════════════════════ */
+.right-panel{
+  width:0;overflow:hidden;flex-shrink:0;
+  background:var(--l1);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+}
+.right-panel.open{width:240px}
+.rp-hdr{
+  flex-shrink:0;padding:12px 12px 8px;
+  border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;
+}
+.rp-title{font-size:10px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em}
+.rp-close{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tx3);cursor:pointer}
+.rp-body{flex:1;overflow-y:auto;scrollbar-width:none;padding:10px 10px}
+.rp-body::-webkit-scrollbar{display:none}
+.rp-section{margin-bottom:16px}
+.rp-section-label{font-size:8.5px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.rp-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:8px;padding:7px 10px;color:var(--tx);
+  font-family:var(--font-b);font-size:11px;outline:none;transition:.2s;margin-bottom:6px;
+}
+.rp-input:focus{border-color:var(--bd-acc)}
+.rp-input::placeholder{color:var(--tx4)}
+.rp-textarea{resize:none;min-height:64px;line-height:1.55}
+.rp-select{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:8px;padding:7px 10px;color:var(--tx);
+  font-family:var(--font-b);font-size:11px;outline:none;cursor:pointer;margin-bottom:6px;
+  appearance:none;-webkit-appearance:none;
+}
+.rp-select option{background:#0d0e12}
+
+/* Genre pills */
+.genre-pill-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.genre-pill{
+  font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--bd);background:transparent;color:var(--tx3);transition:.15s;
+}
+.genre-pill.on{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc3)}
+
+/* Status toggle */
+.status-row{display:flex;gap:5px;margin-bottom:6px}
+.status-opt{
+  flex:1;padding:6px 4px;border-radius:8px;text-align:center;cursor:pointer;
+  font-size:9px;font-weight:700;border:1.5px solid var(--bd);color:var(--tx3);
+  font-family:var(--font-b);transition:.15s;
+}
+.status-opt.pub{border-color:rgba(52,211,153,.25);color:var(--green);background:rgba(52,211,153,.05)}
+.status-opt.draft{border-color:rgba(251,191,36,.2);color:var(--gold);background:rgba(251,191,36,.04)}
+.status-opt.sch{border-color:rgba(56,189,248,.2);color:var(--blue);background:rgba(56,189,248,.04)}
+.status-opt.active.pub{background:rgba(52,211,153,.14);border-color:var(--green)}
+.status-opt.active.draft{background:rgba(251,191,36,.14);border-color:var(--gold)}
+.status-opt.active.sch{background:rgba(56,189,248,.14);border-color:var(--blue)}
+
+/* Publish action */
+.publish-action-btn{
+  width:100%;padding:11px;border-radius:10px;
+  background:var(--acc);color:#fff;border:none;
+  font-size:12px;font-weight:800;cursor:pointer;
+  font-family:var(--font-b);transition:.15s;
+  box-shadow:0 0 14px var(--glow-sm);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.publish-action-btn:active{transform:scale(.98)}
+.save-draft-btn{
+  width:100%;padding:9px;border-radius:10px;
+  background:rgba(255,255,255,.06);color:var(--tx2);
+  border:1px solid var(--bd);font-size:11px;font-weight:700;cursor:pointer;
+  font-family:var(--font-b);transition:.15s;margin-top:6px;
+}
+.save-draft-btn:active{transform:scale(.98)}
+
+/* Divider */
+.rp-div{height:1px;background:var(--bd);margin:10px 0}
+
+/* Reading time estimate */
+.read-est{
+  background:var(--l2);border:1px solid var(--bd);border-radius:8px;
+  padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;
+}
+.re-icon{font-size:14px;flex-shrink:0}
+.re-body{flex:1}
+.re-val{font-size:13px;font-weight:800;color:var(--tx);line-height:1}
+.re-label{font-size:8px;color:var(--tx4);margin-top:2px}
+
+/* Tags input */
+.tags-input-wrap{
+  background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  border-radius:8px;padding:6px 8px;margin-bottom:6px;
+  display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:36px;
+  cursor:text;
+}
+.tag-chip{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:12px;
+  background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);color:var(--acc3);
+  display:flex;align-items:center;gap:3px;
+}
+.tag-chip-del{cursor:pointer;font-size:8px;opacity:.6}
+.tag-chip-del:hover{opacity:1}
+.tags-text-input{
+  background:transparent;border:none;outline:none;
+  font-family:var(--font-b);font-size:10px;color:var(--tx);
+  min-width:80px;flex:1;
+}
+.tags-text-input::placeholder{color:var(--tx4)}
+
+/* ══════════════════════════════════════
+   BOTTOM DOCK
+══════════════════════════════════════ */
+.dock{
+  position:fixed;bottom:0;left:0;right:0;z-index:150;
+  height:calc(var(--dock-h) + var(--safe-b));
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);
+  border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;
+  padding:0 12px var(--safe-b);
+}
+.dock-stat{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  flex-shrink:0;min-width:42px;cursor:pointer;padding:4px 4px;border-radius:8px;transition:.15s;
+}
+.dock-stat:hover{background:rgba(255,255,255,.04)}
+.dock-stat-num{font-family:var(--font-d);font-size:14px;font-weight:900;color:var(--tx);line-height:1}
+.dock-stat-label{font-size:7.5px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em}
+.dock-div{width:1px;height:24px;background:var(--bd);flex-shrink:0}
+.dock-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.dock-insert-btn{
+  display:flex;align-items:center;gap:5px;padding:7px 12px;
+  background:var(--l2);border:1px solid var(--bd);border-radius:10px;
+  font-size:10px;font-weight:700;color:var(--tx2);cursor:pointer;transition:.15s;
+}
+.dock-insert-btn:hover{border-color:var(--bd-acc);color:var(--acc3);background:rgba(255,0,80,.05)}
+.dock-insert-btn:active{transform:scale(.97)}
+.dock-ai-btn{
+  display:flex;align-items:center;gap:5px;padding:7px 12px;
+  background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(255,0,80,.1));
+  border:1px solid rgba(167,139,250,.25);border-radius:10px;
+  font-size:10px;font-weight:700;color:var(--purple);cursor:pointer;transition:.15s;
+}
+.dock-ai-btn:hover{background:linear-gradient(135deg,rgba(167,139,250,.25),rgba(255,0,80,.15));border-color:rgba(167,139,250,.4)}
+.dock-ai-btn:active{transform:scale(.97)}
+
+/* ══════════════════════════════════════
+   OVERLAYS & SHEETS
+══════════════════════════════════════ */
+.overlay-bg{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);
+  display:none;align-items:flex-end;
+}
+.overlay-bg.open{display:flex}
+.sheet{
+  width:100%;background:var(--l2);border-radius:20px 20px 0 0;
+  animation:slideUp .28s ease;
+  max-height:90vh;overflow-y:auto;scrollbar-width:none;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.sheet-hdr h3{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:7px}
+.sheet-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--tx2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sheet-body{padding:0 16px 4px}
+
+/* Insert options */
+.insert-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.insert-opt{
+  display:flex;align-items:center;gap:9px;padding:11px 13px;
+  background:rgba(255,255,255,.03);border:1.5px solid var(--bd);
+  border-radius:12px;cursor:pointer;transition:.18s;
+}
+.insert-opt:active{transform:scale(.98);border-color:var(--bd-acc)}
+.insert-opt-icon{font-size:18px;flex-shrink:0}
+.insert-opt-body{flex:1;min-width:0}
+.insert-opt-title{font-size:11px;font-weight:700;color:var(--tx)}
+.insert-opt-sub{font-size:9px;color:var(--tx3);margin-top:1px}
+
+/* AI assist sheet */
+.ai-prompts{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.ai-prompt-btn{
+  display:flex;align-items:center;gap:10px;padding:11px 13px;
+  background:rgba(255,255,255,.03);border:1.5px solid var(--bd);
+  border-radius:12px;cursor:pointer;transition:.18s;
+}
+.ai-prompt-btn:active{transform:scale(.98);border-color:rgba(167,139,250,.3)}
+.ai-prompt-btn i{font-size:14px;color:var(--purple);width:18px;text-align:center;flex-shrink:0}
+.ai-prompt-btn span{font-size:12px;font-weight:600;color:var(--tx2)}
+
+.ai-custom-wrap{
+  background:rgba(255,255,255,.03);border:1px solid var(--bd);
+  border-radius:12px;overflow:hidden;margin-bottom:12px;
+}
+.ai-custom-inp{
+  width:100%;background:transparent;border:none;outline:none;padding:10px 12px;
+  color:var(--tx);font-family:var(--font-b);font-size:12px;line-height:1.55;
+  resize:none;min-height:56px;
+}
+.ai-custom-inp::placeholder{color:var(--tx4)}
+.ai-custom-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 10px;border-top:1px solid var(--bd);
+}
+.ai-send-btn{
+  background:linear-gradient(135deg,var(--purple),var(--acc2));
+  color:#fff;border:none;padding:6px 14px;border-radius:10px;
+  font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font-b);
+  display:flex;align-items:center;gap:4px;
+}
+.ai-response-box{
+  background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);
+  border-radius:12px;padding:12px;margin:0 0 12px;
+  font-size:12px;color:var(--tx2);line-height:1.65;
+  display:none;font-family:var(--font-story);
+}
+.ai-response-box.show{display:block}
+.ai-response-actions{display:flex;gap:7px;margin-top:8px}
+.ai-res-btn{
+  flex:1;padding:7px 8px;border-radius:9px;text-align:center;
+  font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-b);
+  border:1px solid var(--bd);background:rgba(255,255,255,.04);color:var(--tx2);transition:.15s;
+}
+.ai-res-btn.insert{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.25);color:var(--purple)}
+.ai-res-btn:active{transform:scale(.97)}
+
+/* Publish sheet */
+.pub-cover-preview{
+  width:100%;height:140px;border-radius:12px;
+  background-size:cover;background-position:center;
+  border:1.5px solid var(--bd);margin-bottom:12px;
+  display:flex;align-items:center;justify-content:center;
+  background-color:var(--l3);font-size:13px;color:var(--tx4);cursor:pointer;
+}
+.pub-checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.pub-check-item{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;
+  background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:10px;
+}
+.pci-icon{font-size:13px;flex-shrink:0}
+.pci-label{flex:1;font-size:11px;font-weight:600;color:var(--tx2)}
+.pci-status{font-size:11px}
+.pci-status.ok{color:var(--green)}
+.pci-status.warn{color:var(--gold)}
+.pub-final-btn{
+  width:100%;padding:13px;border-radius:13px;
+  background:var(--acc);color:#fff;border:none;
+  font-size:14px;font-weight:800;cursor:pointer;
+  font-family:var(--font-b);box-shadow:0 0 18px var(--glow-sm);transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.pub-final-btn:active{transform:scale(.98)}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:calc(var(--dock-h) + var(--safe-b) + 14px);left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--l3);border:1px solid var(--bd);color:var(--tx);
+  padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;
+  z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;
+  max-width:92vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Preview mode overlay */
+.preview-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:var(--bg);overflow-y:auto;scrollbar-width:none;
+  display:none;flex-direction:column;
+}
+.preview-overlay.open{display:flex}
+.preview-overlay::-webkit-scrollbar{display:none}
+.preview-topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);
+}
+.prev-back{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--l2);border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--tx2);cursor:pointer;
+}
+.prev-title{font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--tx);flex:1}
+.preview-hero{
+  height:220px;position:relative;overflow:hidden;flex-shrink:0;
+}
+.preview-hero-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+}
+.preview-hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,#000 0%,rgba(0,0,0,.4) 55%,transparent 100%)}
+.preview-hero-content{position:absolute;bottom:0;left:0;right:0;padding:16px}
+.preview-cat{font-size:8px;font-weight:800;background:var(--acc);color:#fff;padding:2px 8px;border-radius:6px;margin-bottom:7px;display:inline-block}
+.preview-title{font-family:var(--font-d);font-size:20px;font-weight:900;color:#fff;line-height:1.2;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.preview-content{padding:22px 18px 80px;font-family:var(--font-story);font-size:15px;line-height:1.85;color:#e0e0e8;max-width:640px;margin:0 auto}
+.preview-content p{margin-bottom:1.4em}
+.preview-content p:first-child::first-letter{
+  font-family:var(--font-d);font-size:3.4em;font-weight:900;float:left;
+  line-height:.78;margin-right:.09em;margin-top:.05em;color:var(--acc);
+}
+.preview-content blockquote{border-left:3px solid var(--acc);padding:4px 0 4px 14px;font-style:italic;color:#a0a0b8;margin:14px 0}
+.preview-content h1,.preview-content h2{font-family:var(--font-d);color:#fff;margin:18px 0 8px}
+.preview-content h1{font-size:22px}
+.preview-content h2{font-size:18px}
+.preview-content hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:18px 0}
+
+/* Focus mode */
+.shell.focus-mode .topbar,
+.shell.focus-mode .toolbar{opacity:0;pointer-events:none;transform:translateY(-100%);transition:opacity .3s,transform .3s}
+.shell.focus-mode .left-panel,
+.shell.focus-mode .right-panel{width:0 !important}
+.shell.focus-mode .dock{opacity:0;pointer-events:none;transform:translateY(100%)}
+.shell.focus-mode .content-editor,
+.shell.focus-mode .ch-header{padding:24px min(5vw, 80px)}
+.shell.focus-mode .writing-area{font-size:17px;max-width:640px;margin:0 auto}
+.shell:not(.focus-mode) .topbar,
+.shell:not(.focus-mode) .toolbar,
+.shell:not(.focus-mode) .dock{transition:opacity .3s,transform .3s}
+
+/* Mobile adjustments */
+@media(max-width:600px){
+  .left-panel.open{width:100%;position:absolute;top:0;bottom:0;z-index:300}
+  .right-panel.open{width:100%;position:absolute;top:0;bottom:0;z-index:300}
+  .wc-pill{display:none}
+}
+
+/* Utility */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .25s ease both}
+
+/* Thinking spinner for AI */
+.ai-thinking{
+  display:none;align-items:center;gap:8px;padding:10px;
+  font-size:11px;color:var(--purple);margin-bottom:10px;
+}
+.ai-thinking.show{display:flex}
+.ai-spin{width:14px;height:14px;border-radius:50%;border:2.5px solid rgba(167,139,250,.2);border-top-color:var(--purple);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Scrollbar for desktop */
+.editor-scroll::-webkit-scrollbar{width:3px}
+.editor-scroll::-webkit-scrollbar-thumb{background:rgba(255,0,80,.15);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell">
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="tb-back" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-meta">
+    <div class="tb-series-name" id="tbSeriesName">New Story</div>
+    <div class="tb-doc-title" id="tbDocTitle">Chapter 1 · Draft</div>
+  </div>
+  <div class="tb-save-status saved" id="saveStatus">
+    <div class="autosave-dot"></div>
+    <span id="saveLabel">Saved</span>
+  </div>
+  <div class="tb-actions">
+    <div class="tb-btn" id="focusModeBtn" onclick="toggleFocusMode()" title="Focus Mode"><i class="fas fa-expand"></i></div>
+    <div class="tb-btn" onclick="toggleLeft()" title="Story Structure"><i class="fas fa-layer-group"></i></div>
+    <div class="tb-btn" onclick="openPreview()" title="Preview"><i class="fas fa-eye"></i></div>
+    <div class="tb-btn" onclick="toggleRight()" title="Settings"><i class="fas fa-sliders-h"></i></div>
+    <button class="tb-publish-btn" onclick="openPublish()"><i class="fas fa-rocket"></i><span id="publishBtnLabel">Publish</span></button>
+  </div>
+</div>
+
+<!-- ══ FORMAT TOOLBAR ══ -->
+<div class="toolbar" id="toolbar">
+  <div class="tool" onclick="fmt('bold')" title="Bold"><i class="fas fa-bold"></i></div>
+  <div class="tool" onclick="fmt('italic')" title="Italic"><i class="fas fa-italic"></i></div>
+  <div class="tool" onclick="fmt('underline')" title="Underline"><i class="fas fa-underline"></i></div>
+  <div class="tool-div"></div>
+  <div class="tool-label" onclick="fmt('h1')" title="Heading 1">H1</div>
+  <div class="tool-label" onclick="fmt('h2')" title="Heading 2">H2</div>
+  <div class="tool-label" onclick="fmt('h3')" title="Heading 3">H3</div>
+  <div class="tool-div"></div>
+  <div class="tool" onclick="fmt('blockquote')" title="Quote"><i class="fas fa-quote-left"></i></div>
+  <div class="tool" onclick="insertSceneDivider()" title="Scene Break"><i class="fas fa-minus"></i></div>
+  <div class="tool" onclick="fmt('ul')" title="List"><i class="fas fa-list-ul"></i></div>
+  <div class="tool-div"></div>
+  <div class="tool" onclick="fmt('align-left')" title="Align Left"><i class="fas fa-align-left"></i></div>
+  <div class="tool" onclick="fmt('align-center')" title="Align Center"><i class="fas fa-align-center"></i></div>
+  <div class="tool-div"></div>
+  <div class="tool" onclick="openInsert()" title="Insert Media"><i class="fas fa-image"></i></div>
+  <div class="tool" onclick="toggleAuthorNote()" title="Author's Note" id="anToggleBtn"><i class="fas fa-feather-pointed"></i></div>
+  <div class="tool-div"></div>
+  <div class="tool" id="findBtn" onclick="openFindReplace()" title="Find & Replace"><i class="fas fa-magnifying-glass"></i></div>
+  <div class="tool-div"></div>
+  <div class="wc-pill" id="wcPill">0 words · ~0 min</div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel" id="leftPanel">
+    <div class="lp-hdr">
+      <div class="lp-title">Story Structure</div>
+    </div>
+    <div class="lp-body">
+      <!-- Story type -->
+      <div class="lp-section-label">Type</div>
+      <div class="type-sel" id="typeSel">
+        <div class="type-btn active" data-type="series" onclick="setType('series',this)"><span class="type-btn-icon">📺</span>Series Chapter</div>
+        <div class="type-btn" data-type="short" onclick="setType('short',this)"><span class="type-btn-icon">✨</span>Short Story</div>
+        <div class="type-btn" data-type="poem" onclick="setType('poem',this)"><span class="type-btn-icon">🌙</span>Poem</div>
+        <div class="type-btn" data-type="elegy" onclick="setType('elegy',this)"><span class="type-btn-icon">🕯️</span>Elegy</div>
+      </div>
+
+      <!-- Series details (shown for series type) -->
+      <div id="seriesMetaSection">
+        <div class="lp-section-label">Series Info</div>
+        <div class="meta-fields">
+          <div>
+            <div class="mf-label">Series Title</div>
+            <input class="mf-input" id="lp-series-title" placeholder="Series name…" oninput="syncMeta()"/>
+          </div>
+          <div>
+            <div class="mf-label">Season</div>
+            <input class="mf-input" id="lp-season" type="number" min="1" max="99" value="1" oninput="syncMeta()"/>
+          </div>
+        </div>
+
+        <div class="lp-section-label">Chapters</div>
+        <div id="chaptersList"></div>
+        <div class="add-ch-btn" onclick="addChapter()">
+          <i class="fas fa-plus"></i> Add Chapter
+        </div>
+      </div>
+
+      <!-- Stand-alone metadata (for short/poem) -->
+      <div id="standaloneMeta" style="display:none">
+        <div class="lp-section-label">Story Info</div>
+        <div class="meta-fields">
+          <div>
+            <div class="mf-label">Category</div>
+            <select class="mf-select" id="lp-cat" onchange="syncMeta()">
+              <option>💔 Betrayal</option>
+              <option>✨ Twist</option>
+              <option>👑 Family</option>
+              <option>🏙️ Urban Love</option>
+              <option>🔥 Revenge</option>
+              <option>🌙 Elegy</option>
+              <option>🎓 Campus</option>
+              <option>💍 Marriage</option>
+              <option>😂 Comedy</option>
+              <option>😱 Thriller</option>
+            </select>
+          </div>
+          <div>
+            <div class="mf-label">Tagline</div>
+            <textarea class="mf-input mf-textarea" id="lp-tagline" placeholder="One-line hook…" rows="2" oninput="syncMeta()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-wrap">
+    <div class="editor-scroll" id="editorScroll" onclick="focusEditor()">
+      <!-- Chapter header -->
+      <div class="ch-header">
+        <div class="ch-type-bar" id="chTypePills">
+          <div class="ctb-pill active" data-t="series" onclick="setChType('series',this)">📺 Chapter</div>
+          <div class="ctb-pill" data-t="short" onclick="setChType('short',this)">✨ Short Story</div>
+          <div class="ctb-pill" data-t="poem" onclick="setChType('poem',this)">🌙 Poem</div>
+        </div>
+
+        <!-- Cover image -->
+        <div class="cover-zone" id="coverZone" onclick="changeCover()">
+          <div class="cover-zone-placeholder" id="coverPlaceholder">
+            <i class="fas fa-image"></i>
+            <span>Add cover image</span>
+          </div>
+          <img id="coverImg" style="display:none" alt="Cover"/>
+          <div class="cover-zone-overlay"><div class="cover-change-btn"><i class="fas fa-camera"></i> Change Cover</div></div>
+        </div>
+
+        <!-- Chapter title -->
+        <textarea
+          class="ch-title-input"
+          id="chTitleInput"
+          placeholder="Chapter title…"
+          rows="1"
+          oninput="autoResizeTitle(this);markUnsaved()"
+        ></textarea>
+
+        <!-- Chapter meta: season, chapter num, status, schedule -->
+        <div class="ch-meta-edit" id="chMetaEdit">
+          <div class="cme-item" id="seasonCme">
+            <span class="cme-label">S</span>
+            <input class="cme-input" id="cme-season" type="number" value="1" min="1" max="99" style="width:36px" oninput="markUnsaved();updateDocTitle()"/>
+          </div>
+          <div class="cme-item" id="chNumCme">
+            <span class="cme-label">Ch</span>
+            <input class="cme-input" id="cme-chnum" type="number" value="1" min="1" style="width:36px" oninput="markUnsaved();updateDocTitle()"/>
+          </div>
+          <div class="cme-item">
+            <span class="cme-label">Status</span>
+            <select class="cme-sel" id="cme-status" onchange="markUnsaved();updateDocTitle()">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+          </div>
+          <div class="cme-item" id="schedItem" style="display:none">
+            <span class="cme-label">Date</span>
+            <input class="cme-input" id="cme-scheddate" type="date" style="width:110px" oninput="markUnsaved()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Writing area -->
+      <div class="content-editor">
+        <!-- Author note -->
+        <div class="author-note-zone" id="authorNoteZone">
+          <div class="an-label"><i class="fas fa-feather-pointed" style="font-size:8px;margin-right:4px"></i>Author's Note</div>
+          <textarea class="author-note-inp" id="authorNoteInp" placeholder="Write a note to your readers before this chapter…" rows="2" oninput="markUnsaved()"></textarea>
+        </div>
+
+        <!-- Main content area -->
+        <div
+          class="writing-area"
+          id="writingArea"
+          contenteditable="true"
+          data-placeholder="Begin your story here…"
+          oninput="onWritingInput()"
+          onkeydown="onWritingKeyDown(event)"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel" id="rightPanel">
+    <div class="rp-hdr">
+      <div class="rp-title">Settings</div>
+      <div class="rp-close" onclick="toggleRight()">✕</div>
+    </div>
+    <div class="rp-body">
+
+      <!-- Reading estimate -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="far fa-clock" style="color:var(--acc);font-size:9px"></i> Reading Estimate</div>
+        <div class="read-est">
+          <div class="re-icon">⏱️</div>
+          <div class="re-body">
+            <div class="re-val" id="readTimeVal">—</div>
+            <div class="re-label">based on word count</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="background:var(--l2);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;flex:1;text-align:center">
+            <div style="font-family:var(--font-d);font-size:16px;font-weight:900;color:var(--tx)" id="rpWordCount">0</div>
+            <div style="font-size:8px;color:var(--tx4);margin-top:1px">Words</div>
+          </div>
+          <div style="background:var(--l2);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;flex:1;text-align:center">
+            <div style="font-family:var(--font-d);font-size:16px;font-weight:900;color:var(--tx)" id="rpCharCount">0</div>
+            <div style="font-size:8px;color:var(--tx4);margin-top:1px">Chars</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-div"></div>
+
+      <!-- Category -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-tag" style="color:var(--acc);font-size:9px"></i> Category</div>
+        <select class="rp-select" id="rp-cat">
+          <option>💔 Betrayal</option>
+          <option>✨ Twist</option>
+          <option>👑 Family</option>
+          <option>🏙️ Urban Love</option>
+          <option>🔥 Revenge</option>
+          <option>🌙 Elegy</option>
+          <option>🎓 Campus</option>
+          <option>💍 Marriage</option>
+          <option>😂 Comedy</option>
+          <option>😱 Thriller</option>
+          <option>🌿 Spiritual</option>
+        </select>
+      </div>
+
+      <!-- Genres / Tags -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-hashtag" style="color:var(--acc);font-size:9px"></i> Genre Tags</div>
+        <div class="genre-pill-row" id="genrePills">
+          <div class="genre-pill" onclick="toggleGenre(this)">Betrayal</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Family</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Heartbreak</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Twist</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Romance</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Revenge</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Campus</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Elegy</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Marriage</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Urban</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Comedy</div>
+          <div class="genre-pill" onclick="toggleGenre(this)">Dark</div>
+        </div>
+      </div>
+
+      <!-- Custom tags -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-tag" style="color:var(--acc);font-size:9px"></i> Custom Tags</div>
+        <div class="tags-input-wrap" id="tagsInputWrap" onclick="document.getElementById('tagTextInput').focus()">
+          <input class="tags-text-input" id="tagTextInput" placeholder="Type a tag, press Enter…" onkeydown="handleTagInput(event)"/>
+        </div>
+      </div>
+
+      <div class="rp-div"></div>
+
+      <!-- Synopsis -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-book" style="color:var(--acc);font-size:9px"></i> Synopsis / Description</div>
+        <textarea class="rp-input rp-textarea" id="rp-synopsis" placeholder="One-paragraph synopsis for readers…" rows="4" oninput="markUnsaved()"></textarea>
+      </div>
+
+      <!-- Content warnings -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-triangle-exclamation" style="color:var(--gold);font-size:9px"></i> Content Warning</div>
+        <input class="rp-input" id="rp-cw" placeholder="e.g. Grief, Domestic tension…" oninput="markUnsaved()"/>
+      </div>
+
+      <div class="rp-div"></div>
+
+      <!-- Publish status -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-circle-dot" style="color:var(--acc);font-size:9px"></i> Publish Status</div>
+        <div class="status-row">
+          <div class="status-opt draft active" id="so-draft" onclick="setStatus('draft')">📝 Draft</div>
+          <div class="status-opt pub" id="so-pub" onclick="setStatus('published')">✓ Live</div>
+          <div class="status-opt sch" id="so-sch" onclick="setStatus('scheduled')">⏰ Sch</div>
+        </div>
+        <div id="schedDateRow" style="display:none">
+          <input class="rp-input" type="datetime-local" id="rp-sched-date" oninput="markUnsaved()"/>
+        </div>
+        <button class="publish-action-btn" onclick="openPublish()"><i class="fas fa-rocket"></i> Publish Chapter</button>
+        <button class="save-draft-btn" onclick="saveDraft()"><i class="fas fa-floppy-disk" style="font-size:10px;margin-right:4px"></i>Save Draft</button>
+      </div>
+
+      <div class="rp-div"></div>
+
+      <!-- Visibility -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-eye" style="color:var(--acc);font-size:9px"></i> Visibility</div>
+        <select class="rp-select" id="rp-visibility">
+          <option value="public">🌍 Public — Everyone</option>
+          <option value="followers">👥 Followers Only</option>
+          <option value="private">🔒 Private — Only Me</option>
+        </select>
+      </div>
+
+      <!-- Comments -->
+      <div class="rp-section">
+        <div class="rp-section-label"><i class="fas fa-comment" style="color:var(--acc);font-size:9px"></i> Comments</div>
+        <select class="rp-select" id="rp-comments">
+          <option value="on">✅ Enabled</option>
+          <option value="moderated">🛡️ Moderated</option>
+          <option value="off">❌ Disabled</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+</div><!-- /shell -->
+
+<!-- ══ DOCK ══ -->
+<div class="dock" id="dock">
+  <div class="dock-stat" onclick="toast('📊 Chapter analytics coming soon')">
+    <div class="dock-stat-num" id="dockWords">0</div>
+    <div class="dock-stat-label">Words</div>
+  </div>
+  <div class="dock-div"></div>
+  <div class="dock-stat" onclick="toast('⏱ Reading time')">
+    <div class="dock-stat-num" id="dockTime">0m</div>
+    <div class="dock-stat-label">Read</div>
+  </div>
+  <div class="dock-div"></div>
+  <div class="dock-center">
+    <div class="dock-insert-btn" onclick="openInsert()">
+      <i class="fas fa-plus-circle" style="font-size:12px"></i> Insert
+    </div>
+    <div class="dock-ai-btn" onclick="openAI()">
+      <i class="fas fa-wand-magic-sparkles" style="font-size:11px"></i> AI Assist
+    </div>
+  </div>
+  <div class="dock-div"></div>
+  <div class="dock-stat" onclick="openHistory()">
+    <div class="dock-stat-num" id="dockVersion">v1</div>
+    <div class="dock-stat-label">Version</div>
+  </div>
+</div>
+
+<!-- ══ INSERT SHEET ══ -->
+<div class="overlay-bg" id="insertOv" onclick="if(event.target===this)closeInsert()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-plus-circle" style="color:var(--acc);font-size:13px"></i> Insert</h3>
+      <button class="sheet-close" onclick="closeInsert()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="insert-grid">
+        <div class="insert-opt" onclick="insert('scene-break')">
+          <div class="insert-opt-icon">✦</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Scene Break</div><div class="insert-opt-sub">Separate scenes with a divider</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('chapter-quote')">
+          <div class="insert-opt-icon">❝</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Epigraph / Quote</div><div class="insert-opt-sub">Opening quote for chapter</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('image')">
+          <div class="insert-opt-icon">🖼️</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Image</div><div class="insert-opt-sub">Add a photo or illustration</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('letter')">
+          <div class="insert-opt-icon">✉️</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Letter / Note</div><div class="insert-opt-sub">In-story letter format</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('flashback')">
+          <div class="insert-opt-icon">⏮️</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Flashback</div><div class="insert-opt-sub">Indented flashback scene</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('thought')">
+          <div class="insert-opt-icon">💭</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Inner Thought</div><div class="insert-opt-sub">Character's internal voice</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('time-skip')">
+          <div class="insert-opt-icon">⏩</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Time Skip</div><div class="insert-opt-sub">Mark a time jump</div></div>
+        </div>
+        <div class="insert-opt" onclick="insert('cliffhanger')">
+          <div class="insert-opt-icon">🪝</div>
+          <div class="insert-opt-body"><div class="insert-opt-title">Cliffhanger End</div><div class="insert-opt-sub">Chapter-ending hook marker</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI ASSIST SHEET ══ -->
+<div class="overlay-bg" id="aiOv" onclick="if(event.target===this)closeAI()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-wand-magic-sparkles" style="color:var(--purple);font-size:13px"></i> AI Story Assistant</h3>
+      <button class="sheet-close" onclick="closeAI()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="ai-prompts">
+        <div class="ai-prompt-btn" onclick="aiPrompt('Continue the story from where I left off, matching my voice and style.')">
+          <i class="fas fa-pen-nib"></i><span>Continue writing</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Suggest 3 different directions this chapter could go next.')">
+          <i class="fas fa-code-branch"></i><span>Suggest plot directions</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Rewrite the last paragraph with more emotional depth and sensory detail.')">
+          <i class="fas fa-heart"></i><span>Add emotional depth</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Improve the dialogue in this scene to sound more natural and character-specific.')">
+          <i class="fas fa-comments"></i><span>Improve dialogue</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Write a gripping chapter-ending cliffhanger based on what has happened so far.')">
+          <i class="fas fa-bolt"></i><span>Write a cliffhanger</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Suggest names and brief backstories for 3 supporting characters that would work in this story.')">
+          <i class="fas fa-users"></i><span>Develop characters</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Generate a gripping chapter title and a 2-sentence synopsis for this content.')">
+          <i class="fas fa-heading"></i><span>Generate title & synopsis</span>
+        </div>
+        <div class="ai-prompt-btn" onclick="aiPrompt('Fix grammar, punctuation, and style inconsistencies in the selected text.')">
+          <i class="fas fa-spell-check"></i><span>Fix grammar & style</span>
+        </div>
+      </div>
+
+      <div style="font-size:9px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Or type a custom prompt</div>
+      <div class="ai-custom-wrap">
+        <textarea class="ai-custom-inp" id="aiCustomInp" placeholder="e.g. Write the scene where Ada confronts her husband about the photograph…" rows="3"></textarea>
+        <div class="ai-custom-foot">
+          <span style="font-size:9px;color:var(--tx4)">Context-aware · Uses your story</span>
+          <button class="ai-send-btn" onclick="aiCustomSend()"><i class="fas fa-paper-plane" style="font-size:9px"></i> Generate</button>
+        </div>
+      </div>
+
+      <div class="ai-thinking" id="aiThinking">
+        <div class="ai-spin"></div>
+        <span>Thinking…</span>
+      </div>
+
+      <div class="ai-response-box" id="aiResponseBox"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PUBLISH SHEET ══ -->
+<div class="overlay-bg" id="publishOv" onclick="if(event.target===this)closePublish()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-rocket" style="color:var(--acc);font-size:13px"></i> Publish Chapter</h3>
+      <button class="sheet-close" onclick="closePublish()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <!-- Cover preview -->
+      <div class="pub-cover-preview" id="pubCoverPreview" onclick="changeCover()" style="background-image:none">
+        <span id="pubCoverPlaceholder"><i class="fas fa-image" style="font-size:18px;margin-right:6px"></i>Tap to set cover image</span>
+      </div>
+
+      <!-- Checklist -->
+      <div class="pub-checklist" id="pubChecklist"></div>
+
+      <!-- Final publish -->
+      <button class="pub-final-btn" onclick="publishNow()">
+        <i class="fas fa-rocket"></i>
+        <span id="pubFinalLabel">Publish Now</span>
+      </button>
+      <button style="width:100%;padding:10px;border-radius:12px;background:transparent;border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);margin-top:7px" onclick="scheduleLater()">
+        <i class="fas fa-calendar" style="font-size:10px;margin-right:5px"></i>Schedule for Later
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIND & REPLACE ══ -->
+<div class="overlay-bg" id="findOv" onclick="if(event.target===this)closeFindReplace()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <h3><i class="fas fa-magnifying-glass" style="color:var(--blue);font-size:13px"></i> Find & Replace</h3>
+      <button class="sheet-close" onclick="closeFindReplace()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="margin-bottom:8px">
+        <div style="font-size:9px;font-weight:800;color:var(--tx4);margin-bottom:5px;text-transform:uppercase">Find</div>
+        <input class="rp-input" id="findInput" placeholder="Search text…" style="margin:0" oninput="doFind()"/>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:9px;font-weight:800;color:var(--tx4);margin-bottom:5px;text-transform:uppercase">Replace with</div>
+        <input class="rp-input" id="replaceInput" placeholder="Replacement text…" style="margin:0"/>
+      </div>
+      <div style="font-size:10px;color:var(--tx4);margin-bottom:10px" id="findCount"></div>
+      <div style="display:flex;gap:7px">
+        <button style="flex:1;padding:9px;border-radius:10px;background:rgba(56,189,248,.08);border:1.5px solid rgba(56,189,248,.2);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-b)" onclick="replaceOne()">Replace</button>
+        <button style="flex:1;padding:9px;border-radius:10px;background:rgba(56,189,248,.08);border:1.5px solid rgba(56,189,248,.2);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-b)" onclick="replaceAll()">Replace All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PREVIEW OVERLAY ══ -->
+<div class="preview-overlay" id="previewOv">
+  <div class="preview-topbar">
+    <div class="prev-back" onclick="closePreview()"><i class="fas fa-chevron-left"></i></div>
+    <div class="prev-title">Preview</div>
+    <div style="font-size:10px;font-weight:700;color:var(--tx2);background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.2);padding:4px 10px;border-radius:20px;cursor:pointer" onclick="closePreview();openPublish()">← Back to Editor</div>
+  </div>
+  <div class="preview-hero" id="previewHero">
+    <div class="preview-hero-bg" id="previewHeroBg"></div>
+    <div class="preview-hero-grad"></div>
+    <div class="preview-hero-content">
+      <div class="preview-cat" id="previewCat">💔 Betrayal</div>
+      <div class="preview-title" id="previewTitle">Chapter Title</div>
+    </div>
+  </div>
+  <div class="preview-content" id="previewContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const STATE = {
+  type: 'series', // series | short | poem | elegy
+  currentChIdx: 0,
+  status: 'draft',
+  saved: true,
+  focusMode: false,
+  leftOpen: false,
+  rightOpen: false,
+  autoSaveTimer: null,
+  versionCount: 1,
+  coverUrl: null,
+  tags: [],
+  chapters: [
+    { id: 'ch1', num: 1, title: '', content: '', status: 'draft', words: 0 }
+  ]
+};
+
+/* parse URL params */
+(function() {
+  const p = new URLSearchParams(location.search);
+  const sid = p.get('sid'), sTitle = p.get('seriesTitle'), cat = p.get('cat'), chNum = p.get('chapterNum');
+  if (sTitle) {
+    document.getElementById('lp-series-title').value = sTitle;
+    document.getElementById('tbSeriesName').textContent = sTitle;
+  }
+  if (chNum) {
+    document.getElementById('cme-chnum').value = chNum;
+    STATE.chapters[0].num = parseInt(chNum) || 1;
+  }
+  if (cat) document.getElementById('rp-cat').value = cat;
+  if (sid) document.getElementById('tbSeriesName').textContent = sTitle || 'Series · Chapter ' + (chNum || '1');
+  updateDocTitle();
+  renderChaptersList();
+})();
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function getWordCount() {
+  const text = document.getElementById('writingArea').innerText || '';
+  const w = text.trim().split(/\s+/).filter(Boolean).length;
+  return w;
+}
+
+function updateStats() {
+  const wc = getWordCount();
+  const chars = (document.getElementById('writingArea').innerText || '').length;
+  const mins = Math.max(1, Math.round(wc / 220));
+  document.getElementById('wcPill').textContent = `${wc.toLocaleString()} words · ~${mins} min`;
+  document.getElementById('dockWords').textContent = wc >= 1000 ? (wc/1000).toFixed(1)+'k' : wc;
+  document.getElementById('dockTime').textContent = mins + 'm';
+  document.getElementById('rpWordCount').textContent = wc.toLocaleString();
+  document.getElementById('rpCharCount').textContent = chars.toLocaleString();
+  document.getElementById('readTimeVal').textContent = `~${mins} min read`;
+}
+
+function updateDocTitle() {
+  const status = document.getElementById('cme-status').value;
+  const s = document.getElementById('cme-season').value;
+  const c = document.getElementById('cme-chnum').value;
+  const type = STATE.type;
+  let label = '';
+  if (type === 'series') label = `S${s}·Ch${c} · ${status.charAt(0).toUpperCase()+status.slice(1)}`;
+  else if (type === 'poem') label = `Poem · ${status.charAt(0).toUpperCase()+status.slice(1)}`;
+  else if (type === 'short') label = `Short Story · ${status.charAt(0).toUpperCase()+status.slice(1)}`;
+  else label = `Elegy · ${status.charAt(0).toUpperCase()+status.slice(1)}`;
+  document.getElementById('tbDocTitle').textContent = label;
+}
+
+function autoResizeTitle(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+/* ══════════════════════════════════════════
+   SAVE STATE
+══════════════════════════════════════════ */
+function markUnsaved() {
+  if (STATE.saved) {
+    STATE.saved = false;
+    const el = document.getElementById('saveStatus');
+    el.className = 'tb-save-status unsaved';
+    document.getElementById('saveLabel').textContent = 'Unsaved';
+  }
+  clearTimeout(STATE.autoSaveTimer);
+  STATE.autoSaveTimer = setTimeout(autoSave, 1800);
+}
+
+function autoSave() {
+  const el = document.getElementById('saveStatus');
+  el.className = 'tb-save-status saving';
+  document.getElementById('saveLabel').textContent = 'Saving…';
+  // Save to localStorage
+  try {
+    const data = {
+      type: STATE.type,
+      title: document.getElementById('chTitleInput').value,
+      content: document.getElementById('writingArea').innerHTML,
+      seriesTitle: document.getElementById('lp-series-title').value,
+      season: document.getElementById('cme-season').value,
+      chNum: document.getElementById('cme-chnum').value,
+      status: document.getElementById('cme-status').value,
+      cat: document.getElementById('rp-cat').value,
+      synopsis: document.getElementById('rp-synopsis').value,
+      cw: document.getElementById('rp-cw').value,
+      tags: STATE.tags,
+      coverUrl: STATE.coverUrl,
+      ts: Date.now()
+    };
+    localStorage.setItem('droboard_draft_story', JSON.stringify(data));
+  } catch(e) {}
+  STATE.versionCount++;
+  document.getElementById('dockVersion').textContent = 'v' + STATE.versionCount;
+  setTimeout(() => {
+    STATE.saved = true;
+    el.className = 'tb-save-status saved';
+    document.getElementById('saveLabel').textContent = 'Saved';
+  }, 500);
+}
+
+function saveDraft() {
+  autoSave();
+  toast('📝 Draft saved!');
+}
+
+/* ══════════════════════════════════════════
+   WRITING EVENTS
+══════════════════════════════════════════ */
+function onWritingInput() {
+  updateStats();
+  markUnsaved();
+  // Keep contenteditable clean
+  const wa = document.getElementById('writingArea');
+  if (wa.innerHTML === '<br>') wa.innerHTML = '';
+}
+
+function onWritingKeyDown(e) {
+  // Tab → 4 spaces
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    document.execCommand('insertText', false, '    ');
+  }
+  // Enter after a line in poem mode → preserve line-by-line
+  if (e.key === 'Enter' && STATE.type === 'poem') {
+    // default is fine
+  }
+}
+
+function focusEditor() {
+  const wa = document.getElementById('writingArea');
+  if (!window.getSelection().toString()) wa.focus();
+}
+
+/* ══════════════════════════════════════════
+   FORMAT
+══════════════════════════════════════════ */
+function fmt(cmd) {
+  document.getElementById('writingArea').focus();
+  switch(cmd) {
+    case 'bold': document.execCommand('bold'); break;
+    case 'italic': document.execCommand('italic'); break;
+    case 'underline': document.execCommand('underline'); break;
+    case 'h1': document.execCommand('formatBlock', false, 'h1'); break;
+    case 'h2': document.execCommand('formatBlock', false, 'h2'); break;
+    case 'h3': document.execCommand('formatBlock', false, 'h3'); break;
+    case 'blockquote': document.execCommand('formatBlock', false, 'blockquote'); break;
+    case 'ul': document.execCommand('insertUnorderedList'); break;
+    case 'align-left': document.execCommand('justifyLeft'); break;
+    case 'align-center': document.execCommand('justifyCenter'); break;
+  }
+  markUnsaved();
+}
+
+function insertSceneDivider() {
+  const wa = document.getElementById('writingArea');
+  wa.focus();
+  document.execCommand('insertHTML', false,
+    '<div contenteditable="false" style="display:flex;align-items:center;gap:10px;padding:12px 0;opacity:.5;user-select:none"><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.1);margin:0"/><span style="color:#555;font-size:12px">✦</span><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.1);margin:0"/></div><p><br></p>'
+  );
+  markUnsaved();
+}
+
+/* ══════════════════════════════════════════
+   TYPE / MODE
+══════════════════════════════════════════ */
+function setType(type, btn) {
+  STATE.type = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // sync pills in ch header
+  document.querySelectorAll('.ctb-pill').forEach(p => p.classList.toggle('active', p.dataset.t === type));
+  // show/hide sidebar sections
+  document.getElementById('seriesMetaSection').style.display = type === 'series' ? '' : 'none';
+  document.getElementById('standaloneMeta').style.display = type !== 'series' ? '' : 'none';
+  // show/hide meta fields in editor header
+  document.getElementById('seasonCme').style.display = type === 'series' ? '' : 'none';
+  document.getElementById('chNumCme').style.display = type === 'series' ? '' : 'none';
+  // poem mode on writing area
+  document.getElementById('writingArea').classList.toggle('poem-mode', type === 'poem' || type === 'elegy');
+  updateDocTitle();
+  updatePlaceholder();
+}
+
+function setChType(type, btn) {
+  document.querySelectorAll('.ctb-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  STATE.type = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  document.getElementById('writingArea').classList.toggle('poem-mode', type === 'poem' || type === 'elegy');
+  document.getElementById('seriesMetaSection').style.display = type === 'series' ? '' : 'none';
+  document.getElementById('standaloneMeta').style.display = type !== 'series' ? '' : 'none';
+  document.getElementById('seasonCme').style.display = type === 'series' ? '' : 'none';
+  document.getElementById('chNumCme').style.display = type === 'series' ? '' : 'none';
+  updateDocTitle();
+  updatePlaceholder();
+}
+
+function updatePlaceholder() {
+  const placeholders = {
+    series: 'Begin your chapter here…',
+    short: 'Tell your story…',
+    poem: 'Write your poem, line by line…',
+    elegy: 'Pour your elegy onto the page…',
+  };
+  document.getElementById('writingArea').dataset.placeholder = placeholders[STATE.type] || 'Begin writing…';
+}
+
+/* ══════════════════════════════════════════
+   CHAPTERS SIDEBAR
+══════════════════════════════════════════ */
+function renderChaptersList() {
+  const list = document.getElementById('chaptersList');
+  list.innerHTML = STATE.chapters.map((ch, i) => `
+    <div class="ch-item${i === STATE.currentChIdx ? ' active' : ''}" onclick="switchChapter(${i})">
+      <div class="ch-item-num">${ch.num}</div>
+      <div class="ch-item-body">
+        <div class="ch-item-title">${ch.title || 'Untitled Chapter'}</div>
+        <div class="ch-item-meta">
+          <span>${ch.words} words</span>
+          <span class="ch-item-status ${ch.status === 'published' ? 'cis-pub' : 'cis-draft'}">${ch.status === 'published' ? '✓ Pub' : '📝 Draft'}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addChapter() {
+  const num = STATE.chapters.length + 1;
+  STATE.chapters.push({ id: 'ch' + Date.now(), num, title: '', content: '', status: 'draft', words: 0 });
+  switchChapter(STATE.chapters.length - 1);
+  renderChaptersList();
+  toast(`📖 Chapter ${num} added`);
+}
+
+function switchChapter(idx) {
+  // Save current chapter content first
+  STATE.chapters[STATE.currentChIdx].content = document.getElementById('writingArea').innerHTML;
+  STATE.chapters[STATE.currentChIdx].title = document.getElementById('chTitleInput').value;
+  STATE.chapters[STATE.currentChIdx].words = getWordCount();
+  STATE.chapters[STATE.currentChIdx].status = document.getElementById('cme-status').value;
+
+  STATE.currentChIdx = idx;
+  const ch = STATE.chapters[idx];
+  document.getElementById('writingArea').innerHTML = ch.content || '';
+  document.getElementById('chTitleInput').value = ch.title || '';
+  document.getElementById('cme-chnum').value = ch.num;
+  document.getElementById('cme-status').value = ch.status || 'draft';
+  autoResizeTitle(document.getElementById('chTitleInput'));
+  updateStats();
+  updateDocTitle();
+  renderChaptersList();
+}
+
+function syncMeta() {
+  const title = document.getElementById('lp-series-title').value;
+  if (title) document.getElementById('tbSeriesName').textContent = title;
+  markUnsaved();
+}
+
+/* ══════════════════════════════════════════
+   AUTHOR NOTE
+══════════════════════════════════════════ */
+function toggleAuthorNote() {
+  const zone = document.getElementById('authorNoteZone');
+  zone.classList.toggle('show');
+  document.getElementById('anToggleBtn').classList.toggle('active', zone.classList.contains('show'));
+  if (zone.classList.contains('show')) document.getElementById('authorNoteInp').focus();
+}
+
+/* ══════════════════════════════════════════
+   STATUS
+══════════════════════════════════════════ */
+function setStatus(s) {
+  STATE.status = s;
+  ['draft','pub','sch'].forEach(k => {
+    const el = document.getElementById('so-' + k);
+    el.classList.toggle('active', (k === 'draft' && s === 'draft') || (k === 'pub' && s === 'published') || (k === 'sch' && s === 'scheduled'));
+  });
+  document.getElementById('schedDateRow').style.display = s === 'scheduled' ? '' : 'none';
+  document.getElementById('cme-status').value = s;
+  document.getElementById('schedItem').style.display = s === 'scheduled' ? '' : 'none';
+  updateDocTitle();
+  markUnsaved();
+}
+
+document.getElementById('cme-status').addEventListener('change', function() {
+  setStatus(this.value);
+});
+
+/* ══════════════════════════════════════════
+   TAGS
+══════════════════════════════════════════ */
+function handleTagInput(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,/g, '');
+    if (val && !STATE.tags.includes(val)) {
+      STATE.tags.push(val);
+      renderTags();
+      markUnsaved();
+    }
+    e.target.value = '';
+  }
+}
+
+function renderTags() {
+  const wrap = document.getElementById('tagsInputWrap');
+  const inp = document.getElementById('tagTextInput');
+  wrap.innerHTML = '';
+  STATE.tags.forEach((tag, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `${tag}<span class="tag-chip-del" onclick="removeTag(${i})">✕</span>`;
+    wrap.appendChild(chip);
+  });
+  wrap.appendChild(inp);
+}
+
+function removeTag(i) {
+  STATE.tags.splice(i, 1);
+  renderTags();
+  markUnsaved();
+}
+
+/* ══════════════════════════════════════════
+   GENRE PILLS
+══════════════════════════════════════════ */
+function toggleGenre(el) {
+  el.classList.toggle('on');
+  markUnsaved();
+}
+
+/* ══════════════════════════════════════════
+   COVER
+══════════════════════════════════════════ */
+const DEMO_COVERS = [
+  'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+  'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+  'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+  'https://i.postimg.cc/23WvkFLH/images-(2).jpg',
+  'https://i.postimg.cc/cgLZJNmC/8.jpg',
+  'https://i.postimg.cc/WF1j4Pnh/6.jpg',
+];
+let coverPickIdx = 0;
+
+function changeCover() {
+  // Cycle through demo covers (real app would open file picker)
+  STATE.coverUrl = DEMO_COVERS[coverPickIdx % DEMO_COVERS.length];
+  coverPickIdx++;
+  const img = document.getElementById('coverImg');
+  const placeholder = document.getElementById('coverPlaceholder');
+  img.src = STATE.coverUrl;
+  img.style.display = 'block';
+  placeholder.style.display = 'none';
+  // Update publish preview
+  document.getElementById('pubCoverPreview').style.backgroundImage = `url('${STATE.coverUrl}')`;
+  document.getElementById('pubCoverPlaceholder').style.display = 'none';
+  markUnsaved();
+  toast('🖼️ Cover updated (tap again to cycle)');
+}
+
+/* ══════════════════════════════════════════
+   PANELS
+══════════════════════════════════════════ */
+function toggleLeft() {
+  STATE.leftOpen = !STATE.leftOpen;
+  document.getElementById('leftPanel').classList.toggle('open', STATE.leftOpen);
+}
+function toggleRight() {
+  STATE.rightOpen = !STATE.rightOpen;
+  document.getElementById('rightPanel').classList.toggle('open', STATE.rightOpen);
+}
+
+/* ══════════════════════════════════════════
+   FOCUS MODE
+══════════════════════════════════════════ */
+function toggleFocusMode() {
+  STATE.focusMode = !STATE.focusMode;
+  document.getElementById('shell').classList.toggle('focus-mode', STATE.focusMode);
+  document.getElementById('focusModeBtn').classList.toggle('accent', STATE.focusMode);
+  if (STATE.focusMode) {
+    STATE.leftOpen = false;
+    STATE.rightOpen = false;
+    document.getElementById('leftPanel').classList.remove('open');
+    document.getElementById('rightPanel').classList.remove('open');
+    toast('Focus mode on · Tap anywhere to exit', 2000);
+    setTimeout(() => {
+      document.getElementById('writingArea').focus();
+    }, 350);
+  } else {
+    toast('Focus mode off');
+  }
+}
+
+// Tap in focus mode to exit
+document.getElementById('writingArea').addEventListener('click', (e) => {
+  // Only exit focus mode if user taps the writing area (not types)
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && STATE.focusMode) toggleFocusMode();
+});
+
+/* ══════════════════════════════════════════
+   INSERT
+══════════════════════════════════════════ */
+function openInsert() { document.getElementById('insertOv').classList.add('open'); }
+function closeInsert() { document.getElementById('insertOv').classList.remove('open'); }
+
+function insert(type) {
+  closeInsert();
+  const wa = document.getElementById('writingArea');
+  wa.focus();
+  const inserts = {
+    'scene-break': '<div contenteditable="false" style="display:flex;align-items:center;gap:12px;padding:14px 0;user-select:none"><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.08);margin:0"/><span style="color:#555;font-size:12px;letter-spacing:.2em">✦ ✦ ✦</span><hr style="flex:1;border:none;border-top:1px solid rgba(255,255,255,.08);margin:0"/></div><p><br></p>',
+    'chapter-quote': '<blockquote style="font-family:var(--font-d);font-style:italic;padding:8px 0 8px 14px;border-left:3px solid #ff0050;margin:12px 0;color:#a1a1aa"><em>Type your epigraph here…</em></blockquote><p><br></p>',
+    'image': '<p>[Image placeholder — tap to upload in app]</p><p><br></p>',
+    'letter': '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;margin:12px 0;font-style:italic;color:#c0c0cc"><p><em>Dear [Name],</em></p><p><br></p><p><em>Write your letter here…</em></p><p><br></p><p><em>Yours,<br/>[Sender]</em></p></div><p><br></p>',
+    'flashback': '<div style="border-left:3px solid rgba(167,139,250,.4);padding-left:14px;margin:14px 0;opacity:.88"><p style="font-size:11px;color:rgba(167,139,250,.6);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">— Flashback —</p><p>Write your flashback scene here…</p></div><p><br></p>',
+    'thought': '<p><em style="color:#a0c0e8">[Thought: Her mind drifted to…]</em></p><p><br></p>',
+    'time-skip': '<div contenteditable="false" style="text-align:center;padding:12px 0;font-size:10px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:.15em;text-transform:uppercase;user-select:none">— Three Months Later —</div><p><br></p>',
+    'cliffhanger': '<div contenteditable="false" style="text-align:center;padding:16px 0;color:rgba(255,0,80,.4);font-size:11px;font-weight:700;letter-spacing:.08em;user-select:none">✦ End of Chapter ✦</div>',
+  };
+  document.execCommand('insertHTML', false, inserts[type] || '');
+  markUnsaved();
+}
+
+/* ══════════════════════════════════════════
+   AI ASSIST
+══════════════════════════════════════════ */
+function openAI() {
+  document.getElementById('aiOv').classList.add('open');
+  document.getElementById('aiResponseBox').classList.remove('show');
+  document.getElementById('aiResponseBox').innerHTML = '';
+  document.getElementById('aiThinking').classList.remove('show');
+}
+function closeAI() { document.getElementById('aiOv').classList.remove('open'); }
+
+function aiPrompt(prompt) {
+  document.getElementById('aiCustomInp').value = prompt;
+  aiCustomSend();
+}
+
+async function aiCustomSend() {
+  const customInp = document.getElementById('aiCustomInp');
+  const prompt = customInp.value.trim();
+  if (!prompt) { toast('✍️ Enter a prompt first'); return; }
+
+  // Get story context
+  const title = document.getElementById('chTitleInput').value;
+  const storyText = document.getElementById('writingArea').innerText || '';
+  const seriesTitle = document.getElementById('lp-series-title').value;
+  const synopsis = document.getElementById('rp-synopsis').value;
+
+  const thinking = document.getElementById('aiThinking');
+  const box = document.getElementById('aiResponseBox');
+  thinking.classList.add('show');
+  box.classList.remove('show');
+  box.innerHTML = '';
+
+  const systemPrompt = `You are a story writing assistant for Droboard, a Nigerian-focused creative writing platform.
+You help writers craft compelling, emotionally resonant fiction with authentic African settings and voices.
+The stories on this platform are known for: betrayal, family drama, heartbreak, twist endings, urban Lagos life, and deep emotional authenticity.
+Write in a literary but accessible style. Be specific, sensory, and emotionally true. Maximum 200 words per response unless asked otherwise.`;
+
+  const contextMsg = [
+    seriesTitle ? `Series: "${seriesTitle}"` : '',
+    title ? `Chapter title: "${title}"` : '',
+    synopsis ? `Synopsis: ${synopsis}` : '',
+    storyText ? `Story so far (last 800 chars):\n${storyText.slice(-800)}` : 'No content written yet.',
+  ].filter(Boolean).join('\n');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: `${contextMsg}\n\nWriter's request: ${prompt}`
+        }]
+      })
+    });
+    const data = await res.json();
+    thinking.classList.remove('show');
+    const text = (data.content || []).map(c => c.text || '').join('\n');
+    if (!text) { toast('⚠️ No response. Try again.'); return; }
+    box.innerHTML = text.replace(/\n/g, '<br>') +
+      `<div class="ai-response-actions">
+        <div class="ai-res-btn insert" onclick="insertAIText()">⬇ Insert into story</div>
+        <div class="ai-res-btn" onclick="copyAIText()">📋 Copy</div>
+        <div class="ai-res-btn" onclick="document.getElementById('aiCustomInp').value='';document.getElementById('aiResponseBox').classList.remove('show')">✕ Dismiss</div>
+      </div>`;
+    box.dataset.rawText = text;
+    box.classList.add('show');
+  } catch(e) {
+    thinking.classList.remove('show');
+    toast('⚠️ AI request failed. Check connection.');
+  }
+}
+
+function insertAIText() {
+  const text = document.getElementById('aiResponseBox').dataset.rawText || '';
+  if (!text) return;
+  document.getElementById('writingArea').focus();
+  // Remove action buttons from text, just insert clean paragraphs
+  const paras = text.split('\n').filter(Boolean);
+  const html = '<p>' + paras.join('</p><p>') + '</p>';
+  document.execCommand('insertHTML', false, html);
+  markUnsaved();
+  closeAI();
+  toast('✅ Text inserted!');
+}
+
+function copyAIText() {
+  const text = document.getElementById('aiResponseBox').dataset.rawText || '';
+  navigator.clipboard?.writeText(text).catch(() => {});
+  toast('📋 Copied!');
+}
+
+/* ══════════════════════════════════════════
+   PREVIEW
+══════════════════════════════════════════ */
+function openPreview() {
+  const title = document.getElementById('chTitleInput').value || 'Untitled';
+  const cat = document.getElementById('rp-cat').value;
+  const content = document.getElementById('writingArea').innerHTML;
+  const coverUrl = STATE.coverUrl;
+
+  document.getElementById('previewTitle').textContent = title;
+  document.getElementById('previewCat').textContent = cat;
+  if (coverUrl) {
+    document.getElementById('previewHeroBg').style.backgroundImage = `url('${coverUrl}')`;
+    document.getElementById('previewHero').style.height = '220px';
+  } else {
+    document.getElementById('previewHero').style.height = '0';
+  }
+  document.getElementById('previewContent').innerHTML = content || '<p><em style="color:#555">No content yet.</em></p>';
+  document.getElementById('previewOv').classList.add('open');
+}
+function closePreview() { document.getElementById('previewOv').classList.remove('open'); }
+
+/* ══════════════════════════════════════════
+   PUBLISH
+══════════════════════════════════════════ */
+function openPublish() {
+  buildPublishChecklist();
+  document.getElementById('publishOv').classList.add('open');
+}
+function closePublish() { document.getElementById('publishOv').classList.remove('open'); }
+
+function buildPublishChecklist() {
+  const title = document.getElementById('chTitleInput').value.trim();
+  const wc = getWordCount();
+  const hasCover = !!STATE.coverUrl;
+  const hasSynopsis = document.getElementById('rp-synopsis').value.trim().length > 0;
+  const storyType = STATE.type;
+
+  const checks = [
+    {
+      icon: '📝',
+      label: title ? `Title: "${title.substring(0,35)}${title.length>35?'…':''}"` : 'Missing chapter title',
+      ok: !!title
+    },
+    {
+      icon: '📖',
+      label: wc >= 50 ? `${wc.toLocaleString()} words written` : `Too short (${wc} words · min 50)`,
+      ok: wc >= 50
+    },
+    {
+      icon: '🖼️',
+      label: hasCover ? 'Cover image set' : 'No cover image (recommended)',
+      ok: hasCover,
+      warn: !hasCover
+    },
+    {
+      icon: '🏷️',
+      label: hasSynopsis ? 'Synopsis added' : 'Synopsis missing (recommended)',
+      ok: hasSynopsis,
+      warn: !hasSynopsis
+    },
+    {
+      icon: '🌍',
+      label: `Visibility: ${document.getElementById('rp-visibility').value}`,
+      ok: true
+    }
+  ];
+
+  const allCriticalOk = !!title && wc >= 50;
+  document.getElementById('pubFinalLabel').textContent = allCriticalOk ? 'Publish Now' : 'Fix Issues First';
+
+  document.getElementById('pubChecklist').innerHTML = checks.map(c => `
+    <div class="pub-check-item">
+      <span class="pci-icon">${c.icon}</span>
+      <span class="pci-label">${c.label}</span>
+      <span class="pci-status ${c.ok ? 'ok' : c.warn ? '' : 'warn'}">${c.ok ? '✓' : c.warn ? '⚠️' : '✕'}</span>
+    </div>`).join('');
+}
+
+function publishNow() {
+  const title = document.getElementById('chTitleInput').value.trim();
+  const wc = getWordCount();
+  if (!title) { toast('📝 Add a chapter title first'); return; }
+  if (wc < 50) { toast(`✍️ Story too short (${wc} words)`); return; }
+  setStatus('published');
+  autoSave();
+  closePublish();
+  toast('🚀 Chapter published!');
+  // Update chapter status
+  STATE.chapters[STATE.currentChIdx].status = 'published';
+  STATE.chapters[STATE.currentChIdx].title = title;
+  STATE.chapters[STATE.currentChIdx].words = wc;
+  renderChaptersList();
+  document.getElementById('publishBtnLabel').textContent = 'Update';
+}
+
+function scheduleLater() {
+  closePublish();
+  setStatus('scheduled');
+  toggleRight();
+  setTimeout(() => {
+    document.getElementById('rp-sched-date').focus();
+    toast('⏰ Pick a publish date and time');
+  }, 350);
+}
+
+/* ══════════════════════════════════════════
+   FIND & REPLACE
+══════════════════════════════════════════ */
+function openFindReplace() { document.getElementById('findOv').classList.add('open'); }
+function closeFindReplace() { document.getElementById('findOv').classList.remove('open'); clearHighlights(); }
+
+function doFind() {
+  const term = document.getElementById('findInput').value;
+  const countEl = document.getElementById('findCount');
+  clearHighlights();
+  if (!term) { countEl.textContent = ''; return; }
+  const text = document.getElementById('writingArea').innerText;
+  const matches = (text.match(new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')) || []).length;
+  countEl.textContent = matches ? `${matches} match${matches > 1 ? 'es' : ''} found` : 'No matches found';
+}
+
+function clearHighlights() {
+  // Simple: no highlight DOM manipulation needed for this demo
+}
+
+function replaceOne() {
+  const find = document.getElementById('findInput').value;
+  const rep = document.getElementById('replaceInput').value;
+  if (!find) return;
+  const wa = document.getElementById('writingArea');
+  const text = wa.innerHTML;
+  const regex = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+  if (regex.test(text)) {
+    wa.innerHTML = text.replace(regex, rep);
+    markUnsaved();
+    doFind();
+    toast('✅ Replaced once');
+  } else {
+    toast('No match found');
+  }
+}
+
+function replaceAll() {
+  const find = document.getElementById('findInput').value;
+  const rep = document.getElementById('replaceInput').value;
+  if (!find) return;
+  const wa = document.getElementById('writingArea');
+  const regex = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  const count = (wa.innerHTML.match(regex) || []).length;
+  if (count) {
+    wa.innerHTML = wa.innerHTML.replace(regex, rep);
+    markUnsaved();
+    document.getElementById('findCount').textContent = `Replaced ${count} match${count > 1 ? 'es' : ''}`;
+    toast(`✅ Replaced ${count} instance${count > 1 ? 's' : ''}`);
+  } else {
+    toast('No matches found');
+  }
+}
+
+/* ══════════════════════════════════════════
+   VERSION HISTORY (minimal)
+══════════════════════════════════════════ */
+function openHistory() {
+  toast(`📚 Version ${STATE.versionCount} — auto-save active`);
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function goBack() {
+  if (!STATE.saved) {
+    if (confirm('You have unsaved changes. Save before leaving?')) autoSave();
+  }
+  history.back();
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+// Try to restore draft
+try {
+  const saved = localStorage.getItem('droboard_draft_story');
+  if (saved) {
+    const d = JSON.parse(saved);
+    // Only restore if it was saved in last 24h
+    if (Date.now() - d.ts < 86400000) {
+      if (d.content) document.getElementById('writingArea').innerHTML = d.content;
+      if (d.title) { document.getElementById('chTitleInput').value = d.title; autoResizeTitle(document.getElementById('chTitleInput')); }
+      if (d.synopsis) document.getElementById('rp-synopsis').value = d.synopsis;
+      if (d.cat) document.getElementById('rp-cat').value = d.cat;
+      if (d.cw) document.getElementById('rp-cw').value = d.cw;
+      if (d.coverUrl) {
+        STATE.coverUrl = d.coverUrl;
+        document.getElementById('coverImg').src = d.coverUrl;
+        document.getElementById('coverImg').style.display = 'block';
+        document.getElementById('coverPlaceholder').style.display = 'none';
+      }
+      if (d.tags) { STATE.tags = d.tags; renderTags(); }
+      if (d.seriesTitle && !document.getElementById('lp-series-title').value) {
+        document.getElementById('lp-series-title').value = d.seriesTitle;
+        document.getElementById('tbSeriesName').textContent = d.seriesTitle;
+      }
+      if (d.season) document.getElementById('cme-season').value = d.season;
+      if (d.chNum) document.getElementById('cme-chnum').value = d.chNum;
+      updateStats();
+      updateDocTitle();
+    }
+  }
+} catch(e) {}
+
+updateStats();
+updateDocTitle();
+renderChaptersList();
+updatePlaceholder();
+
+// Focus writing area after a moment
+setTimeout(() => {
+  if (!STATE.leftOpen && !STATE.rightOpen) {
+    document.getElementById('writingArea').focus();
+  }
+}, 500);
+
+// Keyboard shortcut: Ctrl/Cmd+S to save
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveDraft();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    openFindReplace();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+    e.preventDefault();
+    openPreview();
+  }
+});
+</script>
+</body>
+</html>

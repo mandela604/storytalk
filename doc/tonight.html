@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>Tonight's Drop Bar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;
+}
+html,body{
+  height:100%;
+  background:#000;
+  color:#f0f0f0;
+  font-family:'DM Sans',sans-serif;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+
+/* ── OUTER WRAPPER ── */
+.drop-wrap{
+  width:100%;
+  max-width:480px;
+  overflow:hidden;
+  border-bottom:1px solid rgba(255,0,80,.15);
+  background:linear-gradient(90deg,rgba(255,0,80,.12) 0%,rgba(0,0,0,.6) 100%);
+  cursor:pointer;
+  user-select:none;
+  position:relative;
+}
+.drop-wrap:active{opacity:.85}
+
+/* ── SLIDING TRACK ── */
+.drop-track{
+  display:flex;
+  width:500%; /* 5 slides */
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── SINGLE SLIDE = one drop-bar row ── */
+.drop-bar{
+  width:20%; /* 1/5 of track */
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 14px;
+}
+
+.drop-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--acc);
+  flex-shrink:0;
+  animation:blink 1.4s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.drop-label{
+  font-size:10px;
+  font-weight:700;
+  color:#aaa;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  flex-shrink:0;
+}
+
+.drop-num{
+  font-size:9px;
+  font-weight:800;
+  color:rgba(255,0,80,.5);
+  flex-shrink:0;
+  font-variant-numeric:tabular-nums;
+}
+
+.drop-story{
+  font-size:11px;
+  font-weight:600;
+  color:var(--acc2);
+  flex:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.drop-timer{
+  font-size:10px;
+  font-weight:800;
+  color:var(--acc);
+  background:rgba(255,0,80,.12);
+  border:1px solid rgba(255,0,80,.2);
+  padding:2px 8px;
+  border-radius:8px;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.04em;
+  flex-shrink:0;
+}
+
+/* ── PROGRESS DOTS ── */
+.drop-dots{
+  position:absolute;
+  bottom:3px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:4px;
+  pointer-events:none;
+}
+.d{
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:rgba(255,0,80,.25);
+  transition:background .3s, width .3s;
+}
+.d.on{
+  background:var(--acc);
+  width:10px;
+  border-radius:2px;
+}
+</style>
+</head>
+<body>
+
+<div class="drop-wrap" id="dropWrap">
+  <div class="drop-track" id="dropTrack">
+
+    <div class="drop-bar">
+      <div class="drop-dot"></div>
+      <span class="drop-label">Tonight</span>
+      <span class="drop-num">01/05</span>
+      <span class="drop-story">"She found his second phone at their anniversary dinner"</span>
+      <span class="drop-timer" id="t0"></span>
+    </div>
+
+    <div class="drop-bar">
+      <div class="drop-dot"></div>
+      <span class="drop-label">Tonight</span>
+      <span class="drop-num">02/05</span>
+      <span class="drop-story">"I came home early and caught him kissing her photograph"</span>
+      <span class="drop-timer" id="t1"></span>
+    </div>
+
+    <div class="drop-bar">
+      <div class="drop-dot"></div>
+      <span class="drop-label">Tonight</span>
+      <span class="drop-num">03/05</span>
+      <span class="drop-story">"My grandmother's will revealed I wasn't her blood"</span>
+      <span class="drop-timer" id="t2"></span>
+    </div>
+
+    <div class="drop-bar">
+      <div class="drop-dot"></div>
+      <span class="drop-label">Tonight</span>
+      <span class="drop-num">04/05</span>
+      <span class="drop-story">"I left at the altar in my socked feet and never looked back"</span>
+      <span class="drop-timer" id="t3"></span>
+    </div>
+
+    <div class="drop-bar">
+      <div class="drop-dot"></div>
+      <span class="drop-label">Tonight</span>
+      <span class="drop-num">05/05</span>
+      <span class="drop-story">"The letter he never sent was in the pocket of his old jacket"</span>
+      <span class="drop-timer" id="t4"></span>
+    </div>
+
+  </div>
+
+  <div class="drop-dots" id="dropDots">
+    <div class="d on"></div>
+    <div class="d"></div>
+    <div class="d"></div>
+    <div class="d"></div>
+    <div class="d"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var COUNT = 5;
+  var cur = 0;
+  var autoTimer = null;
+  var AUTO_MS = 3500;
+
+  // ── countdown ──
+  var secs = 8*3600 + 42*60 + 11;
+  var timerEls = [
+    document.getElementById('t0'),
+    document.getElementById('t1'),
+    document.getElementById('t2'),
+    document.getElementById('t3'),
+    document.getElementById('t4')
+  ];
+  function tickStr(){
+    secs = Math.max(0, secs - 1);
+    var h = Math.floor(secs/3600);
+    var m = Math.floor((secs%3600)/60);
+    var s = secs%60;
+    return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  // init immediately
+  var init = tickStr(); secs++; // compensate
+  timerEls.forEach(function(el){ el.textContent = init; });
+  setInterval(function(){
+    var str = tickStr();
+    timerEls.forEach(function(el){ el.textContent = str; });
+  }, 1000);
+
+  // ── slide ──
+  var track = document.getElementById('dropTrack');
+  var dots  = document.getElementById('dropDots').children;
+
+  function goTo(idx){
+    cur = (idx + COUNT) % COUNT;
+    track.style.transform = 'translateX(-' + (cur * 20) + '%)';
+    for(var i=0; i<dots.length; i++) dots[i].classList.toggle('on', i===cur);
+  }
+
+  function resetAuto(){
+    clearInterval(autoTimer);
+    autoTimer = setInterval(function(){ goTo(cur+1); }, AUTO_MS);
+  }
+
+  goTo(0);
+  resetAuto();
+
+  // ── swipe ──
+  var wrap = document.getElementById('dropWrap');
+  var tx = 0;
+  wrap.addEventListener('touchstart', function(e){
+    tx = e.changedTouches[0].clientX;
+    clearInterval(autoTimer);
+  }, {passive:true});
+  wrap.addEventListener('touchend', function(e){
+    var dx = tx - e.changedTouches[0].clientX;
+    if(Math.abs(dx) > 30) goTo(dx > 0 ? cur+1 : cur-1);
+    resetAuto();
+  }, {passive:true});
+
+  // ── click ──
+  wrap.addEventListener('click', function(e){
+    // on desktop, click left half = prev, right half = next
+    var rect = wrap.getBoundingClientRect();
+    var mid  = rect.left + rect.width/2;
+    goTo(e.clientX < mid ? cur-1 : cur+1);
+    resetAuto();
+  });
+
+})();
+</script>
+</body>
+</html>

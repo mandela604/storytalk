@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #030303;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 620px;
+            width: 100%;
+            background: #030303;
+            border-radius: 12px;
+        }
+
+        /* ── Feed Item ── */
+        .feed-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+
+        /* ── Avatar ── */
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1e1e1e;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .avatar i {
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* ── Content ── */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+
+        .subreddit {
+            font-size: 12px;
+            font-weight: 600;
+            color: #d7dadc;
+        }
+
+        .subreddit i {
+            font-size: 10px;
+            color: #666;
+            margin-right: 2px;
+        }
+
+        .dot {
+            color: #484848;
+            font-size: 10px;
+        }
+
+        .time {
+            font-size: 11px;
+            color: #787c7e;
+            font-weight: 400;
+        }
+
+        .title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #d7dadc;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .title a {
+            color: #d7dadc;
+            text-decoration: none;
+        }
+
+        .title a:hover {
+            text-decoration: underline;
+        }
+
+        .body-text {
+            font-size: 13px;
+            color: #818384;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        /* ── Promoted ── */
+        .promoted-label {
+            font-size: 10px;
+            color: #787c7e;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .promoted-body {
+            font-size: 14px;
+            color: #d7dadc;
+            line-height: 1.5;
+            margin-bottom: 2px;
+        }
+
+        .promoted-body strong {
+            color: #d7dadc;
+            font-weight: 600;
+        }
+
+        /* ── Actions ── */
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #787c7e;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: color 0.15s;
+            background: transparent;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .action-btn:hover {
+            color: #d7dadc;
+        }
+
+        .action-btn i {
+            font-size: 14px;
+        }
+
+        .action-btn .count {
+            font-size: 12px;
+        }
+
+        .action-btn .fa-chevron-down {
+            font-size: 10px;
+            color: #484848;
+        }
+
+        /* ─── Promoted Item ─── */
+        .promoted-item .avatar {
+            background: #1a1a1a;
+        }
+
+        .promoted-item .avatar i {
+            color: #666;
+        }
+
+        .promoted-item .subreddit {
+            color: #787c7e;
+            font-weight: 500;
+        }
+
+        .promoted-item .subreddit i {
+            color: #484848;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 480px) {
+            .feed-item {
+                padding: 10px 0;
+            }
+            .title {
+                font-size: 13px;
+            }
+            .body-text {
+                font-size: 12px;
+            }
+            .actions {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ─── Item 1 ─── -->
+        <div class="feed-item">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="header">
+                    <span class="subreddit"><i class="fas fa-rocket"></i> r/startups</span>
+                    <span class="dot">•</span>
+                    <span class="time">2d</span>
+                </div>
+                <div class="title">
+                    <a href="#">Tried building my own startup, it failed, now I want to learn from someone else's i will not promote</a>
+                </div>
+                <div class="body-text">
+                    After trying to build my own start up and failing I'm beginning and I would like to start at interning as a product analyst intern or customer Insights intern in...
+                </div>
+                <div class="actions">
+                    <button class="action-btn"><i class="far fa-heart"></i> <span class="count">7</span></button>
+                    <button class="action-btn"><i class="far fa-comment"></i> <span class="count">7</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Item 2 ─── -->
+        <div class="feed-item">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="header">
+                    <span class="subreddit"><i class="fas fa-code"></i> r/WebDeveloperJobs</span>
+                    <span class="dot">•</span>
+                    <span class="time">19h</span>
+                    <span class="dot">•</span>
+                    <span style="font-size:10px;color:#4a9eff;font-weight:600;">Join</span>
+                </div>
+                <div class="title">
+                    <a href="#">[Hiring] – Web Developer (Full-Time) $40 – $60/Hourly</a>
+                </div>
+                <div class="body-text">
+                    Fully Remote Job Opening 🏅 Role – Web Developer (NetroLynx AI) Salary – $40 – $60/Hourly Location – Remote, United States About the Company – Netro...
+                </div>
+                <div class="actions">
+                    <button class="action-btn"><i class="far fa-heart"></i> <span class="count">29</span></button>
+                    <button class="action-btn"><i class="far fa-comment"></i> <span class="count">141</span></button>
+                    <button class="action-btn"><i class="fas fa-share-alt"></i> <span class="count">22</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Item 3 ─── -->
+        <div class="feed-item">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="header">
+                    <span class="subreddit"><i class="fas fa-chart-line"></i> r/SaaSAcquire</span>
+                    <span class="dot">•</span>
+                    <span class="time">2d</span>
+                    <span class="dot">•</span>
+                    <span style="font-size:10px;color:#4a9eff;font-weight:600;">Join</span>
+                </div>
+                <div class="title">
+                    <a href="#">Got $1k, want to buy a small SaaS</a>
+                </div>
+                <div class="body-text">
+                    Budget is under $1k, no niche preference I just want something real, not an idea on a napkin. I'm a builder, not a suit. I code fast (AI-assisted, full-stack, can pi...
+                </div>
+                <div class="actions">
+                    <button class="action-btn"><i class="far fa-heart"></i> <span class="count">3</span></button>
+                    <button class="action-btn"><i class="far fa-comment"></i> <span class="count">33</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Divider ─── -->
+        <div class="divider"></div>
+
+        <!-- ─── Item 4: Promoted ─── -->
+        <div class="feed-item promoted-item">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="content">
+                <div class="header">
+                    <span class="subreddit"><i class="fas fa-user"></i> u/freedom-forum</span>
+                    <span class="dot">•</span>
+                    <span class="promoted-label">Promoted</span>
+                </div>
+                <div class="promoted-body">
+                    <strong>Gathering and cheering for a goal</strong> is brought to you by the First Amendment.
+                </div>
+                <div class="promoted-body" style="margin-bottom:4px;">
+                    Gathering to root for
+                </div>
+                <div class="actions">
+                    <button class="action-btn"><i class="far fa-heart"></i> <span class="count"></span></button>
+                    <button class="action-btn"><i class="far fa-comment"></i> <span class="count"></span></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

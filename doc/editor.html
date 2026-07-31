@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Editor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.10);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx:#e8e8e8;--tx2:#a0a8b2;--muted:#71717a;--faint:#3f3f46;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --nav-h:60px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;flex-shrink:0;cursor:pointer}
+.top-center{flex:1;min-width:0}
+.top-title{font-size:14px;font-weight:800;color:var(--tx)}
+.top-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.top-icon{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--tx2);cursor:pointer;flex-shrink:0;position:relative;transition:.15s}
+.top-icon:active{transform:scale(.92)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:2px solid var(--bg)}
+
+/* EDITOR HERO */
+.editor-hero{background:var(--l1);border-bottom:1px solid var(--bd);padding:16px 14px}
+.editor-profile{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.editor-av{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid var(--acc);flex-shrink:0}
+.editor-info{flex:1;min-width:0}
+.editor-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--tx)}
+.editor-handle{font-size:11px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:6px}
+.editor-badge{font-size:8px;font-weight:800;padding:2px 7px;border-radius:7px;background:rgba(255,0,80,.12);border:1px solid rgba(255,0,80,.25);color:var(--acc2)}
+.editor-rank{font-size:8px;font-weight:800;padding:2px 7px;border-radius:7px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--gold)}
+.editor-actions{display:flex;gap:7px}
+.ea-btn{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.18s;display:flex;align-items:center;gap:5px}
+.ea-btn.primary{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
+.ea-btn.secondary{background:rgba(255,255,255,.07);border:1.5px solid var(--bd);color:var(--tx2)}
+.ea-btn:active{transform:scale(.96)}
+
+/* CONTRACT POWER BANNER */
+.contract-power-banner{margin:14px 14px 0;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(0,0,0,0));border:1px solid rgba(167,139,250,.2);border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:10px}
+.cpb-icon{width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cpb-info{flex:1}
+.cpb-title{font-size:12px;font-weight:800;color:var(--purple);margin-bottom:2px}
+.cpb-sub{font-size:10px;color:var(--muted);line-height:1.4}
+.cpb-toggle{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--purple);font-weight:700;flex-shrink:0;cursor:pointer}
+.toggle-sw{width:36px;height:20px;border-radius:10px;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.3);position:relative;transition:.25s;flex-shrink:0}
+.toggle-sw.on{background:var(--purple)}
+.toggle-knob{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.toggle-sw.on .toggle-knob{left:18px}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 14px 0}
+.stat-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;padding:12px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0}
+.stat-card.red::after{background:var(--acc)}
+.stat-card.green::after{background:var(--green)}
+.stat-card.gold::after{background:var(--gold)}
+.stat-card.blue::after{background:var(--blue)}
+.stat-card.purple::after{background:var(--purple)}
+.stat-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.stat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--tx);line-height:1}
+.stat-num.red{color:var(--acc)}
+.stat-num.green{color:var(--green)}
+.stat-num.gold{color:var(--gold)}
+.stat-num.blue{color:var(--blue)}
+.stat-num.purple{color:var(--purple)}
+.stat-change{font-size:9px;color:var(--green);font-weight:700;margin-top:3px;display:flex;align-items:center;gap:2px}
+.stat-change.down{color:#f87171}
+
+/* EARNINGS STRIP */
+.earnings-strip{margin:14px 14px 0;background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(0,0,0,0));border:1px solid rgba(251,191,36,.18);border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between}
+.es-left{flex:1}
+.es-label{font-size:9px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.es-amount{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#fff;line-height:1}
+.es-sub{font-size:10px;color:rgba(251,191,36,.6);margin-top:3px}
+.es-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.es-pct-badge{font-size:11px;font-weight:800;color:var(--gold);background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.22);padding:4px 10px;border-radius:9px}
+.es-withdraw-btn{background:var(--gold);color:#000;border:none;padding:7px 14px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.es-withdraw-btn:active{transform:scale(.96)}
+
+/* SECTION HEADERS */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:18px 14px 10px}
+.sh-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;padding:3px 9px;border-radius:9px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc)}
+.badge-count{background:var(--acc);color:#fff;font-size:7.5px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 3px;display:inline-flex;align-items:center;justify-content:center;margin-left:3px}
+.badge-count.green{background:var(--green)}
+.badge-count.gold{background:var(--gold);color:#000}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:5px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none}
+.filter-tabs::-webkit-scrollbar{display:none}
+.ftab{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--muted);transition:.18s}
+.ftab.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 0 10px var(--glow)}
+
+/* REVIEW QUEUE */
+.review-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;margin:0 14px 8px;overflow:hidden;cursor:pointer;transition:border-color .18s}
+.review-card:active{transform:scale(.99)}
+.review-card:hover{border-color:var(--bd-acc)}
+.rc-header{display:flex;gap:10px;padding:11px 12px}
+.rc-cover{width:48px;height:56px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0;border:1px solid var(--bd)}
+.rc-info{flex:1;min-width:0}
+.rc-cat{font-size:8px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.rc-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rc-writer{font-size:10px;color:var(--muted);margin-bottom:4px}
+.rc-meta{display:flex;gap:8px;flex-wrap:wrap}
+.rc-meta span{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:3px;font-weight:600}
+.rc-status-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--bd2)}
+.rc-status-pill{font-size:8px;font-weight:800;padding:3px 9px;border-radius:8px}
+.rsp-pending{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.rsp-review{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+.rsp-approved{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.rsp-rejected{background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.rsp-contracted{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.rc-actions{display:flex;gap:6px}
+.rc-act{padding:5px 11px;border-radius:8px;font-size:9px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.rc-act.approve{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.rc-act.reject{background:rgba(248,113,113,.08);color:#f87171;border:1px solid rgba(248,113,113,.18)}
+.rc-act.contract{background:var(--acc);color:#fff}
+.rc-act.view{background:rgba(255,255,255,.06);color:var(--tx2);border:1px solid var(--bd)}
+.rc-act:active{transform:scale(.95)}
+
+/* SIGNED STORIES */
+.signed-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;margin:0 14px 8px;overflow:hidden;cursor:pointer}
+.signed-card:active{transform:scale(.99)}
+.sc-inner{display:flex;gap:10px;padding:11px 12px}
+.sc-cover{width:42px;height:50px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.sc-info{flex:1;min-width:0}
+.sc-title{font-family:'Playfair Display',serif;font-size:11.5px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-writer{font-size:10px;color:var(--muted);margin-bottom:4px}
+.sc-stats{display:flex;gap:10px}
+.sc-stat{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:2px;font-weight:600}
+.sc-stat.earn{color:var(--gold)}
+.sc-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--bd2)}
+.sc-pct{font-size:9px;font-weight:700;color:var(--gold)}
+.sc-revenue{font-family:'Playfair Display',serif;font-size:13px;font-weight:900;color:var(--gold)}
+
+/* CONTRACTS */
+.contract-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;margin:0 14px 8px;overflow:hidden}
+.cc-header{display:flex;align-items:center;gap:10px;padding:11px 12px 8px}
+.cc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cc-icon.sent{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.18)}
+.cc-icon.signed{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2)}
+.cc-icon.pending{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2)}
+.cc-icon.admin{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)}
+.cc-info{flex:1;min-width:0}
+.cc-title{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:1px}
+.cc-writer{font-size:10px;color:var(--muted)}
+.cc-pill{font-size:8px;font-weight:800;padding:2px 8px;border-radius:7px}
+.cc-sent{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+.cc-signed{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.cc-pending{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.cc-admin{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.cc-body{padding:0 12px 10px}
+.cc-terms-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cc-term{font-size:9px;font-weight:700;padding:3px 8px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--tx2)}
+.cc-actions{display:flex;gap:6px}
+.cca{padding:6px 12px;border-radius:9px;font-size:9px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.cca.view{background:rgba(255,255,255,.06);color:var(--tx2);border:1px solid var(--bd)}
+.cca.resend{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)}
+.cca.remind{background:rgba(251,191,36,.08);color:var(--gold);border:1px solid rgba(251,191,36,.15)}
+.cca.download{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.cca.revoke{background:rgba(248,113,113,.07);color:#f87171;border:1px solid rgba(248,113,113,.15)}
+.cca:active{transform:scale(.95)}
+.cc-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--bd2)}
+.cc-date{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.cc-pct{font-size:10px;font-weight:800;color:var(--gold)}
+
+/* CONTRACT COMPOSER (slide-up panel) */
+.contract-composer{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.8);backdrop-filter:blur(14px);display:none;align-items:flex-end;justify-content:center}
+.contract-composer.open{display:flex}
+.composer-sheet{width:100%;max-width:480px;background:var(--l2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);animation:slideUp .3s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(20px + var(--safe-b))}
+.composer-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cs-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:4px;margin:12px auto 0}
+.cs-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
+.cs-hdr h3{font-size:15px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:8px}
+.cs-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:var(--tx2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cs-body{padding:0 16px}
+.cs-section{margin-bottom:14px}
+.cs-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;display:block}
+.cs-input{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--bd);border-radius:10px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.cs-input:focus{border-color:var(--bd-acc)}
+.cs-input::placeholder{color:var(--faint)}
+.cs-select{background:rgba(255,255,255,.04);border:1.5px solid var(--bd);border-radius:10px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer;width:100%;appearance:none;-webkit-appearance:none}
+.cs-select option{background:#111}
+.cs-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.terms-grid{display:flex;gap:7px;flex-wrap:wrap}
+.term-check{display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:9px;border:1.5px solid var(--bd);background:rgba(255,255,255,.03);cursor:pointer;font-size:10px;font-weight:700;color:var(--muted);transition:.18s;user-select:none}
+.term-check.on{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc2)}
+.term-check i{font-size:9px}
+.pct-slider{width:100%;margin:8px 0 4px}
+.pct-display{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold);text-align:center;margin-bottom:4px}
+.pct-sub{font-size:10px;color:var(--muted);text-align:center;margin-bottom:8px}
+.power-note{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start;margin-bottom:12px}
+.power-note i{color:var(--purple);flex-shrink:0;margin-top:1px}
+.power-note-text{font-size:11px;color:var(--tx2);line-height:1.5}
+.cs-send-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 18px var(--glow-sm);margin-top:4px;transition:.18s}
+.cs-send-btn:active{transform:scale(.98)}
+.cs-preview-row{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:10px 12px;display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.cs-prev-cover{width:38px;height:44px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.cs-prev-info{flex:1;min-width:0}
+.cs-prev-title{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.cs-prev-writer{font-size:10px;color:var(--muted)}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px}
+.anlyt-mini{background:var(--l1);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.anlyt-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.anlyt-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--tx);line-height:1}
+.anlyt-bar{height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:7px}
+.anlyt-bar-fill{height:100%;border-radius:3px}
+
+/* TOP PERFORMING */
+.perf-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bd2)}
+.perf-item:last-child{border-bottom:none}
+.perf-rank{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;width:20px;text-align:center;flex-shrink:0}
+.perf-cover{width:34px;height:40px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0;border:1px solid var(--bd)}
+.perf-info{flex:1;min-width:0}
+.perf-title{font-size:11px;font-weight:700;color:var(--tx);line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:1px}
+.perf-writer{font-size:9px;color:var(--muted)}
+.perf-right{text-align:right;flex-shrink:0}
+.perf-earn{font-family:'Playfair Display',serif;font-size:12px;font-weight:900;color:var(--gold)}
+.perf-reads{font-size:9px;color:var(--muted)}
+
+/* NOTIFICATIONS */
+.notif-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd2)}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:rgba(255,0,80,.025)}
+.ni-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ni-contract{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2)}
+.ni-earn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.18)}
+.ni-submit{background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)}
+.ni-approved{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2)}
+.ni-info{flex:1;min-width:0}
+.ni-text{font-size:12px;color:var(--tx);line-height:1.45;margin-bottom:2px}
+.ni-text strong{font-weight:700;color:#fff}
+.ni-time{font-size:9px;color:var(--muted)}
+.ni-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* TAB PANELS */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* SECTION CARD WRAPPER */
+.section-block{background:var(--l1);border-radius:16px;border:1px solid var(--bd2);margin:0 6px 12px}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ADMIN GATE MODAL */
+.admin-gate{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:20px}
+.admin-gate.open{display:flex}
+.ag-box{background:var(--l2);border:1px solid var(--bd);border-radius:18px;padding:24px 20px;width:100%;max-width:320px;text-align:center;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.ag-icon{font-size:32px;margin-bottom:10px}
+.ag-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px}
+.ag-sub{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:18px}
+.ag-btns{display:flex;gap:8px}
+.ag-btn{flex:1;padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.18s}
+.ag-cancel{background:rgba(255,255,255,.07);color:var(--tx2)}
+.ag-request{background:var(--purple);color:#fff}
+.ag-btn:active{transform:scale(.97)}
+
+/* REVIEW DETAIL PANEL */
+.review-detail{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);display:none;align-items:flex-end;justify-content:center}
+.review-detail.open{display:flex}
+.rd-sheet{width:100%;max-width:480px;background:var(--l2);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);animation:slideUp .3s cubic-bezier(.4,0,.2,1);max-height:90vh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(20px + var(--safe-b))}
+.rd-sheet::-webkit-scrollbar{display:none}
+.rd-cover{height:160px;background-size:cover;background-position:center;position:relative}
+.rd-cover-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.2) 60%,transparent)}
+.rd-cover-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rd-cover-content{position:absolute;bottom:0;left:0;right:0;padding:10px 14px 12px}
+.rd-cat{font-size:8px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.rd-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:#fff;line-height:1.3}
+.rd-body{padding:14px 14px 8px}
+.rd-writer-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:10px 12px;margin-bottom:12px}
+.rd-w-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);flex-shrink:0}
+.rd-w-info{flex:1}
+.rd-w-name{font-size:13px;font-weight:700;color:var(--tx)}
+.rd-w-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.rd-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+.rd-stat{background:rgba(255,255,255,.03);border:1px solid var(--bd2);border-radius:10px;padding:8px;text-align:center}
+.rd-stat-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:var(--tx);line-height:1}
+.rd-stat-label{font-size:8px;color:var(--muted);margin-top:2px;font-weight:600}
+.rd-excerpt{font-family:'Playfair Display',serif;font-size:12px;color:var(--tx2);line-height:1.65;font-style:italic;padding:10px 12px;background:rgba(255,255,255,.02);border-left:2px solid rgba(255,0,80,.3);border-radius:0 8px 8px 0;margin-bottom:14px}
+.rd-actions{display:flex;gap:7px;flex-wrap:wrap}
+.rd-act{flex:1;min-width:80px;padding:10px;border-radius:11px;font-size:11px;font-weight:800;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s;text-align:center}
+.rd-approve{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.rd-reject{background:rgba(248,113,113,.08);color:#f87171;border:1px solid rgba(248,113,113,.18)}
+.rd-contract{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
+.rd-act:active{transform:scale(.96)}
+
+/* SCROLLABLE DIVIDER */
+.sdiv{height:1px;background:var(--bd);margin:12px 14px}
+
+/* FU ANIMATION */
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .3s ease both}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo" onclick="location.href='index.html'">D</div>
+  <div class="top-center">
+    <div class="top-title">Editor Dashboard</div>
+    <div class="top-sub" id="topSubEl">Senior Fiction Editor · Season 2025</div>
+  </div>
+  <div class="top-icon" onclick="toast('🔔 3 new alerts')">
+    <i class="fas fa-bell"></i>
+    <div class="notif-dot"></div>
+  </div>
+  <div class="top-icon" onclick="toast('⚙️ Settings')">
+    <i class="fas fa-sliders-h"></i>
+  </div>
+</div>
+
+<!-- EDITOR HERO -->
+<div class="editor-hero fu">
+  <div class="editor-profile">
+    <img class="editor-av" src="https://i.pravatar.cc/100?img=32" alt="Editor"/>
+    <div class="editor-info">
+      <div class="editor-name">Ada_Writes</div>
+      <div class="editor-handle">
+        @ada_writes
+        <span class="editor-badge">✍️ Senior Editor</span>
+        <span class="editor-rank">⭐ Verified</span>
+      </div>
+    </div>
+  </div>
+  <div class="editor-actions">
+    <button class="ea-btn primary" onclick="openComposer()"><i class="fas fa-file-signature" style="font-size:11px"></i> Send Contract</button>
+    <button class="ea-btn secondary" onclick="switchTab('queue')"><i class="fas fa-inbox" style="font-size:11px"></i> Review Queue</button>
+    <button class="ea-btn secondary" onclick="toast('📊 Full analytics')"><i class="fas fa-chart-line" style="font-size:11px"></i></button>
+  </div>
+</div>
+
+<!-- CONTRACT POWER BANNER -->
+<div class="contract-power-banner fu">
+  <div class="cpb-icon"><i class="fas fa-stamp" style="color:var(--purple);font-size:15px"></i></div>
+  <div class="cpb-info">
+    <div class="cpb-title">Contract Authority</div>
+    <div class="cpb-sub">You can send contracts directly. Admin co-sign is optional for premium deals over ₦500k.</div>
+  </div>
+  <div class="cpb-toggle" onclick="togglePower()">
+    <div class="toggle-sw on" id="powerToggle"><div class="toggle-knob"></div></div>
+  </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stat-grid fu">
+  <div class="stat-card red">
+    <div class="stat-label">Under Review</div>
+    <div class="stat-num red" id="statPending">14</div>
+    <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:8px"></i> 5 new today</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Signed Stories</div>
+    <div class="stat-num green" id="statSigned">38</div>
+    <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:8px"></i> 2 this week</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="stat-label">Total Earnings</div>
+    <div class="stat-num gold">₦142k</div>
+    <div class="stat-change"><i class="fas fa-arrow-up" style="font-size:8px"></i> ↑ 24% this month</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-label">Contracts Sent</div>
+    <div class="stat-num blue">52</div>
+    <div class="stat-change"><i class="fas fa-check" style="font-size:8px;color:var(--green)"></i> <span style="color:var(--green)">38 signed</span></div>
+  </div>
+</div>
+
+<!-- EARNINGS STRIP -->
+<div class="earnings-strip fu">
+  <div class="es-left">
+    <div class="es-label"><i class="fas fa-coins" style="font-size:9px;margin-right:3px"></i>This Month's Revenue Share</div>
+    <div class="es-amount">₦28,750</div>
+    <div class="es-sub">Avg 12% across 38 signed stories</div>
+  </div>
+  <div class="es-right">
+    <div class="es-pct-badge">12% avg cut</div>
+    <button class="es-withdraw-btn" onclick="toast('💰 Withdraw to wallet…')">Withdraw ₦28,750</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV TABS -->
+<div style="display:flex;gap:0;border-bottom:1px solid var(--bd);margin-top:14px;overflow-x:auto;scrollbar-width:none;position:sticky;top:57px;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(12px)">
+  <div style="flex-shrink:0;padding:10px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;color:var(--muted)" class="dtab active-tab" data-t="overview" onclick="switchTab('overview')">Overview</div>
+  <div style="flex-shrink:0;padding:10px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;color:var(--muted)" class="dtab" data-t="queue" onclick="switchTab('queue')">Review Queue <span id="qct" style="background:var(--acc);color:#fff;font-size:7.5px;font-weight:800;padding:1px 5px;border-radius:6px;margin-left:3px">14</span></div>
+  <div style="flex-shrink:0;padding:10px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;color:var(--muted)" class="dtab" data-t="signed" onclick="switchTab('signed')">My Signed</div>
+  <div style="flex-shrink:0;padding:10px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;color:var(--muted)" class="dtab" data-t="contracts" onclick="switchTab('contracts')">Contracts</div>
+  <div style="flex-shrink:0;padding:10px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;color:var(--muted)" class="dtab" data-t="analytics" onclick="switchTab('analytics')">Analytics</div>
+</div>
+
+<!-- OVERVIEW TAB -->
+<div id="panel-overview" class="tab-panel active">
+  <!-- Top Performing -->
+  <div class="sh"><div class="sh-title"><i class="fas fa-trophy" style="color:var(--gold);font-size:10px"></i> Top Performing Signed</div><div class="sh-more" onclick="switchTab('signed')">See all</div></div>
+  <div class="section-block">
+    <div id="topPerfList"></div>
+  </div>
+
+  <!-- Recent Notifications -->
+  <div class="sh"><div class="sh-title"><i class="fas fa-bell" style="color:var(--acc);font-size:10px"></i> Recent Activity <span class="badge-count">3</span></div></div>
+  <div class="section-block">
+    <div id="notifList"></div>
+  </div>
+</div>
+
+<!-- REVIEW QUEUE TAB -->
+<div id="panel-queue" class="tab-panel">
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-inbox" style="color:var(--acc);font-size:10px"></i> Pending Review</div>
+    <div class="sh-more" onclick="toast('🔽 Sort/filter options')">Filter</div>
+  </div>
+  <div class="filter-tabs" id="queueFilterTabs">
+    <div class="ftab on" data-f="all" onclick="filterQueue('all',this)">All (14)</div>
+    <div class="ftab" data-f="pending" onclick="filterQueue('pending',this)">Pending (7)</div>
+    <div class="ftab" data-f="reviewing" onclick="filterQueue('reviewing',this)">In Review (4)</div>
+    <div class="ftab" data-f="approved" onclick="filterQueue('approved',this)">Approved (3)</div>
+    <div class="ftab" data-f="rejected" onclick="filterQueue('rejected',this)">Rejected (2)</div>
+  </div>
+  <div id="reviewList"></div>
+</div>
+
+<!-- SIGNED STORIES TAB -->
+<div id="panel-signed" class="tab-panel">
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-file-signature" style="color:var(--green);font-size:10px"></i> Signed Stories (38)</div>
+    <div class="sh-more" onclick="toast('🔽 Sort by earnings')">Sort</div>
+  </div>
+  <div class="filter-tabs">
+    <div class="ftab on">All</div>
+    <div class="ftab" onclick="toast('💔 Betrayal stories')">💔 Betrayal</div>
+    <div class="ftab" onclick="toast('👑 Family stories')">👑 Family</div>
+    <div class="ftab" onclick="toast('✨ Twist stories')">✨ Twist</div>
+    <div class="ftab" onclick="toast('🔥 Revenge stories')">🔥 Revenge</div>
+  </div>
+  <div id="signedList"></div>
+</div>
+
+<!-- CONTRACTS TAB -->
+<div id="panel-contracts" class="tab-panel">
+  <div class="sh">
+    <div class="sh-title"><i class="fas fa-file-contract" style="color:var(--purple);font-size:10px"></i> Contracts (52)</div>
+    <button onclick="openComposer()" style="font-size:10px;font-weight:800;color:#fff;background:var(--acc);border:none;padding:5px 12px;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif">+ New</button>
+  </div>
+  <div class="filter-tabs">
+    <div class="ftab on" onclick="toast('All contracts')">All</div>
+    <div class="ftab" onclick="toast('Awaiting signature')">Awaiting <span style="background:var(--gold);color:#000;font-size:7px;font-weight:800;padding:1px 4px;border-radius:4px;margin-left:2px">8</span></div>
+    <div class="ftab" onclick="toast('Signed contracts')">Signed</div>
+    <div class="ftab" onclick="toast('Admin approval needed')">Admin Needed</div>
+  </div>
+  <div id="contractList"></div>
+</div>
+
+<!-- ANALYTICS TAB -->
+<div id="panel-analytics" class="tab-panel">
+  <div class="sh"><div class="sh-title"><i class="fas fa-chart-bar" style="color:var(--blue);font-size:10px"></i> Your Analytics</div>
+    <div style="display:flex;gap:5px">
+      <div style="font-size:9px;font-weight:700;color:var(--acc);background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);padding:4px 9px;border-radius:8px;cursor:pointer" onclick="toast('📅 Monthly')">Month</div>
+      <div style="font-size:9px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--bd);padding:4px 9px;border-radius:8px;cursor:pointer" onclick="toast('📅 All time')">All Time</div>
+    </div>
+  </div>
+  <div class="analytics-grid fu">
+    <div class="anlyt-mini"><div class="anlyt-label">Reviews Done</div><div class="anlyt-num" style="color:var(--acc)">142</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:71%;background:var(--acc)"></div></div></div>
+    <div class="anlyt-mini"><div class="anlyt-label">Sign Rate</div><div class="anlyt-num" style="color:var(--green)">73%</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:73%;background:var(--green)"></div></div></div>
+    <div class="anlyt-mini"><div class="anlyt-label">Avg Response</div><div class="anlyt-num" style="color:var(--blue)">1.4d</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:56%;background:var(--blue)"></div></div></div>
+    <div class="anlyt-mini"><div class="anlyt-label">Rejection Rate</div><div class="anlyt-num" style="color:#f87171">27%</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:27%;background:#f87171"></div></div></div>
+    <div class="anlyt-mini"><div class="anlyt-label">Avg % Cut</div><div class="anlyt-num" style="color:var(--gold)">12%</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:48%;background:var(--gold)"></div></div></div>
+    <div class="anlyt-mini"><div class="anlyt-label">Writer Reach</div><div class="anlyt-num" style="color:var(--purple)">31</div><div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:62%;background:var(--purple)"></div></div></div>
+  </div>
+  <div class="sh"><div class="sh-title">Earnings Breakdown</div></div>
+  <div class="section-block">
+    <div style="padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--muted)">Story read revenue → your 12% cut</div>
+        <div style="font-size:10px;font-weight:700;color:var(--gold)">This month</div>
+      </div>
+      <div id="earningsBreakdown"></div>
+    </div>
+  </div>
+  <div class="sh" style="margin-top:4px"><div class="sh-title">Top Performing Signed</div></div>
+  <div class="section-block"><div id="analyticsTopPerf"></div></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item active" href="editor-dashboard.html"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="alerts.html"><i class="fas fa-bell"></i>Alerts</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- CONTRACT COMPOSER OVERLAY -->
+<div class="contract-composer" id="contractComposer" onclick="if(event.target===this)closeComposer()">
+  <div class="composer-sheet">
+    <div class="cs-handle"></div>
+    <div class="cs-hdr">
+      <h3><i class="fas fa-file-signature" style="color:var(--acc);font-size:13px"></i> New Contract</h3>
+      <button class="cs-close" onclick="closeComposer()">✕</button>
+    </div>
+    <div class="cs-body">
+      <!-- Story preview (set dynamically) -->
+      <div class="cs-preview-row" id="csPreviewRow">
+        <div class="cs-prev-cover" id="csPreviewCover" style="background:rgba(255,0,80,.15);background-image:url('')"></div>
+        <div class="cs-prev-info">
+          <div class="cs-prev-title" id="csPreviewTitle">Select a story from the queue</div>
+          <div class="cs-prev-writer" id="csPreviewWriter">Writer details will appear here</div>
+        </div>
+      </div>
+
+      <div class="cs-section">
+        <span class="cs-label">Writer's email address</span>
+        <input class="cs-input" id="csWriterEmail" type="email" placeholder="writer@example.com"/>
+      </div>
+
+      <div class="cs-section">
+        <span class="cs-label">Contract type</span>
+        <select class="cs-select" id="csContractType">
+          <option value="exclusive">🔒 Exclusive Rights (Platform only)</option>
+          <option value="non-exclusive">🌍 Non-Exclusive (Multi-platform)</option>
+          <option value="revenue-share">💰 Revenue Share Only</option>
+          <option value="premium">👑 Premium Content Lock</option>
+          <option value="limited">⏱️ Limited License (12 months)</option>
+        </select>
+      </div>
+
+      <div class="cs-section cs-row">
+        <div>
+          <span class="cs-label">Contract duration</span>
+          <select class="cs-select" id="csDuration">
+            <option>6 months</option>
+            <option selected>12 months</option>
+            <option>24 months</option>
+            <option>Lifetime</option>
+          </select>
+        </div>
+        <div>
+          <span class="cs-label">Payment model</span>
+          <select class="cs-select" id="csPayment">
+            <option>Revenue share only</option>
+            <option>Upfront + share</option>
+            <option>Flat fee</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cs-section">
+        <span class="cs-label">Editor's revenue share</span>
+        <div class="pct-display" id="pctDisplay">12%</div>
+        <div class="pct-sub">of story reads attributed to your editorial work</div>
+        <input type="range" class="pct-slider" min="5" max="30" value="12" id="pctSlider" oninput="updatePct(this.value)"/>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:2px"><span>5% min</span><span>Standard: 10-15%</span><span>30% max</span></div>
+      </div>
+
+      <div class="cs-section">
+        <span class="cs-label">Contract terms</span>
+        <div class="terms-grid" id="termsGrid">
+          <div class="term-check on" onclick="this.classList.toggle('on')"><i class="fas fa-check"></i> Revenue Share</div>
+          <div class="term-check on" onclick="this.classList.toggle('on')"><i class="fas fa-check"></i> Editorial Credit</div>
+          <div class="term-check" onclick="this.classList.toggle('on')">Exclusivity</div>
+          <div class="term-check" onclick="this.classList.toggle('on')">Early Drop Rights</div>
+          <div class="term-check" onclick="this.classList.toggle('on')">Series Continuation</div>
+          <div class="term-check" onclick="this.classList.toggle('on')">Adaptation Rights</div>
+        </div>
+      </div>
+
+      <div class="cs-section">
+        <span class="cs-label">Special notes to writer (optional)</span>
+        <textarea class="cs-input" rows="3" style="resize:none;min-height:72px;line-height:1.5" placeholder="e.g. We'd love to feature this in our Betrayal collection. The revenue potential is strong given your readership…"></textarea>
+      </div>
+
+      <!-- Power / Admin note -->
+      <div class="power-note" id="powerNote">
+        <i class="fas fa-stamp" style="font-size:13px;margin-top:1px"></i>
+        <div class="power-note-text"><strong style="color:var(--purple)">You have direct contract authority.</strong> This contract will be sent directly to the writer's email and takes effect upon their digital signature. Admin is notified automatically.</div>
+      </div>
+
+      <button class="cs-send-btn" id="csSendBtn" onclick="sendContract()">
+        <i class="fas fa-paper-plane" style="font-size:12px;margin-right:7px"></i>Send Contract to Writer
+      </button>
+      <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:10px">Contracts are legally binding once signed. Droboard T&C apply.</div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW DETAIL OVERLAY -->
+<div class="review-detail" id="reviewDetail" onclick="if(event.target===this)closeDetail()">
+  <div class="rd-sheet">
+    <div class="rd-cover" id="rdCover">
+      <div class="rd-cover-grad"></div>
+      <button class="rd-cover-close" onclick="closeDetail()">✕</button>
+      <div class="rd-cover-content">
+        <div class="rd-cat" id="rdCat"></div>
+        <div class="rd-title" id="rdTitle"></div>
+      </div>
+    </div>
+    <div class="rd-body">
+      <div class="rd-writer-row">
+        <img class="rd-w-av" id="rdWriterAv" src="" alt=""/>
+        <div class="rd-w-info">
+          <div class="rd-w-name" id="rdWriterName"></div>
+          <div class="rd-w-sub" id="rdWriterSub"></div>
+        </div>
+        <button style="font-size:9px;font-weight:800;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="toast('👤 Viewing writer profile…')">Profile</button>
+      </div>
+      <div class="rd-stats-row" id="rdStatsRow"></div>
+      <div class="rd-excerpt" id="rdExcerpt"></div>
+      <div class="rd-actions">
+        <button class="rd-act rd-approve" onclick="approveFromDetail()"><i class="fas fa-check" style="font-size:10px;margin-right:4px"></i>Approve</button>
+        <button class="rd-act rd-reject" onclick="rejectFromDetail()"><i class="fas fa-times" style="font-size:10px;margin-right:4px"></i>Decline</button>
+        <button class="rd-act rd-contract" onclick="contractFromDetail()"><i class="fas fa-file-signature" style="font-size:10px;margin-right:4px"></i>Send Contract</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN GATE MODAL -->
+<div class="admin-gate" id="adminGate">
+  <div class="ag-box">
+    <div class="ag-icon">🛡️</div>
+    <div class="ag-title">Admin Co-sign Required</div>
+    <div class="ag-sub">This contract exceeds your direct authority threshold. It will be sent to the admin team for co-signature before delivery to the writer.</div>
+    <div class="ag-btns">
+      <button class="ag-btn ag-cancel" onclick="closeAdminGate()">Cancel</button>
+      <button class="ag-btn ag-request" onclick="requestAdmin()">Request Co-sign</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+/* ── DATA ── */
+const REVIEW_QUEUE=[
+  {id:'r1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing my late sister\'s photograph',writer:'Ada_Writes',writerAv:'https://i.pravatar.cc/100?img=32',writerSub:'3 prior published series · 171k total reads',reads:'12.4k',likes:'1.8k',chapters:'4',status:'reviewing',excerpt:'"He was standing at the mantelpiece, both hands wrapped around the photograph frame. His shoulders were shaking. He was whispering her name. He said it twice — then a third time, softer and more broken than the last."',submitted:'2h ago'},
+  {id:'r2',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'🎓 Campus',title:'The richest boy in school suddenly started sitting beside me every morning',writer:'CampusQueen',writerAv:'https://i.pravatar.cc/100?img=12',writerSub:'1 prior series · 18k total reads',reads:'8.1k',likes:'900',chapters:'7',status:'pending',excerpt:'"He did not slow me down. He kept up. Some days he kept up better than I did, which annoyed me in a way I chose not to examine."',submitted:'4h ago'},
+  {id:'r3',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'🌙 Elegy',title:'The letter folded inside the pocket of his old jacket',writer:'Efe_O',writerAv:'https://i.pravatar.cc/100?img=22',writerSub:'2 prior series · 218k total reads',reads:'21k',likes:'3.6k',chapters:'7',status:'approved',excerpt:'"I pressed it against my face and breathed in. It still smelled faintly of the jacket. Of him — of whatever combination of laundry and skin made up his particular smell."',submitted:'1d ago'},
+  {id:'r4',cover:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'🔥 Revenge',title:'My stepmother stole my university fund — so I quietly uncovered her entire secret life',writer:'Zara_M',writerAv:'https://i.pravatar.cc/100?img=16',writerSub:'2 prior series · 28k total reads',reads:'4.2k',likes:'680',chapters:'5',status:'pending',excerpt:'"By morning something had settled in me. Not forgiveness — not yet. But a decision. A decision to not let the wound fester in silence."',submitted:'6h ago'},
+  {id:'r5',cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'✨ Twist',title:'I left the altar in my socked feet and found my actual life',writer:'Ifeanyi_Story',writerAv:'https://i.pravatar.cc/100?img=53',writerSub:'5 prior published · 312k total reads',reads:'45k',likes:'6.8k',chapters:'8',status:'pending',excerpt:'"Four hundred guests. The ceremony was in the hotel ballroom. My dress had cost four hundred and twenty thousand naira."',submitted:'3h ago'},
+  {id:'r6',cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood but she left everything to me",writer:'Chiamaka_N',writerAv:'https://i.pravatar.cc/100?img=47',writerSub:'4 prior series · 138k total reads',reads:'19k',likes:'3.1k',chapters:'12',status:'reviewing',excerpt:'"She had written: \'My Adanna. You were brought to me eleven days old. Cold but not crying. I took one look at you and I knew I was going to spend the rest of my life making sure you were warm.\'"',submitted:'5h ago'},
+  {id:'r7',cover:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'💔 Heartbreak',title:'He deleted our anniversary photos before I came home',writer:'Kemi_A',writerAv:'https://i.pravatar.cc/100?img=28',writerSub:'1 prior series · 96k total reads',reads:'7.2k',likes:'1.1k',chapters:'3',status:'rejected',excerpt:'"I checked my phone, his folder, every shared album. Every trace of that evening was gone. The restaurant. The flowers. Our faces."',submitted:'1d ago'},
+];
+
+const SIGNED_STORIES=[
+  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:'I came home early and caught my husband kissing…',writer:'Ada_Writes',reads:'171k',likes:'24.3k',pct:15,monthlyEarn:'₦14,200',signedDate:'Jan 2025',status:'contracted'},
+  {cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',cat:'✨ Twist',title:'The runaway bride — I left in my socked feet',writer:'Ifeanyi_Story',reads:'312k',likes:'45k',pct:12,monthlyEarn:'₦8,750',signedDate:'Sep 2024',status:'contracted'},
+  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'🌙 Elegy',title:'The letter folded inside the pocket of his old jacket',writer:'Efe_O',reads:'218k',likes:'36.5k',pct:10,monthlyEarn:'₦5,400',signedDate:'Mar 2025',status:'contracted'},
+  {cover:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",writer:'Chiamaka_N',reads:'138k',likes:'21k',pct:14,monthlyEarn:'₦4,100',signedDate:'Feb 2025',status:'contracted'},
+  {cover:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'🔥 Revenge',title:'My stepmother stole my university fund',writer:'Zara_M',reads:'88k',likes:'14k',pct:11,monthlyEarn:'₦2,890',signedDate:'Apr 2025',status:'contracted'},
+  {cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',writer:'Kemi_A',reads:'96k',likes:'19.2k',pct:13,monthlyEarn:'₦3,610',signedDate:'Mar 2025',status:'contracted'},
+];
+
+const CONTRACTS=[
+  {story:'I came home early and caught my husband…',writer:'Ada_Writes',writerEmail:'ada_writes@email.com',type:'Exclusive · 15% cut · 12 months',icon:'signed',pill:'cc-signed',iconClass:'signed',status:'Signed ✓',date:'Jan 14, 2025',terms:['Exclusivity','15% Revenue','Editorial Credit','Series Rights']},
+  {story:'The runaway bride — I left in my socked feet',writer:'Ifeanyi_Story',writerEmail:'ifeanyi@email.com',type:'Non-Exclusive · 12% cut · 12 months',icon:'sent',pill:'cc-sent',iconClass:'sent',status:'Signed ✓',date:'Sep 3, 2024',terms:['12% Revenue','Editorial Credit','Early Drop']},
+  {story:'The richest boy in school beside me every morning',writer:'CampusQueen',writerEmail:'campusqueen@email.com',type:'Revenue Share · 10% cut · 6 months',icon:'pending',pill:'cc-pending',iconClass:'pending',status:'Awaiting Signature',date:'Sent Jun 18, 2025',terms:['10% Revenue','Non-Exclusive']},
+  {story:'My grandmother\'s will revealed I wasn\'t her blood',writer:'Chiamaka_N',writerEmail:'chiamaka@email.com',type:'Premium Lock · 14% cut · Lifetime',icon:'admin',pill:'cc-admin',iconClass:'admin',status:'Admin Co-sign Needed',date:'Submitted Jun 20, 2025',terms:['14% Revenue','Exclusivity','Premium Lock','Adaptation Rights']},
+  {story:'My stepmother stole my university fund',writer:'Zara_M',writerEmail:'zara_m@email.com',type:'Exclusive · 11% cut · 12 months',icon:'signed',pill:'cc-signed',iconClass:'signed',status:'Signed ✓',date:'Apr 2, 2025',terms:['Exclusivity','11% Revenue','Series Continuation']},
+  {story:'She found his second phone at their anniversary dinner',writer:'Kemi_A',writerEmail:'kemi@email.com',type:'Revenue Share · 13% cut · 24 months',icon:'pending',pill:'cc-pending',iconClass:'pending',status:'Awaiting Signature',date:'Sent Jun 10, 2025',terms:['13% Revenue','Editorial Credit']},
+];
+
+const NOTIFICATIONS=[
+  {icon:'ni-contract',type:'📝',text:'<strong>Ifeanyi_Story</strong> signed the contract for <span style="color:var(--acc2)">The Runaway Bride</span>',time:'2h ago',unread:true},
+  {icon:'ni-earn',type:'💰',text:'Your revenue share of <strong>₦4,200</strong> has been credited from <span style="color:var(--acc2)">Ada_Writes</span> reads this week',time:'5h ago',unread:true},
+  {icon:'ni-submit',type:'📖',text:'<strong>Dami_Cole</strong> submitted a new story for review: <span style="color:var(--acc2)">"She Rejected Me 3 Times"</span>',time:'7h ago',unread:true},
+  {icon:'ni-approved',type:'✅',text:'Admin <strong>co-signed</strong> the premium contract for <span style="color:var(--acc2)">Chiamaka_N</span> — now active',time:'1d ago',unread:false},
+  {icon:'ni-contract',type:'📝',text:'<strong>Kemi_A</strong> opened the contract email for <span style="color:var(--acc2)">"He Deleted Our Photos"</span>',time:'1d ago',unread:false},
+];
+
+const TOP_PERF=[
+  {rank:'#1',cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',title:'Runaway Bride',writer:'Ifeanyi_Story',reads:'312k',earn:'₦8,750',rankColor:'var(--gold)'},
+  {rank:'#2',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',title:'I came home early…',writer:'Ada_Writes',reads:'171k',earn:'₦14,200',rankColor:'#a0a0b0'},
+  {rank:'#3',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',title:'The Letter He Never Sent',writer:'Efe_O',reads:'218k',earn:'₦5,400',rankColor:'#a07040'},
+  {rank:'#4',cover:'https://i.postimg.cc/DJwFzKgd/4.jpg',title:"Grandmother's Will",writer:'Chiamaka_N',reads:'138k',earn:'₦4,100',rankColor:'var(--muted)'},
+  {rank:'#5',cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',title:'Second Phone Discovery',writer:'Kemi_A',reads:'96k',earn:'₦3,610',rankColor:'var(--muted)'},
+];
+
+const EARNINGS_BREAKDOWN=[
+  {story:'Ada_Writes (I came home early…)',earn:'₦14,200',pct:15,bar:82},
+  {story:'Ifeanyi_Story (Runaway Bride)',earn:'₦8,750',pct:12,bar:64},
+  {story:'Efe_O (The Letter)',earn:'₦5,400',pct:10,bar:47},
+  {story:'Chiamaka_N (Grandmother\'s Will)',earn:'₦4,100',pct:14,bar:38},
+  {story:'Kemi_A (Second Phone)',earn:'₦3,610',pct:13,bar:32},
+];
+
+/* ── STATE ── */
+let currentTab='overview';
+let powerOn=true;
+let activeDetailId=null;
+let activeQueueFilter='all';
+
+/* ── UTILS ── */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+function fmtN(n){if(typeof n==='string')return n;return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+/* ── TABS ── */
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.dtab').forEach(t=>{
+    const on=t.dataset.t===tab;
+    t.style.color=on?'var(--tx)':'var(--muted)';
+    t.style.borderBottomColor=on?'var(--acc)':'transparent';
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('panel-'+tab);
+  if(panel)panel.classList.add('active');
+}
+
+/* ── POWER TOGGLE ── */
+function togglePower(){
+  powerOn=!powerOn;
+  const t=document.getElementById('powerToggle');
+  t.classList.toggle('on',powerOn);
+  const note=document.getElementById('powerNote');
+  const btn=document.getElementById('csSendBtn');
+  if(powerOn){
+    note.innerHTML='<i class="fas fa-stamp" style="font-size:13px;color:var(--purple);margin-top:1px"></i><div class="power-note-text"><strong style="color:var(--purple)">You have direct contract authority.</strong> This contract will be sent directly to the writer\'s email and takes effect upon their digital signature. Admin is notified automatically.</div>';
+    btn.innerHTML='<i class="fas fa-paper-plane" style="font-size:12px;margin-right:7px"></i>Send Contract to Writer';
+  }else{
+    note.innerHTML='<i class="fas fa-shield-halved" style="font-size:13px;color:var(--gold);margin-top:1px"></i><div class="power-note-text"><strong style="color:var(--gold)">Admin co-sign mode active.</strong> This contract will be submitted to the admin team for review before delivery to the writer. ETA: 24-48 hours.</div>';
+    btn.innerHTML='<i class="fas fa-inbox" style="font-size:12px;margin-right:7px"></i>Submit for Admin Co-sign';
+  }
+  toast(powerOn?'✅ Direct authority ON':'🛡️ Admin co-sign mode ON');
+}
+
+/* ── CONTRACT COMPOSER ── */
+let composerStoryRef=null;
+function openComposer(storyRef){
+  composerStoryRef=storyRef||null;
+  if(storyRef){
+    document.getElementById('csPreviewTitle').textContent=storyRef.title;
+    document.getElementById('csPreviewWriter').textContent='@'+storyRef.writer;
+    document.getElementById('csPreviewCover').style.backgroundImage=`url('${storyRef.cover}')`;
+    document.getElementById('csWriterEmail').value='';
+  }else{
+    document.getElementById('csPreviewTitle').textContent='No story selected — type writer email manually';
+    document.getElementById('csPreviewWriter').textContent='Or select from review queue';
+    document.getElementById('csPreviewCover').style.backgroundImage='none';
+  }
+  document.getElementById('contractComposer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeComposer(){
+  document.getElementById('contractComposer').classList.remove('open');
+  document.body.style.overflow='';
+}
+function updatePct(v){document.getElementById('pctDisplay').textContent=v+'%';}
+function sendContract(){
+  const email=document.getElementById('csWriterEmail').value.trim();
+  const pct=document.getElementById('pctSlider').value;
+  const type=document.getElementById('csContractType').value;
+  if(!email&&!composerStoryRef){toast('✉️ Enter writer email address');return;}
+  closeComposer();
+  if(!powerOn){
+    document.getElementById('adminGate').classList.add('open');
+    document.body.style.overflow='hidden';
+  }else{
+    toast('✅ Contract sent to writer!');
+    const sc=document.getElementById('statPending');
+    if(sc)sc.textContent=Math.max(0,parseInt(sc.textContent||'14')-1);
+  }
+}
+function closeAdminGate(){document.getElementById('adminGate').classList.remove('open');document.body.style.overflow='';}
+function requestAdmin(){closeAdminGate();toast('🛡️ Submitted to admin for co-sign!');}
+
+/* ── REVIEW QUEUE ── */
+function filterQueue(f,el){
+  activeQueueFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderReviewList();
+}
+function getStatusPill(s){
+  const m={pending:'rsp-pending',reviewing:'rsp-review',approved:'rsp-approved',rejected:'rsp-rejected',contracted:'rsp-contracted'};
+  const l={pending:'⏳ Pending',reviewing:'👁️ In Review',approved:'✅ Approved',rejected:'❌ Declined',contracted:'📝 Contracted'};
+  return{cls:m[s]||'rsp-pending',label:l[s]||'Pending'};
+}
+function renderReviewList(){
+  let stories=REVIEW_QUEUE;
+  if(activeQueueFilter!=='all'){
+    if(activeQueueFilter==='reviewing')stories=stories.filter(s=>s.status==='reviewing');
+    else if(activeQueueFilter==='pending')stories=stories.filter(s=>s.status==='pending');
+    else if(activeQueueFilter==='approved')stories=stories.filter(s=>s.status==='approved');
+    else if(activeQueueFilter==='rejected')stories=stories.filter(s=>s.status==='rejected');
+  }
+  const list=document.getElementById('reviewList');
+  list.innerHTML=stories.map(s=>{
+    const p=getStatusPill(s.status);
+    const actsHtml=s.status==='pending'||s.status==='reviewing'?`
+      <div class="rc-act view" onclick="event.stopPropagation();openDetail('${s.id}')"><i class="fas fa-eye" style="font-size:9px;margin-right:3px"></i>Read</div>
+      <div class="rc-act approve" onclick="event.stopPropagation();approveStory('${s.id}')"><i class="fas fa-check" style="font-size:9px;margin-right:3px"></i>Approve</div>
+      <div class="rc-act contract" onclick="event.stopPropagation();openComposerFor('${s.id}')"><i class="fas fa-file-signature" style="font-size:9px;margin-right:3px"></i>Contract</div>
+      <div class="rc-act reject" onclick="event.stopPropagation();rejectStory('${s.id}')"><i class="fas fa-times" style="font-size:9px;margin-right:3px"></i></div>`:
+    s.status==='approved'?`<div class="rc-act contract" onclick="event.stopPropagation();openComposerFor('${s.id}')"><i class="fas fa-file-signature" style="font-size:9px;margin-right:3px"></i>Send Contract</div><div class="rc-act view" onclick="event.stopPropagation();openDetail('${s.id}')">View Details</div>`:`<div class="rc-act view" onclick="event.stopPropagation();openDetail('${s.id}')">View Details</div>`;
+    return`<div class="review-card" onclick="openDetail('${s.id}')">
+      <div class="rc-header">
+        <div class="rc-cover" style="background-image:url('${s.cover}')"></div>
+        <div class="rc-info">
+          <div class="rc-cat">${s.cat}</div>
+          <div class="rc-title">${s.title}</div>
+          <div class="rc-writer">@${s.writer} · ${s.submitted}</div>
+          <div class="rc-meta">
+            <span><i class="fas fa-eye" style="font-size:7px"></i>${s.reads}</span>
+            <span><i class="fas fa-heart" style="font-size:7px"></i>${s.likes}</span>
+            <span><i class="fas fa-book-open" style="font-size:7px"></i>${s.chapters} chapters</span>
+          </div>
+        </div>
+      </div>
+      <div class="rc-status-row">
+        <span class="rc-status-pill ${p.cls}">${p.label}</span>
+        <div class="rc-actions">${actsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function approveStory(id){
+  const s=REVIEW_QUEUE.find(x=>x.id===id);
+  if(!s)return;
+  s.status='approved';
+  renderReviewList();
+  toast('✅ Story approved! Ready for contract.');
+}
+function rejectStory(id){
+  const s=REVIEW_QUEUE.find(x=>x.id===id);
+  if(!s)return;
+  s.status='rejected';
+  renderReviewList();
+  toast('❌ Story declined.');
+}
+function openComposerFor(id){
+  const s=REVIEW_QUEUE.find(x=>x.id===id);
+  if(!s)return;
+  closeDetail();
+  openComposer(s);
+}
+
+/* ── REVIEW DETAIL ── */
+function openDetail(id){
+  const s=REVIEW_QUEUE.find(x=>x.id===id);
+  if(!s)return;
+  activeDetailId=id;
+  document.getElementById('rdCover').style.backgroundImage=`url('${s.cover}')`;
+  document.getElementById('rdCat').textContent=s.cat;
+  document.getElementById('rdTitle').textContent=s.title;
+  document.getElementById('rdWriterAv').src=s.writerAv;
+  document.getElementById('rdWriterName').textContent='@'+s.writer;
+  document.getElementById('rdWriterSub').textContent=s.writerSub;
+  document.getElementById('rdExcerpt').textContent=s.excerpt;
+  document.getElementById('rdStatsRow').innerHTML=`
+    <div class="rd-stat"><div class="rd-stat-num" style="color:var(--acc)">${s.reads}</div><div class="rd-stat-label">Reads</div></div>
+    <div class="rd-stat"><div class="rd-stat-num" style="color:var(--gold)">${s.likes}</div><div class="rd-stat-label">Likes</div></div>
+    <div class="rd-stat"><div class="rd-stat-num" style="color:var(--blue)">${s.chapters}</div><div class="rd-stat-label">Chapters</div></div>`;
+  document.getElementById('reviewDetail').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDetail(){
+  document.getElementById('reviewDetail').classList.remove('open');
+  document.body.style.overflow='';
+  activeDetailId=null;
+}
+function approveFromDetail(){if(activeDetailId)approveStory(activeDetailId);closeDetail();}
+function rejectFromDetail(){if(activeDetailId)rejectStory(activeDetailId);closeDetail();}
+function contractFromDetail(){if(activeDetailId)openComposerFor(activeDetailId);}
+
+/* ── SIGNED STORIES ── */
+function renderSignedList(){
+  document.getElementById('signedList').innerHTML=SIGNED_STORIES.map(s=>`
+    <div class="signed-card">
+      <div class="sc-inner">
+        <div class="sc-cover" style="background-image:url('${s.cover}');background-size:cover;background-position:center"></div>
+        <div class="sc-info">
+          <div style="font-size:8px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">${s.cat}</div>
+          <div class="sc-title">${s.title}</div>
+          <div class="sc-writer">@${s.writer} · Signed ${s.signedDate}</div>
+          <div class="sc-stats">
+            <span class="sc-stat"><i class="fas fa-eye" style="font-size:7px"></i>${s.reads}</span>
+            <span class="sc-stat"><i class="fas fa-heart" style="font-size:7px"></i>${s.likes}</span>
+            <span class="sc-stat earn"><i class="fas fa-coins" style="font-size:7px"></i>${s.monthlyEarn}/mo</span>
+          </div>
+        </div>
+      </div>
+      <div class="sc-footer">
+        <div class="sc-pct">${s.pct}% revenue share</div>
+        <div class="sc-revenue">${s.monthlyEarn} <span style="font-size:9px;color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif">this month</span></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── CONTRACTS ── */
+function renderContractList(){
+  const iconColors={sent:'color:var(--blue)',signed:'color:var(--green)',pending:'color:var(--gold)',admin:'color:var(--purple)'};
+  const iconFA={sent:'fa-paper-plane',signed:'fa-check-double',pending:'fa-clock',admin:'fa-shield-halved'};
+  document.getElementById('contractList').innerHTML=CONTRACTS.map((c,i)=>`
+    <div class="contract-card">
+      <div class="cc-header">
+        <div class="cc-icon ${c.iconClass}"><i class="fas ${iconFA[c.iconClass]||'fa-file'}" style="${iconColors[c.iconClass]||''}"></i></div>
+        <div class="cc-info">
+          <div class="cc-title">${c.story.length>45?c.story.substring(0,45)+'…':c.story}</div>
+          <div class="cc-writer">@${c.writer} · ${c.writerEmail}</div>
+        </div>
+        <span class="cc-pill ${c.pill}">${c.status}</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-terms-row">${c.terms.map(t=>`<span class="cc-term">${t}</span>`).join('')}</div>
+        <div class="cc-actions">
+          <button class="cca view" onclick="toast('📄 Viewing contract…')"><i class="fas fa-eye" style="font-size:9px;margin-right:3px"></i>View</button>
+          ${c.iconClass==='pending'?`<button class="cca resend" onclick="toast('📨 Reminder sent!')"><i class="fas fa-bell" style="font-size:9px;margin-right:3px"></i>Remind</button>`:''}
+          ${c.iconClass==='signed'?`<button class="cca download" onclick="toast('📥 Downloading PDF…')"><i class="fas fa-download" style="font-size:9px;margin-right:3px"></i>Download</button>`:''}
+          ${c.iconClass==='admin'?`<button class="cca remind" onclick="toast('🛡️ Following up with admin…')"><i class="fas fa-shield-halved" style="font-size:9px;margin-right:3px"></i>Follow up</button>`:''}
+          <button class="cca revoke" onclick="toast('⚠️ Confirm revoke in next screen')"><i class="fas fa-ban" style="font-size:9px;margin-right:3px"></i>Revoke</button>
+        </div>
+      </div>
+      <div class="cc-footer">
+        <div class="cc-date"><i class="fas fa-calendar" style="font-size:8px"></i>${c.date}</div>
+        <div class="cc-pct">${c.type}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── TOP PERFORMING ── */
+function renderTopPerf(){
+  const html=TOP_PERF.map(p=>`
+    <div class="perf-item">
+      <div class="perf-rank" style="color:${p.rankColor}">${p.rank}</div>
+      <div class="perf-cover" style="background-image:url('${p.cover}');background-size:cover;background-position:center"></div>
+      <div class="perf-info">
+        <div class="perf-title">${p.title}</div>
+        <div class="perf-writer">@${p.writer}</div>
+      </div>
+      <div class="perf-right">
+        <div class="perf-earn">${p.earn}</div>
+        <div class="perf-reads">${p.reads} reads</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('topPerfList').innerHTML=html;
+  const analyticsEl=document.getElementById('analyticsTopPerf');
+  if(analyticsEl)analyticsEl.innerHTML=html;
+}
+
+/* ── NOTIFICATIONS ── */
+function renderNotifications(){
+  document.getElementById('notifList').innerHTML=NOTIFICATIONS.map(n=>`
+    <div class="notif-item${n.unread?' unread':''}">
+      <div class="ni-icon ${n.icon}">${n.type}</div>
+      <div class="ni-info">
+        <div class="ni-text">${n.text}</div>
+        <div class="ni-time">${n.time}</div>
+      </div>
+      ${n.unread?'<div class="ni-dot"></div>':''}
+    </div>`).join('');
+}
+
+/* ── EARNINGS BREAKDOWN ── */
+function renderEarningsBreakdown(){
+  const el=document.getElementById('earningsBreakdown');
+  if(!el)return;
+  el.innerHTML=EARNINGS_BREAKDOWN.map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;font-weight:700;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">${e.story}</div>
+        <div style="height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:${e.bar}%;background:linear-gradient(90deg,var(--gold),var(--acc));border-radius:4px"></div></div>
+      </div>
+      <div style="flex-shrink:0;text-align:right">
+        <div style="font-size:11px;font-weight:800;color:var(--gold)">${e.earn}</div>
+        <div style="font-size:8px;color:var(--muted)">${e.pct}%</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── INIT ── */
+switchTab('overview');
+renderReviewList();
+renderSignedList();
+renderContractList();
+renderTopPerf();
+renderNotifications();
+renderEarningsBreakdown();
+</script>
+</body>
+</html>

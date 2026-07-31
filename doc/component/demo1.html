@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Comments Demo</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 680px;
+            width: 100%;
+            background: #0e0f13;
+            border-radius: 20px;
+            padding: 24px 20px 30px;
+            border: 1px solid rgba(255,255,255,.06);
+            margin: 20px 0;
+        }
+        
+        .story-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        
+        .story-header h2 {
+            color: #e0e0e0;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .story-header p {
+            color: #71717a;
+            font-size: 13px;
+        }
+        
+        .story-header .badge {
+            display: inline-block;
+            background: rgba(255,0,80,.12);
+            color: #ff0050;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+        
+        #comments-container {
+            min-height: 100px;
+        }
+        
+        .log {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255,255,255,.03);
+            border-radius: 10px;
+            font-size: 11px;
+            color: #555;
+            font-family: monospace;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        .log-entry { padding: 2px 0; }
+        
+        .demo-note {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 10px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .demo-note strong { color: #888; }
+        .demo-note code {
+            background: rgba(255,255,255,.06);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #ff4d7a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="story-header">
+            <h2>💔 The Runaway Bride</h2>
+            <p>by @Ifeanyi_Story · 45k likes · 2.3k shares</p>
+            <span class="badge">📖 Chapter 5</span>
+        </div>
+        
+        <!-- ─── Comments mount point ─── -->
+        <div id="comments-container"></div>
+        
+        <div class="log" id="log">
+            <strong>📋 Activity:</strong>
+            <div id="logEntries">Ready... Comments loading 👇</div>
+        </div>
+        
+        <div class="demo-note">
+            <strong>✨ Features:</strong><br>
+            • <code>🔵</code> Verified badge (blue circle with ✓)<br>
+            • <code>🔗</code> Click avatar/name → opens status viewer<br>
+            • <code>📸</code> Ring-has = blue conic · Ring-viewed = dim gray<br>
+            • <code>✏️</code> Edit your own comments (••• menu)<br>
+            • <code>🔥 / 🆕</code> Sort by Top or New<br>
+            • <code>📤</code> Share any comment
+        </div>
+    </div>
+    
+    <!-- ─── Load components ─── -->
+    <script src="share-modal.js"></script>
+    <script src="droboard-comments.js"></script>
+    <script src="status-viewer.js"></script>
+    <!-- ─── Load comments data ─── -->
+    <script src="comments-data.js"></script>
+    
+    <script>
+        (function() {
+            function addLog(msg) {
+                const logDiv = document.getElementById('logEntries');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logDiv.insertBefore(entry, logDiv.firstChild);
+                while (logDiv.children.length > 20) logDiv.removeChild(logDiv.lastChild);
+            }
+            
+            // ─── Writer statuses ──────────────────────────────────────────
+            const WRITER_STATUSES = [
+                {
+                    id: 'w1',
+                    name: 'Ada_Writes',
+                    avatar: 'https://i.pravatar.cc/100?img=32',
+                    isLive: true,
+                    ring: 'ring-live',
+                    likes: 3241,
+                    threads: 614,
+                    statuses: [
+                        {
+                            bg: 'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+                            quote: '"Sometimes love is just grief wearing a familiar face."',
+                            caption: 'Working on Chapter 5 🖊️',
+                            time: '2h ago'
+                        }
+                    ]
+                },
+                {
+                    id: 'w5',
+                    name: 'Ifeanyi_Story',
+                    avatar: 'https://i.pravatar.cc/100?img=53',
+                    isLive: false,
+                    ring: 'ring-has',
+                    likes: 1200,
+                    threads: 287,
+                    statuses: [
+                        {
+                            bg: 'https://i.postimg.cc/WF1j4Pnh/6.jpg',
+                            quote: '"I walked out in socked feet and found my actual life."',
+                            caption: 'Bare Kitchen is real btw 🥐',
+                            time: '30m ago'
+                        }
+                    ]
+                },
+                {
+                    id: 'w2',
+                    name: 'Chioma_R',
+                    avatar: 'https://i.pravatar.cc/100?img=47',
+                    isLive: false,
+                    ring: 'ring-has',
+                    likes: 890,
+                    threads: 142,
+                    statuses: [
+                        {
+                            bg: 'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+                            quote: '"Not every love story ends with a wedding."',
+                            caption: 'My reaction to chapter 4 🥺',
+                            time: '4h ago'
+                        }
+                    ]
+                },
+                {
+                    id: 'w3',
+                    name: 'Chiamaka',
+                    avatar: 'https://i.pravatar.cc/100?img=43',
+                    isLive: false,
+                    ring: 'ring-has',
+                    likes: 540,
+                    threads: 98,
+                    statuses: [
+                        {
+                            bg: 'https://i.postimg.cc/N9jY0w4m/5.jpg',
+                            quote: '"Family stories are the only stories."',
+                            caption: 'Writing S3 Ch8 tonight 🌙',
+                            time: '1h ago'
+                        }
+                    ]
+                }
+            ];
+            
+            // ─── Mount comments ──────────────────────────────────────────
+            const container = document.getElementById('comments-container');
+            
+            if (typeof mountDroboardComments === 'undefined') {
+                container.innerHTML = '<p style="color:#ff0050;padding:20px;text-align:center;">❌ Error: droboard-comments.js not loaded.</p>';
+                addLog('❌ Error: droboard-comments.js not loaded!');
+                return;
+            }
+            
+            if (typeof COMMENTS_DATA === 'undefined') {
+                container.innerHTML = '<p style="color:#ff0050;padding:20px;text-align:center;">❌ Error: comments-data.js not loaded.</p>';
+                addLog('❌ Error: comments-data.js not loaded!');
+                return;
+            }
+            
+            const instance = mountDroboardComments(container, {
+                storyId: 'story_123',
+                comments: COMMENTS_DATA,
+                currentUser: {
+                    name: 'You',
+                    avatar: null,
+                    verified: false,
+                    team: null,
+                    statusRing: 'ring-none',
+                    wid: null
+                },
+                writerStatuses: WRITER_STATUSES,
+                onPost: async (comment) => {
+                    addLog(`💬 Comment posted: "${comment.text.substring(0, 30)}..."`);
+                    return { ok: true };
+                },
+                onLike: async (commentId, liked) => {
+                    addLog(`❤️ ${liked ? 'Liked' : 'Unliked'} comment ${commentId}`);
+                    return { ok: true };
+                },
+                onReact: async (commentId, reactionId) => {
+                    addLog(`😊 Reacted ${reactionId} on comment ${commentId}`);
+                    return { ok: true };
+                }
+            });
+            
+            addLog(`✅ Comments loaded! (${COMMENTS_DATA.length} comments)`);
+            addLog('💡 Click avatar/name → status viewer');
+            addLog('💡 Click ••• → Edit to edit your comment');
+            
+            window.__commentsInstance = instance;
+            window.WRITER_STATUSES = WRITER_STATUSES;
+            
+        })();
+    </script>
+</body>
+</html>

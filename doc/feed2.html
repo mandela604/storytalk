@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#0d0b1a"/>
+<title>Droboard · Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  /* ══ Dark theme lifted from the Book Management dashboard / Genre Hub ══ */
+  --acc:#7c3aed;--acc2:#8b5cf6;--acc3:#a78bfa;
+  --card:#161329;
+  --glow:rgba(124,58,237,.35);--glow-sm:rgba(124,58,237,.15);
+  --bg:#0d0b1a;--l1:#150f2b;--l2:#161329;--l3:#1d1a35;--l4:#241f42;
+  --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.035);--bd-acc:rgba(124,58,237,.28);
+  --tx-high:#f1f0f8;--tx-body:#a29fbf;--tx-muted:#716e93;--tx-faint:#4a4568;
+  --tx-title:#dedbf2;
+  --blue:#60a5fa;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
+  --for-col:#34d399;--ag-col:#f87171;
+  --post-sep:#241f42;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:2px}
+
+/* ══ TOP BAR ══ */
+.top-bar{position:sticky;top:0;z-index:200;background:rgba(13,11,26,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:calc(var(--safe-t) + 10px) 14px 10px;display:flex;align-items:center;gap:10px}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;flex-shrink:0;cursor:pointer}
+.search-bar{flex:1;display:flex;align-items:center;gap:7px;background:var(--l2);border:1.5px solid var(--bd);border-radius:24px;padding:8px 13px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--bd-acc)}
+.search-bar i{color:var(--tx-faint);font-size:12px}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--tx-body);font-family:'DM Sans',sans-serif;font-size:13px}
+.search-bar input::placeholder{color:var(--tx-faint)}
+.top-icon{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--tx-muted);cursor:pointer;flex-shrink:0;position:relative;transition:.15s}
+.top-icon:active{transform:scale(.92);color:var(--acc)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:2px solid var(--bg)}
+
+/* ══ TABS ══ */
+.tabs-bar{position:sticky;top:calc(var(--safe-t) + 54px);z-index:190;background:rgba(13,11,26,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;font-size:12px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
+.tab-ct{background:rgba(124,58,237,.18);color:var(--acc3);font-size:8px;font-weight:800;padding:1px 5px;border-radius:6px}
+
+/* ══ STATUS RINGS ══ */
+.statuses-row{display:flex;gap:14px;padding:14px 14px 12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--post-sep)}
+.statuses-row::-webkit-scrollbar{display:none}
+.status-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.status-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;position:relative}
+.status-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.status-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc3),var(--acc))}
+.status-ring.ring-viewed{background:var(--tx-faint)}
+.status-ring.ring-none{background:var(--l3)}
+.status-ring-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.status-ring-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.status-ring-initial{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--acc3);background:rgba(124,58,237,.12)}
+.status-live-dot{position:absolute;bottom:1px;right:1px;width:14px;height:14px;border-radius:50%;background:var(--acc);border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:900;color:var(--tx-high);animation:pdot 1.4s ease-in-out infinite}
+@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.status-name{font-size:9.5px;font-weight:700;color:var(--tx-muted);text-align:center;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-name.new-s{color:var(--tx-high)}
+
+/* ══ FEATURED SLIDER ══ */
+.featured-slider-wrap{margin:0;border-radius:0;overflow:hidden;position:relative;border-bottom:1px solid var(--post-sep)}
+.fs-track{display:flex;will-change:transform;transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.fs-slide{flex:0 0 100%;position:relative;cursor:pointer}
+.fb-img{width:100%;height:200px;background-size:cover;background-position:center 25%}
+.fb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.1) 100%)}
+.fb-content{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px}
+.fb-tags{display:flex;gap:5px;margin-bottom:7px}
+.fb-tag{font-size:8px;font-weight:900;padding:2px 8px;border-radius:6px;letter-spacing:.05em;text-transform:uppercase}
+.fb-tag-hot{background:var(--acc);color:#fff}
+.fb-tag-cat{background:rgba(255,255,255,.12);backdrop-filter:blur(4px);color:rgba(255,255,255,.85)}
+.fb-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;line-height:1.28;color:#e8e8e8;margin-bottom:8px}
+.fb-meta{display:flex;align-items:center;gap:8px}
+.fb-av{width:20px;height:20px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.3)}
+.fb-author{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);flex:1}
+.fb-stats{display:flex;gap:8px}
+.fb-stat{font-size:10px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:3px;font-weight:600}
+.fb-read-btn{background:var(--acc);color:#fff;border:none;padding:6px 14px;border-radius:14px;font-size:10px;font-weight:800;cursor:pointer}
+.fs-dots{display:flex;gap:5px;justify-content:center;padding:7px 0 4px}
+.fs-dot{width:5px;height:5px;border-radius:50%;background:var(--tx-faint);cursor:pointer;transition:.25s}
+.fs-dot.on{width:18px;border-radius:3px;background:var(--acc)}
+
+/* ══ PEOPLE TO FOLLOW — mid-feed injection ══ */
+.people-row-wrap{padding:14px 14px 10px;border-bottom:1px solid var(--post-sep);border-top:1px solid var(--post-sep);background:var(--l1)}
+.people-row-title{font-size:10px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.people-row{display:flex;gap:18px;overflow-x:auto;scrollbar-width:none}
+.people-row::-webkit-scrollbar{display:none}
+.person-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-width:56px}
+.person-av-wrap{position:relative;width:50px;height:50px}
+.person-av{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--bd);display:block}
+.person-verified{position:absolute;bottom:-1px;right:-1px;width:16px;height:16px;border-radius:50%;background:var(--blue);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:900}
+.person-name{font-size:9.5px;font-weight:700;color:var(--tx-muted);text-align:center;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person-follow-btn{font-size:8px;font-weight:800;color:var(--acc3);background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.24);border-radius:8px;padding:2px 7px;cursor:pointer;white-space:nowrap;transition:.15s;font-family:'DM Sans',sans-serif}
+.person-follow-btn.ing{background:rgba(255,255,255,.05);border-color:var(--bd);color:var(--tx-muted)}
+
+/* ══ LIVE BANNER ══ */
+.live-banner{padding:12px 14px;display:none;align-items:center;gap:10px;border-bottom:1px solid var(--post-sep);background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(0,0,0,0))}
+.live-banner.show{display:flex}
+.live-dot-big{width:10px;height:10px;border-radius:50%;background:var(--acc);animation:pdot 1.2s ease-in-out infinite;flex-shrink:0}
+.live-banner-info{flex:1}
+.live-banner-label{font-size:9px;font-weight:900;color:var(--acc3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.live-banner-title{font-size:13px;font-weight:800;color:var(--tx-high);line-height:1.3}
+.live-banner-meta{font-size:10px;color:var(--tx-muted);margin-top:2px}
+.live-banner-btn{background:var(--acc);color:#fff;border:none;padding:7px 14px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0}
+
+/* ══ POST CARD ══ */
+.post-card{border-bottom:1px solid var(--post-sep);background:var(--bg);position:relative;overflow:visible;animation:fadeUp .22s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.post-card.pinned::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+
+.post-card-inner{padding:13px 14px 0}
+
+/* ══ POST HEADER ══ */
+.pc-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.pc-av-ring{width:40px;height:40px;border-radius:50%;flex-shrink:0;padding:2px;cursor:pointer}
+.pc-av-ring.ring-has{background:conic-gradient(var(--blue),#0ea5e9,#bae6fd,var(--blue))}
+.pc-av-ring.ring-live{background:conic-gradient(var(--acc),var(--acc2),var(--acc))}
+.pc-av-ring.ring-viewed{background:var(--tx-faint)}
+.pc-av-ring.ring-none{background:var(--l3)}
+.pc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg)}
+.pc-av-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-av-initial{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--tx-high)}
+.pc-meta{flex:1;min-width:0}
+.pc-name-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:1px}
+.pc-name{font-size:13px;font-weight:700;color:var(--tx-high);cursor:pointer;text-decoration:none}
+.verified-badge{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.verified-badge i{font-size:7px;color:#fff}
+.rank-badge{font-size:8px;font-weight:800;padding:1px 6px;border-radius:6px;letter-spacing:.04em;white-space:nowrap}
+.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
+.rank-2{background:linear-gradient(135deg,#a1a1aa,#71717a);color:#fff}
+.rank-3{background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff}
+.rank-top{background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.26);color:var(--acc3)}
+.rank-new{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.pc-meta-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:2px}
+.pc-badge{font-size:8px;font-weight:800;padding:1px 6px;border-radius:6px;letter-spacing:.04em}
+.badge-writer{background:rgba(124,58,237,.12);border:1px solid var(--bd-acc);color:var(--acc3)}
+.badge-anon{background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--tx-muted)}
+.pc-time{font-size:10px;color:var(--tx-faint)}
+.post-type-pill{font-size:8px;font-weight:900;padding:2px 8px;border-radius:8px;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;margin-top:2px}
+.pt-story{background:rgba(124,58,237,.12);color:var(--acc3);border:1px solid var(--bd-acc)}
+.pt-post{background:rgba(255,255,255,.05);color:var(--tx-muted);border:1px solid var(--bd)}
+.pt-chapter{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.pt-debate{background:rgba(251,146,60,.08);color:var(--orange);border:1px solid rgba(251,146,60,.18)}
+.pt-forum{background:rgba(167,139,250,.08);color:var(--purple);border:1px solid rgba(167,139,250,.18)}
+.pt-confession{background:rgba(124,58,237,.1);color:var(--acc2);border:1px solid rgba(124,58,237,.2)}
+.pt-ama{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2)}
+.pt-repost{background:rgba(96,165,250,.08);color:var(--blue);border:1px solid rgba(96,165,250,.18)}
+.pt-review{background:rgba(251,191,36,.08);color:var(--gold);border:1px solid rgba(251,191,36,.16)}
+.pt-motivation{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.pt-career{background:rgba(96,165,250,.08);color:var(--blue);border:1px solid rgba(96,165,250,.18)}
+
+/* ══ STATUS UPDATE STRIP inside post ══ */
+.status-update-strip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:7px 11px;margin:8px 0;cursor:pointer}
+.status-update-strip .su-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.status-update-strip .su-text{font-size:11px;color:var(--tx-muted);font-style:italic;flex:1}
+.status-update-strip .su-time{font-size:9px;color:var(--tx-faint)}
+
+/* ══ POST BODY ══ */
+.pc-body{padding:0 0 9px}
+.pc-title{
+  font-family:'Playfair Display',serif;
+  font-size:16px;
+  font-weight:700;
+  line-height:1.35;
+  color:var(--tx-title);
+  margin-bottom:6px
+}
+.pc-text{font-size:14px;color:var(--tx-body);line-height:1.65;word-break:break-word}
+.pc-text.trunc-5{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.pc-text.trunc-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pc-mention{color:var(--acc2);font-weight:700}
+.pc-read-more{font-size:11px;font-weight:700;color:var(--acc2);cursor:pointer;display:inline-block;margin-top:4px}
+.pc-read-less{font-size:11px;font-weight:700;color:var(--tx-muted);cursor:pointer;display:inline-block;margin-top:4px}
+.pc-quote-block{font-family:'Playfair Display',serif;font-size:15px;font-style:italic;font-weight:700;color:var(--tx-title);line-height:1.5;border-left:3px solid var(--acc);padding-left:11px;margin:2px 0 5px}
+.pinned-label{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:800;color:var(--gold);margin-bottom:5px}
+
+/* ══ STORY CHIP ══ */
+.pc-story-chip{display:flex;align-items:center;gap:9px;background:var(--l2);border:1px solid var(--bd);border-radius:11px;padding:8px 10px;margin:7px 0;cursor:pointer;transition:.15s}
+.pc-story-chip:active{border-color:var(--bd-acc)}
+.pc-story-thumb{width:38px;height:44px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.pc-story-chip-body{flex:1;min-width:0}
+.pc-story-chip-cat{font-size:8px;font-weight:800;color:var(--acc3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.pc-story-chip-title{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--tx-title);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-story-chip-writer{font-size:9px;color:var(--tx-faint);margin-top:2px}
+.pc-story-chip-arrow{font-size:11px;color:var(--acc2);flex-shrink:0}
+
+/* ══ DEBATE BLOCK ══ */
+.pc-debate-block{margin:8px 0;background:var(--l2);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.pc-debate-motion{font-size:12px;font-weight:700;color:var(--tx-body);line-height:1.4;margin-bottom:10px;font-style:italic}
+.pc-debate-sides{display:flex;gap:6px;margin-bottom:8px}
+.pc-debate-side{flex:1;border-radius:10px;padding:8px;text-align:center;cursor:pointer;border:1.5px solid rgba(255,255,255,.05);transition:.2s;position:relative;overflow:hidden}
+.pc-debate-side.for-side{background:rgba(52,211,153,.03)}
+.pc-debate-side.ag-side{background:rgba(248,113,113,.03)}
+.pc-debate-side.for-side.voted{border-color:var(--for-col)}
+.pc-debate-side.ag-side.voted{border-color:var(--ag-col)}
+.pds-label{font-size:10px;font-weight:800;margin-bottom:4px}
+.for-side .pds-label{color:var(--for-col)}.ag-side .pds-label{color:var(--ag-col)}
+.pds-bar{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:3px}
+.pds-bar-fill{height:100%;border-radius:4px}
+.for-side .pds-bar-fill{background:var(--for-col)}.ag-side .pds-bar-fill{background:var(--ag-col)}
+.pds-pct{font-size:12px;font-weight:900}
+.for-side .pds-pct{color:var(--for-col)}.ag-side .pds-pct{color:var(--ag-col)}
+.pds-ct{font-size:8px;color:var(--tx-faint)}
+.pc-debate-total{font-size:9px;color:var(--tx-faint);text-align:center}
+
+/* ══ POLL BLOCK ══ */
+.pc-poll{margin:8px 0;background:var(--l2);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.pc-poll-q{font-size:12px;font-weight:700;color:var(--tx-body);margin-bottom:9px;line-height:1.4}
+.pc-poll-opt{position:relative;border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);margin-bottom:5px;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.pc-poll-opt:last-child{margin-bottom:0}
+.pc-poll-opt.voted{border-color:var(--acc)}
+.pc-poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(124,58,237,.12);z-index:0;border-radius:8px}
+.pc-poll-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.pc-poll-txt{font-size:12px;font-weight:600;color:var(--tx-body)}
+.pc-poll-pct{font-size:11px;font-weight:800;color:var(--acc3)}
+.pc-poll-meta{font-size:9px;color:var(--tx-faint);margin-top:6px}
+
+/* ══ AMA BANNER ══ */
+.pc-ama-banner{margin:8px 0;background:linear-gradient(135deg,rgba(251,146,60,.08),rgba(124,58,237,.05));border:1px solid rgba(251,146,60,.25);border-radius:12px;padding:12px;cursor:pointer}
+.pc-ama-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.pc-ama-live{display:flex;align-items:center;gap:4px;background:var(--acc);color:#fff;font-size:8px;font-weight:900;padding:3px 8px;border-radius:8px;letter-spacing:.07em}
+.pc-ama-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pdot 1.2s ease-in-out infinite}
+.pc-ama-viewers{font-size:10px;color:var(--orange);font-weight:600}
+.pc-ama-title{font-size:13px;font-weight:700;color:var(--tx-high);line-height:1.35;margin-bottom:4px}
+.pc-ama-meta{font-size:10px;color:rgba(251,146,60,.65)}
+.pc-ama-join{display:inline-block;background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff;border:none;padding:6px 14px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+
+/* ══ CHAPTER DROP ══ */
+.pc-chapter-drop{margin:8px 0;background:linear-gradient(135deg,rgba(52,211,153,.05),rgba(0,0,0,0));border:1px solid rgba(52,211,153,.15);border-radius:12px;padding:12px;cursor:pointer}
+.pc-chapter-top{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.pc-chapter-badge{background:rgba(52,211,153,.12);color:var(--green);font-size:8px;font-weight:900;padding:2px 8px;border-radius:7px;border:1px solid rgba(52,211,153,.2)}
+.pc-chapter-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:var(--tx-title);margin-bottom:3px;line-height:1.3}
+.pc-chapter-meta{font-size:9px;color:var(--green);display:flex;align-items:center;gap:6px}
+.pc-chapter-read-btn{display:inline-block;background:var(--green);color:#000;border:none;padding:6px 14px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+
+/* ══ IMAGE ══ */
+.pc-image{width:100%;max-height:280px;object-fit:cover;display:block;border-radius:10px;margin-bottom:6px;cursor:pointer}
+
+/* ══ FOOTER ══ */
+.pc-footer{display:flex;align-items:center;padding:7px 0 10px;border-top:1px solid var(--bd2);margin-top:5px;gap:0}
+.pc-act{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--tx-faint);cursor:pointer;padding:5px 8px;border-radius:9px;transition:.15s;user-select:none;flex-shrink:0;position:relative}
+.pc-act:active{background:rgba(255,255,255,.04)}
+.pc-act.liked{color:var(--acc)}
+.pc-act i{font-size:13px}
+.pc-spacer{flex:1}
+.pc-dots{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx-faint);cursor:pointer;transition:.15s;flex-shrink:0}
+.pc-dots:active{color:var(--tx-high)}
+
+/* ══ REACTION POPUP ══ */
+.rx-popup{position:absolute;bottom:40px;left:0;z-index:500;background:var(--l3);border:1px solid var(--bd);border-radius:36px;padding:8px 10px;display:none;flex-direction:row;gap:2px;box-shadow:0 8px 32px rgba(0,0,0,.95);animation:popIn .2s cubic-bezier(.34,1.56,.64,1)}
+.rx-popup.show{display:flex}
+.rx-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 6px;border-radius:12px;transition:.15s;user-select:none}
+.rx-btn:active{transform:scale(.88)}
+.rx-em{font-size:22px;line-height:1}
+.rx-ct{font-size:8px;font-weight:700;color:var(--tx-faint);min-width:16px;text-align:center}
+.rx-btn.reacted .rx-ct{color:var(--acc2)}
+
+/* ══ 3-DOT MENU ══ */
+.dots-menu{position:fixed;z-index:1000;background:var(--l3);border:1px solid var(--bd);border-radius:13px;padding:5px;min-width:195px;box-shadow:0 8px 40px rgba(0,0,0,.95);display:none;animation:popIn .18s cubic-bezier(.34,1.56,.64,1)}
+.dots-menu.open{display:block}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.dots-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:9px;font-size:12px;font-weight:600;color:var(--tx-body);cursor:pointer;transition:.12s}
+.dots-item:hover{background:rgba(255,255,255,.04);color:var(--tx-high)}
+.dots-item.danger{color:var(--ag-col)}
+.dots-item i{width:16px;text-align:center;font-size:13px;color:inherit}
+.dots-section{height:1px;background:var(--bd2);margin:3px 8px}
+
+/* ══ REPLY BAR ══ */
+.pc-reply-bar{display:none;align-items:center;gap:8px;padding:0 14px 10px}
+.pc-reply-bar.open{display:flex}
+.pc-reply-av-sm{width:26px;height:26px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.pc-reply-inp{flex:1;background:var(--l2);border:1px solid var(--bd);border-radius:18px;padding:7px 12px;color:var(--tx-body);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.pc-reply-inp::placeholder{color:var(--tx-faint)}
+.pc-reply-inp:focus{border-color:var(--bd-acc)}
+.pc-reply-send{background:var(--acc);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#fff;flex-shrink:0}
+.pc-reply-send:disabled{background:var(--l4);cursor:default}
+
+/* ══ AD CARD ══ */
+.ad-post-card{border-bottom:1px solid var(--post-sep);background:var(--bg);padding:13px 14px;position:relative;overflow:hidden}
+.ad-post-card::after{content:'Sponsored';position:absolute;top:9px;right:11px;font-size:7px;font-weight:800;color:var(--tx-faint);letter-spacing:.1em;text-transform:uppercase;background:var(--l2);padding:2px 7px;border-radius:6px;border:1px solid var(--bd)}
+.ad-post-inner{display:flex;gap:10px;align-items:center}
+.ad-post-logo{width:42px;height:42px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd)}
+.ad-post-body{flex:1;min-width:0}
+.ad-post-brand{font-size:9px;font-weight:800;color:var(--blue);margin-bottom:3px}
+.ad-post-headline{font-size:13px;font-weight:700;color:var(--tx-high);margin-bottom:2px}
+.ad-post-sub{font-size:11px;color:var(--tx-muted)}
+.ad-post-cta{background:var(--acc);color:#fff;border:none;padding:7px 16px;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'DM Sans',sans-serif}
+
+/* ══ HAMBURGER MENU ══ */
+.hamburger-menu{position:fixed;inset:0;z-index: 9999 !important;background:rgba(6,5,14,.75);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:flex-end}
+.hamburger-menu.open{display: flex !important;}
+.hamburger-sheet{background:var(--l2) !important;border:1px solid var(--bd);border-radius:16px;margin:calc(var(--safe-t) + 60px) 14px 0 0;min-width:200px;padding:6px;box-shadow:0 8px 40px rgba(0,0,0,.95);animation:popIn .2s cubic-bezier(.34,1.56,.64,1)}
+.hm-label{font-size:9px;font-weight:800;color:var(--tx-faint);text-transform:uppercase;letter-spacing:.1em;padding:8px 12px 4px}
+.hm-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx-body);cursor:pointer;transition:.12s}
+.hm-item:hover{background:rgba(255,255,255,.04);color:var(--tx-high)}
+.hm-item.active{color:var(--acc3);background:rgba(124,58,237,.1)}
+.hm-item i{font-size:13px;width:16px;text-align:center;color:inherit}
+.hm-divider{height:1px;background:var(--bd2);margin:3px 8px}
+
+/* ══ MENU OVERLAY ══ */
+.menu-overlay{position:fixed;inset:0;z-index:998;display:none}
+.menu-overlay.on{display:block}
+
+/* ══ LOAD MORE ══ */
+.load-more-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:transparent;border-top:1px solid var(--post-sep);font-size:12px;font-weight:700;color:var(--tx-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;border:none}
+.load-more-btn:active{color:var(--acc2)}
+
+/* ══ FAB ══ */
+.fab{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);right:16px;z-index:150;width:50px;height:50px;border-radius:50%;background:var(--acc);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;cursor:pointer;box-shadow:0 4px 22px var(--glow);transition:.18s}
+.fab:active{transform:scale(.92)}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(13,11,26,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc3)}
+
+/* ══ STATUS VIEWER ══ */
+.status-ov{position:fixed;inset:0;z-index:600;background:#000;display:none;flex-direction:column}
+.status-ov.open{display:flex}
+.status-top-bar{position:absolute;top:0;left:0;right:0;z-index:20;padding:calc(var(--safe-t) + 10px) 14px 8px;background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent)}
+.status-prog-bars{display:flex;gap:4px;margin-bottom:10px}
+.spb{flex:1;height:2.5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.spb-fill{height:100%;background:#fff;border-radius:3px;width:0%}
+.status-writer-info{display:flex;align-items:center;gap:10px}
+.status-w-av{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--blue)}
+.status-w-name{font-size:13px;font-weight:700;color:#fff;flex:1}
+.status-w-time{font-size:10px;color:rgba(255,255,255,.4)}
+.status-close-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.status-content{flex:1;position:relative;overflow:hidden}
+.status-slide{position:absolute;inset:0;background-size:cover;background-position:center}
+.status-slide-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,transparent 100%)}
+.status-slide-text{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:90px 24px 140px;text-align:center;pointer-events:none}
+.status-slide-quote{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.42;color:#e8e8e8}
+.status-slide-caption{font-size:12px;color:rgba(255,255,255,.55);margin-top:10px}
+.status-nav-left{position:absolute;left:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.status-nav-right{position:absolute;right:0;top:0;bottom:0;width:35%;cursor:pointer;z-index:10}
+.status-bottom{position:absolute;bottom:0;left:0;right:0;padding:12px 16px calc(var(--safe-b) + 16px);background:linear-gradient(to top,rgba(0,0,0,.85),transparent);display:flex;align-items:center;gap:10px;z-index:15}
+.status-reply-inp{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:9px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.status-react-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty-state{text-align:center;padding:40px 24px;color:var(--tx-muted)}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block;color:var(--tx-faint)}
+.empty-state h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--tx-body);margin-bottom:6px}
+.empty-state p{font-size:12px;line-height:1.55;max-width:220px;margin:0 auto}
+
+#feedArea{border-top:1px solid var(--post-sep)}
+</style>
+</head>
+<body>
+
+<div class="menu-overlay" id="menuOverlay" onclick="closeAllMenus()"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo" onclick="location.href='index.html'">D</div>
+  <div class="search-bar" onclick="location.href='search.html'">
+    <i class="fas fa-magnifying-glass"></i>
+    <input placeholder="Search stories, writers, debates…" readonly/>
+  </div>
+  <div class="top-icon" onclick="toast('🔔 7 new notifications')">
+    <i class="fas fa-bell"></i>
+    <div class="notif-dot"></div>
+  </div>
+<div class="top-icon" id="hamburgerBtn" onclick="toggleHamburger(event)">
+     <i class="fas fa-bars"></i>
+  </div>
+</div>
+
+<!-- HAMBURGER TIME FILTER MENU -->
+<div class="hamburger-menu" id="hamburgerMenu" onclick="if(event.target===this)closeHamburger()">
+  <div class="hamburger-sheet">
+    <div class="hm-label">Time Filter</div>
+    <div class="hm-item active" id="tf-all" onclick="setTimeFilter('all',this)"><i class="fas fa-infinity"></i> All Time</div>
+    <div class="hm-item" id="tf-today" onclick="setTimeFilter('today',this)"><i class="fas fa-sun"></i> Today</div>
+    <div class="hm-item" id="tf-week" onclick="setTimeFilter('week',this)"><i class="fas fa-calendar-week"></i> This Week</div>
+    <div class="hm-item" id="tf-month" onclick="setTimeFilter('month',this)"><i class="fas fa-calendar-alt"></i> This Month</div>
+    <div class="hm-divider"></div>
+    <div class="hm-item" onclick="setTimeFilter('all',document.getElementById('tf-all'));closeHamburger()"><i class="fas fa-times"></i> Clear Filter</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active" data-tab="all" onclick="switchTab(this,'all')"><i class="fas fa-house" style="font-size:11px"></i> For You</div>
+  <div class="tab" data-tab="following" onclick="switchTab(this,'following')"><i class="fas fa-user-group" style="font-size:11px"></i> Following</div>
+  <div class="tab" data-tab="stories" onclick="switchTab(this,'stories')"><i class="fas fa-book-open" style="font-size:11px"></i> Stories <span class="tab-ct">48</span></div>
+  <div class="tab" data-tab="debates" onclick="switchTab(this,'debates')"><i class="fas fa-scale-balanced" style="font-size:11px"></i> Debates <span class="tab-ct">12</span></div>
+  <div class="tab" data-tab="forum" onclick="switchTab(this,'forum')"><i class="fas fa-comments" style="font-size:11px"></i> Forum</div>
+  <div class="tab" data-tab="career" onclick="switchTab(this,'career')"><i class="fas fa-briefcase" style="font-size:11px"></i> Career</div>
+  <div class="tab" data-tab="live" onclick="switchTab(this,'live')"><i class="fas fa-circle" style="font-size:8px;color:var(--acc)"></i> Live</div>
+</div>
+
+<!-- STATUS RINGS -->
+<div class="statuses-row" id="statusesRow"></div>
+
+<!-- FEATURED SLIDER -->
+<div class="featured-slider-wrap" id="featuredSlider">
+  <div class="fs-track" id="fsTrack"></div>
+</div>
+<div class="fs-dots" id="fsDots"></div>
+
+<!-- LIVE BANNER -->
+<div class="live-banner" id="liveBanner">
+  <div class="live-dot-big"></div>
+  <div class="live-banner-info">
+    <div class="live-banner-label"><i class="fas fa-signal" style="font-size:8px;margin-right:3px"></i> Live Now</div>
+    <div class="live-banner-title">Ada_Writes · Ask Me Anything 🎙</div>
+    <div class="live-banner-meta">847 watching · Writing dark chapters · Series S3</div>
+  </div>
+  <button class="live-banner-btn" onclick="toast('🎙 Joining live AMA…')"><i class="fas fa-arrow-right" style="font-size:10px"></i> Join</button>
+</div>
+
+<!-- FEED (people-to-follow injected at card 8) -->
+<div id="feedArea"></div>
+
+<!-- LOAD MORE -->
+<button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">
+  <i class="fas fa-chevron-down"></i> Load more posts
+</button>
+
+<!-- BOTTOM NAV — active on Feed -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item active" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="toast('✏️ What would you like to post?')">
+  <i class="fas fa-pen"></i>
+</button>
+
+<!-- STATUS VIEWER -->
+<div class="status-ov" id="statusOv">
+  <div class="status-top-bar">
+    <div class="status-prog-bars" id="statusProgBars"></div>
+    <div class="status-writer-info">
+      <img class="status-w-av" id="statusWAv" src="" alt=""/>
+      <div style="flex:1">
+        <div class="status-w-name" id="statusWName"></div>
+        <div class="status-w-time" id="statusWTime"></div>
+      </div>
+      <button class="status-close-btn" onclick="closeStatus()"><i class="fas fa-xmark"></i></button>
+    </div>
+  </div>
+  <div class="status-content" id="statusContent"></div>
+  <div style="position:absolute;bottom:70px;left:0;right:0;z-index:15;display:flex;align-items:center;justify-content:center;padding:8px 16px">
+    <div style="display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.65);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:8px 16px;cursor:pointer" onclick="toast('💬 Opening threads…')">
+      <div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#fff"><i class="fas fa-heart" style="font-size:13px;color:var(--acc)"></i><span id="stLikeCount">3.2k</span></div>
+      <div style="width:1px;height:14px;background:rgba(255,255,255,.2)"></div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#fff"><i class="fas fa-comments" style="font-size:13px;color:var(--blue)"></i><span id="stThreadCount">614 threads</span></div>
+    </div>
+  </div>
+  <div class="status-bottom">
+    <input class="status-reply-inp" placeholder="Reply to status…"/>
+    <button class="status-react-btn" onclick="toast('❤️')"><i class="fas fa-heart"></i></button>
+    <button class="status-react-btn" onclick="toast('🔥')"><i class="fas fa-fire"></i></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="component/share-modal.js"></script>
+<script>
+
+
+
+/* ═══ UTILS ═══ */
+function toast(m,dur=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur)}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+function fmtTx(t){return(t||'').replace(/(@[\w_]+)/g,'<span class="pc-mention">$1</span>')}
+
+/* ═══ REACTIONS ═══ */
+const REACTIONS=[
+  {id:'love',fa:'fa-heart',col:'#ff4d7a',label:'Love'},
+  {id:'fire',fa:'fa-fire',col:'#fb923c',label:'Fire'},
+  {id:'cry',fa:'fa-face-sad-cry',col:'#38bdf8',label:'Crying'},
+  {id:'shock',fa:'fa-face-surprise',col:'#fbbf24',label:'Shocked'},
+  {id:'angry',fa:'fa-face-angry',col:'#f87171',label:'Angry'},
+  {id:'clap',fa:'fa-hands-clapping',col:'#a78bfa',label:'Clap'},
+];
+const postRx={};
+function getRx(pid){
+  if(!postRx[pid]){const init={userRx:null};REACTIONS.forEach(r=>{init[r.id]=Math.floor(Math.random()*500)+10;});postRx[pid]=init;}
+  return postRx[pid];
+}
+
+/* ═══ STATUS DATA ═══ */
+const WRITER_STATUSES=[
+  {id:'you',name:'Your Story',avatar:null,isYou:true,ring:'ring-none',statuses:[]},
+  {id:'w1',name:'Ada_Writes',avatar:'https://i.pravatar.cc/100?img=32',isLive:true,ring:'ring-live',likes:3241,threads:614,statusUpdate:'Just finished Chapter 5 draft 🖊️ Posting at midnight!',statuses:[{bg:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',quote:'"Sometimes love is just grief wearing a familiar face."',caption:'Working on Chapter 5 🖊️',time:'2h ago'}]},
+  {id:'w5',name:'Ifeanyi',avatar:'https://i.pravatar.cc/100?img=53',ring:'ring-has',likes:1200,threads:287,statuses:[{bg:'https://i.postimg.cc/WF1j4Pnh/6.jpg',quote:'"I walked out in socked feet and found my actual life."',caption:'Bare Kitchen is real btw 🥐',time:'30m ago'}]},
+  {id:'w2',name:'Chioma_R',avatar:'https://i.pravatar.cc/100?img=47',ring:'ring-has',likes:890,threads:142,statusUpdate:'Reading @Ada_Writes at 2am again. Send help 😭',statuses:[{bg:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',quote:'"Not every love story ends with a wedding."',caption:'My reaction to chapter 4 🥺',time:'4h ago'}]},
+  {id:'w3',name:'Chiamaka',avatar:'https://i.pravatar.cc/100?img=43',ring:'ring-has',likes:540,threads:98,statuses:[{bg:'https://i.postimg.cc/N9jY0w4m/5.jpg',quote:'"Family stories are the only stories."',caption:'Writing S3 Ch8 tonight 🌙',time:'1h ago'}]},
+  {id:'w4',name:'Kemi_A',avatar:'https://i.pravatar.cc/100?img=28',ring:'ring-viewed',likes:320,threads:67,statuses:[{bg:'https://i.postimg.cc/DJwFzKgd/4.jpg',quote:'"He deleted the anniversary photos."',caption:'Chapter 3 is live! 📖',time:'6h ago'}]},
+  {id:'w6',name:'Efe_O',avatar:'https://i.pravatar.cc/100?img=22',ring:'ring-has',likes:2100,threads:410,statusUpdate:'The sequel to "The Letter" is 40% written. You will cry.',statuses:[{bg:'https://i.postimg.cc/N9jY0w4m/5.jpg',quote:'"He carried the letter so it would reach me someday."',caption:'The Letter sequel is coming 💔',time:'3h ago'}]},
+  {id:'w7',name:'Zara_M',avatar:'https://i.pravatar.cc/100?img=16',ring:'ring-viewed',likes:780,threads:155,statuses:[{bg:'https://i.postimg.cc/ftRZbhKx/3.jpg',quote:'"Revenge isn\'t punishment. It\'s reclaiming."',caption:'Final chapter next week 🔥',time:'8h ago'}]},
+];
+
+/* ═══ PEOPLE TO FOLLOW ═══ */
+const PEOPLE_TO_FOLLOW=[
+  {name:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',verified:true,rank:'#1 This Week',following:false},
+  {name:'Ifeanyi',av:'https://i.pravatar.cc/100?img=53',verified:true,rank:'#2 This Week',following:false},
+  {name:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=43',verified:false,rank:'Rising',following:false},
+  {name:'Efe_O',av:'https://i.pravatar.cc/100?img=22',verified:true,rank:'Top Elegy',following:false},
+  {name:'Zara_M',av:'https://i.pravatar.cc/100?img=16',verified:false,rank:'🔥 Hot',following:false},
+  {name:'CampusQ',av:'https://i.pravatar.cc/100?img=12',verified:false,rank:'Campus',following:false},
+  {name:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',verified:false,rank:'New',following:false},
+];
+
+function buildPeopleToFollowHTML(){
+  const chips=PEOPLE_TO_FOLLOW.map((p,i)=>`
+    <div class="person-item">
+      <div class="person-av-wrap"><img class="person-av" src="${p.av}" loading="lazy" onclick="location.href='profile.html'"/>
+      ${p.verified?`<div class="person-verified"><i class="fas fa-check"></i></div>`:''}</div>
+      <div class="person-name">${p.name}</div>
+      <div class="person-follow-btn${p.following?' ing':''}" id="pfbtn-${i}" onclick="togglePersonFollow(${i})">${p.following?'Following':'+ Follow'}</div>
+    </div>`).join('');
+  return `<div class="people-row-wrap" id="peopleToFollowSection">
+    <div class="people-row-title"><i class="fas fa-user-plus" style="color:var(--acc);font-size:10px"></i> People to Follow</div>
+    <div class="people-row">${chips}</div>
+  </div>`;
+}
+
+function togglePersonFollow(i){
+  PEOPLE_TO_FOLLOW[i].following=!PEOPLE_TO_FOLLOW[i].following;
+  document.querySelectorAll(`[id^="pfbtn-${i}"]`).forEach(btn=>{
+    btn.textContent=PEOPLE_TO_FOLLOW[i].following?'Following':'+ Follow';
+    btn.classList.toggle('ing',PEOPLE_TO_FOLLOW[i].following);
+  });
+  toast(PEOPLE_TO_FOLLOW[i].following?`✅ Following @${PEOPLE_TO_FOLLOW[i].name}`:`Unfollowed @${PEOPLE_TO_FOLLOW[i].name}`);
+}
+
+/* ═══ FEATURED ═══ */
+const TOP3=[
+  {bg:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',rank:'#1 This Week',cat:'💔 Betrayal',title:'"I came home early and caught my husband kissing my late sister\'s photograph"',av:'https://i.pravatar.cc/100?img=32',author:'@Ada_Writes · S2 Ch4',reads:'171k',likes:'24.3k'},
+  {bg:'https://i.postimg.cc/WF1j4Pnh/6.jpg',rank:'#2 This Week',cat:'✨ Twist',title:'"I left the altar in my socked feet — and found my real life"',av:'https://i.pravatar.cc/100?img=53',author:'@Ifeanyi_Story · Complete',reads:'312k',likes:'45k'},
+  {bg:'https://i.postimg.cc/N9jY0w4m/5.jpg',rank:'#3 This Week',cat:'🌙 Elegy',title:'"The letter folded in his jacket pocket — he died before he could send it"',av:'https://i.pravatar.cc/100?img=22',author:'@Efe_O · Complete',reads:'218k',likes:'36.5k'},
+];
+
+/* ═══ FEED DATA ═══ */
+let FEED=[
+  {id:'p1',type:'chapter-drop',tab:['all','stories','following'],timeHours:1,pinned:true,name:'Ada_Writes',wid:'w1',avatar:'https://i.pravatar.cc/100?img=32',verified:true,badge:'writer',rank:'#1 This Week',rankClass:'rank-1',time:'1h ago',showStatusUpdate:true,title:'Season 2 · Chapter 5 just dropped 🌙',text:"This chapter almost broke me to write. No spoilers — but Ada says something she cannot unsay. Read it with the lights off.",chapterRef:{cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",ch:'S2 · Chapter 5',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg'},likes:1840,liked:false,comments:312,saved:false,mine:false},
+
+  {id:'p2',type:'quote',tab:['all','stories','following'],timeHours:2,pinned:false,name:'Ada_Writes',wid:'w1',avatar:'https://i.pravatar.cc/100?img=32',verified:true,badge:'writer',rank:'#1 This Week',rankClass:'rank-1',time:'2h ago',showStatusUpdate:true,quote:'"She didn\'t ask for an explanation. She just picked up her bag, pressed her lips together so her voice wouldn\'t shake, and walked out like she had planned it for years. She hadn\'t. But some exits become perfect the moment you commit to them."',caption:'— Chapter 3, Season 2',likes:3240,liked:true,comments:478,saved:false,mine:false},
+
+  {id:'p3',type:'debate',tab:['all','debates'],timeHours:3,pinned:false,name:'Droboard Debate',wid:null,avatar:null,avatarBg:'#ff4400',verified:false,badge:null,rank:null,time:'3h ago',title:'Reader Debate: Stay or Leave?',debateData:{motion:'"Ada should stay and fight for her marriage, not leave."',forV:2341,agV:3819,userVote:null},likes:892,liked:false,comments:1240,saved:false,mine:false},
+
+  {id:'p4',type:'confession',tab:['all','forum'],timeHours:4,pinned:false,name:'Anonymous',wid:null,avatar:null,avatarBg:'#7c3aed',verified:false,badge:'anon',rank:null,time:'4h ago',title:'I read stories here instead of going to therapy and it might actually be working',text:"Reading The Grandmother's Will helped me process losing my own grandmother more than 6 months of journaling. There's something about seeing your grief reflected in a story written by a stranger that cracks something open. It's strange and beautiful and I don't know how to explain it to anyone who doesn't read here.",storyRef:{cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',writer:'Chiamaka_N'},likes:891,liked:false,comments:134,saved:false,mine:false},
+
+  {id:'p5',type:'ama',tab:['all','live'],timeHours:5,pinned:false,name:'Ada_Writes',wid:'w1',avatar:'https://i.pravatar.cc/100?img=32',verified:true,badge:'writer',rank:'#1 This Week',rankClass:'rank-1',time:'5h ago',amaData:{isLive:true,viewers:847,title:'Ask Me Anything — Live now 🎙',meta:'Writing dark chapters · Series S3 · Life as a Lagos writer'},likes:421,liked:false,comments:89,saved:false,mine:true},
+
+  {id:'p6',type:'writer-post',tab:['all','following'],timeHours:5,pinned:false,name:'Chiamaka_N',wid:'w3',avatar:'https://i.pravatar.cc/100?img=43',verified:false,badge:'writer',rank:'Top Family',rankClass:'rank-top',time:'5h ago',text:"To every writer scared to post their first chapter: post it anyway.\n\nMy first chapter of Grandmother's Will got 12 reads in week one. I almost deleted it. Chapter 3 went viral.\n\nThe only chapter that gets zero reads is the one you never post. Your story is waiting for someone who needs it exactly.",likes:2341,liked:false,comments:267,saved:false,mine:false},
+
+  {id:'p7',type:'forum-poll',tab:['all','forum'],timeHours:6,pinned:false,name:'Emeka_T',wid:null,avatar:'https://i.pravatar.cc/100?img=15',verified:false,badge:null,rank:null,time:'6h ago',title:'Should writers take breaks mid-series?',text:"I'm 8 chapters in and I feel burnt out. My readers are invested. Do I push through or take a break?",poll:{q:'What should a writer do when burnt out mid-series?',opts:[{t:'Take a break and announce it',v:412},{t:'Push through — readers are waiting',v:89},{t:'Outline everything first, then continue',v:231},{t:'Write ahead privately, release on schedule',v:167}],voted:-1,total:899},likes:189,liked:false,comments:45,saved:false,mine:false},
+
+  {id:'p8',type:'career-post',tab:['all','career'],timeHours:7,pinned:false,name:'Tolu_Career',wid:null,avatar:'https://i.pravatar.cc/100?img=44',verified:false,badge:null,rank:'New',rankClass:'rank-new',time:'7h ago',title:"My boss promoted the intern I trained over me. Here's what I did next.",text:"Three years building that department from scratch. He came in six months ago. I trained him. I answered his questions at midnight. I gave him my contacts.\n\nThen they announced his promotion in the all-hands meeting. My name wasn't mentioned once.\n\nI didn't cry. I didn't quit. I documented every project I led, every target I hit, every skill I transferred. Sent it to HR with a formal review request.\n\nTwo weeks later: a counter-offer from a competitor. 60% more. Better title. Remote work.\n\nI resigned on a Tuesday. My boss called twice.",likes:2890,liked:false,comments:445,saved:false,mine:false},
+
+  {id:'p8b',type:'career-post',tab:['career'],timeHours:8,pinned:false,name:'Adaeze_Pro',wid:null,avatar:'https://i.pravatar.cc/100?img=19',verified:true,badge:null,rank:'Career',rankClass:'rank-top',time:'8h ago',title:"5 things nobody tells you about getting promoted in Nigeria's tech sector",text:"1. Your work must be visible, not just good. The best engineers are often invisible. The promoted ones are vocal.\n\n2. Relationships with decision makers matter more than your manager's opinion.\n\n3. You need a sponsor, not a mentor. Mentors give advice. Sponsors fight for your name in rooms you're not in.\n\n4. Asking for a promotion too early signals desperation. Ask when you're already doing the job above your grade.\n\n5. If they say 'we'll see' for more than 90 days — start interviewing.",likes:3102,liked:false,comments:521,saved:false,mine:false},
+
+  {id:'p8c',type:'debate',tab:['career','debates'],timeHours:9,pinned:false,name:'Droboard Debate',wid:null,avatar:null,avatarBg:'#0284c7',verified:false,badge:null,rank:null,time:'9h ago',title:'Career vs Passion: The Nigerian Reality',debateData:{motion:'"Chasing passion is a luxury. In Nigeria, stability must come first."',forV:4100,agV:2800,userVote:null},likes:1240,liked:false,comments:892,saved:false,mine:false},
+
+  {id:'p8d',type:'career-post',tab:['career','following'],timeHours:12,pinned:false,name:'Kemi_Builds',wid:null,avatar:'https://i.pravatar.cc/100?img=38',verified:false,badge:null,rank:null,time:'12h ago',title:"I negotiated my first salary in Lagos and got ₦800k more than the initial offer",text:"They said 'our budget is ₦2.2M'. I said 'based on the role scope and my experience, I was expecting between ₦3M and ₦3.2M.'\n\nSilence.\n\nThen: 'Let us see what we can do.'\n\nThey came back at ₦3M. I took it.\n\nThe lesson: most companies have a flex budget. They just don't offer it first. If you don't ask, you don't get it. Research the market, anchor high, stay calm.",likes:4200,liked:false,comments:678,saved:false,mine:false},
+
+  {id:'p9',type:'repost',tab:['all','stories'],timeHours:7,pinned:false,name:'Chioma_R',wid:'w2',avatar:'https://i.pravatar.cc/100?img=47',verified:false,badge:null,rank:null,time:'7h ago',showStatusUpdate:true,note:'"Read this twice. The second time I cried harder. This is why Droboard exists."',storyRef:{cat:'✨ Twist',title:"The runaway bride — I left at the altar in my socked feet",cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',writer:'Ifeanyi_Story'},likes:524,liked:false,comments:72,saved:false,mine:false},
+
+  {id:'p10',type:'photo-post',tab:['all','following'],timeHours:8,pinned:false,name:'Ada_Writes',wid:'w1',avatar:'https://i.pravatar.cc/100?img=32',verified:true,badge:'writer',rank:'#1 This Week',rankClass:'rank-1',time:'8h ago',text:"Writing at 2am has a different energy. The city is quiet. The grief is louder. That's where the best chapters come from. 🌙",image:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',likes:612,liked:false,comments:89,saved:false,mine:false},
+
+  {id:'p11',type:'forum-post',tab:['all','forum','debates'],timeHours:9,pinned:false,name:'Kemi_A',wid:'w4',avatar:'https://i.pravatar.cc/100?img=28',verified:false,badge:null,rank:null,time:'9h ago',title:'HOT TAKE: Most "twist" stories here are predictable by chapter 3',text:"Change my mind. The formula is: nice girl, powerful love interest, one secret we all figure out by chapter 2, dramatic confrontation, reconciliation. The Runaway Bride is an exception. Where are the twists we actually don't see coming?",likes:673,liked:false,comments:198,saved:false,mine:false},
+
+  {id:'p12',type:'motivation',tab:['all','stories'],timeHours:10,pinned:false,name:'Ifeanyi_Story',wid:'w5',avatar:'https://i.pravatar.cc/100?img=53',verified:true,badge:'writer',rank:'#2 This Week',rankClass:'rank-2',time:'10h ago',quote:'"The reason I write betrayal stories is because betrayal is just love that didn\'t know how to leave quietly. Every reader who cries at my chapter is really crying about something real in their life. That\'s the whole point."',caption:'— Ifeanyi Story',likes:1890,liked:false,comments:256,saved:false,mine:false},
+
+  {id:'p13',type:'chapter-drop',tab:['all','stories','following'],timeHours:11,pinned:false,name:'Chiamaka_N',wid:'w3',avatar:'https://i.pravatar.cc/100?img=43',verified:false,badge:'writer',rank:'Top Family',rankClass:'rank-top',time:'11h ago',title:'Season 3 · Chapter 8 is live ✨',text:"The will scene you've all been waiting for. Adanna finally opens the second envelope.",chapterRef:{cat:'👑 Family',title:"My grandmother's will revealed I wasn't her blood",ch:'S3 · Chapter 8',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg'},likes:940,liked:false,comments:187,saved:false,mine:false},
+
+  {id:'p14',type:'forum-review',tab:['all','forum'],timeHours:12,pinned:false,name:'Zara_M',wid:'w7',avatar:'https://i.pravatar.cc/100?img=16',verified:false,badge:'writer',rank:null,time:'12h ago',title:'If you loved "The Letter He Never Sent" — read these next',text:"Efe_O's elegy style is rare. If it broke you (it will), here are 3 stories with the same slow heartbreak energy:\n\n1. The Runaway Bride — different genre but same emotional precision\n2. My Grandmother's Will — grief written with dignity\n3. The Richest Boy — quieter pain, slower burn\n\nAll three will ruin your productivity for a day.",storyRef:{cat:'🌙 Elegy',title:"The letter folded in his jacket pocket — he died before he could send it",cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',writer:'Efe_O'},likes:524,liked:false,comments:63,saved:false,mine:false},
+
+  {id:'p15',type:'confession',tab:['all','forum'],timeHours:15,pinned:false,name:'Anonymous',wid:null,avatar:null,avatarBg:'#0f766e',verified:false,badge:'anon',rank:null,time:'15h ago',title:"My husband reads my stories and thinks they're not about him. They are.",text:"I've written three chapters about a couple going through what we went through last year. He actually praised the writing and said 'how do you come up with this stuff?'. I said nothing. He read the chapter where she leaves and said 'whoever this woman is, she's too harsh.' I nearly choked.",likes:1102,liked:false,comments:312,saved:false,mine:true},
+
+  {id:'p16',type:'debate',tab:['all','debates'],timeHours:17,pinned:false,name:'Droboard Debate',wid:null,avatar:null,avatarBg:'#0284c7',verified:false,badge:null,rank:null,time:'17h ago',title:'Career vs Love: Which sacrifice is worth it?',debateData:{motion:'"No career opportunity is worth sacrificing a healthy relationship."',forV:4100,agV:5800,userVote:null},likes:1240,liked:false,comments:892,saved:false,mine:false},
+
+  {id:'p17',type:'forum-post',tab:['all','forum'],timeHours:18,pinned:false,name:'CampusQueen',wid:null,avatar:'https://i.pravatar.cc/100?img=12',verified:false,badge:null,rank:null,time:'18h ago',title:'The Richest Boy keeps asking to sit next to me in Stats. Should I let him?',text:"We're in the same Stats class. He's never spoken to a girl voluntarily in public. His friends dared him to speak to me last semester. I ignored him.\n\nNow he comes early just to get the seat beside mine. He's never asked. He just sits.\n\nYesterday he slid over his notes without a word. They were perfect.\n\nShould I be concerned or… what do I do?",likes:3412,liked:false,comments:678,saved:false,mine:false},
+];
+
+const AD_POOL=[
+  {logo:'https://i.pravatar.cc/100?img=23',brand:'PiggyVest',headline:'Save money. Build your future.',sub:'Join 4M+ Nigerians saving smarter.',cta:'Start'},
+  {logo:'https://i.pravatar.cc/100?img=10',brand:'Flutterwave',headline:'Send money across Africa instantly',sub:'Zero hidden fees. Trusted by 1M+.',cta:'Go'},
+  {logo:'https://i.pravatar.cc/100?img=35',brand:'Cowrywise',headline:'Invest in mutual funds from ₦100',sub:'Smart investing for every income.',cta:'Invest'},
+];
+let adIdx=0;
+
+const MORE_FEED=[
+  {id:'pm1',type:'career-post',tab:['career','all'],timeHours:20,pinned:false,name:'Tolu_Career',wid:null,avatar:'https://i.pravatar.cc/100?img=44',verified:false,badge:null,rank:null,time:'20h ago',title:"Six months after the promotion story",text:"Six months update: I started my own consultancy. The company that passed me over just hired me as a freelancer at 3× my old salary.\n\nSometimes the door closing IS the door opening. I'm grateful they promoted him. It forced the best decision of my career.",likes:4102,liked:false,comments:521,saved:false,mine:false},
+  {id:'pm2',type:'forum-post',tab:['forum','all'],timeHours:21,pinned:false,name:'Lagos_Lit',wid:null,avatar:'https://i.pravatar.cc/100?img=44',verified:false,badge:null,rank:null,time:'21h ago',title:"Why Droboard is the best thing to happen to Nigerian storytelling",text:"There's no Western gatekeeping here. No agent required. No publishing deal needed. Just a writer, a story, and readers who understand the language of your life. That's powerful.",likes:1102,liked:false,comments:312,saved:false,mine:false},
+  {id:'pm3',type:'chapter-drop',tab:['stories','all'],timeHours:22,pinned:false,name:'Kemi_A',wid:'w4',avatar:'https://i.pravatar.cc/100?img=28',verified:false,badge:'writer',rank:null,time:'22h ago',title:'He Deleted Our Photos · Chapter 3',text:"She checks every backup. Every cloud folder. Looks at her own face in old screenshots trying to remember how happy they were.",chapterRef:{cat:'💔 Romance',title:"He deleted our anniversary photos without telling me",ch:'Ch · 3',cover:'https://i.postimg.cc/0MyxNqfz/7.jpg'},likes:780,liked:false,comments:145,saved:false,mine:false},
+];
+
+/* ═══ STATE ═══ */
+let currentTab='all';
+let currentTimeFilter='all';
+let feedLoaded=false;
+let openMenuId=null;
+const PEOPLE_INJECT_AT=7; // inject after card index 7 (0-based = after 8 cards)
+
+const TIME_LIMITS={today:24,week:168,month:720};
+function passesTimeFilter(p){if(currentTimeFilter==='all')return true;return p.timeHours<=(TIME_LIMITS[currentTimeFilter]||999);}
+
+function setTimeFilter(val,el){
+  currentTimeFilter=val;
+  document.querySelectorAll('.hm-item').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderFeed(filteredFeed());
+  closeHamburger();
+  const labels={all:'All Time',today:'Today',week:'This Week',month:'This Month'};
+  toast('📅 Showing: '+labels[val]);
+}
+
+function toggleHamburger(e){
+  if(e) e.stopPropagation();
+  const menu=document.getElementById('hamburgerMenu');
+  menu.classList.toggle('open');
+}
+function closeHamburger(){document.getElementById('hamburgerMenu').classList.remove('open');}
+
+function filteredFeed(){
+  let posts=FEED.filter(p=>passesTimeFilter(p));
+  if(currentTab==='all') return posts;
+  if(currentTab==='live') return posts.filter(p=>p.type==='ama'&&p.amaData?.isLive);
+  if(currentTab==='forum') return posts.filter(p=>['forum-post','forum-poll','forum-review','confession','writer-post'].includes(p.type)&&p.type!=='ama'&&p.type!=='debate');
+  if(currentTab==='debates') return posts.filter(p=>p.type==='debate');
+  if(currentTab==='stories') return posts.filter(p=>['chapter-drop','quote','motivation','repost','photo-post'].includes(p.type));
+  if(currentTab==='career') return posts.filter(p=>['career-post'].includes(p.type)||p.tab?.includes('career'));
+  if(currentTab==='following') return posts.filter(p=>p.tab?.includes('following'));
+  return posts;
+}
+
+function switchTab(el,tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  el.scrollIntoView({inline:'center',behavior:'smooth'});
+  currentTab=tab;
+  document.getElementById('liveBanner').classList.toggle('show',tab==='live');
+  document.getElementById('featuredSlider').style.display=tab==='all'?'block':'none';
+  document.getElementById('fsDots').style.display=tab==='all'?'flex':'none';
+  renderFeed(filteredFeed());
+}
+
+/* ═══ FEATURED SLIDER ═══ */
+let fsIdx=0,fsTimer=null;
+function initFeaturedSlider(){
+  const track=document.getElementById('fsTrack');
+  const dots=document.getElementById('fsDots');
+  track.innerHTML=TOP3.map(s=>`<div class="fs-slide" onclick="toast('📖 Opening story…')"><div class="fb-img" style="background-image:url('${s.bg}')"></div><div class="fb-scrim"></div><div class="fb-content"><div class="fb-tags"><span class="fb-tag fb-tag-hot"><i class="fas fa-trophy" style="font-size:7px;margin-right:3px"></i>${s.rank}</span><span class="fb-tag fb-tag-cat">${s.cat}</span></div><div class="fb-title">${s.title}</div><div class="fb-meta"><img class="fb-av" src="${s.av}"/><span class="fb-author">${s.author}</span><div class="fb-stats"><span class="fb-stat"><i class="fas fa-eye" style="font-size:9px"></i>${s.reads}</span><span class="fb-stat"><i class="fas fa-heart" style="font-size:9px"></i>${s.likes}</span></div><button class="fb-read-btn" onclick="event.stopPropagation();toast('📖 Reading now')">Read Now</button></div></div></div>`).join('');
+  dots.innerHTML=TOP3.map((_,i)=>`<div class="fs-dot${i===0?' on':''}" onclick="goSlide(${i})"></div>`).join('');
+  let sx=0;
+  const wrap=document.getElementById('featuredSlider');
+  wrap.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;clearTimeout(fsTimer);},{passive:true});
+  wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)goSlide(dx<0?(fsIdx+1)%3:(fsIdx-1+3)%3);else startSlider();},{passive:true});
+  startSlider();
+}
+function goSlide(i){fsIdx=i;document.getElementById('fsTrack').style.transform=`translateX(-${i*100}%)`;document.querySelectorAll('.fs-dot').forEach((d,j)=>d.classList.toggle('on',j===i));clearTimeout(fsTimer);startSlider();}
+function startSlider(){fsTimer=setTimeout(()=>goSlide((fsIdx+1)%3),4500);}
+
+/* ═══ STATUS RENDERING ═══ */
+function renderStatuses(){
+  document.getElementById('statusesRow').innerHTML=WRITER_STATUSES.map(ws=>{
+    if(ws.isYou){
+      return`<div class="status-item" onclick="toast('✏️ Add to your story')"><div class="status-ring ring-none" style="position:relative"><div class="status-ring-inner"><div class="status-ring-initial">Y</div></div><div style="position:absolute;bottom:1px;right:1px;width:16px;height:16px;border-radius:50%;background:var(--acc);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900">+</div></div><div class="status-name">Your Story</div></div>`;
+    }
+    const liveEl=ws.isLive?`<div class="status-live-dot"><i class="fas fa-signal" style="font-size:5px"></i></div>`:'';
+    const avHtml=ws.avatar?`<img src="${ws.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" loading="lazy"/>`:`<div class="status-ring-initial">${ws.name[0]}</div>`;
+    return`<div class="status-item" onclick="openStatus('${ws.id}')"><div class="status-ring ${ws.ring}" style="position:relative"><div class="status-ring-inner">${avHtml}</div>${liveEl}</div><div class="status-name${ws.ring!=='ring-viewed'&&ws.ring!=='ring-none'?' new-s':''}">${ws.name.split('_')[0]}</div></div>`;
+  }).join('');
+}
+
+/* ═══ AVATAR BUILD ═══ */
+function buildAv(p){
+  if(p.wid&&p.avatar){
+    const ws=WRITER_STATUSES.find(w=>w.id===p.wid);
+    const ring=ws?ws.ring:'ring-none';
+    const click=ws&&ws.statuses.length?`openStatus('${p.wid}')`:`location.href='profile.html'`;
+    return`<div class="pc-av-ring ${ring}" onclick="${click}" style="cursor:pointer"><div class="pc-av-inner"><img src="${p.avatar}" loading="lazy"/></div></div>`;
+  }
+  if(p.avatar){return`<div class="pc-av-ring ring-none" onclick="location.href='profile.html'" style="cursor:pointer"><div class="pc-av-inner"><img src="${p.avatar}" loading="lazy"/></div></div>`;}
+  const bg=p.avatarBg||'#555';
+  const init=p.name==='Anonymous'?'?':(p.name[0]||'?');
+  return`<div class="pc-av-ring ring-none"><div class="pc-av-inner"><div class="pc-av-initial" style="background:${bg}">${init}</div></div></div>`;
+}
+
+function buildBadge(b){
+  if(!b)return'';
+  const m={writer:['✍️ Writer','badge-writer'],anon:['Anon','badge-anon']};
+  const[l,c]=m[b]||['',''];
+  return l?`<span class="pc-badge ${c}">${l}</span>`:'';
+}
+
+function buildTypePill(type){
+  const m={
+    'writer-post':['Post','pt-post'],'chapter-drop':['Chapter Drop','pt-chapter'],
+    'debate':['Debate','pt-debate'],'forum-post':['Forum','pt-forum'],
+    'forum-poll':['Poll','pt-forum'],'forum-review':['Review','pt-review'],
+    'confession':['Confession','pt-confession'],'ama':['AMA 🔴','pt-ama'],
+    'repost':['Repost','pt-repost'],'quote':['Quote','pt-story'],
+    'motivation':['Motivation','pt-motivation'],'photo-post':['Photo','pt-post'],
+    'career-post':['Career','pt-career'],
+  };
+  const[l,c]=m[type]||['Post','pt-post'];
+  return`<span class="post-type-pill ${c}">${l}</span>`;
+}
+
+function buildStatusUpdateStrip(p){
+  if(!p.showStatusUpdate)return'';
+  const ws=p.wid?WRITER_STATUSES.find(w=>w.id===p.wid):null;
+  if(!ws||!ws.statusUpdate)return'';
+  return`<div class="status-update-strip" onclick="openStatus('${ws.id}')"><div class="su-dot"></div><div class="su-text">${ws.statusUpdate}</div><div class="su-time">Now</div></div>`;
+}
+
+/* ═══ 3-DOT MENU ═══ */
+function buildDotsMenu(p){
+  const existing=document.getElementById('dm-'+p.id);if(existing)existing.remove();
+  const isMine=p.mine;
+  const div=document.createElement('div');
+  div.className='dots-menu';div.id='dm-'+p.id;
+  div.innerHTML=`${isMine?`<div class="dots-item" onclick="dotsAction('edit','${p.id}')"><i class="fas fa-pen"></i>Edit post</div><div class="dots-item danger" onclick="dotsAction('delete','${p.id}')"><i class="fas fa-trash"></i>Delete post</div>`:`<div class="dots-item" onclick="dotsAction('report','${p.id}')"><i class="fas fa-flag"></i>Report post</div><div class="dots-item" onclick="dotsAction('less','${p.id}')"><i class="fas fa-eye-slash"></i>See less of this</div><div class="dots-section"></div><div class="dots-item" onclick="dotsAction('follow','${p.id}','${p.name}')"><i class="fas fa-user-plus"></i>Follow @${p.name}</div>`}
+  <div class="dots-section"></div>
+  <div class="dots-item" onclick="openShareForPost('${p.id}');closeAllMenus()"><i class="fas fa-share-nodes"></i>Share post</div>
+  <div class="dots-item" onclick="dotsAction('save','${p.id}')"><i class="far fa-bookmark"></i>Save post</div>`;
+  document.body.appendChild(div);
+}
+
+function positionMenu(pid,triggerEl){
+  const menu=document.getElementById('dm-'+pid);if(!menu)return;
+  const rect=triggerEl.getBoundingClientRect();
+  menu.style.top=(rect.bottom+4)+'px';
+  const menuW=200;let left=rect.right-menuW;if(left<8)left=8;
+  menu.style.left=left+'px';
+  menu.style.display='block';
+  menu.classList.add('open');
+  document.getElementById('menuOverlay').classList.add('on');
+  openMenuId=pid;
+}
+
+function closeAllMenus(){
+  if(openMenuId){const m=document.getElementById('dm-'+openMenuId);if(m){m.classList.remove('open');m.style.display='none';}openMenuId=null;}
+  document.getElementById('menuOverlay').classList.remove('on');
+  closeHamburger();
+}
+
+function dotsAction(action,pid,extra){
+  closeAllMenus();
+  if(action==='edit'){toast('✏️ Editing post…');return;}
+  if(action==='delete'){const idx=FEED.findIndex(x=>x.id===pid);if(idx>-1)FEED.splice(idx,1);renderFeed(filteredFeed());toast('🗑️ Post deleted.');return;}
+  if(action==='report'){toast('🚩 Reported.');return;}
+  if(action==='less'){toast('👁️ You\'ll see less of this.');return;}
+  if(action==='follow'){toast(`✅ Following @${extra}!`);return;}
+  if(action==='save'){toast('🔖 Post saved to bookmarks.');return;}
+}
+
+/* ═══ REACTION POPUP ═══ */
+function buildRxPopup(pid){
+  const rx=getRx(pid);
+  return`<div class="rx-popup" id="rx-${pid}">${REACTIONS.map(r=>`<div class="rx-btn${rx.userRx===r.id?' reacted':''}" data-pid="${pid}" data-rid="${r.id}"><i class="fas ${r.fa} rx-em" style="font-size:22px;color:${r.col}"></i><span class="rx-ct">${fmtN(rx[r.id])}</span></div>`).join('')}</div>`;
+}
+function hideAllRx(){document.querySelectorAll('.rx-popup.show').forEach(p=>p.classList.remove('show'));}
+
+function openShareForPost(pid) {
+    const p = allPosts().find(x => x.id === pid);
+    if (!p) return;
+    
+    openShareModal({
+        title: p.title || p.quote || (p.text ? p.text.substring(0, 60) : 'Droboard Post'),
+        sub: `by @${p.name}`,
+        img: p.image || p.chapterRef?.cover || p.storyRef?.cover || '',
+        url: `https://droboard.app/post/${pid}`
+    });
+}
+
+/* ═══ RENDER SINGLE POST ═══ */
+function renderPost(p,i){
+  if(p.type==='ad')return renderAdPost();
+  const delay=`animation-delay:${Math.min(i*.04,.5)}s`;
+  const avHtml=buildAv(p);
+  const typePill=buildTypePill(p.type);
+  const badgeHtml=buildBadge(p.badge);
+  const pinnedHtml=p.pinned?`<div class="pinned-label"><i class="fas fa-thumbtack" style="font-size:9px"></i> Pinned</div>`:'';
+  const verifiedHtml=p.verified?`<div class="verified-badge" title="Verified"><i class="fas fa-check"></i></div>`:'';
+  const rankHtml=p.rank?`<span class="rank-badge ${p.rankClass||'rank-top'}">${p.rank}</span>`:'';
+  const statusUpdateHtml=buildStatusUpdateStrip(p);
+
+  let bodyHtml='';
+
+  if(p.type==='quote'||p.type==='motivation'){
+    bodyHtml=`<div class="pc-body"><div class="pc-quote-block">${p.quote}</div>${p.caption?`<div style="font-size:11px;color:var(--tx-faint);margin-top:2px">${p.caption}</div>`:''}</div>`;
+  }else if(p.type==='chapter-drop'){
+    const cr=p.chapterRef;
+    bodyHtml=`<div class="pc-body">
+      ${p.title?`<div class="pc-title">${p.title}</div>`:''}
+      ${p.text?`<div class="pc-text trunc-3" id="pt-${p.id}" data-full="${encodeURIComponent(p.text)}" data-hasimg="0">${fmtTx(p.text).replace(/\n/g,'<br>')}</div><span class="pc-read-more" data-pid="${p.id}">See more <i class="fas fa-chevron-down" style="font-size:8px"></i></span>`:''}
+      <div class="pc-chapter-drop" onclick="toast('📖 Reading chapter…')">
+        <div class="pc-chapter-top"><span class="pc-chapter-badge"><i class="fas fa-book-open" style="font-size:7px;margin-right:3px"></i>New Chapter</span></div>
+        <div class="pc-chapter-title">${cr.title}</div>
+        <div class="pc-chapter-meta"><span>${cr.cat}</span><span>·</span><span style="font-weight:800">${cr.ch}</span></div>
+        <button class="pc-chapter-read-btn">Read Now <i class="fas fa-arrow-right" style="font-size:9px"></i></button>
+      </div>
+    </div>`;
+  }else if(p.type==='debate'){
+    const d=p.debateData;
+    const tot=d.forV+d.agV;
+    const fp=Math.round(d.forV/tot*100);
+    const ap=100-fp;
+    bodyHtml=`<div class="pc-body">
+      ${p.title?`<div class="pc-title">${p.title}</div>`:''}
+      <div class="pc-debate-block">
+        <div class="pc-debate-motion">${d.motion}</div>
+        <div class="pc-debate-sides">
+          <div class="pc-debate-side for-side${d.userVote==='for'?' voted':''}" onclick="castDebateVote('${p.id}','for')">
+            <div class="pds-label"><i class="fas fa-check" style="font-size:8px;margin-right:2px"></i>FOR</div>
+            <div class="pds-bar"><div class="pds-bar-fill" id="db-for-${p.id}" style="width:${fp}%"></div></div>
+            <div class="pds-pct" id="dp-for-${p.id}">${fp}%</div>
+            <div class="pds-ct" id="dc-for-${p.id}">${fmtN(d.forV)} readers</div>
+          </div>
+          <div class="pc-debate-side ag-side${d.userVote==='against'?' voted':''}" onclick="castDebateVote('${p.id}','against')">
+            <div class="pds-label"><i class="fas fa-xmark" style="font-size:8px;margin-right:2px"></i>AGAINST</div>
+            <div class="pds-bar"><div class="pds-bar-fill" id="db-ag-${p.id}" style="width:${ap}%"></div></div>
+            <div class="pds-pct" id="dp-ag-${p.id}">${ap}%</div>
+            <div class="pds-ct" id="dc-ag-${p.id}">${fmtN(d.agV)} readers</div>
+          </div>
+        </div>
+        <div class="pc-debate-total" id="dt-${p.id}">${fmtN(tot)} total votes · <span style="color:var(--acc2);cursor:pointer;font-weight:700" onclick="toast('⚔️ Full debate…')">Full Debate <i class="fas fa-arrow-right" style="font-size:8px"></i></span></div>
+      </div>
+    </div>`;
+  }else if(p.type==='ama'){
+    const a=p.amaData;
+    bodyHtml=`<div class="pc-body"><div class="pc-ama-banner" onclick="toast('🎙 Joining AMA…')"><div class="pc-ama-top">${a.isLive?`<div class="pc-ama-live"><div class="pc-ama-dot"></div>LIVE</div>`:''}<span class="pc-ama-viewers"><i class="fas fa-eye" style="font-size:9px;margin-right:3px"></i>${fmtN(a.viewers)} watching</span></div><div class="pc-ama-title">${a.title}</div><div class="pc-ama-meta">${a.meta}</div><button class="pc-ama-join">Join AMA <i class="fas fa-arrow-right" style="font-size:9px"></i></button></div></div>`;
+  }else if(p.type==='forum-poll'){
+    const pl=p.poll;
+    const tot=pl.total||1;
+    const textHtml=p.text?`<div class="pc-text trunc-3" id="pt-${p.id}" data-full="${encodeURIComponent(p.text)}" data-hasimg="0">${fmtTx(p.text).replace(/\n/g,'<br>')}</div><span class="pc-read-more" data-pid="${p.id}">See more <i class="fas fa-chevron-down" style="font-size:8px"></i></span>`:'';
+    bodyHtml=`<div class="pc-body">
+      ${p.title?`<div class="pc-title">${p.title}</div>`:''}
+      ${textHtml}
+      <div class="pc-poll">
+        <div class="pc-poll-q">${pl.q}</div>
+        ${pl.opts.map((o,oi)=>`<div class="pc-poll-opt${pl.voted===oi?' voted':''}" onclick="castPollVote('${p.id}',${oi})"><div class="pc-poll-bar" style="width:${Math.round(o.v/tot*100)}%"></div><div class="pc-poll-row"><span class="pc-poll-txt">${o.t}</span><span class="pc-poll-pct">${Math.round(o.v/tot*100)}%</span></div></div>`).join('')}
+        <div class="pc-poll-meta"><i class="fas fa-users" style="font-size:8px;margin-right:2px"></i>${fmtN(tot)} votes</div>
+      </div>
+    </div>`;
+  }else if(p.type==='photo-post'){
+    const textHtml=p.text?`<div class="pc-text trunc-3" id="pt-${p.id}" data-full="${encodeURIComponent(p.text)}" data-hasimg="1">${fmtTx(p.text).replace(/\n/g,'<br>')}</div><span class="pc-read-more" data-pid="${p.id}">See more <i class="fas fa-chevron-down" style="font-size:8px"></i></span>`:'';
+    bodyHtml=`<div class="pc-body">${textHtml}<img class="pc-image" src="${p.image}" loading="lazy" onclick="toast('🖼 Viewing…')"/></div>`;
+  }else if(p.type==='repost'){
+    const sr=p.storyRef;
+    bodyHtml=`<div class="pc-body">
+      ${p.note?`<div class="pc-text" style="font-style:italic;margin-bottom:7px">${p.note}</div>`:''}
+      <div class="pc-story-chip" onclick="toast('📖 Opening story…')">
+        <div class="pc-story-thumb" style="background-image:url('${sr.cover}')"></div>
+        <div class="pc-story-chip-body"><div class="pc-story-chip-cat">${sr.cat}</div><div class="pc-story-chip-title">${sr.title}</div><div class="pc-story-chip-writer">by @${sr.writer}</div></div>
+        <i class="fas fa-arrow-right pc-story-chip-arrow"></i>
+      </div>
+    </div>`;
+  }else{
+    const hasTitle=p.title&&['forum-post','forum-review','confession','career-post'].includes(p.type);
+    const sr=p.storyRef;
+    const truncClass=p.image?'trunc-3':'trunc-5';
+    const textHtml=p.text?`<div class="pc-text ${truncClass}" id="pt-${p.id}" data-full="${encodeURIComponent(p.text)}" data-hasimg="${p.image?'1':'0'}">${fmtTx(p.text).replace(/\n/g,'<br>')}</div><span class="pc-read-more" data-pid="${p.id}">See more <i class="fas fa-chevron-down" style="font-size:8px"></i></span>`:'';
+    bodyHtml=`<div class="pc-body">
+      ${hasTitle?`<div class="pc-title">${p.title}</div>`:''}
+      ${textHtml}
+      ${sr?`<div class="pc-story-chip" onclick="toast('📖 Opening story…')"><div class="pc-story-thumb" style="background-image:url('${sr.cover}')"></div><div class="pc-story-chip-body"><div class="pc-story-chip-cat">${sr.cat}</div><div class="pc-story-chip-title">${sr.title}</div><div class="pc-story-chip-writer">by @${sr.writer}</div></div><i class="fas fa-arrow-right pc-story-chip-arrow"></i></div>`:''}
+    </div>`;
+  }
+
+  const footerHtml=`<div class="pc-footer">
+    <div class="pc-act pc-like${p.liked?' liked':''}" data-pid="${p.id}" style="position:relative">
+      ${buildRxPopup(p.id)}
+      <i class="${p.liked?'fas':'far'} fa-heart"></i>
+      <span class="like-ct">${fmtN(p.likes)}</span>
+    </div>
+    <div class="pc-act pc-comment-btn" data-pid="${p.id}">
+      <i class="fas fa-comment-dots"></i>
+      <span>${fmtN(p.comments)}</span>
+    </div>
+    <div class="pc-act" onclick="openShareForPost('${p.id}')">
+      <i class="fas fa-share-nodes"></i>
+    </div>
+    <div class="pc-spacer"></div>
+    <div class="pc-dots" data-pid="${p.id}">
+      <i class="fas fa-ellipsis-vertical"></i>
+    </div>
+  </div>`;
+
+  return`<div class="post-card${p.pinned?' pinned':''}" data-pid="${p.id}" style="${delay}">
+    <div class="post-card-inner">
+      ${pinnedHtml}
+      <div class="pc-header">
+        ${avHtml}
+        <div class="pc-meta">
+          <div class="pc-name-row">
+            <a class="pc-name" href="profile.html">${p.name}</a>
+            ${verifiedHtml}
+            ${badgeHtml}
+          </div>
+          <div class="pc-meta-sub">${rankHtml}<span class="pc-time">${p.time}</span></div>
+        </div>
+        ${typePill}
+      </div>
+      ${statusUpdateHtml}
+      ${bodyHtml}
+      ${footerHtml}
+    </div>
+    <div class="pc-reply-bar" id="rb-${p.id}">
+      <div class="pc-reply-av-sm">Y</div>
+      <input class="pc-reply-inp" id="ri-${p.id}" placeholder="Write a reply…"/>
+      <button class="pc-reply-send" id="rs-${p.id}" disabled onclick="postReply('${p.id}')"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>`;
+}
+
+function renderAdPost(){
+  const ad=AD_POOL[adIdx%AD_POOL.length];adIdx++;
+  return`<div class="ad-post-card"><div class="ad-post-inner"><img class="ad-post-logo" src="${ad.logo}" loading="lazy" alt="${ad.brand}"/><div class="ad-post-body"><div class="ad-post-brand"><i class="fas fa-bullhorn" style="font-size:8px;margin-right:3px"></i>${ad.brand}</div><div class="ad-post-headline">${ad.headline}</div><div class="ad-post-sub">${ad.sub}</div></div><button class="ad-post-cta" onclick="toast('Opening ${ad.brand}…')">${ad.cta} <i class="fas fa-arrow-right" style="font-size:8px"></i></button></div></div>`;
+}
+
+/* ═══ RENDER FEED (with people-to-follow injected after 8 cards) ═══ */
+function renderFeed(posts){
+  const area=document.getElementById('feedArea');
+  document.querySelectorAll('.dots-menu').forEach(m=>m.remove());
+  area.innerHTML='';
+
+  if(!posts.length){
+    area.innerHTML=`<div class="empty-state"><i class="fas fa-inbox"></i><h4>Nothing here yet</h4><p>No posts match your current filter. Try a different tab or time range.</p></div>`;
+    return;
+  }
+
+  let cardCount=0;
+  let peopleInjected=false;
+
+  posts.forEach((p,i)=>{
+    const tmp=document.createElement('div');
+    tmp.innerHTML=renderPost(p,i);
+    while(tmp.firstChild)area.appendChild(tmp.firstChild);
+    cardCount++;
+
+    // Inject ad every 5 posts
+    if(cardCount%5===0){
+      const adTmp=document.createElement('div');
+      adTmp.innerHTML=renderAdPost();
+      while(adTmp.firstChild)area.appendChild(adTmp.firstChild);
+    }
+
+    // Inject people-to-follow after 8 cards
+    if(!peopleInjected && cardCount===PEOPLE_INJECT_AT){
+      peopleInjected=true;
+      const ptf=document.createElement('div');
+      ptf.innerHTML=buildPeopleToFollowHTML();
+      while(ptf.firstChild)area.appendChild(ptf.firstChild);
+    }
+  });
+
+  // If fewer than 8 posts, inject at end
+  if(!peopleInjected){
+    const ptf=document.createElement('div');
+    ptf.innerHTML=buildPeopleToFollowHTML();
+    while(ptf.firstChild)area.appendChild(ptf.firstChild);
+  }
+
+  posts.forEach(p=>{if(p.type!=='ad')buildDotsMenu(p);});
+  attachFeedEvents();
+}
+
+/* ═══ ATTACH EVENTS ═══ */
+function attachFeedEvents(){
+  const area=document.getElementById('feedArea');
+
+  area.querySelectorAll('.pc-like').forEach(el=>{
+    const pid=el.dataset.pid;
+    let holdTimer=null,isHolding=false;
+    el.addEventListener('pointerdown',()=>{isHolding=false;holdTimer=setTimeout(()=>{isHolding=true;hideAllRx();document.getElementById('rx-'+pid)?.classList.add('show');},600);});
+    el.addEventListener('pointerup',()=>{
+      clearTimeout(holdTimer);if(isHolding)return;
+      const p=allPosts().find(x=>x.id===pid);if(!p)return;
+      p.liked=!p.liked;p.likes+=p.liked?1:-1;
+      el.classList.toggle('liked',p.liked);
+      const ico=el.querySelector('i');if(ico)ico.className=p.liked?'fas fa-heart':'far fa-heart';
+      const ct=el.querySelector('.like-ct');if(ct)ct.textContent=fmtN(p.likes);
+    });
+    el.addEventListener('pointercancel',()=>clearTimeout(holdTimer));
+    el.addEventListener('click',e=>{
+      const rb=e.target.closest('.rx-btn');if(!rb)return;
+      e.stopPropagation();
+      const pid2=rb.dataset.pid,rid=rb.dataset.rid;
+      const rx=getRx(pid2);const p=allPosts().find(x=>x.id===pid2);if(!p)return;
+      if(rx.userRx===rid){rx[rid]--;rx.userRx=null;rb.classList.remove('reacted');}
+      else{if(rx.userRx)rx[rx.userRx]--;rx[rid]++;rx.userRx=rid;rb.classList.add('reacted');}
+      const ct=rb.querySelector('.rx-ct');if(ct)ct.textContent=fmtN(rx[rid]);
+      const r=REACTIONS.find(x=>x.id===rid);toast(r?r.label+' reaction saved':'Done');
+      hideAllRx();
+    },{capture:true});
+  });
+
+  // Comment icon → post.html
+  area.querySelectorAll('.pc-comment-btn').forEach(el=>{
+    el.addEventListener('click',()=>{location.href='post.html?pid='+el.dataset.pid;});
+  });
+
+  area.querySelectorAll('.pc-reply-inp').forEach(inp=>{
+    const pid=inp.id.replace('ri-','');
+    inp.addEventListener('input',()=>{const btn=document.getElementById('rs-'+pid);if(btn)btn.disabled=inp.value.trim().length<2;});
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')postReply(pid);});
+  });
+
+  // See more — expand fully
+  area.querySelectorAll('.pc-read-more').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      const pid=el.dataset.pid;
+      const p=allPosts().find(x=>x.id===pid);if(!p)return;
+      const bodyEl=document.getElementById('pt-'+pid);if(!bodyEl)return;
+      bodyEl.classList.remove('trunc-5','trunc-3');
+      bodyEl.innerHTML=fmtTx(p.text||p.quote||'').replace(/\n/g,'<br>');
+      el.className='pc-read-less';
+      el.innerHTML='See less <i class="fas fa-chevron-up" style="font-size:8px"></i>';
+      el.dataset.pid=pid;
+    });
+  });
+
+  // See less — shrink
+  area.addEventListener('click',e=>{
+    const less=e.target.closest('.pc-read-less');
+    if(less){
+      e.stopPropagation();
+      const pid=less.dataset.pid;const p=allPosts().find(x=>x.id===pid);if(!p)return;
+      const bodyEl=document.getElementById('pt-'+pid);if(!bodyEl)return;
+      const hasImg=bodyEl.dataset.hasimg==='1';
+      bodyEl.classList.add(hasImg?'trunc-3':'trunc-5');
+      bodyEl.innerHTML=fmtTx(p.text||p.quote||'').replace(/\n/g,'<br>');
+      less.className='pc-read-more';
+      less.innerHTML='See more <i class="fas fa-chevron-down" style="font-size:8px"></i>';
+      less.dataset.pid=pid;
+    }
+  });
+
+  area.querySelectorAll('.pc-dots').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      const pid=el.dataset.pid;
+      if(openMenuId===pid){closeAllMenus();return;}
+      closeAllMenus();hideAllRx();
+      positionMenu(pid,el);
+    });
+  });
+
+  area.addEventListener('click',e=>{
+    if(!e.target.closest('.pc-dots'))closeAllMenus();
+    if(!e.target.closest('.pc-like')&&!e.target.closest('.rx-popup'))hideAllRx();
+  });
+}
+
+function allPosts(){return FEED.concat(MORE_FEED);}
+
+function postReply(pid){
+  const inp=document.getElementById('ri-'+pid);if(!inp||inp.value.trim().length<2)return;
+  const p=allPosts().find(x=>x.id===pid);
+  if(p){p.comments++;const btn=document.querySelector(`.pc-comment-btn[data-pid="${pid}"] span`);if(btn)btn.textContent=fmtN(p.comments);}
+  inp.value='';
+  document.getElementById('rb-'+pid)?.classList.remove('open');
+  const rs=document.getElementById('rs-'+pid);if(rs)rs.disabled=true;
+  toast('💬 Reply posted!');
+}
+
+function castDebateVote(pid,side){
+  const p=FEED.find(x=>x.id===pid);if(!p||!p.debateData)return;
+  const d=p.debateData;if(d.userVote){toast('✅ Already voted!');return;}
+  d.userVote=side;if(side==='for')d.forV++;else d.agV++;
+  const tot=d.forV+d.agV;const fp=Math.round(d.forV/tot*100),ap=100-fp;
+  ['for','ag'].forEach(s=>{
+    const suf=s==='for'?fp:ap;
+    const pe=document.getElementById(`dp-${s}-${pid}`);if(pe)pe.textContent=suf+'%';
+    const be=document.getElementById(`db-${s}-${pid}`);if(be)be.style.width=suf+'%';
+  });
+  const cF=document.getElementById(`dc-for-${pid}`);if(cF)cF.textContent=fmtN(d.forV)+' readers';
+  const cA=document.getElementById(`dc-ag-${pid}`);if(cA)cA.textContent=fmtN(d.agV)+' readers';
+  const dt=document.getElementById('dt-'+pid);if(dt)dt.innerHTML=fmtN(tot)+' total votes · <span style="color:var(--acc2);cursor:pointer;font-weight:700" onclick="toast(\'⚔️ Full debate…\')">Full Debate <i class="fas fa-arrow-right" style="font-size:8px"></i></span>';
+  toast(side==='for'?'✅ Voted FOR!':'❌ Voted AGAINST!');
+}
+
+function castPollVote(pid,oi){
+  const p=FEED.find(x=>x.id===pid);if(!p||!p.poll)return;
+  if(p.poll.voted>=0){toast('✅ Already voted!');return;}
+  p.poll.opts[oi].v++;p.poll.voted=oi;p.poll.total++;
+  const tot=p.poll.total;
+  const card=document.querySelector(`[data-pid="${pid}"]`);if(!card)return;
+  card.querySelectorAll('.pc-poll-opt').forEach((opt,i)=>{
+    opt.classList.toggle('voted',i===oi);
+    const pct=Math.round(p.poll.opts[i].v/tot*100);
+    opt.querySelector('.pc-poll-bar').style.width=pct+'%';
+    opt.querySelector('.pc-poll-pct').textContent=pct+'%';
+  });
+  toast('✅ Vote cast!');
+}
+
+function loadMore(){
+  if(feedLoaded){toast('✅ All posts loaded!');return;}
+  feedLoaded=true;
+  const area=document.getElementById('feedArea');
+  MORE_FEED.forEach((p,i)=>{
+    const tmp=document.createElement('div');tmp.innerHTML=renderPost(p,i+FEED.length);
+    while(tmp.firstChild)area.appendChild(tmp.firstChild);
+    buildDotsMenu(p);
+  });
+  const adTmp=document.createElement('div');adTmp.innerHTML=renderAdPost();
+  while(adTmp.firstChild)area.appendChild(adTmp.firstChild);
+  attachFeedEvents();
+  document.getElementById('loadMoreBtn').innerHTML='<i class="fas fa-check"></i> All posts loaded';
+  toast('✨ More posts loaded!');
+}
+
+/* ═══ STATUS VIEWER ═══ */
+let statusWid=null,statusIdx=0,statusTimer=null;
+const STATUS_DUR=5000;
+
+function openStatus(wid){
+  const ws=WRITER_STATUSES.find(w=>w.id===wid);
+  if(!ws||!ws.statuses.length){toast('No status available');return;}
+  statusWid=wid;statusIdx=0;
+  document.getElementById('statusWAv').src=ws.avatar||'';
+  document.getElementById('statusWName').textContent='@'+ws.name;
+  document.getElementById('stLikeCount').textContent=fmtN(ws.likes||0);
+  document.getElementById('stThreadCount').textContent=fmtN(ws.threads||0)+' threads';
+  document.getElementById('statusOv').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderStatusSlide();
+  ws.ring='ring-viewed';renderStatuses();
+}
+
+function renderStatusSlide(){
+  const ws=WRITER_STATUSES.find(w=>w.id===statusWid);if(!ws)return;
+  const slides=ws.statuses;const slide=slides[statusIdx];
+  document.getElementById('statusWTime').textContent=slide.time;
+  document.getElementById('statusProgBars').innerHTML=slides.map((_,i)=>`<div class="spb"><div class="spb-fill" id="spb${i}" style="width:${i<statusIdx?100:0}%"></div></div>`).join('');
+  const content=document.getElementById('statusContent');
+  content.innerHTML=`<div class="status-slide" style="background-image:url('${slide.bg}');background-size:cover;position:absolute;inset:0"><div class="status-slide-grad"></div><div class="status-slide-text"><div class="status-slide-quote">${slide.quote}</div><div class="status-slide-caption">${slide.caption}</div></div></div><div class="status-nav-left" id="sNL"></div><div class="status-nav-right" id="sNR"></div>`;
+  document.getElementById('sNL').onclick=()=>statusNav(-1);
+  document.getElementById('sNR').onclick=()=>statusNav(1);
+  clearTimeout(statusTimer);
+  requestAnimationFrame(()=>{
+    const fill=document.getElementById('spb'+statusIdx);
+    if(fill){fill.style.transition=`width ${STATUS_DUR}ms linear`;fill.style.width='100%';}
+    statusTimer=setTimeout(()=>statusNav(1),STATUS_DUR);
+  });
+}
+
+function statusNav(dir){
+  const ws=WRITER_STATUSES.find(w=>w.id===statusWid);if(!ws)return;
+  clearTimeout(statusTimer);statusIdx+=dir;
+  if(statusIdx<0||statusIdx>=ws.statuses.length){closeStatus();return;}
+  renderStatusSlide();
+}
+function closeStatus(){
+  clearTimeout(statusTimer);
+  document.getElementById('statusOv').classList.remove('open');
+  document.body.style.overflow='';statusWid=null;
+}
+
+function simulateLive(){
+  setInterval(()=>{
+    const live=FEED.filter(p=>p.likes!==undefined);
+    if(!live.length)return;
+    const rnd=live[Math.floor(Math.random()*Math.min(4,live.length))];
+    if(rnd&&Math.random()>.5){
+      rnd.likes+=Math.floor(Math.random()*3)+1;
+      const el=document.querySelector(`.pc-like[data-pid="${rnd.id}"] .like-ct`);
+      if(el)el.textContent=fmtN(rnd.likes);
+    }
+  },3500);
+}
+
+/* ═══ INIT ═══ */
+renderStatuses();
+initFeaturedSlider();
+renderFeed(filteredFeed());
+simulateLive();
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.pc-dots')&&!e.target.closest('.dots-menu'))closeAllMenus();
+  if(!e.target.closest('.pc-like')&&!e.target.closest('.rx-popup'))hideAllRx();
+  if(!e.target.closest('#hamburgerMenu')&&!e.target.closest('#hamburgerBtn'))closeHamburger();
+});
+</script>
+</body>
+</html>

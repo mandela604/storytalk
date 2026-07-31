@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Contracts & Stories</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --bg:#000;--section-bg:#07070b;--surface:#111318;--surface2:#1a1b20;
+  --acc:#ff0050;--acc2:#ff4d7a;--acc-grad:linear-gradient(135deg,#ff0050,#ff4d7a);
+  --acc-glow:rgba(255,0,80,.22);--acc-dim:rgba(255,0,80,.10);--acc-border:rgba(255,0,80,.28);
+  --gold:#f59e0b;--gold-dim:rgba(245,158,11,.10);--gold-border:rgba(245,158,11,.28);
+  --green:#10b981;--green-dim:rgba(16,185,129,.10);--green-border:rgba(16,185,129,.25);
+  --blue:#00aaff;--blue-dim:rgba(0,170,255,.10);--blue-border:rgba(0,170,255,.25);
+  --purple:#a78bfa;--orange:#fb923c;
+  --tx:#fff;--tx2:#a1a1aa;--muted:#52525b;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);
+  --nav-h:60px;--safe-b:env(safe-area-inset-bottom,14px);
+  --px:14px;--r:12px;--r-sm:8px;
+  --font-d:'Syne',sans-serif;--font-b:'Instrument Sans',sans-serif;--font-ser:'Playfair Display',serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow-x:hidden}
+body{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 16px)}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+::-webkit-scrollbar{width:2px;height:2px}
+::-webkit-scrollbar-thumb{background:var(--acc-dim);border-radius:2px}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:60;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px var(--px) 9px;background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);backdrop-filter:blur(20px)}
+.logo{font-family:var(--font-d);font-size:22px;font-weight:800;letter-spacing:-1px;background:var(--acc-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-title{font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--tx);text-align:center}
+.topbar-notif{width:36px;height:36px;border-radius:50%;background:var(--section-bg);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--tx2);position:relative;cursor:pointer;flex-shrink:0}
+.notif-badge{position:absolute;top:4px;right:4px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg)}
+
+/* ── HOW IT WORKS BANNER ── */
+.how-banner{margin:12px var(--px) 0;background:linear-gradient(135deg,rgba(0,170,255,.08),rgba(255,0,80,.04));border:1.5px solid var(--blue-border);border-radius:16px;padding:14px 15px;position:relative;overflow:hidden}
+.how-banner::before{content:'';position:absolute;top:-24px;right:-24px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(0,170,255,.12),transparent 70%);pointer-events:none}
+.how-title{font-family:var(--font-d);font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.how-steps{display:flex;flex-direction:column;gap:7px}
+.how-step{display:flex;align-items:flex-start;gap:9px}
+.how-step-num{width:20px;height:20px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--blue);flex-shrink:0;margin-top:1px}
+.how-step-text{font-size:11px;color:var(--tx2);line-height:1.45;flex:1}
+.how-step-text strong{color:#fff;font-weight:700}
+.how-note{font-size:9.5px;color:var(--muted);margin-top:9px;padding-top:8px;border-top:1px solid var(--bd);line-height:1.5}
+
+/* ── SUMMARY STRIP ── */
+.summary-strip{display:flex;margin:10px var(--px) 0;background:var(--section-bg);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden}
+.ss-item{flex:1;text-align:center;padding:11px 6px;border-right:1px solid var(--bd)}
+.ss-item:last-child{border-right:none}
+.ss-num{font-family:var(--font-d);font-size:18px;font-weight:800;line-height:1;color:#fff}
+.ss-num.acc{color:var(--acc2)} .ss-num.gold{color:var(--gold)} .ss-num.green{color:var(--green)}
+.ss-label{font-size:8px;color:var(--muted);font-weight:600;margin-top:2px}
+
+/* ── ALERT STRIP ── */
+.alert-strip{margin:10px var(--px) 0;background:linear-gradient(135deg,var(--gold-dim),transparent);border:1.5px solid var(--gold-border);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.alert-icon{width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,.15);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.alert-body{flex:1;min-width:0}
+.alert-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:1px}
+.alert-sub{font-size:10px;color:var(--tx2)}
+.alert-cta{font-size:10px;font-weight:800;color:var(--gold);white-space:nowrap;display:flex;align-items:center;gap:3px}
+
+/* ── TABS ── */
+.tabs-bar{position:sticky;top:57px;z-index:55;background:rgba(0,0,0,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab.active{color:var(--tx);border-bottom-color:var(--acc)}
+.tab-ct{background:rgba(255,0,80,.15);color:var(--acc2);font-size:8px;font-weight:800;padding:1px 5px;border-radius:6px}
+.tab-ct.gold{background:rgba(245,158,11,.15);color:var(--gold)}
+.tab-ct.green{background:rgba(16,185,129,.15);color:var(--green)}
+
+/* ── PANELS ── */
+.panel{display:none;padding:14px var(--px)}
+.panel.active{display:block}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-more{font-size:10px;font-weight:700;color:var(--acc2);cursor:pointer;padding:3px 9px;border-radius:10px;background:var(--acc-dim);border:1px solid var(--acc-border)}
+.sdiv{height:1px;background:var(--bd);margin:14px 0}
+
+/* ── CONTRACT CARD ── */
+.contract-card{background:var(--section-bg);border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:10px;transition:border-color .2s}
+.contract-card.has-action{border-color:var(--gold-border)}
+.contract-card.signed{border-color:var(--green-border)}
+
+.cc-header{display:flex;gap:10px;padding:12px 13px 10px}
+.cc-cover{width:52px;height:60px;border-radius:var(--r-sm);background-size:cover;background-position:center;flex-shrink:0}
+.cc-info{flex:1;min-width:0}
+.cc-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.cc-badge{font-size:7px;font-weight:800;padding:2px 7px;border-radius:7px;letter-spacing:.04em;text-transform:uppercase}
+.badge-pending{background:rgba(245,158,11,.18);color:var(--gold);border:1px solid var(--gold-border)}
+.badge-signed{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.badge-nonexcl{background:rgba(0,170,255,.12);color:var(--blue);border:1px solid var(--blue-border)}
+.badge-expired{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--bd)}
+.cc-title{font-family:var(--font-ser);font-size:12px;font-weight:700;line-height:1.3;color:var(--tx);margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cc-meta{font-size:9px;color:var(--tx2);font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cc-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+
+/* ── BONUS UNLOCK TRACKER ── */
+.bonus-tracker{margin:0 13px 10px;background:rgba(245,158,11,.05);border:1.5px solid var(--gold-border);border-radius:12px;padding:11px 12px}
+.bt-title{font-size:9px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.bt-rows{display:flex;flex-direction:column;gap:8px}
+.bt-row{display:flex;flex-direction:column;gap:4px}
+.bt-row-hdr{display:flex;align-items:center;justify-content:space-between}
+.bt-row-label{font-size:10px;font-weight:600;color:var(--tx2);display:flex;align-items:center;gap:5px}
+.bt-row-label i{font-size:9px}
+.bt-row-val{font-size:10px;font-weight:800}
+.bt-row-val.done{color:var(--green)}
+.bt-row-val.progress{color:var(--gold)}
+.bt-bar{height:5px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.bt-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.bt-bar-fill.words{background:linear-gradient(90deg,var(--blue),#06b6d4)}
+.bt-bar-fill.earn{background:linear-gradient(90deg,var(--gold),var(--orange))}
+.bt-bar-fill.done-bar{background:linear-gradient(90deg,var(--green),#06b6d4)}
+.bt-bonus-row{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:8px;border-top:1px solid var(--bd)}
+.bt-bonus-label{font-size:9px;color:var(--tx2);font-weight:600}
+.bt-bonus-amount{font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--gold)}
+.bt-bonus-locked{font-size:9px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:3px;background:rgba(255,255,255,.04);border:1px solid var(--bd);padding:3px 8px;border-radius:8px}
+.bt-bonus-ready{font-size:9px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:3px;background:var(--green-dim);border:1px solid var(--green-border);padding:3px 10px;border-radius:8px;cursor:pointer;animation:glow-pulse 2s ease-in-out infinite}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.3)}50%{box-shadow:0 0 0 4px rgba(16,185,129,.1)}}
+
+/* ── CONTRACT TERMS ROW ── */
+.cc-terms{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--bd2);background:rgba(255,255,255,.01)}
+.cc-term{padding:9px 11px;border-right:1px solid var(--bd2)}
+.cc-term:last-child{border-right:none}
+.cc-term-label{font-size:8px;color:var(--muted);font-weight:600;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em}
+.cc-term-val{font-size:11px;font-weight:800;color:var(--tx)}
+.cc-term-val.gold{color:var(--gold)} .cc-term-val.green{color:var(--green)}
+
+/* ── DEADLINE STRIP ── */
+.cc-deadline{display:flex;align-items:center;gap:6px;padding:8px 13px;background:rgba(245,158,11,.06);border-top:1px solid var(--gold-border)}
+.cc-deadline-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.cc-deadline-text{font-size:9px;font-weight:700;color:var(--gold);flex:1}
+.cc-deadline-cta{font-size:9px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:3px;cursor:pointer}
+
+/* ── CONTRACT ACTIONS ── */
+.cc-actions{display:flex;gap:7px;padding:10px 13px;border-top:1px solid var(--bd2)}
+.cca{flex:1;padding:8px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;transition:.18s;text-align:center}
+.cca:active{transform:scale(.97)}
+.cca.sign{background:var(--acc-grad);color:#fff;box-shadow:0 2px 12px var(--acc-glow)}
+.cca.view{background:rgba(255,255,255,.06);border:1.5px solid var(--bd);color:var(--tx2)}
+.cca.done{background:var(--green-dim);border:1.5px solid var(--green-border);color:var(--green);pointer-events:none}
+
+/* ── STORY CARD ── */
+.story-card{background:var(--section-bg);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.sc-hdr{display:flex;gap:10px;padding:11px 12px}
+.sc-cover{width:52px;height:60px;border-radius:var(--r-sm);background-size:cover;background-position:center;flex-shrink:0;position:relative}
+.sc-cover-badge{position:absolute;top:0;left:0;font-size:6px;font-weight:800;padding:2px 5px 2px 4px;border-radius:0 5px 5px 0;text-transform:uppercase}
+.sc-cover-badge.hot{background:var(--acc);color:#fff}
+.sc-cover-badge.new{background:#3b0764;color:#d8b4fe}
+.sc-body{flex:1;min-width:0}
+.sc-cat{font-size:8px;font-weight:800;color:var(--acc);margin-bottom:2px}
+.sc-title{font-family:var(--font-ser);font-size:11.5px;font-weight:700;line-height:1.3;color:var(--tx);margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-stats{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.sc-stat{font-size:9px;color:var(--tx2);font-weight:600;display:flex;align-items:center;gap:2px}
+.sc-ctag{font-size:7.5px;font-weight:800;padding:1.5px 6px;border-radius:6px}
+.sc-ctag.signed{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.sc-ctag.pending{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.sc-ctag.none{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--bd)}
+
+/* ── WORD / EARN MINI TRACKER (in story card) ── */
+.sc-tracker{padding:0 12px 10px}
+.sc-tracker-row{display:flex;gap:8px}
+.sct-item{flex:1}
+.sct-hdr{display:flex;justify-content:space-between;font-size:9px;font-weight:600;color:var(--tx2);margin-bottom:3px}
+.sct-bar{height:3px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.sct-fill{height:100%;border-radius:3px}
+.sct-fill.w{background:linear-gradient(90deg,var(--blue),#06b6d4)}
+.sct-fill.e{background:linear-gradient(90deg,var(--gold),var(--orange))}
+
+/* ── CHAPTER TOGGLE ── */
+.sc-ch-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--bd2);cursor:pointer}
+.sc-ch-toggle:active{background:rgba(255,255,255,.02)}
+.sc-ch-left{display:flex;align-items:center;gap:7px}
+.sc-ch-count{font-size:10px;font-weight:700;color:var(--tx2)}
+.sc-ch-arrow{font-size:10px;color:var(--muted);transition:transform .2s}
+.sc-ch-arrow.open{transform:rotate(180deg)}
+.ch-list{display:none;border-top:1px solid var(--bd2)}
+.ch-list.open{display:block}
+.ch-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--bd2)}
+.ch-item:last-child{border-bottom:none}
+.ch-bubble{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--tx2);flex-shrink:0}
+.ch-bubble.pub{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+.ch-bubble.draft{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+.ch-bubble.sched{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.ch-body{flex:1;min-width:0}
+.ch-title{font-size:11px;font-weight:600;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-meta{display:flex;gap:5px;align-items:center;font-size:9px;color:var(--tx2)}
+.ch-pill{font-size:7.5px;font-weight:800;padding:1px 6px;border-radius:6px}
+.ch-pill.pub{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.ch-pill.draft{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.ch-pill.sched{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+.ch-words{font-size:8.5px;color:var(--muted);font-weight:600;padding:1px 5px;background:rgba(255,255,255,.04);border-radius:5px}
+.ch-right{display:flex;align-items:center;gap:5px}
+.ch-reads{font-size:9px;color:var(--tx2);font-weight:600;display:flex;align-items:center;gap:2px}
+.ch-edit{font-size:8px;font-weight:700;color:var(--acc2);cursor:pointer;padding:2px 8px;border-radius:6px;background:var(--acc-dim);border:1px solid var(--acc-border)}
+
+/* ── STORY FOOTER ── */
+.sc-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.01);border-top:1px solid var(--bd2)}
+.sc-footer-stats{display:flex;gap:10px}
+.sc-fstat{font-size:9px;color:var(--tx2);font-weight:600;display:flex;align-items:center;gap:3px}
+.sc-factions{display:flex;gap:6px}
+.sfca{font-size:9px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;transition:.15s}
+.sfca:active{transform:scale(.95)}
+.sfca.edit{background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--tx2)}
+.sfca.apply{background:var(--acc-grad);color:#fff;box-shadow:0 1px 8px var(--acc-glow)}
+.sfca.share{background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--tx2)}
+
+/* ── EARNINGS PANEL ── */
+.earn-hero{background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(255,0,80,.04));border:1.5px solid var(--gold-border);border-radius:16px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.earn-hero::after{content:'$';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:var(--font-d);font-size:64px;font-weight:800;color:rgba(245,158,11,.08);line-height:1;pointer-events:none}
+.eh-label{font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.eh-amount{font-family:var(--font-d);font-size:30px;font-weight:800;color:#fff;line-height:1;margin-bottom:2px}
+.eh-sub{font-size:10px;color:var(--tx2);margin-bottom:12px}
+.eh-actions{display:flex;gap:7px}
+.eh-btn{flex:1;padding:8px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:.15s}
+.eh-btn:active{transform:scale(.97)}
+.eh-btn.withdraw{background:var(--gold);color:#000}
+.eh-btn.history{background:rgba(255,255,255,.07);border:1.5px solid var(--bd);color:var(--tx2)}
+.earn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.earn-card{background:var(--section-bg);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.earn-card-label{font-size:9px;color:var(--muted);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.earn-card-num{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--tx)}
+.earn-card-num.green{color:var(--green)} .earn-card-num.gold{color:var(--gold)}
+.earn-card-num.blue{color:var(--blue)} .earn-card-num.purple{color:var(--purple)}
+.earn-card-sub{font-size:9px;color:var(--tx2);margin-top:2px}
+
+/* Payout row */
+.payout-row{display:flex;align-items:center;gap:10px;background:var(--section-bg);border:1px solid var(--bd);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.pr-icon{width:32px;height:32px;border-radius:9px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pr-info{flex:1}
+.pr-title{font-size:11px;font-weight:700;color:var(--tx);margin-bottom:1px}
+.pr-meta{font-size:9px;color:var(--tx2);font-weight:600}
+.pr-amount{font-family:var(--font-d);font-size:13px;font-weight:800;color:var(--green)}
+
+/* Bonus claimable card */
+.bonus-claim-card{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(245,158,11,.04));border:1.5px solid var(--green-border);border-radius:14px;padding:13px 14px;margin-bottom:12px;display:flex;align-items:center;gap:11px}
+.bcc-icon{width:40px;height:40px;border-radius:12px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;animation:glow-pulse 2s ease-in-out infinite}
+.bcc-body{flex:1}
+.bcc-label{font-size:9px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.bcc-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:1px}
+.bcc-sub{font-size:9px;color:var(--tx2)}
+.bcc-btn{background:var(--green);color:#000;border:none;padding:7px 14px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:var(--font-b);flex-shrink:0}
+.bcc-btn:active{transform:scale(.96)}
+
+/* ── UPDATES PANEL ── */
+.notif-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd2)}
+.notif-item:last-child{border-bottom:none}
+.unread-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.notif-icon.contract{background:var(--gold-dim);border:1px solid var(--gold-border)}
+.notif-icon.signed{background:var(--green-dim);border:1px solid var(--green-border)}
+.notif-icon.earn{background:rgba(245,158,11,.1);border:1px solid var(--gold-border)}
+.notif-icon.chapter{background:var(--acc-dim);border:1px solid var(--acc-border)}
+.notif-body{flex:1}
+.notif-title{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:2px;line-height:1.3}
+.notif-sub{font-size:10px;color:var(--tx2);line-height:1.4}
+.notif-time{font-size:9px;color:var(--muted);margin-top:3px}
+.notif-cta{font-size:9px;font-weight:800;color:var(--acc2);cursor:pointer;padding:3px 8px;border-radius:8px;background:var(--acc-dim);border:1px solid var(--acc-border);flex-shrink:0;align-self:flex-start;margin-top:2px}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.97);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 var(--safe-b);z-index:100;backdrop-filter:blur(16px)}
+.bn{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px}
+.bn i{font-size:20px;display:block;margin-bottom:2px}
+.bn.on{color:var(--acc)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal-sheet{width:100%;background:var(--section-bg);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(20px + var(--safe-b))}
+.modal-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:4px;margin:12px auto 0}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.modal-hdr h3{font-family:var(--font-d);font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:7px}
+.modal-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:var(--tx2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* contract detail */
+.cd-sec{padding:0 16px 12px}
+.cd-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.cd-preview{display:flex;gap:10px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:0}
+.cd-prev-cover{width:44px;height:50px;border-radius:8px;background-size:cover;background-position:center;flex-shrink:0}
+.cd-prev-title{font-family:var(--font-ser);font-size:12px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px}
+.cd-prev-meta{font-size:9px;color:var(--tx2);font-weight:600}
+.cd-nonexcl-banner{display:flex;gap:8px;background:var(--blue-dim);border:1.5px solid var(--blue-border);border-radius:11px;padding:10px 12px;margin-bottom:12px}
+.cd-nonexcl-ico{font-size:18px;flex-shrink:0}
+.cd-nonexcl-text{font-size:11px;color:var(--blue);line-height:1.5}
+.cd-terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cd-term{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:10px;padding:9px 11px}
+.cd-term-label{font-size:8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.cd-term-val{font-size:13px;font-weight:800;color:var(--tx)}
+.cd-term-val.gold{color:var(--gold)} .cd-term-val.green{color:var(--green)}
+
+/* bonus unlock detail */
+.cd-bonus-box{background:linear-gradient(135deg,rgba(245,158,11,.07),transparent);border:1.5px solid var(--gold-border);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.cd-bonus-title{font-size:10px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.cd-bonus-conds{display:flex;flex-direction:column;gap:7px}
+.cd-cond{display:flex;align-items:flex-start;gap:8px}
+.cd-cond-num{width:18px;height:18px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--gold);flex-shrink:0;margin-top:1px}
+.cd-cond-text{font-size:11px;color:var(--tx2);line-height:1.45;flex:1}
+.cd-cond-text strong{color:#fff;font-weight:700}
+
+/* bonus progress in modal */
+.cd-bonus-progress{display:flex;flex-direction:column;gap:7px;margin-top:9px;padding-top:9px;border-top:1px solid var(--bd)}
+.cd-bp-row{display:flex;flex-direction:column;gap:3px}
+.cd-bp-hdr{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:var(--tx2)}
+.cd-bp-hdr span:last-child{font-weight:800}
+.cd-bp-bar{height:6px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.cd-bp-fill{height:100%;border-radius:4px}
+.cd-bp-fill.w{background:linear-gradient(90deg,var(--blue),#06b6d4)}
+.cd-bp-fill.e{background:linear-gradient(90deg,var(--gold),var(--orange))}
+
+.cd-clauses{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.cd-clause{display:flex;gap:8px}
+.cd-clause-dot{width:16px;height:16px;border-radius:50%;background:var(--acc-dim);border:1px solid var(--acc-border);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--acc2);flex-shrink:0;margin-top:1px}
+.cd-clause-text{font-size:11px;color:var(--tx2);line-height:1.5;flex:1}
+.cd-sign-section{padding:14px 16px;border-top:1px solid var(--bd2)}
+.cd-warn{display:flex;gap:8px;background:var(--gold-dim);border:1.5px solid var(--gold-border);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+.cd-warn-ico{font-size:18px;flex-shrink:0}
+.cd-warn-text{font-size:11px;color:var(--gold);line-height:1.5}
+.cd-sign-btn{width:100%;background:var(--acc-grad);color:#fff;border:none;padding:13px;border-radius:14px;font-family:var(--font-d);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px var(--acc-glow);transition:.18s}
+.cd-sign-btn:active{transform:scale(.98)}
+.cd-sign-btn.done{background:var(--green-dim);border:1.5px solid var(--green-border);color:var(--green);box-shadow:none;cursor:default;font-size:13px}
+.cd-sdiv{height:1px;background:var(--bd2);margin:4px 16px 12px}
+
+/* apply modal */
+.apply-story-list{display:flex;flex-direction:column;gap:7px;padding:0 16px 12px}
+.apply-opt{display:flex;gap:9px;align-items:center;background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:11px;padding:10px 12px;cursor:pointer;transition:.2s}
+.apply-opt.sel{border-color:var(--acc-border);background:var(--acc-dim)}
+.apply-opt:active{transform:scale(.99)}
+.apply-thumb{width:36px;height:42px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0}
+.apply-info{flex:1;min-width:0}
+.apply-story-title{font-size:11px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.apply-story-meta{font-size:9px;color:var(--tx2);font-weight:600}
+.apply-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:.2s}
+.apply-opt.sel .apply-check{background:var(--acc);border-color:var(--acc);color:#fff}
+/* eligibility badge in apply */
+.elig-badge{font-size:8px;font-weight:800;padding:1.5px 6px;border-radius:6px}
+.elig-badge.eligible{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.elig-badge.not{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--bd)}
+.apply-pitch-area{width:calc(100% - 32px);margin:0 16px 12px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;font-family:var(--font-b);font-size:12px;color:var(--tx);outline:none;resize:none;min-height:70px;display:block}
+.apply-pitch-area::placeholder{color:var(--muted)}
+.apply-submit-btn{display:block;width:calc(100% - 32px);margin:0 16px;background:var(--acc-grad);color:#fff;border:none;padding:12px;border-radius:14px;font-family:var(--font-d);font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 3px 16px var(--acc-glow)}
+.apply-submit-btn:active{transform:scale(.98)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface);color:var(--tx);padding:9px 18px;border-radius:28px;font-size:12px;font-weight:700;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:88vw;text-align:center;border:1px solid var(--bd);box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .3s ease both}
+.d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.12s}.d4{animation-delay:.17s}.d5{animation-delay:.22s}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Dro</div>
+  <div class="topbar-title">Contracts & Stories</div>
+  <div class="topbar-notif" onclick="goUpdates()">
+    <i class="fas fa-bell"></i>
+    <div class="notif-badge" id="notifBadge">3</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-banner fu d1">
+  <div class="how-title"><i class="fas fa-info-circle" style="color:var(--blue);font-size:12px"></i> How Droboard Contracts Work</div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div class="how-step-text">Droboard offers you a <strong>non-exclusive contract</strong> for qualifying stories. You keep full rights — you can still publish elsewhere.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div class="how-step-text">Once signed, your story joins the revenue programme. You earn <strong>50% of all platform profit</strong> your story generates.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div class="how-step-text"><strong>Signing Bonus</strong> is released only when your story hits <strong>150,000 words</strong> AND the story has earned a total of <strong>$40 platform profit</strong> (your share = $20).</div>
+    </div>
+  </div>
+  <div class="how-note">💡 Word count and earnings are tracked in real time. You'll see live progress bars on each contract below.</div>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary-strip fu d2">
+  <div class="ss-item"><div class="ss-num acc" id="sumPending">2</div><div class="ss-label">Awaiting Sign</div></div>
+  <div class="ss-item"><div class="ss-num green" id="sumSigned">2</div><div class="ss-label">Active</div></div>
+  <div class="ss-item"><div class="ss-num gold" id="sumStories">8</div><div class="ss-label">Stories</div></div>
+  <div class="ss-item"><div class="ss-num" style="color:var(--purple)">$37</div><div class="ss-label">Total Earned</div></div>
+</div>
+
+<!-- ALERT -->
+<div class="alert-strip fu d3" id="alertStrip" onclick="switchTab('contracts');flashPending()">
+  <div class="alert-icon">⚡</div>
+  <div class="alert-body">
+    <div class="alert-title">2 contracts awaiting your signature</div>
+    <div class="alert-sub">Non-exclusive · Free to sign · Signing bonus unlocks on milestones</div>
+  </div>
+  <div class="alert-cta">Review <i class="fas fa-chevron-right" style="font-size:8px"></i></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar fu d4">
+  <div class="tab active" data-tab="contracts" onclick="switchTab('contracts')"><i class="fas fa-file-signature" style="font-size:10px"></i> Contracts <span class="tab-ct" id="contracts-ct">2</span></div>
+  <div class="tab" data-tab="stories" onclick="switchTab('stories')"><i class="fas fa-book-open" style="font-size:10px"></i> My Stories <span class="tab-ct gold">8</span></div>
+  <div class="tab" data-tab="earn" onclick="switchTab('earn')"><i class="fas fa-dollar-sign" style="font-size:10px"></i> Earnings <span class="tab-ct green">$</span></div>
+  <div class="tab" data-tab="updates" onclick="switchTab('updates')"><i class="fas fa-bell" style="font-size:10px"></i> Updates <span class="tab-ct" id="updates-ct">3</span></div>
+</div>
+
+<!-- ═══ CONTRACTS PANEL ═══ -->
+<div class="panel active" id="panel-contracts">
+
+  <div class="sh">
+    <div class="sh-title">🔴 Sign These Contracts</div>
+  </div>
+
+  <!-- Contract A — The Runaway Bride -->
+  <div class="contract-card has-action fu d1" id="cc-A">
+    <div class="cc-header">
+      <div class="cc-cover" style="background-image:url('https://i.postimg.cc/RqtfSQJJ/wife3.jpg')"></div>
+      <div class="cc-info">
+        <div class="cc-badges">
+          <span class="cc-badge badge-pending">⚡ Offer Received</span>
+          <span class="cc-badge badge-nonexcl">🔓 Non-Exclusive</span>
+        </div>
+        <div class="cc-title">The runaway bride — I left at the altar in my socked feet</div>
+        <div class="cc-meta">
+          <span>Droboard Revenue Programme</span>
+          <div class="cc-meta-dot"></div>
+          <span>Offered Dec 3, 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bonus-tracker">
+      <div class="bt-title"><i class="fas fa-trophy" style="font-size:9px"></i> Signing Bonus Unlock Progress — $150</div>
+      <div class="bt-rows">
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-pen" style="color:var(--blue)"></i> Words on Droboard</span>
+            <span class="bt-row-val progress">112,400 / 150,000</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill words" style="width:75%"></div></div>
+        </div>
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-dollar-sign" style="color:var(--gold)"></i> Platform Shared Profit</span>
+            <span class="bt-row-val progress">$28 / $40 total ($14 your share)</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill earn" style="width:70%"></div></div>
+        </div>
+      </div>
+      <div class="bt-bonus-row">
+        <div class="bt-bonus-label">Signing bonus (released on milestones)</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="bt-bonus-amount">$150</span>
+          <span class="bt-bonus-locked"><i class="fas fa-lock" style="font-size:8px"></i> Not yet unlocked</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cc-terms">
+      <div class="cc-term"><div class="cc-term-label">Your Revenue Share</div><div class="cc-term-val gold">50 %</div></div>
+      <div class="cc-term"><div class="cc-term-label">Min. Words Required</div><div class="cc-term-val">150k words</div></div>
+      <div class="cc-term"><div class="cc-term-label">Signing Bonus</div><div class="cc-term-val green">$150</div></div>
+    </div>
+    <div class="cc-deadline">
+      <div class="cc-deadline-dot"></div>
+      <div class="cc-deadline-text">Offer expires Dec 10, 2026 · 7 days left</div>
+      <div class="cc-deadline-cta" onclick="openContractDetail('A')">Sign now <i class="fas fa-arrow-right" style="font-size:8px"></i></div>
+    </div>
+    <div class="cc-actions">
+      <div class="cca view" onclick="openContractDetail('A')">View Full Terms</div>
+      <div class="cca sign" onclick="openContractDetail('A')">✍️ Sign Contract</div>
+    </div>
+  </div>
+
+  <!-- Contract B — Grandmother's Will -->
+  <div class="contract-card has-action fu d2" id="cc-B">
+    <div class="cc-header">
+      <div class="cc-cover" style="background-image:url('https://i.postimg.cc/fkdXzjSj/wife.jpg')"></div>
+      <div class="cc-info">
+        <div class="cc-badges">
+          <span class="cc-badge badge-pending">⚡ Offer Received</span>
+          <span class="cc-badge badge-nonexcl">🔓 Non-Exclusive</span>
+        </div>
+        <div class="cc-title">My grandmother's will revealed I wasn't her blood — but she left everything to me</div>
+        <div class="cc-meta">
+          <span>Droboard Revenue Programme</span>
+          <div class="cc-meta-dot"></div>
+          <span>Offered Dec 4, 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bonus-tracker">
+      <div class="bt-title"><i class="fas fa-trophy" style="font-size:9px"></i> Signing Bonus Unlock Progress — $100</div>
+      <div class="bt-rows">
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-pen" style="color:var(--blue)"></i> Words on Droboard</span>
+            <span class="bt-row-val progress">68,200 / 150,000</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill words" style="width:45%"></div></div>
+        </div>
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-dollar-sign" style="color:var(--gold)"></i> Platform Shared Profit</span>
+            <span class="bt-row-val progress">$12 / $40 total ($6 your share)</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill earn" style="width:30%"></div></div>
+        </div>
+      </div>
+      <div class="bt-bonus-row">
+        <div class="bt-bonus-label">Signing bonus (released on milestones)</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="bt-bonus-amount">$100</span>
+          <span class="bt-bonus-locked"><i class="fas fa-lock" style="font-size:8px"></i> Not yet unlocked</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cc-terms">
+      <div class="cc-term"><div class="cc-term-label">Your Revenue Share</div><div class="cc-term-val gold">50 %</div></div>
+      <div class="cc-term"><div class="cc-term-label">Min. Words Required</div><div class="cc-term-val">150k words</div></div>
+      <div class="cc-term"><div class="cc-term-val green">$100</div><div class="cc-term-label">Signing Bonus</div></div>
+    </div>
+    <div class="cc-actions">
+      <div class="cca view" onclick="openContractDetail('B')">View Full Terms</div>
+      <div class="cca sign" onclick="openContractDetail('B')">✍️ Sign Contract</div>
+    </div>
+  </div>
+
+  <div class="sdiv"></div>
+
+  <div class="sh"><div class="sh-title">✅ Signed & Active</div></div>
+
+  <!-- Signed — Betrayal story (bonus unlocked!) -->
+  <div class="contract-card signed fu d3">
+    <div class="cc-header">
+      <div class="cc-cover" style="background-image:url('https://i.postimg.cc/vDn9YLx5/wife2.jpg')"></div>
+      <div class="cc-info">
+        <div class="cc-badges">
+          <span class="cc-badge badge-signed">✅ Active</span>
+          <span class="cc-badge badge-nonexcl">🔓 Non-Exclusive</span>
+        </div>
+        <div class="cc-title">I came home early and caught my husband kissing my late sister's photograph</div>
+        <div class="cc-meta"><span>Droboard Revenue Programme</span><div class="cc-meta-dot"></div><span>Signed Oct 2, 2026</span></div>
+      </div>
+    </div>
+    <div class="bonus-tracker" style="border-color:var(--green-border);background:rgba(16,185,129,.05)">
+      <div class="bt-title" style="color:var(--green)"><i class="fas fa-check-circle" style="font-size:9px"></i> Signing Bonus Unlocked 🎉</div>
+      <div class="bt-rows">
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-pen" style="color:var(--blue)"></i> Words on Droboard</span>
+            <span class="bt-row-val done">✅ 163,200 / 150,000</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill done-bar" style="width:100%"></div></div>
+        </div>
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-dollar-sign" style="color:var(--gold)"></i> Platform Shared Profit</span>
+            <span class="bt-row-val done">✅ $44 total earned ($22 your share)</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill done-bar" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div class="bt-bonus-row">
+        <div class="bt-bonus-label">Signing bonus</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="bt-bonus-amount">$200</span>
+          <span class="bt-bonus-ready" onclick="claimBonus(this)"><i class="fas fa-unlock" style="font-size:8px"></i> Claim Now</span>
+        </div>
+      </div>
+    </div>
+    <div class="cc-terms">
+      <div class="cc-term"><div class="cc-term-label">Earned (Your 50%)</div><div class="cc-term-val green">$22.00</div></div>
+      <div class="cc-term"><div class="cc-term-label">Total Platform</div><div class="cc-term-val gold">$44.00</div></div>
+      <div class="cc-term"><div class="cc-term-label">Bonus Status</div><div class="cc-term-val green">Claimable</div></div>
+    </div>
+    <div class="cc-actions">
+      <div class="cca view" onclick="toast('📋 Viewing contract…')">View Contract</div>
+      <div class="cca done">✅ Active</div>
+    </div>
+  </div>
+
+  <!-- Signed — Campus story (in progress) -->
+  <div class="contract-card signed" style="opacity:.82">
+    <div class="cc-header">
+      <div class="cc-cover" style="background-image:url('https://i.postimg.cc/cgLZJNmC/8.jpg')"></div>
+      <div class="cc-info">
+        <div class="cc-badges">
+          <span class="cc-badge badge-signed">✅ Active</span>
+          <span class="cc-badge badge-nonexcl">🔓 Non-Exclusive</span>
+        </div>
+        <div class="cc-title">The richest boy in school suddenly started sitting beside me every morning</div>
+        <div class="cc-meta"><span>Droboard Revenue Programme</span><div class="cc-meta-dot"></div><span>Signed Nov 1, 2026</span></div>
+      </div>
+    </div>
+    <div class="bonus-tracker">
+      <div class="bt-title"><i class="fas fa-spinner fa-spin" style="font-size:9px;color:var(--gold)"></i> Progress towards $80 Signing Bonus</div>
+      <div class="bt-rows">
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-pen" style="color:var(--blue)"></i> Words on Droboard</span>
+            <span class="bt-row-val progress">87,500 / 150,000</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill words" style="width:58%"></div></div>
+        </div>
+        <div class="bt-row">
+          <div class="bt-row-hdr">
+            <span class="bt-row-label"><i class="fas fa-dollar-sign" style="color:var(--gold)"></i> Platform Shared Profit</span>
+            <span class="bt-row-val progress">$15 / $40 total ($7.50 your share)</span>
+          </div>
+          <div class="bt-bar"><div class="bt-bar-fill earn" style="width:37%"></div></div>
+        </div>
+      </div>
+      <div class="bt-bonus-row">
+        <div class="bt-bonus-label">Signing bonus (released on milestones)</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="bt-bonus-amount">$80</span>
+          <span class="bt-bonus-locked"><i class="fas fa-lock" style="font-size:8px"></i> Not yet unlocked</span>
+        </div>
+      </div>
+    </div>
+    <div class="cc-terms">
+      <div class="cc-term"><div class="cc-term-label">Earned (Your 50%)</div><div class="cc-term-val green">$7.50</div></div>
+      <div class="cc-term"><div class="cc-term-label">Total Platform</div><div class="cc-term-val gold">$15.00</div></div>
+      <div class="cc-term"><div class="cc-term-label">Bonus Status</div><div class="cc-term-val" style="color:var(--muted)">Locked</div></div>
+    </div>
+    <div class="cc-actions">
+      <div class="cca view" onclick="toast('📋 Viewing contract…')">View Contract</div>
+      <div class="cca done">✅ Active</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ STORIES PANEL ═══ -->
+<div class="panel" id="panel-stories">
+  <div class="sh">
+    <div class="sh-title">All My Stories (8)</div>
+    <div class="sh-more" onclick="toast('✏️ New story')">+ New</div>
+  </div>
+  <div id="storiesList"></div>
+</div>
+
+<!-- ═══ EARNINGS PANEL ═══ -->
+<div class="panel" id="panel-earn">
+  <div class="earn-hero">
+    <div class="eh-label">Total Earned (Your 50% Share)</div>
+    <div class="eh-amount">$37.00</div>
+    <div class="eh-sub">+ $150 signing bonus claimable · Total platform profit: $74.00</div>
+    <div class="eh-actions">
+      <div class="eh-btn withdraw" onclick="toast('💸 Opening withdrawal…')"><i class="fas fa-arrow-up" style="font-size:9px"></i> Withdraw</div>
+      <div class="eh-btn history" onclick="toast('📊 Full history…')"><i class="fas fa-chart-line" style="font-size:9px"></i> History</div>
+    </div>
+  </div>
+
+  <!-- Claimable bonus -->
+  <div class="bonus-claim-card">
+    <div class="bcc-icon">🎁</div>
+    <div class="bcc-body">
+      <div class="bcc-label">Signing Bonus Ready!</div>
+      <div class="bcc-title">"I came home early…" — Milestones hit</div>
+      <div class="bcc-sub">163k words ✅ · $44 platform profit ✅ · Bonus = $200</div>
+    </div>
+    <button class="bcc-btn" onclick="claimBonusFromEarn()">Claim $200</button>
+  </div>
+
+  <div class="earn-grid">
+    <div class="earn-card"><div class="earn-card-label">Your Revenue (50%)</div><div class="earn-card-num green">$37.00</div><div class="earn-card-sub">From 2 active contracts</div></div>
+    <div class="earn-card"><div class="earn-card-label">Platform Total</div><div class="earn-card-num gold">$74.00</div><div class="earn-card-sub">Gross shared profit</div></div>
+    <div class="earn-card"><div class="earn-card-label">Bonus Claimable</div><div class="earn-card-num" style="color:var(--purple)">$200</div><div class="earn-card-sub">1 story qualified</div></div>
+    <div class="earn-card"><div class="earn-card-label">Bonus Locked</div><div class="earn-card-num blue">$280</div><div class="earn-card-sub">3 stories in progress</div></div>
+  </div>
+
+  <div class="sh" style="margin-bottom:10px"><div class="sh-title">Payouts Received</div></div>
+  <div class="payout-row"><div class="pr-icon">💸</div><div class="pr-info"><div class="pr-title">November Revenue Share</div><div class="pr-meta">Nov 30, 2026 · Droboard Wallet</div></div><div class="pr-amount">$15.00</div></div>
+  <div class="payout-row"><div class="pr-icon">💸</div><div class="pr-info"><div class="pr-title">October Revenue Share</div><div class="pr-meta">Oct 31, 2026 · Droboard Wallet</div></div><div class="pr-amount">$12.00</div></div>
+  <div class="payout-row"><div class="pr-icon">💸</div><div class="pr-info"><div class="pr-title">October Revenue Share</div><div class="pr-meta">Oct 15, 2026 · Droboard Wallet</div></div><div class="pr-amount">$10.00</div></div>
+</div>
+
+<!-- ═══ UPDATES PANEL ═══ -->
+<div class="panel" id="panel-updates">
+  <div class="sh" style="margin-bottom:10px"><div class="sh-title">Contract & Story Updates</div></div>
+  <div id="updatesList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <div class="bn" onclick="location.href='index.html'"><i class="fas fa-home"></i>Home</div>
+  <div class="bn" onclick="location.href='discover.html'"><i class="fas fa-compass"></i>Discover</div>
+  <div class="bn on"><i class="fas fa-file-signature"></i>Contracts</div>
+  <div class="bn" onclick="location.href='people.html'"><i class="fas fa-users"></i>People</div>
+  <div class="bn" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i>Profile</div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- CONTRACT DETAIL MODAL -->
+<div class="modal-bg" id="contractModal" onclick="if(event.target===this)closeModal('contractModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <h3>📋 Contract Terms</h3>
+      <button class="modal-close" onclick="closeModal('contractModal')">✕</button>
+    </div>
+    <div id="contractModalContent"></div>
+  </div>
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-bg" id="applyModal" onclick="if(event.target===this)closeModal('applyModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <h3>🚀 Apply for Contract</h3>
+      <button class="modal-close" onclick="closeModal('applyModal')">✕</button>
+    </div>
+    <div style="padding:0 16px 8px;font-size:11px;color:var(--tx2);line-height:1.5">Choose a story to submit to Droboard for a revenue contract. Stories with 50k+ words are more likely to qualify.</div>
+    <div style="padding:8px 16px 6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Select Story</div>
+    <div class="apply-story-list" id="applyStoryList"></div>
+    <div style="padding:8px 16px 6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Pitch (optional)</div>
+    <textarea class="apply-pitch-area" id="pitchArea" placeholder="Tell editors why this story deserves a contract — engagement, where it's going, your commitment…"></textarea>
+    <button class="apply-submit-btn" onclick="submitApply()">Submit to Droboard →</button>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const STORIES = [
+  {id:1,cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'✨ Twist',badge:'hot',
+   title:"The runaway bride — I left at the altar in my socked feet",
+   reads:'312k',likes:'45k',words:112400,platformProfit:28,
+   contractStatus:'pending', // offer received not yet signed
+   totalCh:5,
+   chapters:[
+    {n:1,title:'The morning of',status:'pub',reads:'312k',words:18200},
+    {n:2,title:'Four hundred guests',status:'pub',reads:'218k',words:19800},
+    {n:3,title:'I said: I know',status:'pub',reads:'201k',words:21100},
+    {n:4,title:'The fire exit',status:'pub',reads:'189k',words:22400},
+    {n:5,title:'Bare Kitchen opens',status:'pub',reads:'171k',words:30900},
+   ]},
+  {id:2,cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'💔 Betrayal',badge:'hot',
+   title:"I came home early and caught my husband kissing my late sister's photograph",
+   reads:'171k',likes:'24.3k',words:163200,platformProfit:44,
+   contractStatus:'signed',
+   totalCh:14,
+   chapters:[
+    {n:1,title:'The photograph on the mantel',status:'pub',reads:'171k',words:11200},
+    {n:2,title:'Six years of silence',status:'pub',reads:'142k',words:12800},
+    {n:3,title:'What Sade saw',status:'pub',reads:'138k',words:10900},
+    {n:4,title:'Four hundred guests',status:'pub',reads:'130k',words:11600},
+    {n:5,title:'The cardamom loaf',status:'pub',reads:'121k',words:12200},
+    {n:6,title:'Three strangers',status:'pub',reads:'118k',words:11800},
+    {n:7,title:'What Emeka texted',status:'pub',reads:'111k',words:12100},
+    {n:8,title:'Bare Kitchen',status:'pub',reads:'109k',words:11700},
+    {n:9,title:'November',status:'pub',reads:'98k',words:12400},
+    {n:10,title:'The woman came back',status:'pub',reads:'91k',words:11900},
+    {n:11,title:'Season 2 begins',status:'pub',reads:'88k',words:12300},
+    {n:12,title:'Ada comes home',status:'pub',reads:'82k',words:12800},
+    {n:13,title:'The second envelope',status:'pub',reads:'78k',words:11800},
+    {n:14,title:'Chapter 14 — Latest',status:'pub',reads:'71k',words:11700},
+    {n:15,title:'Chapter 15 — in progress',status:'draft',reads:'—',words:0},
+   ]},
+  {id:3,cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'👑 Family',badge:'',
+   title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",
+   reads:'204k',likes:'31k',words:68200,platformProfit:12,
+   contractStatus:'pending',
+   totalCh:12,
+   chapters:[
+    {n:1,title:'The lawyer came on Saturday',status:'pub',reads:'204k',words:9800},
+    {n:2,title:'The sealed envelope',status:'pub',reads:'172k',words:8200},
+    {n:3,title:'Adanna reads the letter',status:'pub',reads:'165k',words:7900},
+    {n:4,title:'The veranda',status:'pub',reads:'158k',words:6800},
+    {n:5,title:'Forty-seven journals',status:'pub',reads:'149k',words:8100},
+    {n:6,title:'Season 2 — Blood tests',status:'pub',reads:'141k',words:7400},
+    {n:7,title:'She finds her real mother',status:'pub',reads:'134k',words:6900},
+    {n:8,title:'The confrontation',status:'pub',reads:'128k',words:7200},
+    {n:9,title:'Forgiveness',status:'pub',reads:'121k',words:6800},
+    {n:10,title:'Chapter 10',status:'pub',reads:'114k',words:7100},
+    {n:11,title:'Chapter 11',status:'pub',reads:'106k',words:6900},
+    {n:12,title:'Latest chapter',status:'pub',reads:'98k',words:7100},
+    {n:13,title:'Chapter 13 — draft',status:'draft',reads:'—',words:0},
+   ]},
+  {id:4,cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'🎓 Campus',badge:'new',
+   title:"The richest boy in school suddenly started sitting beside me every morning",
+   reads:'134k',likes:'18.1k',words:87500,platformProfit:15,
+   contractStatus:'signed',
+   totalCh:8,
+   chapters:[
+    {n:1,title:'Monday morning',status:'pub',reads:'134k',words:10200},
+    {n:2,title:'The front row',status:'pub',reads:'118k',words:9800},
+    {n:3,title:'The folded note',status:'pub',reads:'109k',words:11400},
+    {n:4,title:'The neem tree',status:'pub',reads:'101k',words:10800},
+    {n:5,title:'The truth about his family',status:'pub',reads:'94k',words:11100},
+    {n:6,title:'Exams',status:'pub',reads:'88k',words:12200},
+    {n:7,title:'Graduation',status:'pub',reads:'81k',words:11700},
+    {n:8,title:'Latest',status:'pub',reads:'74k',words:10300},
+    {n:9,title:'Chapter 9 — in progress',status:'draft',reads:'—',words:0},
+   ]},
+  {id:5,cover:'https://i.postimg.cc/0MyxNqfz/7.jpg',cat:'💔 Heartbreak',badge:'new',
+   title:"He deleted our anniversary photos from every device before I came home",
+   reads:'96k',likes:'9.8k',words:32600,platformProfit:0,
+   contractStatus:'none',totalCh:3,
+   chapters:[
+    {n:1,title:'I came home to empty shelves',status:'pub',reads:'96k',words:11200},
+    {n:2,title:'The cloud backup',status:'pub',reads:'78k',words:10900},
+    {n:3,title:'What he said',status:'pub',reads:'54k',words:10500},
+    {n:4,title:'Chapter 4 — draft',status:'draft',reads:'—',words:0},
+   ]},
+  {id:6,cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'🌙 Elegy',badge:'',
+   title:"The letter folded inside the pocket of his old jacket",
+   reads:'218k',likes:'36.5k',words:78400,platformProfit:9,
+   contractStatus:'none',totalCh:4,
+   chapters:[
+    {n:1,title:'His name was Emeka',status:'pub',reads:'218k',words:19200},
+    {n:2,title:'The green jacket',status:'pub',reads:'198k',words:21800},
+    {n:3,title:'What he wrote',status:'pub',reads:'188k',words:18900},
+    {n:4,title:'She still carries the letter',status:'pub',reads:'179k',words:18500},
+   ]},
+  {id:7,cover:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'🔥 Revenge',badge:'',
+   title:"My stepmother stole my university fund so I quietly uncovered her secret life",
+   reads:'192k',likes:'28k',words:59100,platformProfit:7,
+   contractStatus:'none',totalCh:5,
+   chapters:[
+    {n:1,title:'The empty tin',status:'pub',reads:'192k',words:11400},
+    {n:2,title:'The folder under the wardrobe',status:'pub',reads:'171k',words:12200},
+    {n:3,title:'Two IDs same face',status:'pub',reads:'162k',words:11800},
+    {n:4,title:'The lawyer',status:'pub',reads:'154k',words:12100},
+    {n:5,title:'The judgment',status:'pub',reads:'146k',words:11600},
+   ]},
+  {id:8,cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'💔 Betrayal',badge:'',
+   title:"Caught my husband kissing her photograph at our anniversary dinner",
+   reads:'88k',likes:'14k',words:44200,platformProfit:4,
+   contractStatus:'none',totalCh:6,
+   chapters:[
+    {n:1,title:'He made a reservation',status:'pub',reads:'88k',words:7200},
+    {n:2,title:'The phone on the table',status:'pub',reads:'72k',words:7800},
+    {n:3,title:'What I saw',status:'pub',reads:'64k',words:7400},
+    {n:4,title:'The drive home',status:'pub',reads:'58k',words:7100},
+    {n:5,title:'The conversation',status:'pub',reads:'52k',words:7300},
+    {n:6,title:'Latest',status:'pub',reads:'44k',words:7400},
+    {n:7,title:'Chapter 7 — scheduled',status:'sched',reads:'—',words:0},
+   ]},
+];
+
+const CONTRACT_DETAILS = {
+  A:{
+    storyId:1,bonus:150,
+    bonusConds:{words:112400,wordsTarget:150000,profit:28,profitTarget:40},
+    title:"The runaway bride — I left at the altar in my socked feet",
+    cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'✨ Twist',
+    offeredBy:'Droboard Revenue Programme',
+    clauses:[
+      'This is a non-exclusive contract. You retain full copyright and can publish this story on other platforms.',
+      'Droboard earns revenue from ads and reader subscriptions. You receive 50% of the net profit this story generates.',
+      'Your $150 signing bonus is held in escrow and released automatically when BOTH conditions are met: (1) story reaches 150,000 cumulative words on Droboard, (2) total platform profit from this story reaches $40.',
+      'There is no monthly payment guarantee — earnings are purely performance-based (your 50% share).',
+      'You must post at least 1 chapter every 30 days to keep the contract active.',
+      'Either party may terminate with 14 days written notice via the app.',
+    ],
+    signed:false,
+  },
+  B:{
+    storyId:3,bonus:100,
+    bonusConds:{words:68200,wordsTarget:150000,profit:12,profitTarget:40},
+    title:"My grandmother's will revealed I wasn't her blood — but she left everything to me",
+    cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'👑 Family',
+    offeredBy:'Droboard Revenue Programme',
+    clauses:[
+      'This is a non-exclusive contract. You retain full copyright and can publish this story on other platforms.',
+      'You receive 50% of net profit generated by this story on Droboard (ads + subscriptions).',
+      'Your $100 signing bonus is held in escrow. It releases when: (1) story hits 150,000 words on Droboard, AND (2) total platform profit from this story reaches $40.',
+      'No minimum monthly payment — earnings are performance-based.',
+      'Minimum 1 chapter per 30 days to maintain active status.',
+      'Either party may terminate with 14 days notice.',
+    ],
+    signed:false,
+  },
+};
+
+const UPDATES = [
+  {icon:'contract',emoji:'⚡',title:'New contract offer: "The runaway bride"',sub:'Non-exclusive · $150 signing bonus (unlocks at 150k words + $40 platform profit) · Accept before Dec 10.',time:'2h ago',unread:true,action:'Sign'},
+  {icon:'contract',emoji:'⚡',title:'New contract offer: "My grandmother\'s will…"',sub:'Non-exclusive · $100 signing bonus unlockable · Review the terms.',time:'5h ago',unread:true,action:'Sign'},
+  {icon:'earn',emoji:'🎁',title:'Signing bonus of $200 is now claimable!',sub:'"I came home early…" has crossed 150k words and $40 platform profit. Your bonus is ready.',time:'1d ago',unread:true,action:'Claim'},
+  {icon:'chapter',emoji:'📖',title:'Chapter 5 crossed 170,000 reads',sub:'"The runaway bride" — your highest read chapter this month.',time:'2d ago',unread:false,action:null},
+  {icon:'signed',emoji:'✅',title:'Contract activated',sub:'"The richest boy in school" is now in the revenue programme. Earnings begin from your next chapter.',time:'5d ago',unread:false,action:null},
+  {icon:'earn',emoji:'💰',title:'$7.50 earned (your 50% share)',sub:'"The richest boy in school" — $15 total platform profit generated.',time:'6d ago',unread:false,action:null},
+];
+
+const signedContracts = new Set();
+const openCh = new Set();
+let selectedApplyStory = null;
+
+/* ── UTILS ── */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function fmtW(n){return n>=1000?(n/1000).toFixed(1)+'k':n}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  document.querySelector('.tab.active')?.scrollIntoView({inline:'center',behavior:'smooth'});
+}
+
+function goUpdates(){
+  switchTab('updates');
+  UPDATES.forEach(u=>u.unread=false);
+  document.getElementById('notifBadge').style.display='none';
+  document.getElementById('updates-ct').textContent='0';
+  renderUpdates();
+}
+
+function flashPending(){
+  document.querySelectorAll('.contract-card.has-action').forEach(c=>{
+    c.style.boxShadow='0 0 0 2px var(--gold),0 0 22px rgba(245,158,11,.25)';
+    setTimeout(()=>c.style.boxShadow='',2200);
+  });
+}
+
+/* ── CONTRACT DETAIL ── */
+function openContractDetail(key){
+  const d = CONTRACT_DETAILS[key];
+  if(!d) return;
+  const isSigned = signedContracts.has(key);
+  const wordsPct = Math.min(100, Math.round(d.bonusConds.words/d.bonusConds.wordsTarget*100));
+  const profitPct = Math.min(100, Math.round(d.bonusConds.profit/d.bonusConds.profitTarget*100));
+  const wordsOk = d.bonusConds.words >= d.bonusConds.wordsTarget;
+  const profitOk = d.bonusConds.profit >= d.bonusConds.profitTarget;
+
+  document.getElementById('contractModalContent').innerHTML = `
+    <div class="cd-sec">
+      <div class="cd-label">Story</div>
+      <div class="cd-preview">
+        <div class="cd-prev-cover" style="background-image:url('${d.cover}')"></div>
+        <div><div class="cd-prev-title">${d.title}</div><div class="cd-prev-meta">${d.cat} · Offered by ${d.offeredBy}</div></div>
+      </div>
+    </div>
+    <div class="cd-sdiv"></div>
+    <div class="cd-sec">
+      <div class="cd-label">Non-Exclusive Rights</div>
+      <div class="cd-nonexcl-banner">
+        <div class="cd-nonexcl-ico">🔓</div>
+        <div class="cd-nonexcl-text"><strong>This is non-exclusive.</strong> You keep full copyright. You can publish this story on Wattpad, GoodNovel, your own site — anywhere. Droboard simply earns revenue from its platform and shares 50% with you.</div>
+      </div>
+    </div>
+    <div class="cd-sec">
+      <div class="cd-label">Revenue Terms</div>
+      <div class="cd-terms-grid">
+        <div class="cd-term"><div class="cd-term-label">Your Share</div><div class="cd-term-val gold">50%</div></div>
+        <div class="cd-term"><div class="cd-term-label">Droboard Share</div><div class="cd-term-val">50%</div></div>
+        <div class="cd-term"><div class="cd-term-label">Signing Bonus</div><div class="cd-term-val green">$${d.bonus}</div></div>
+        <div class="cd-term"><div class="cd-term-label">Payment Type</div><div class="cd-term-val">Performance</div></div>
+      </div>
+    </div>
+    <div class="cd-sdiv"></div>
+    <div class="cd-sec">
+      <div class="cd-label">Signing Bonus — $${d.bonus} (Escrow)</div>
+      <div class="cd-bonus-box">
+        <div class="cd-bonus-title"><i class="fas fa-lock" style="font-size:9px"></i> Both conditions must be met to unlock</div>
+        <div class="cd-bonus-conds">
+          <div class="cd-cond"><div class="cd-cond-num">${wordsOk?'✓':'1'}</div><div class="cd-cond-text">Story reaches <strong>150,000 cumulative words</strong> published on Droboard.</div></div>
+          <div class="cd-cond"><div class="cd-cond-num">${profitOk?'✓':'2'}</div><div class="cd-cond-text">Story generates <strong>$40 total platform profit</strong> on Droboard (your share = $20). Revenue comes from ads and reader subscriptions.</div></div>
+        </div>
+        <div class="cd-bonus-progress">
+          <div class="cd-bp-row">
+            <div class="cd-bp-hdr"><span>📝 Words on Droboard</span><span style="color:${wordsOk?'var(--green)':'var(--gold)'}">${fmtW(d.bonusConds.words)} / 150k ${wordsOk?'✅':''}</span></div>
+            <div class="cd-bp-bar"><div class="cd-bp-fill w" style="width:${wordsPct}%"></div></div>
+          </div>
+          <div class="cd-bp-row">
+            <div class="cd-bp-hdr"><span>💰 Platform Shared Profit</span><span style="color:${profitOk?'var(--green)':'var(--gold)'}">\$${d.bonusConds.profit} / \$40 ${profitOk?'✅':''}</span></div>
+            <div class="cd-bp-bar"><div class="cd-bp-fill e" style="width:${profitPct}%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cd-sdiv"></div>
+    <div class="cd-sec">
+      <div class="cd-label">Key Clauses</div>
+      <div class="cd-clauses">
+        ${d.clauses.map((c,i)=>`<div class="cd-clause"><div class="cd-clause-dot">${i+1}</div><div class="cd-clause-text">${c}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="cd-sign-section">
+      ${!isSigned ? `
+        <div class="cd-warn">
+          <div class="cd-warn-ico">⚠️</div>
+          <div class="cd-warn-text">By signing you agree to post at least 1 chapter/month. There is no guaranteed payment — you earn 50% of what your story earns on Droboard.</div>
+        </div>
+        <button class="cd-sign-btn" onclick="doSign('${key}',this)">✍️ Sign Contract — $${d.bonus} bonus in escrow</button>
+      ` : `
+        <button class="cd-sign-btn done">✅ Contract Signed · $${d.bonus} bonus in escrow</button>
+      `}
+    </div>`;
+  openModal('contractModal');
+}
+
+function doSign(key, btn){
+  signedContracts.add(key);
+  CONTRACT_DETAILS[key].signed = true;
+  btn.className = 'cd-sign-btn done';
+  btn.textContent = `✅ Signed · $${CONTRACT_DETAILS[key].bonus} bonus in escrow`;
+  // update card
+  const card = document.getElementById('cc-'+key);
+  if(card){
+    card.classList.remove('has-action');
+    card.classList.add('signed');
+    const actions = card.querySelector('.cc-actions');
+    if(actions){
+      const signBtn = actions.querySelector('.cca.sign');
+      if(signBtn){signBtn.className='cca done';signBtn.textContent='✅ Signed';}
+    }
+    const dl = card.querySelector('.cc-deadline');
+    if(dl) dl.remove();
+  }
+  const remaining = document.querySelectorAll('.contract-card.has-action').length;
+  document.getElementById('contracts-ct').textContent = remaining || '0';
+  document.getElementById('sumPending').textContent = remaining;
+  document.getElementById('sumSigned').textContent = signedContracts.size + 2;
+  if(remaining === 0) document.getElementById('alertStrip').style.display='none';
+  // push update
+  UPDATES.unshift({icon:'signed',emoji:'✅',title:`Contract signed — $${CONTRACT_DETAILS[key].bonus} bonus in escrow`,sub:`"${CONTRACT_DETAILS[key].title.substring(0,50)}…" · Bonus unlocks at 150k words + $40 platform profit`,time:'Just now',unread:false,action:null});
+  renderUpdates();
+  setTimeout(()=>{closeModal('contractModal');toast(`🎉 Signed! Write to unlock your $${CONTRACT_DETAILS[key].bonus} bonus.`);},500);
+}
+
+function claimBonus(btn){
+  btn.textContent='✅ Claimed!';
+  btn.style.background='var(--muted)';
+  btn.style.pointerEvents='none';
+  toast('🎁 $200 signing bonus added to your wallet!');
+}
+function claimBonusFromEarn(){
+  toast('🎁 $200 signing bonus claimed and added to your wallet!');
+  document.querySelector('.bonus-claim-card').style.display='none';
+}
+
+/* ── RENDER STORIES ── */
+function renderStories(){
+  document.getElementById('storiesList').innerHTML = STORIES.map(s => {
+    const ctag = s.contractStatus==='signed'
+      ? `<span class="sc-ctag signed">✅ Contract Active</span>`
+      : s.contractStatus==='pending'
+      ? `<span class="sc-ctag pending">⚡ Offer Pending</span>`
+      : `<span class="sc-ctag none">No Contract</span>`;
+    const wordsPct = Math.min(100,Math.round(s.words/150000*100));
+    const profitPct = Math.min(100,Math.round(s.platformProfit/40*100));
+    const isOpen = openCh.has(s.id);
+    const hasDraft = s.chapters.some(c=>c.status==='draft');
+    const chHtml = s.chapters.map(c=>`
+      <div class="ch-item">
+        <div class="ch-bubble ${c.status==='pub'?'pub':c.status==='draft'?'draft':'sched'}">${c.n}</div>
+        <div class="ch-body">
+          <div class="ch-title">Ch.${c.n} — ${c.title}</div>
+          <div class="ch-meta">
+            <span class="ch-pill ${c.status==='pub'?'pub':c.status==='draft'?'draft':'sched'}">${c.status==='pub'?'Published':c.status==='draft'?'Draft':'Scheduled'}</span>
+            ${c.words>0?`<span class="ch-words">${fmtW(c.words)} words</span>`:''}
+          </div>
+        </div>
+        <div class="ch-right">
+          ${c.reads!=='—'?`<span class="ch-reads"><i class="far fa-eye" style="font-size:7px"></i>${c.reads}</span>`:''}
+          ${c.status==='draft'?`<span class="ch-edit" onclick="toast('✏️ Editing Ch.${c.n}…')">Edit</span>`:''}
+        </div>
+      </div>`).join('');
+
+    const showTracker = s.contractStatus !== 'none';
+    return `
+      <div class="story-card">
+        <div class="sc-hdr">
+          <div class="sc-cover" style="background-image:url('${s.cover}')">
+            ${s.badge?`<div class="sc-cover-badge ${s.badge}">${s.badge.toUpperCase()}</div>`:''}
+          </div>
+          <div class="sc-body">
+            <div class="sc-cat">${s.cat}</div>
+            <div class="sc-title">${s.title}</div>
+            <div class="sc-stats">
+              <span class="sc-stat"><i class="far fa-eye" style="font-size:8px"></i>${s.reads}</span>
+              <span class="sc-stat"><i class="far fa-heart" style="font-size:8px"></i>${s.likes}</span>
+              <span class="sc-stat"><i class="fas fa-pen" style="font-size:7px"></i>${fmtW(s.words)} words</span>
+              ${ctag}
+            </div>
+          </div>
+        </div>
+        ${showTracker ? `
+        <div class="sc-tracker">
+          <div class="sc-tracker-row">
+            <div class="sct-item">
+              <div class="sct-hdr"><span>📝 Words to bonus</span><span style="color:${wordsPct>=100?'var(--green)':'var(--gold)'}">${wordsPct>=100?'✅ Done':wordsPct+'%'}</span></div>
+              <div class="sct-bar"><div class="sct-fill w" style="width:${wordsPct}%"></div></div>
+            </div>
+            <div style="width:8px"></div>
+            <div class="sct-item">
+              <div class="sct-hdr"><span>💰 Profit to bonus</span><span style="color:${profitPct>=100?'var(--green)':'var(--gold)'}">${profitPct>=100?'✅ Done':'$'+s.platformProfit+'/$40'}</span></div>
+              <div class="sct-bar"><div class="sct-fill e" style="width:${profitPct}%"></div></div>
+            </div>
+          </div>
+        </div>` : ''}
+        <div class="sc-ch-toggle" onclick="toggleCh(${s.id},this)">
+          <div class="sc-ch-left">
+            <i class="fas fa-list-ul" style="font-size:10px;color:var(--muted)"></i>
+            <span class="sc-ch-count">${s.totalCh} chapters</span>
+            ${hasDraft?`<span style="font-size:8px;font-weight:800;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 6px;border-radius:6px">draft</span>`:''}
+          </div>
+          <i class="fas fa-chevron-down sc-ch-arrow${isOpen?' open':''}" id="arr-${s.id}"></i>
+        </div>
+        <div class="ch-list${isOpen?' open':''}" id="chl-${s.id}">${chHtml}</div>
+        <div class="sc-footer">
+          <div class="sc-footer-stats">
+            <span class="sc-fstat"><i class="fas fa-book-open" style="font-size:8px"></i>${s.totalCh} ch</span>
+            <span class="sc-fstat"><i class="fas fa-pen" style="font-size:7px"></i>${fmtW(s.words)} words</span>
+            <span class="sc-fstat"><i class="far fa-eye" style="font-size:8px"></i>${s.reads}</span>
+          </div>
+          <div class="sc-factions">
+            <div class="sfca share" onclick="toast('📤 Sharing…')"><i class="fas fa-share-alt"></i></div>
+            ${s.contractStatus==='none'?`<div class="sfca apply" onclick="openApplyForStory(${s.id})">Apply</div>`:''}
+            <div class="sfca edit" onclick="toast('✏️ Editing…')">Edit</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleCh(id, row){
+  const list=document.getElementById('chl-'+id);
+  const arr=document.getElementById('arr-'+id);
+  const open=list.classList.contains('open');
+  list.classList.toggle('open',!open);
+  arr.classList.toggle('open',!open);
+  if(!open) openCh.add(id); else openCh.delete(id);
+}
+
+/* ── RENDER UPDATES ── */
+function renderUpdates(){
+  const unread = UPDATES.filter(u=>u.unread).length;
+  document.getElementById('updates-ct').textContent = unread || '0';
+  document.getElementById('notifBadge').textContent = unread;
+  document.getElementById('notifBadge').style.display = unread > 0 ? 'flex' : 'none';
+  document.getElementById('updatesList').innerHTML = UPDATES.map((u,i)=>`
+    <div class="notif-item" style="${u.unread?'':'opacity:.72'}">
+      ${u.unread?'<div class="unread-dot"></div>':'<div style="width:7px"></div>'}
+      <div class="notif-icon ${u.icon}">${u.emoji}</div>
+      <div class="notif-body">
+        <div class="notif-title">${u.title}</div>
+        <div class="notif-sub">${u.sub}</div>
+        <div class="notif-time">${u.time}</div>
+      </div>
+      ${u.action?`<div class="notif-cta" onclick="handleUpdate('${u.action}',${i})">${u.action} <i class="fas fa-arrow-right" style="font-size:8px"></i></div>`:''}
+    </div>`).join('');
+}
+
+function handleUpdate(action,idx){
+  UPDATES[idx].unread=false;
+  if(action==='Sign'){switchTab('contracts');flashPending();}
+  else if(action==='Claim'){switchTab('earn');}
+  renderUpdates();
+}
+
+/* ── APPLY ── */
+function openApplyModal(){
+  selectedApplyStory=null;
+  const eligible = STORIES.filter(s=>s.contractStatus==='none');
+  document.getElementById('applyStoryList').innerHTML = eligible.map(s=>`
+    <div class="apply-opt" id="aopt-${s.id}" onclick="selectApply(${s.id})">
+      <div class="apply-thumb" style="background-image:url('${s.cover}')"></div>
+      <div class="apply-info">
+        <div class="apply-story-title">${s.title}</div>
+        <div class="apply-story-meta">${s.cat} · ${fmtW(s.words)} words · ${s.reads} reads
+          <span class="elig-badge ${s.words>=50000?'eligible':'not'}" style="margin-left:4px">${s.words>=50000?'Eligible':'Build more'}</span>
+        </div>
+      </div>
+      <div class="apply-check" id="achk-${s.id}"><i class="fas fa-check"></i></div>
+    </div>`).join('');
+  document.getElementById('pitchArea').value='';
+  openModal('applyModal');
+}
+
+function openApplyForStory(id){
+  openApplyModal();
+  setTimeout(()=>selectApply(id),120);
+}
+
+function selectApply(id){
+  selectedApplyStory=id;
+  document.querySelectorAll('.apply-opt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('aopt-'+id)?.classList.add('sel');
+}
+
+function submitApply(){
+  if(!selectedApplyStory){toast('📖 Select a story first!');return;}
+  const s=STORIES.find(x=>x.id===selectedApplyStory);
+  if(s && s.words < 30000){toast('⚠️ Story needs more chapters before applying');return;}
+  closeModal('applyModal');
+  if(s) s.contractStatus='pending';
+  renderStories();
+  toast(`🚀 Application submitted for "${s?.title?.substring(0,38)}…"`);
+}
+
+/* ── INIT ── */
+renderStories();
+renderUpdates();
+</script>
+</body>
+</html>

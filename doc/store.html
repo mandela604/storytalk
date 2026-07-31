@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
+  --tx-high:#e8e8e8;--tx-body:#a8b0ba;--tx-muted:#71717a;--tx-faint:#3f3f46;
+  --gold:#fbbf24;--gold-dim:rgba(251,191,36,.1);--gold-border:rgba(251,191,36,.25);
+  --green:#34d399;--blue:#38bdf8;--purple:#a78bfa;
+  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 16px)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;padding:calc(var(--safe-t) + 10px) 14px 10px;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.tb-back{width:34px;height:34px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx-body);cursor:pointer;flex-shrink:0}
+.tb-back:active{transform:scale(.9)}
+.tb-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:var(--tx-high);flex:1}
+.wallet-pill{display:flex;align-items:center;gap:6px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:12px;font-weight:800;padding:7px 13px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.wallet-pill i{font-size:12px}
+
+/* BALANCE CARD */
+.balance-wrap{padding:16px 14px 0}
+.balance-card{background:linear-gradient(150deg,rgba(251,191,36,.1),rgba(255,0,80,.06));border:1.5px solid var(--gold-border);border-radius:18px;padding:20px 18px;text-align:center;position:relative;overflow:hidden}
+.balance-card::before{content:'';position:absolute;top:-40%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(251,191,36,.15),transparent 70%);pointer-events:none}
+.balance-label{font-size:10px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;position:relative}
+.balance-amount{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:6px;position:relative}
+.balance-amount i{color:var(--gold);font-size:26px}
+.balance-sub{font-size:11px;color:var(--tx-muted);margin-bottom:16px;position:relative}
+.balance-actions{display:flex;gap:8px;position:relative}
+.balance-btn{flex:1;padding:10px;border-radius:13px;font-size:12px;font-weight:800;cursor:pointer;transition:.15s}
+.balance-btn:active{transform:scale(.97)}
+.balance-btn.pri{background:var(--acc);color:#fff;box-shadow:0 2px 14px var(--glow)}
+.balance-btn.sec{background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--tx-body)}
+
+/* PROMO STRIP */
+.promo-strip{margin:12px 14px 0;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.promo-ico{width:34px;height:34px;border-radius:10px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--purple);flex-shrink:0}
+.promo-body{flex:1;min-width:0}
+.promo-t{font-size:11.5px;font-weight:800;color:var(--tx-high)}
+.promo-s{font-size:9.5px;color:var(--tx-muted);margin-top:1px}
+.promo-arrow{font-size:11px;color:var(--purple);flex-shrink:0}
+
+/* TABS */
+.store-tabs{display:flex;gap:6px;margin:16px 14px 4px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:4px}
+.stab{flex:1;text-align:center;padding:9px 4px;border-radius:11px;font-size:12px;font-weight:700;color:var(--tx-muted);cursor:pointer;transition:.2s}
+.stab.active{background:var(--acc);color:#fff;box-shadow:0 2px 10px var(--glow-sm)}
+
+.store-panel{display:none;padding:14px}
+.store-panel.active{display:block}
+
+/* COIN BUNDLES */
+.coin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.coin-card{position:relative;background:var(--l1);border:1.5px solid var(--bd);border-radius:16px;padding:16px 12px 14px;text-align:center;cursor:pointer;transition:.18s}
+.coin-card:active{transform:scale(.97)}
+.coin-card.reco{border-color:var(--gold-border);background:linear-gradient(160deg,rgba(251,191,36,.07),var(--l1) 60%)}
+.coin-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--acc);color:#fff;font-size:8px;font-weight:800;padding:3px 10px;border-radius:0 0 8px 8px;letter-spacing:.03em;white-space:nowrap}
+.coin-card.reco .coin-badge{background:var(--gold);color:#1a1206}
+.coin-ico{font-size:30px;margin:10px 0 8px}
+.coin-amt{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--tx-high);display:flex;align-items:baseline;justify-content:center;gap:4px}
+.coin-bonus{font-size:9.5px;font-weight:800;color:var(--green);margin-top:3px}
+.coin-price{font-size:13px;font-weight:800;color:var(--tx-high);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd2)}
+.coin-price-per{font-size:8.5px;color:var(--tx-muted);font-weight:600;margin-top:2px}
+
+/* REDEEM */
+.redeem-row{display:flex;gap:8px;margin-bottom:18px}
+.redeem-inp{flex:1;background:var(--l1);border:1px solid var(--bd);border-radius:12px;padding:10px 13px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.redeem-inp::placeholder{color:var(--tx-faint)}
+.redeem-btn{background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--tx-body);padding:0 16px;border-radius:12px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+
+.section-note{font-size:10.5px;color:var(--tx-muted);line-height:1.6;text-align:center;padding:0 10px}
+.section-note i{color:var(--acc3)}
+
+/* SUBSCRIPTION */
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+.bt-lbl{font-size:11.5px;font-weight:700;color:var(--tx-muted);cursor:pointer;transition:.2s}
+.bt-lbl.on{color:var(--tx-high)}
+.bt-switch{width:44px;height:24px;border-radius:14px;background:var(--l3);border:1px solid var(--bd);position:relative;cursor:pointer;flex-shrink:0}
+.bt-switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--acc);transition:.2s}
+.bt-switch.yearly::after{left:22px}
+.bt-save{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);font-size:8.5px;font-weight:800;padding:2px 7px;border-radius:8px}
+
+.plan-card{background:var(--l1);border:1.5px solid var(--bd);border-radius:18px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.plan-card.on{border-color:var(--bd-acc);background:linear-gradient(160deg,rgba(255,0,80,.05),var(--l1) 60%)}
+.plan-tag{position:absolute;top:0;right:16px;background:var(--acc);color:#fff;font-size:8px;font-weight:800;padding:4px 11px;border-radius:0 0 8px 8px;letter-spacing:.03em}
+.plan-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.plan-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high);display:flex;align-items:center;gap:6px}
+.plan-price{font-size:19px;font-weight:900;color:var(--tx-high)}
+.plan-price span{font-size:10px;font-weight:600;color:var(--tx-muted)}
+.plan-sub{font-size:10.5px;color:var(--tx-muted);margin-bottom:14px}
+.plan-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.plan-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx-body)}
+.plan-feat i{color:var(--green);font-size:11px;width:14px;flex-shrink:0}
+.plan-btn{width:100%;padding:11px;border-radius:13px;font-size:12.5px;font-weight:800;cursor:pointer;transition:.15s}
+.plan-btn:active{transform:scale(.98)}
+.plan-btn.upgrade{background:var(--acc);color:#fff;box-shadow:0 2px 14px var(--glow)}
+.plan-btn.current{background:rgba(255,255,255,.05);color:var(--tx-muted);border:1px solid var(--bd);cursor:default}
+
+/* OVERLAY / PURCHASE SHEET */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-end}
+.overlay-bg.open{display:flex}
+.overlay-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(20px + var(--safe-b))}
+.overlay-sheet::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-handle{width:36px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin:12px auto 0}
+.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px}
+.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high)}
+.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#aaa;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.ps-summary{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:13px;padding:13px;margin:6px 16px 16px}
+.ps-summary-ico{width:42px;height:42px;border-radius:11px;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--gold);flex-shrink:0}
+.ps-summary-body{flex:1;min-width:0}
+.ps-summary-t{font-size:13px;font-weight:800;color:var(--tx-high)}
+.ps-summary-s{font-size:10.5px;color:var(--tx-muted);margin-top:2px}
+.ps-summary-price{font-size:15px;font-weight:900;color:var(--tx-high);flex-shrink:0}
+
+.pm-label{font-size:9.5px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.09em;padding:0 16px 8px}
+.pm-list{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}
+.pm-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:13px;border:1.5px solid var(--bd);background:rgba(255,255,255,.02);cursor:pointer;transition:.15s}
+.pm-item.on{border-color:var(--bd-acc);background:rgba(255,0,80,.05)}
+.pm-item-ico{width:30px;font-size:16px;color:var(--tx-body);text-align:center;flex-shrink:0}
+.pm-item-body{flex:1}
+.pm-item-t{font-size:12.5px;font-weight:700;color:var(--tx-high)}
+.pm-item-s{font-size:9.5px;color:var(--tx-muted);margin-top:1px}
+.pm-item-check{font-size:15px;color:var(--tx-faint)}
+.pm-item.on .pm-item-check{color:var(--acc)}
+
+.ps-pay-btn{width:calc(100% - 32px);margin:0 16px;background:var(--acc);color:#fff;border:none;padding:13px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 2px 16px var(--glow);display:flex;align-items:center;justify-content:center;gap:8px}
+.ps-pay-btn:active{transform:scale(.98)}
+.ps-secure-note{text-align:center;font-size:9.5px;color:var(--tx-faint);padding:10px 16px 0;display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:1400;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="tb-back" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-title">Store</div>
+  <div class="wallet-pill" onclick="toast('📜 Opening transaction history…')"><i class="fas fa-coins"></i> <span id="tbWallet">40</span></div>
+</div>
+
+<!-- BALANCE CARD -->
+<div class="balance-wrap">
+  <div class="balance-card">
+    <div class="balance-label">Your Coin Balance</div>
+    <div class="balance-amount"><i class="fas fa-coins"></i> <span id="balanceHero">40</span></div>
+    <div class="balance-sub">≈ ₦<span id="balanceNaira">200</span> value · used for tips &amp; chapter unlocks</div>
+    <div class="balance-actions">
+      <button class="balance-btn pri" onclick="switchStoreTab('coins');document.getElementById('coinGridAnchor').scrollIntoView({behavior:'smooth'})">Buy Coins</button>
+      <button class="balance-btn sec" onclick="toast('📜 Opening transaction history…')">History</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE & EARN -->
+<div class="promo-strip" onclick="shareInvite()">
+  <div class="promo-ico"><i class="fas fa-gift"></i></div>
+  <div class="promo-body">
+    <div class="promo-t">Invite a friend, earn 50 coins</div>
+    <div class="promo-s">They get 50 coins too when they join</div>
+  </div>
+  <i class="fas fa-chevron-right promo-arrow"></i>
+</div>
+
+<!-- TABS -->
+<div class="store-tabs">
+  <div class="stab active" data-tab="coins" onclick="switchStoreTab('coins')">🪙 Coins</div>
+  <div class="stab" data-tab="sub" onclick="switchStoreTab('sub')">⭐ Subscription</div>
+</div>
+
+<!-- COINS PANEL -->
+<div class="store-panel active" id="panel-coins">
+  <div id="coinGridAnchor"></div>
+  <div class="coin-grid" id="coinGrid"></div>
+
+  <div class="redeem-row">
+    <input class="redeem-inp" id="redeemInput" placeholder="Have a gift code? Enter it here…"/>
+    <button class="redeem-btn" onclick="redeemCode()">Redeem</button>
+  </div>
+
+  <div class="section-note"><i class="fas fa-shield-halved"></i> Coins never expire. Used for tipping writers and unlocking locked chapters.</div>
+</div>
+
+<!-- SUBSCRIPTION PANEL -->
+<div class="store-panel" id="panel-sub">
+  <div class="billing-toggle">
+    <span class="bt-lbl on" id="btMonthlyLbl" onclick="setBilling('monthly')">Monthly</span>
+    <div class="bt-switch" id="btSwitch" onclick="toggleBilling()"></div>
+    <span class="bt-lbl" id="btYearlyLbl" onclick="setBilling('yearly')">Yearly</span>
+    <span class="bt-save">Save 20%</span>
+  </div>
+  <div id="plansList"></div>
+  <div class="section-note"><i class="fas fa-info-circle"></i> Cancel anytime from Settings. Your plan renews automatically until cancelled.</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<!-- PURCHASE SHEET -->
+<div class="overlay-bg" id="purchaseOv" onclick="if(event.target===this)closePurchaseSheet()">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr"><h3>Confirm Purchase</h3><button class="overlay-close" onclick="closePurchaseSheet()">✕</button></div>
+    <div class="ps-summary">
+      <div class="ps-summary-ico" id="psIco">🪙</div>
+      <div class="ps-summary-body">
+        <div class="ps-summary-t" id="psTitle">300 Coins</div>
+        <div class="ps-summary-s" id="psSub">+30 bonus coins included</div>
+      </div>
+      <div class="ps-summary-price" id="psPrice">₦1,400</div>
+    </div>
+    <div class="pm-label">Payment Method</div>
+    <div class="pm-list" id="pmList"></div>
+    <button class="ps-pay-btn" id="psPayBtn" onclick="confirmPurchase()"><i class="fas fa-lock"></i> Pay Now</button>
+    <div class="ps-secure-note"><i class="fas fa-shield-halved"></i> Payments are encrypted and secure</div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- Shared component — used for the invite/gift share action -->
+<script src="component/share-modal.js"></script>
+
+<script>
+/* ══ UTILS ══ */
+function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+function fmtNaira(n){return '₦'+n.toLocaleString('en-NG');}
+
+/* ══ STATE ══ */
+let walletCoins = 40;
+let activePlan = 'free';
+let billing = 'monthly'; // 'monthly' | 'yearly'
+
+const NAIRA_PER_COIN = 5; // used only for the "≈ value" estimate on the balance card
+
+const COIN_BUNDLES = [
+  { id:'b1', coins:100,  bonus:0,    price:500   },
+  { id:'b2', coins:300,  bonus:30,   price:1400  },
+  { id:'b3', coins:700,  bonus:100,  price:3000, badge:'Most Popular', reco:true },
+  { id:'b4', coins:1500, bonus:250,  price:6000  },
+  { id:'b5', coins:3500, bonus:700,  price:13000, badge:'Best Value', reco:true },
+  { id:'b6', coins:8000, bonus:2000, price:28000 },
+];
+
+const PLANS = [
+  {
+    id:'free', name:'Free', icon:'📖',
+    priceMonthly:0, priceYearly:0,
+    tag:null,
+    features:['Read every free chapter','Basic reactions on stories & comments','Standard support'],
+  },
+  {
+    id:'plus', name:'Droboard Plus', icon:'⭐',
+    priceMonthly:1500, priceYearly:14400,
+    tag:'Popular',
+    features:['Everything in Free','Ad-free reading experience','+10% bonus coins on every purchase','Early access to new chapters','Plus badge on your profile'],
+  },
+  {
+    id:'premium', name:'Droboard Premium', icon:'👑',
+    priceMonthly:3500, priceYearly:33600,
+    tag:'Best Value',
+    features:['Everything in Plus','+25% bonus coins on every purchase','Unlimited chapter unlocks in your library','Priority support','Exclusive Premium badge'],
+  },
+];
+
+const PAYMENT_METHODS = [
+  { id:'card',   icon:'fa-credit-card',      t:'Debit / Credit Card', s:'Visa, Mastercard, Verve' },
+  { id:'bank',   icon:'fa-building-columns', t:'Bank Transfer',       s:'Instant confirmation' },
+  { id:'ussd',   icon:'fa-mobile-screen',    t:'USSD',                s:'Pay with your bank\'s USSD code' },
+  { id:'wallet', icon:'fa-wallet',           t:'Apple Pay / Google Pay', s:'Fast checkout' },
+];
+let selectedPM = 'card';
+
+/* ══ BALANCE RENDER ══ */
+function renderBalance(){
+  document.getElementById('tbWallet').textContent = walletCoins;
+  document.getElementById('balanceHero').textContent = walletCoins;
+  document.getElementById('balanceNaira').textContent = (walletCoins * NAIRA_PER_COIN).toLocaleString('en-NG');
+}
+renderBalance();
+
+/* ══ TABS ══ */
+function switchStoreTab(tab){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.store-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+/* ══ COIN GRID ══ */
+function renderCoinGrid(){
+  document.getElementById('coinGrid').innerHTML = COIN_BUNDLES.map(b=>{
+    const perCoin = (b.price / (b.coins + b.bonus));
+    return `<div class="coin-card${b.reco?' reco':''}" onclick="openCoinPurchase('${b.id}')">
+      ${b.badge ? `<div class="coin-badge">${b.badge}</div>` : ''}
+      <div class="coin-ico">🪙</div>
+      <div class="coin-amt">${b.coins.toLocaleString('en-NG')}</div>
+      ${b.bonus ? `<div class="coin-bonus">+${b.bonus.toLocaleString('en-NG')} bonus</div>` : `<div class="coin-bonus" style="opacity:0">—</div>`}
+      <div class="coin-price">${fmtNaira(b.price)}</div>
+      <div class="coin-price-per">₦${perCoin.toFixed(1)} / coin</div>
+    </div>`;
+  }).join('');
+}
+renderCoinGrid();
+
+/* ══ SUBSCRIPTION ══ */
+function toggleBilling(){ setBilling(billing==='monthly'?'yearly':'monthly'); }
+function setBilling(val){
+  billing = val;
+  document.getElementById('btSwitch').classList.toggle('yearly', val==='yearly');
+  document.getElementById('btMonthlyLbl').classList.toggle('on', val==='monthly');
+  document.getElementById('btYearlyLbl').classList.toggle('on', val==='yearly');
+  renderPlans();
+}
+function renderPlans(){
+  document.getElementById('plansList').innerHTML = PLANS.map(p=>{
+    const isCurrent = p.id === activePlan;
+    const price = billing==='monthly' ? p.priceMonthly : p.priceYearly;
+    const priceLbl = price===0 ? 'Free' : (billing==='monthly' ? `${fmtNaira(price)}<span> /mo</span>` : `${fmtNaira(price)}<span> /yr</span>`);
+    return `<div class="plan-card${isCurrent?' on':''}">
+      ${p.tag ? `<div class="plan-tag">${p.tag}</div>` : ''}
+      <div class="plan-hdr">
+        <div class="plan-name">${p.icon} ${p.name}</div>
+        <div class="plan-price">${priceLbl}</div>
+      </div>
+      ${isCurrent ? `<div class="plan-sub">Your current plan</div>` : `<div class="plan-sub">${billing==='yearly' && price>0 ? 'Billed annually' : (price>0?'Billed monthly':'')}</div>`}
+      <div class="plan-feats">${p.features.map(f=>`<div class="plan-feat"><i class="fas fa-check"></i> ${f}</div>`).join('')}</div>
+      ${isCurrent
+        ? `<button class="plan-btn current" disabled>Current Plan</button>`
+        : `<button class="plan-btn upgrade" onclick="openPlanPurchase('${p.id}')">${p.priceMonthly===0?'Downgrade to Free':'Upgrade to '+p.name}</button>`}
+    </div>`;
+  }).join('');
+}
+renderPlans();
+
+/* ══ PURCHASE SHEET ══ */
+let pendingPurchase = null; // { kind:'coin'|'plan', item }
+
+function renderPaymentMethods(){
+  document.getElementById('pmList').innerHTML = PAYMENT_METHODS.map(pm=>`
+    <div class="pm-item${selectedPM===pm.id?' on':''}" data-pm="${pm.id}">
+      <div class="pm-item-ico"><i class="fas ${pm.icon}"></i></div>
+      <div class="pm-item-body"><div class="pm-item-t">${pm.t}</div><div class="pm-item-s">${pm.s}</div></div>
+      <div class="pm-item-check"><i class="${selectedPM===pm.id?'fas fa-circle-check':'far fa-circle'}"></i></div>
+    </div>`).join('');
+  document.querySelectorAll('.pm-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      selectedPM = el.dataset.pm;
+      renderPaymentMethods();
+    });
+  });
+}
+
+function openCoinPurchase(bundleId){
+  const b = COIN_BUNDLES.find(x=>x.id===bundleId);
+  if(!b) return;
+  pendingPurchase = { kind:'coin', item:b };
+  document.getElementById('psIco').textContent = '🪙';
+  document.getElementById('psTitle').textContent = `${b.coins.toLocaleString('en-NG')} Coins`;
+  document.getElementById('psSub').textContent = b.bonus ? `+${b.bonus.toLocaleString('en-NG')} bonus coins included` : 'One-time coin purchase';
+  document.getElementById('psPrice').textContent = fmtNaira(b.price);
+  document.getElementById('psPayBtn').innerHTML = `<i class="fas fa-lock"></i> Pay ${fmtNaira(b.price)}`;
+  renderPaymentMethods();
+  document.getElementById('purchaseOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function openPlanPurchase(planId){
+  const p = PLANS.find(x=>x.id===planId);
+  if(!p) return;
+  if (p.priceMonthly === 0) {
+    // downgrade — no payment needed
+    activePlan = 'free';
+    renderPlans();
+    toast('You\'re back on the Free plan.');
+    return;
+  }
+  const price = billing==='monthly' ? p.priceMonthly : p.priceYearly;
+  pendingPurchase = { kind:'plan', item:p };
+  document.getElementById('psIco').textContent = p.icon;
+  document.getElementById('psTitle').textContent = p.name;
+  document.getElementById('psSub').textContent = billing==='monthly' ? 'Billed monthly · cancel anytime' : 'Billed annually · cancel anytime';
+  document.getElementById('psPrice').textContent = fmtNaira(price);
+  document.getElementById('psPayBtn').innerHTML = `<i class="fas fa-lock"></i> Subscribe · ${fmtNaira(price)}`;
+  renderPaymentMethods();
+  document.getElementById('purchaseOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePurchaseSheet(){
+  document.getElementById('purchaseOv').classList.remove('open');
+  document.body.style.overflow = '';
+  pendingPurchase = null;
+}
+
+function confirmPurchase(){
+  if (!pendingPurchase) return;
+  const btn = document.getElementById('psPayBtn');
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Processing…`;
+
+  setTimeout(()=>{
+    if (pendingPurchase.kind === 'coin') {
+      const b = pendingPurchase.item;
+      walletCoins += b.coins + b.bonus;
+      renderBalance();
+      toast(`🪙 ${(b.coins+b.bonus).toLocaleString('en-NG')} coins added to your wallet!`);
+    } else if (pendingPurchase.kind === 'plan') {
+      activePlan = pendingPurchase.item.id;
+      renderPlans();
+      toast(`✅ You're now on ${pendingPurchase.item.name}!`);
+    }
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+    closePurchaseSheet();
+  }, 900);
+}
+
+/* ══ REDEEM CODE ══ */
+function redeemCode(){
+  const inp = document.getElementById('redeemInput');
+  const code = inp.value.trim();
+  if (!code) { toast('Enter a gift code first.'); return; }
+  // demo: any non-empty code grants 50 coins
+  walletCoins += 50;
+  renderBalance();
+  inp.value = '';
+  toast('🎁 Code redeemed! +50 coins added.');
+}
+
+/* ══ INVITE & EARN — uses the shared share-modal.js component ══ */
+function shareInvite(){
+  window.openShareModal({
+    title: 'Join me on Droboard',
+    sub: 'Sign up with my link and we both get 50 free coins 🎁',
+    img: '',
+    url: 'https://droboard.app/invite/you',
+  });
+}
+</script>
+</body>
+</html>
