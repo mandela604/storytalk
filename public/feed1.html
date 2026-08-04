@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DroBoard — Following Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --pink:#ef1958;
+  --pink2:#ff5686;
+  --pink-light:#fdeaf0;
+  --pink-border:#fbd3de;
+  --green:#1aab5f;
+  --green-light:#e6f7ee;
+  --green-border:#c9ecd9;
+  --purple:#7b2ff0;
+  --purple2:#9b4dff;
+  --gold:#f2b705;
+  --ink:#121218;
+  --sub:#6f6f7c;
+  --faint:#9d9da8;
+  --line:#edeef1;
+  --card:#ffffff;
+  --page:#f2f2f5;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--page);color:var(--ink);font-family:'Inter',system-ui,sans-serif}
+img{display:block;max-width:100%}
+button{font-family:inherit;border:none;background:none;cursor:pointer}
+::-webkit-scrollbar{display:none}
+
+/* ── PHONE FRAME ── */
+.phone-wrap{display:flex;justify-content:center;padding:28px 12px}
+.phone{
+  width:390px;max-width:100%;background:#fff;border-radius:34px;
+  box-shadow:0 30px 80px -20px rgba(20,10,30,.28), 0 0 0 1px rgba(0,0,0,.04);
+  overflow:hidden;position:relative;
+}
+
+/* ── STATUS BAR ── */
+.statusbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px 6px;font-size:15px;font-weight:700;color:var(--ink);
+}
+.statusbar .icons{display:flex;align-items:center;gap:5px;font-size:13px}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 14px}
+.logo{font-family:'Inter',sans-serif;font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
+.logo span{color:var(--ink)}
+.top-icons{display:flex;align-items:center;gap:10px}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;background:#f4f4f7;
+  display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:15px;position:relative;
+}
+.icon-btn.gift{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;box-shadow:0 6px 16px -4px rgba(239,25,88,.55)}
+.notif-badge{
+  position:absolute;top:-3px;right:-3px;background:var(--pink);color:#fff;font-size:9px;font-weight:800;
+  width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;
+}
+
+/* ── TABS ── */
+.tabs{display:flex;align-items:center;gap:22px;padding:0 18px 14px;border-bottom:1px solid var(--line)}
+.tab{font-size:14px;font-weight:700;color:var(--faint);padding-bottom:12px;position:relative;cursor:pointer}
+.tab.on{color:var(--pink)}
+.tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--pink)}
+
+.feed{padding:16px 14px 6px}
+
+/* ── COMPOSER ── */
+.composer{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.composer-pill{
+  flex:1;background:#f4f4f7;border-radius:22px;padding:12px 16px;font-size:13.5px;color:var(--faint);font-weight:500;
+}
+.composer-send{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 8px 18px -6px rgba(239,25,88,.55);
+}
+
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:flex;gap:8px;margin-bottom:18px}
+.qa-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  border:1.5px solid var(--line);border-radius:12px;padding:9px 6px;font-size:11.5px;font-weight:700;color:#3d3d46;
+}
+.qa-btn i{font-size:13px}
+.qa-btn.photo i{color:#2f9bf5}
+.qa-btn.chapter i{color:var(--purple)}
+.qa-btn.poll i{color:var(--green)}
+.qa-btn.debate i{color:var(--pink)}
+
+/* ── STORIES ROW ── */
+.stories{display:flex;gap:16px;overflow-x:auto;padding:2px 2px 20px;scrollbar-width:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:58px}
+.story-ring{width:58px;height:58px;border-radius:50%;padding:2.5px;position:relative}
+.story-ring.you{background:#e2e2e8}
+.story-ring.new{background:linear-gradient(135deg,var(--pink),var(--purple2))}
+.story-ring.seen{background:#e2e2e8}
+.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2.5px solid #fff;display:block}
+.story-plus{
+  position:absolute;bottom:-1px;right:-1px;width:19px;height:19px;border-radius:50%;background:var(--pink);
+  color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;
+}
+.story-more{
+  width:53px;height:53px;border-radius:50%;background:#f4f4f7;color:var(--sub);display:flex;align-items:center;justify-content:center;
+  font-size:14px;margin:2.5px;
+}
+.story-name{font-size:10.5px;font-weight:600;color:#3d3d46;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;display:flex;align-items:center;gap:2px}
+.story-name i{font-size:8px;color:#2f9bf5}
+
+/* ── POST SHELL ── */
+.post{margin-bottom:16px}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.post-head .avatar{width:40px;height:40px}
+.post-head-info{flex:1;min-width:0}
+.post-head-name{font-size:13.5px;font-weight:800;display:flex;align-items:center;gap:5px;color:var(--ink)}
+.post-head-name i.verified{color:#2f9bf5;font-size:11px}
+.post-head-kind{font-size:11px;font-weight:700;color:var(--sub);display:flex;align-items:center;gap:5px}
+.post-head-kind i{font-size:10px}
+.post-head-time{font-size:10.5px;color:var(--faint);font-weight:600;margin-top:1px}
+.post-more{color:var(--faint);font-size:15px;padding:4px}
+.pill-badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.pill-badge.poll{background:var(--pink-light);color:var(--pink)}
+
+.post-text{font-size:13.5px;line-height:1.6;color:#2b2b33;font-weight:600;margin-bottom:11px}
+.post-text b{font-weight:800}
+
+/* ── CHAPTER DROP CARD ── */
+.chapter-card{
+  position:relative;border-radius:18px;overflow:hidden;height:230px;
+  background-size:cover;background-position:center;box-shadow:0 14px 30px -14px rgba(0,0,0,.4);margin-bottom:11px;
+}
+.chapter-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,6,16,.15) 0%,rgba(10,6,16,.55) 45%,rgba(10,6,16,.92) 100%)}
+.chapter-content{position:absolute;left:20px;right:20px;bottom:18px;color:#fff}
+.chapter-title{font-family:'Playfair Display',serif;font-size:23px;font-weight:800;line-height:1.15;margin-bottom:5px;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.chapter-sub{font-size:12px;font-weight:700;opacity:.9;margin-bottom:8px}
+.chapter-desc{font-size:11.5px;line-height:1.5;opacity:.85;margin-bottom:13px;max-width:88%}
+.read-btn{
+  display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:#fff;font-size:12px;font-weight:800;padding:9px 18px;border-radius:22px;box-shadow:0 8px 18px -6px rgba(239,25,88,.6);
+}
+
+/* ── ACTIONS ROW (icon style) ── */
+.actions-row{display:flex;align-items:center;gap:20px;padding:0 2px}
+.act{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--sub)}
+.act i{font-size:15px}
+.act.like i{color:var(--pink)}
+.act-spacer{flex:1}
+.act.save i{color:var(--faint);font-size:15px}
+
+/* ── POST IMAGE (portrait) ── */
+.post-image{border-radius:16px;overflow:hidden;margin-bottom:11px;height:250px;position:relative}
+.post-image img{width:100%;height:100%;object-fit:cover}
+
+/* ── CONTINUE-READING MINI CARD ── */
+.mini-card{
+  display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:14px;padding:9px 12px;margin-bottom:11px;
+}
+.mini-thumb{width:38px;height:50px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.mini-info{flex:1;min-width:0}
+.mini-title{font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-sub{font-size:11px;color:var(--faint);font-weight:600;margin-top:1px}
+.mini-sub.done{color:var(--green);font-weight:700}
+.mini-chevron{color:var(--faint);font-size:13px}
+
+/* ── ACTIONS ROW (text style: "Like 98") ── */
+.actions-row.text-style{gap:22px}
+.actions-row.text-style .act{font-weight:600;color:var(--sub)}
+.actions-row.text-style .act b{font-weight:800;color:var(--ink)}
+
+/* ── POLL ── */
+.poll-q{font-size:14px;font-weight:800;line-height:1.4;margin-bottom:14px;color:var(--ink)}
+.poll-opt{margin-bottom:12px}
+.poll-opt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.poll-opt-lbl{font-size:12.5px;font-weight:700;color:#3d3d46}
+.poll-opt-pct{font-size:12.5px;font-weight:800;color:var(--ink)}
+.poll-bar-track{height:8px;border-radius:6px;background:#f0f0f3;overflow:hidden}
+.poll-bar-fill{height:100%;border-radius:6px}
+.poll-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.vote-btn{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--pink)}
+.poll-meta{font-size:11px;color:var(--faint);font-weight:600}
+
+/* ── PREMIUM BANNER ── */
+.premium-card{
+  position:relative;border-radius:18px;overflow:hidden;height:230px;background-size:cover;background-position:center 30%;
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.4);
+}
+.premium-scrim{position:absolute;inset:0;background:linear-gradient(100deg,rgba(20,4,32,.94) 30%,rgba(20,4,32,.55) 75%)}
+.premium-content{position:absolute;inset:0;padding:20px;display:flex;flex-direction:column;justify-content:center;color:#fff}
+.premium-title{font-size:19px;font-weight:800;line-height:1.25;margin-bottom:12px}
+.premium-list{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.premium-list div{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;opacity:.92}
+.premium-list i{color:#3ddc84;font-size:11px}
+.go-premium-btn{
+  align-self:flex-start;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink),#ff3d78);
+  color:#fff;font-size:12.5px;font-weight:800;padding:10px 20px;border-radius:22px;box-shadow:0 8px 18px -4px rgba(239,25,88,.6);
+}
+
+/* ── SPONSORED / DEBATE / CROWN HEADS ── */
+.head-ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.head-ico.debate{background:#f1e7fe;color:var(--purple)}
+.head-ico.contest{background:#f1e7fe;color:var(--purple)}
+.head-ico.sponsor{background:#f4f4f7;color:var(--sub)}
+.head-ico.crown{background:var(--pink-light);color:var(--pink)}
+
+/* ── DEBATE CARD ── */
+.debate-title{font-size:15.5px;font-weight:800;margin-bottom:5px;color:var(--ink)}
+.debate-sub{font-size:12px;color:var(--sub);font-weight:600;margin-bottom:14px}
+.debate-options{display:flex;gap:10px;margin-bottom:14px}
+.d-opt{flex:1;border-radius:14px;padding:16px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.d-opt.yes{background:var(--green-light);border:1.5px solid var(--green-border)}
+.d-opt.no{background:var(--pink-light);border:1.5px solid var(--pink-border)}
+.d-opt-txt{font-size:12px;font-weight:700;line-height:1.4;color:#2b2b33}
+.d-opt-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
+.d-opt.yes .d-opt-ico{background:var(--green);color:#fff}
+.d-opt.no .d-opt-ico{background:var(--pink);color:#fff}
+.d-opt-join{width:100%;padding:8px;border-radius:20px;font-size:12px;font-weight:800}
+.d-opt.yes .d-opt-join{background:var(--green);color:#fff}
+.d-opt.no .d-opt-join{background:transparent;color:var(--pink);border:1.5px solid var(--pink-border)}
+.debate-footer{display:flex;align-items:center;justify-content:space-between}
+.debate-avs{display:flex;align-items:center}
+.debate-avs img{width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid #fff;margin-left:-8px}
+.debate-avs img:first-child{margin-left:0}
+.debate-avs-lbl{font-size:11px;color:var(--sub);font-weight:600;margin-left:8px}
+.debate-view{font-size:12px;font-weight:800;color:var(--pink)}
+.debate-footer-wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* ── COMING SOON IMAGE ── */
+.comingsoon{position:relative;border-radius:16px;overflow:hidden;height:210px;background-size:cover;background-position:center;margin-bottom:11px}
+.comingsoon-scrim{position:absolute;inset:0;background:rgba(8,4,10,.55)}
+.comingsoon-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff}
+.comingsoon-ch{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.comingsoon-sub{font-size:12px;font-weight:700;opacity:.85;margin-top:6px;letter-spacing:.5px}
+
+/* ── CONTEST BANNER ── */
+.contest-card{
+  position:relative;border-radius:18px;overflow:hidden;padding:24px 22px;color:#fff;
+  background:linear-gradient(135deg,#7b2ff0 0%,#5b1bc9 60%,#3d0f96 100%);
+  box-shadow:0 14px 30px -14px rgba(91,27,201,.55);
+}
+.contest-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.08);
+}
+.contest-trophy{font-size:26px;margin-bottom:10px}
+.contest-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.contest-sub{font-size:13px;font-weight:600;opacity:.9;margin-bottom:16px;line-height:1.4}
+.contest-btn{background:#fff;color:var(--purple);font-size:12.5px;font-weight:800;padding:10px 20px;border-radius:22px;display:inline-flex;align-items:center;gap:8px}
+.contest-dots{display:flex;gap:5px;justify-content:center;margin-top:14px}
+.contest-dot{width:5px;height:5px;border-radius:50%;background:#e4e4e8}
+.contest-dot.on{width:16px;border-radius:3px;background:var(--purple)}
+
+/* ── SPONSORED STORY ── */
+.sponsor-card{border-radius:18px;overflow:hidden;box-shadow:0 14px 30px -14px rgba(0,0,0,.35)}
+.sponsor-img{position:relative;height:190px;background-size:cover;background-position:center}
+.sponsor-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,4,10,.9) 15%,rgba(10,4,10,0) 60%)}
+.sponsor-content{position:absolute;left:18px;right:18px;bottom:14px;color:#fff}
+.sponsor-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:800;line-height:1.2}
+.sponsor-author{font-size:11px;font-weight:600;opacity:.85;margin:4px 0 8px}
+.sponsor-tags{display:flex;gap:6px}
+.sponsor-tag{font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(255,255,255,.16);backdrop-filter:blur(2px)}
+.sponsor-desc{font-size:12px;color:var(--sub);font-weight:600;text-align:center;padding:13px 16px;background:#fff}
+.sponsor-cta{display:block;text-align:center;background:var(--pink-light);color:var(--pink);font-size:12.5px;font-weight:800;padding:12px;}
+
+/* ── INVITE BANNER ── */
+.invite-card{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--pink-light);
+  border-radius:16px;padding:16px 18px;
+}
+.invite-text{font-size:13px;font-weight:800;color:var(--ink);line-height:1.4;max-width:190px}
+.invite-coin{display:inline-flex;align-items:center;gap:4px;background:#fff;color:var(--gold);font-size:10.5px;font-weight:800;padding:3px 9px 3px 6px;border-radius:20px;margin-left:4px;vertical-align:middle}
+.invite-coin i{font-size:10px}
+.invite-link{font-size:12px;font-weight:800;color:var(--pink);margin-top:6px;display:inline-flex;align-items:center;gap:5px}
+.invite-ico{
+  width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--pink2));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;flex-shrink:0;box-shadow:0 8px 18px -4px rgba(239,25,88,.5);
+}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  display:flex;justify-content:space-around;align-items:center;padding:11px 0 14px;
+  border-top:1px solid var(--line);background:#fff;position:sticky;bottom:0;
+}
+.bn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:var(--faint)}
+.bn i{font-size:19px}
+.bn.on{color:var(--pink)}
+
+.section-gap{height:16px}
+</style>
+</head>
+<body>
+<div class="phone-wrap">
+<div class="phone">
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="icons"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+  </div>
+
+  <div class="topbar">
+    <div class="logo">DroBoard</div>
+    <div class="top-icons">
+      <div class="icon-btn"><i class="fas fa-bell"></i><span class="notif-badge">3</span></div>
+      <div class="icon-btn gift"><i class="fas fa-gift"></i></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on">Following</div>
+    <div class="tab">For You</div>
+    <div class="tab">Trending</div>
+    <div class="tab">My Circles</div>
+  </div>
+
+  <div class="feed">
+
+    <!-- COMPOSER -->
+    <div class="composer">
+      <img class="avatar" src="https://i.pravatar.cc/100?img=51" alt=""/>
+      <div class="composer-pill">What's happening in your story world?</div>
+      <div class="composer-send"><i class="fas fa-compass"></i></div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <div class="qa-btn photo"><i class="fas fa-image"></i>Photo</div>
+      <div class="qa-btn chapter"><i class="fas fa-book"></i>Chapter Drop</div>
+      <div class="qa-btn poll"><i class="fas fa-chart-simple"></i>Poll</div>
+      <div class="qa-btn debate"><i class="fas fa-people-arrows"></i>Debate</div>
+    </div>
+
+    <!-- STORIES -->
+    <div class="stories">
+      <div class="story">
+        <div class="story-ring you"><img src="https://i.pravatar.cc/100?img=51" alt=""/><div class="story-plus"><i class="fas fa-plus"></i></div></div>
+        <div class="story-name">Your Story</div>
+      </div>
+      <div class="story">
+        <div class="story-ring new"><img src="https://i.pravatar.cc/100?img=32" alt=""/></div>
+        <div class="story-name">Luna Grey <i class="fas fa-circle-check"></i></div>
+      </div>
+      <div class="story">
+        <div class="story-ring new"><img src="https://i.pravatar.cc/100?img=13" alt=""/></div>
+        <div class="story-name">Alex Pierce <i class="fas fa-circle-check"></i></div>
+      </div>
+      <div class="story">
+        <div class="story-ring seen"><img src="https://i.pravatar.cc/100?img=47" alt=""/></div>
+        <div class="story-name">Mia Clark</div>
+      </div>
+      <div class="story">
+        <div class="story-ring seen"><img src="https://i.pravatar.cc/100?img=14" alt=""/></div>
+        <div class="story-name">Jaxon</div>
+      </div>
+      <div class="story">
+        <div class="story-more"><i class="fas fa-ellipsis"></i></div>
+        <div class="story-name">More</div>
+      </div>
+    </div>
+
+    <!-- POST 1 — CHAPTER DROP -->
+    <div class="post">
+      <div class="post-head">
+        <img class="avatar" src="https://i.pravatar.cc/100?img=32" alt=""/>
+        <div class="post-head-info">
+          <div class="post-head-kind"><i class="fas fa-book-open"></i>Chapter Drop</div>
+          <div class="post-head-name">Luna Grey <i class="fas fa-circle-check verified"></i></div>
+        </div>
+        <div class="post-head-time">2m ago</div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="chapter-card" style="background-image:url('https://i.postimg.cc/MXBR6bfY/wolf3.jpg')">
+        <div class="chapter-scrim"></div>
+        <div class="chapter-content">
+          <div class="chapter-title">His Sweet Revenge</div>
+          <div class="chapter-sub">Chapter 21: The Truth Hurts</div>
+          <div class="chapter-desc">Everything changes when she discovers the truth he tried so hard to hide…</div>
+          <div class="read-btn"><i class="fas fa-book-open"></i>Read Now</div>
+        </div>
+      </div>
+      <div class="actions-row">
+        <div class="act like"><i class="fas fa-heart"></i>128</div>
+        <div class="act"><i class="far fa-comment"></i>36</div>
+        <div class="act"><i class="fas fa-arrow-turn-up" style="transform:rotate(90deg)"></i>12</div>
+        <div class="act-spacer"></div>
+        <div class="act save"><i class="far fa-bookmark"></i></div>
+      </div>
+    </div>
+
+    <!-- POST 2 — TEXT + CONTINUE READING -->
+    <div class="post">
+      <div class="post-head">
+        <img class="avatar" src="https://i.pravatar.cc/100?img=25" alt=""/>
+        <div class="post-head-info">
+          <div class="post-head-name">Emily Carter</div>
+          <div class="post-head-time">15m ago</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="post-text">This chapter just broke me! ❤️🔥<br>Luna Grey never disappoints!</div>
+      <div class="post-image"><img src="https://i.postimg.cc/MXBR6bfY/wolf3.jpg" alt=""/></div>
+      <div class="mini-card">
+        <img class="mini-thumb" src="https://i.postimg.cc/MXBR6bfY/wolf3.jpg" alt=""/>
+        <div class="mini-info">
+          <div class="mini-title">His Sweet Revenge</div>
+          <div class="mini-sub">Chapter 20</div>
+        </div>
+        <i class="fas fa-chevron-right mini-chevron"></i>
+      </div>
+      <div class="actions-row text-style">
+        <div class="act"><i class="far fa-heart"></i>Like&nbsp;<b>98</b></div>
+        <div class="act"><i class="far fa-comment"></i>Comment&nbsp;<b>27</b></div>
+        <div class="act"><i class="fas fa-arrow-turn-up" style="transform:rotate(90deg)"></i>Share</div>
+      </div>
+    </div>
+
+    <!-- POST 3 — POLL -->
+    <div class="post">
+      <div class="post-head">
+        <img class="avatar" src="https://i.pravatar.cc/100?img=48" alt=""/>
+        <div class="post-head-info">
+          <div class="post-head-name">BookLover_99</div>
+          <div class="post-head-time">1h ago</div>
+        </div>
+        <div class="pill-badge poll"><i class="fas fa-chart-simple"></i>Poll</div>
+        <i class="fas fa-ellipsis post-more" style="margin-left:8px"></i>
+      </div>
+      <div class="poll-q">Which ending would you love for &ldquo;The Billionaire's Regret&rdquo;?</div>
+
+      <div class="poll-opt">
+        <div class="poll-opt-top"><span class="poll-opt-lbl">Happy Ending</span><span class="poll-opt-pct">42%</span></div>
+        <div class="poll-bar-track"><div class="poll-bar-fill" style="width:42%;background:var(--pink)"></div></div>
+      </div>
+      <div class="poll-opt">
+        <div class="poll-opt-top"><span class="poll-opt-lbl">Tragic Ending</span><span class="poll-opt-pct">31%</span></div>
+        <div class="poll-bar-track"><div class="poll-bar-fill" style="width:31%;background:var(--purple)"></div></div>
+      </div>
+      <div class="poll-opt" style="margin-bottom:0">
+        <div class="poll-opt-top"><span class="poll-opt-lbl">Open Ending</span><span class="poll-opt-pct">27%</span></div>
+        <div class="poll-bar-track"><div class="poll-bar-fill" style="width:27%;background:var(--gold)"></div></div>
+      </div>
+
+      <div class="poll-footer">
+        <div class="vote-btn"><i class="fas fa-square-poll-vertical"></i>Vote</div>
+        <div class="poll-meta">120 votes · 2d left</div>
+      </div>
+    </div>
+
+    <!-- POST 4 — PREMIUM UPSELL -->
+    <div class="post">
+      <div class="post-head">
+        <div class="head-ico crown"><i class="fas fa-crown"></i></div>
+        <div class="post-head-info">
+          <div class="post-head-name">DroBoard</div>
+          <div class="post-head-time">Sponsored</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="premium-card" style="background-image:url('https://i.postimg.cc/fkdXzjS8/wolf.jpg')">
+        <div class="premium-scrim"></div>
+        <div class="premium-content">
+          <div class="premium-title">Unlock unlimited<br>stories &amp; perks</div>
+          <div class="premium-list">
+            <div><i class="fas fa-check"></i>Ad-free reading</div>
+            <div><i class="fas fa-check"></i>Early chapter access</div>
+            <div><i class="fas fa-check"></i>Exclusive stories</div>
+          </div>
+          <div class="go-premium-btn">Go Premium <i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- POST 5 — DEBATE -->
+    <div class="post">
+      <div class="post-head">
+        <div class="head-ico debate"><i class="fas fa-comments"></i></div>
+        <div class="post-head-info">
+          <div class="post-head-name">Be part of the conversation</div>
+          <div class="post-head-time">3h ago</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="debate-title">Should villains get redemption?</div>
+      <div class="debate-sub">Share your thoughts and join the debate!</div>
+      <div class="debate-options">
+        <div class="d-opt yes">
+          <div class="d-opt-ico"><i class="fas fa-thumbs-up"></i></div>
+          <div class="d-opt-txt">Yes, everyone deserves a second chance.</div>
+          <div class="d-opt-join">Join</div>
+        </div>
+        <div class="d-opt no">
+          <div class="d-opt-ico"><i class="fas fa-thumbs-down"></i></div>
+          <div class="d-opt-txt">No, some actions are unforgivable.</div>
+          <div class="d-opt-join">Join</div>
+        </div>
+      </div>
+      <div class="debate-footer-wrap">
+        <div style="display:flex;align-items:center">
+          <div class="debate-avs">
+            <img src="https://i.pravatar.cc/100?img=32" alt=""/>
+            <img src="https://i.pravatar.cc/100?img=13" alt=""/>
+            <img src="https://i.pravatar.cc/100?img=47" alt=""/>
+          </div>
+          <span class="debate-avs-lbl">428 joined the discussion</span>
+        </div>
+        <div class="debate-view">View Discussion <i class="fas fa-arrow-right"></i></div>
+      </div>
+    </div>
+
+    <!-- POST 6 — AUTHOR UPDATE -->
+    <div class="post">
+      <div class="post-head">
+        <img class="avatar" src="https://i.pravatar.cc/100?img=13" alt=""/>
+        <div class="post-head-info">
+          <div class="post-head-name">Alex Pierce <i class="fas fa-circle-check verified"></i></div>
+          <div class="post-head-time">4h ago</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="post-text">Chapter 22 is almost ready! 🔥<br>Dropping tomorrow at 8PM. Stay tuned!</div>
+      <div class="comingsoon" style="background-image:url('https://i.postimg.cc/WF1j4Pnh/6.jpg')">
+        <div class="comingsoon-scrim"></div>
+        <div class="comingsoon-content">
+          <div class="comingsoon-ch">CHAPTER 22</div>
+          <div class="comingsoon-sub">COMING SOON</div>
+        </div>
+      </div>
+      <div class="actions-row">
+        <div class="act like"><i class="fas fa-heart"></i>156</div>
+        <div class="act"><i class="far fa-comment"></i>48</div>
+        <div class="act"><i class="fas fa-arrow-turn-up" style="transform:rotate(90deg)"></i>18</div>
+        <div class="act-spacer"></div>
+        <div class="act save"><i class="far fa-bookmark"></i></div>
+      </div>
+    </div>
+
+    <!-- POST 7 — WRITING CONTEST -->
+    <div class="post">
+      <div class="post-head">
+        <div class="head-ico contest"><i class="fas fa-trophy"></i></div>
+        <div class="post-head-info">
+          <div class="post-head-name">Writing Contest</div>
+          <div class="post-head-time">1d ago</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="contest-card">
+        <div class="contest-trophy"><i class="fas fa-trophy"></i></div>
+        <div class="contest-title">DroBoard Writing Contest</div>
+        <div class="contest-sub">Win ₦100,000 +<br>Featured Placement!</div>
+        <div class="contest-btn">Enter Contest <i class="fas fa-arrow-right"></i></div>
+      </div>
+      <div class="contest-dots">
+        <div class="contest-dot on"></div><div class="contest-dot"></div><div class="contest-dot"></div><div class="contest-dot"></div>
+      </div>
+    </div>
+
+    <!-- POST 8 — SPONSORED STORY -->
+    <div class="post">
+      <div class="post-head">
+        <div class="head-ico sponsor"><i class="fas fa-bullhorn"></i></div>
+        <div class="post-head-info">
+          <div class="post-head-name">Sponsored Story</div>
+          <div class="post-head-time">Sponsored</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="sponsor-card">
+        <div class="sponsor-img" style="background-image:url('https://i.postimg.cc/23WvkFLH/images-(2).jpg')">
+          <div class="sponsor-scrim"></div>
+          <div class="sponsor-content">
+            <div class="sponsor-title">Bound to the Ruthless CEO</div>
+            <div class="sponsor-author">By Ava Winters</div>
+            <div class="sponsor-tags"><span class="sponsor-tag">Romance</span><span class="sponsor-tag">Billionaire</span></div>
+          </div>
+        </div>
+        <div class="sponsor-desc">A deal. A marriage. A love she never saw coming.</div>
+        <div class="sponsor-cta">Read Now →</div>
+      </div>
+    </div>
+
+    <!-- POST 9 — TESTIMONIAL -->
+    <div class="post">
+      <div class="post-head">
+        <img class="avatar" src="https://i.pravatar.cc/100?img=44" alt=""/>
+        <div class="post-head-info">
+          <div class="post-head-name">BookAddict</div>
+          <div class="post-head-time">6h ago</div>
+        </div>
+        <i class="fas fa-ellipsis post-more"></i>
+      </div>
+      <div class="post-text">Just finished this masterpiece! 😍❤️<br>Recommend it to everyone!</div>
+      <div class="mini-card" style="margin-bottom:11px">
+        <img class="mini-thumb" src="https://i.postimg.cc/WF1j4Pnh/6.jpg" alt=""/>
+        <div class="mini-info">
+          <div class="mini-title">Burn For Me, Elsa</div>
+          <div class="mini-sub done">Completed</div>
+        </div>
+        <i class="fas fa-chevron-right mini-chevron"></i>
+      </div>
+      <div class="actions-row">
+        <div class="act like"><i class="fas fa-heart"></i>82</div>
+        <div class="act"><i class="far fa-comment"></i>19</div>
+        <div class="act">Share</div>
+      </div>
+    </div>
+
+    <!-- INVITE BANNER -->
+    <div class="post">
+      <div class="invite-card">
+        <div>
+          <div class="invite-text">Invite your friends and earn coins!<span class="invite-coin"><i class="fas fa-coins"></i>+50</span></div>
+          <div class="invite-link">Invite Now <i class="fas fa-arrow-right"></i></div>
+        </div>
+        <div class="invite-ico"><i class="fas fa-gift"></i></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bnav">
+    <div class="bn on"><i class="fas fa-house"></i>Home</div>
+    <div class="bn"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn"><i class="fas fa-magnifying-glass"></i>Search</div>
+    <div class="bn"><i class="fas fa-rss"></i>Feed</div>
+    <div class="bn"><i class="fas fa-circle-user"></i>Profile</div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

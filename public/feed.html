@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DroBoard - Feed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #E91E63;
+      --primary-dark: #C2185B;
+      --purple: #7C3AED;
+      --text: #1F2937;
+      --text-secondary: #6B7280;
+      --border: #E5E7EB;
+      --bg: #F9FAFB;
+      --white: #FFFFFF;
+      --green: #10B981;
+      --red: #EF4444;
+      --orange: #F59E0B;
+      --font-display: 'Manrope', sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      background: #E5E7EB;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    svg.icon {
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      background: var(--white);
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px 12px;
+      background: var(--white);
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .logo span {
+      color: var(--primary);
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      background: var(--primary);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      padding: 0 16px;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      padding: 12px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg);
+      padding-bottom: 80px;
+    }
+
+    /* Composer */
+    .composer {
+      background: var(--white);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .composer-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ddd;
+      flex-shrink: 0;
+    }
+
+    .avatar.sm { width: 32px; height: 32px; }
+    .avatar.xs { width: 24px; height: 24px; }
+
+    .composer-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--text-secondary);
+      background: transparent;
+    }
+
+    .composer-send {
+      width: 32px;
+      height: 32px;
+      background: #FCE7F3;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--white);
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .action-btn.photo { color: #3B82F6; }
+    .action-btn.chapter { color: #8B5CF6; }
+    .action-btn.poll { color: #10B981; }
+    .action-btn.debate { color: #F59E0B; }
+
+    /* Stories */
+    .stories {
+      background: var(--white);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .stories::-webkit-scrollbar { display: none; }
+
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 64px;
+      cursor: pointer;
+    }
+
+    .story-ring {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(45deg, #E91E63, #7C3AED, #F59E0B);
+      position: relative;
+    }
+
+    .story-ring.own {
+      background: #E5E7EB;
+    }
+
+    .story-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid white;
+      object-fit: cover;
+    }
+
+    .story-add {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      border: 2px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .story-name {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: center;
+      max-width: 64px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Post card */
+    .post {
+      background: var(--white);
+      margin-top: 8px;
+      padding: 14px 16px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post-meta {
+      flex: 1;
+    }
+
+    .post-author {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .verified {
+      color: #3B82F6;
+      display: flex;
+      align-items: center;
+    }
+
+    .post-time {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .post-type {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .post-type.chapter { color: #8B5CF6; }
+    .post-type.author { color: #F59E0B; }
+    .post-type.contest { color: var(--purple); }
+    .post-type.sponsored { color: var(--primary); }
+    .post-type.debate { color: var(--purple); }
+
+    .poll-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #10B981;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .post-content {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .post-content strong {
+      font-weight: 700;
+    }
+
+    /* Chapter card */
+    .chapter-card {
+      display: flex;
+      gap: 12px;
+      background: #1a1a2e;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .chapter-cover {
+      width: 100px;
+      height: 130px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .chapter-info {
+      padding: 12px 12px 12px 0;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .chapter-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .chapter-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+
+    .chapter-desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: #ccc;
+      line-height: 1.4;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .read-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+    }
+
+    /* Engagement row */
+    .engagement {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 4px;
+    }
+
+    .eng-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .eng-item.liked {
+      color: var(--primary);
+    }
+
+    .eng-spacer {
+      flex: 1;
+    }
+
+    .bookmark-btn {
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Regular image post */
+    .post-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      object-fit: cover;
+      max-height: 220px;
+    }
+
+    .linked-story {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .linked-story img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .linked-info {
+      flex: 1;
+    }
+
+    .linked-title {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .linked-sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .linked-story .chevron {
+      color: var(--text-secondary);
+      display: flex;
+    }
+
+    /* Poll */
+    .poll-options {
+      margin: 12px 0;
+    }
+
+    .poll-option {
+      margin-bottom: 10px;
+    }
+
+    .poll-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .poll-bar {
+      height: 8px;
+      background: #E5E7EB;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .poll-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    .poll-fill.pink { background: var(--primary); }
+    .poll-fill.purple { background: #8B5CF6; }
+    .poll-fill.orange { background: #F59E0B; }
+
+    .poll-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .vote-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--primary);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* Debate */
+    .debate-question {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .debate-prompt {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .debate-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .debate-opt {
+      flex: 1;
+      border: 1.5px solid;
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .debate-opt.yes {
+      border-color: #A7F3D0;
+      background: #ECFDF5;
+    }
+
+    .debate-opt.no {
+      border-color: #FECACA;
+      background: #FEF2F2;
+    }
+
+    .debate-opt-text {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .debate-opt.yes .debate-opt-text { color: #065F46; }
+    .debate-opt.no .debate-opt-text { color: #991B1B; }
+
+    .debate-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .debate-opt.yes .debate-icon { color: #10B981; }
+    .debate-opt.no .debate-icon { color: #EF4444; }
+
+    .join-btn {
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .debate-opt.yes .join-btn {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .debate-opt.no .join-btn {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .debate-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .debate-avatars {
+      display: flex;
+      align-items: center;
+    }
+
+    .debate-avatars img {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-left: -6px;
+    }
+
+    .debate-avatars img:first-child {
+      margin-left: 0;
+    }
+
+    .view-disc {
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    /* Contest banner */
+    .contest-banner {
+      background: linear-gradient(135deg, #5B21B6, #7C3AED);
+      border-radius: 14px;
+      padding: 16px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .contest-banner h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      max-width: 75%;
+    }
+
+    .contest-banner p {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 12px;
+      max-width: 70%;
+    }
+
+    .enter-btn {
+      background: white;
+      color: var(--purple);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .trophy {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.25;
+      color: white;
+    }
+
+    /* Sponsored */
+    .sponsored-card {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .sponsored-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .sponsored-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      color: white;
+    }
+
+    .sponsored-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+
+    .sponsored-author {
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .sponsored-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .sponsored-desc {
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-bottom: 10px;
+    }
+
+    .read-now {
+      color: var(--primary);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 13px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Premium promo */
+    .premium-card {
+      background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      color: white;
+      margin-bottom: 4px;
+    }
+
+    .premium-card img {
+      width: 80px;
+      height: 100px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .premium-info h3 {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .premium-info ul {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+
+    .premium-info li {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #E5E7EB;
+    }
+
+    .premium-info li .icon {
+      color: #10B981;
+    }
+
+    .premium-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Invite card */
+    .invite-card {
+      background: linear-gradient(90deg, #FDF2F8, #FEF3C7);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .invite-text {
+      flex: 1;
+    }
+
+    .invite-text h4 {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+
+    .invite-text p {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .invite-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .invite-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+    }
+
+    .invite-icons .coin { color: var(--orange); }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 390px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 20px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px 12px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    /* Author post image */
+    .author-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      max-height: 180px;
+      object-fit: cover;
+    }
+
+    .more-btn {
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+
+    /* Completed badge */
+    .completed-badge {
+      background: #10B981;
+      color: white;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Dro<span>Board</span></div>
+      <div class="header-icons">
+        <div class="icon-btn" id="bell-btn"></div>
+        <div class="icon-btn" id="gift-btn"></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">Following</div>
+      <div class="tab">For You</div>
+      <div class="tab">Trending</div>
+      <div class="tab">My Circles</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content" id="feed"></div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav" id="bottom-nav"></div>
+  </div>
+
+  <script>
+    /* =========================================================
+       CUSTOM ICON SET (single consistent line-icon style,
+       used everywhere instead of emoji)
+    ========================================================= */
+    const ICON_PATHS = {
+      bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>',
+      gift: '<path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>',
+      home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>',
+      compass: '<circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>',
+      search: '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>',
+      fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
+      user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+      image: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>',
+      bookOpen: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>',
+      barChart: '<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>',
+      zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>',
+      heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>',
+      heartFilled: '<path fill="currentColor" stroke="none" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>',
+      messageCircle: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
+      share: '<circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>',
+      bookmark: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>',
+      edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>',
+      volume: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>',
+      award: '<circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>',
+      checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>',
+      chevronRight: '<polyline points="9 18 15 12 9 6"></polyline>',
+      thumbsUp: '<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>',
+      thumbsDown: '<path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>',
+      moreHorizontal: '<circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle>',
+      send: '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>',
+      star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+      dollar: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+      checkSquare: '<polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>'
+    };
+
+    function icon(name, { size = 18, stroke = 2, className = '' } = {}) {
+      return `<svg class="icon ${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[name] || ''}</svg>`;
+    }
+
+    /* =========================================================
+       HARDCODED IMAGE ASSETS (unchanged from source photos)
+    ========================================================= */
+    const avatars = {
+      user: 'https://i.pravatar.cc/100?img=11',
+      luna: 'https://i.pravatar.cc/100?img=5',
+      alex: 'https://i.pravatar.cc/100?img=12',
+      mia: 'https://i.pravatar.cc/100?img=9',
+      jaxon: 'https://i.pravatar.cc/100?img=15',
+      emily: 'https://i.pravatar.cc/100?img=16',
+      booklover: 'https://i.pravatar.cc/100?img=20',
+      bookaddict: 'https://i.pravatar.cc/100?img=25',
+      sofia: 'https://i.pravatar.cc/100?img=32',
+      notebook: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=250&fit=crop',
+      ceo: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=250&fit=crop',
+      burn: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=100&h=100&fit=crop',
+      premium: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=200&h=250&fit=crop',
+      sweet: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=200&h=260&fit=crop',
+      forbidden: 'https://images.unsplash.com/photo-1495640388908-05fa85288e61?w=200&h=260&fit=crop',
+      reaction1: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop',
+      reaction2: 'https://images.unsplash.com/photo-1481277542470-605612bd2d61?w=400&h=250&fit=crop'
+    };
+
+    /* =========================================================
+       FEED DATA
+    ========================================================= */
+    const feedData = [
+      { type: 'composer' },
+      {
+        type: 'stories',
+        items: [
+          { name: 'Your Story', avatar: avatars.user, own: true },
+          { name: 'Luna Grey', avatar: avatars.luna },
+          { name: 'Alex Pierce', avatar: avatars.alex },
+          { name: 'Mia Clark', avatar: avatars.mia },
+          { name: 'Jaxon', avatar: avatars.jaxon }
+        ]
+      },
+      // Chapter Drop - Luna Grey
+      {
+        type: 'chapter',
+        author: 'Luna Grey',
+        verified: true,
+        time: '2m ago',
+        avatar: avatars.luna,
+        title: 'His Sweet Revenge',
+        subtitle: 'Chapter 21: The Truth Hurts',
+        desc: 'Everything changes when she discovers the truth he tried so hard to hide...',
+        cover: avatars.sweet,
+        likes: 128,
+        comments: 36,
+        shares: 12
+      },
+      // Emily Carter reaction
+      {
+        type: 'reaction',
+        author: 'Emily Carter',
+        time: '15m ago',
+        avatar: avatars.emily,
+        text: 'This chapter just broke me! Luna Grey never disappoints!',
+        image: avatars.reaction1,
+        linked: { title: 'His Sweet Revenge', chapter: 'Chapter 20', cover: avatars.sweet },
+        likes: 98,
+        comments: 27,
+        shares: 0
+      },
+      // Poll - BookLover_99
+      {
+        type: 'poll',
+        author: 'BookLover_99',
+        time: '1h ago',
+        avatar: avatars.booklover,
+        question: 'Which ending would you love for "The Billionaire\'s Regret"?',
+        options: [
+          { label: 'Happy Ending', percent: 42, color: 'pink' },
+          { label: 'Tragic Ending', percent: 31, color: 'purple' },
+          { label: 'Open Ending', percent: 27, color: 'orange' }
+        ],
+        votes: 120,
+        timeLeft: '2d left'
+      },
+      // NEW: Chapter Drop - Mia Clark
+      {
+        type: 'chapter',
+        author: 'Mia Clark',
+        verified: false,
+        time: '32m ago',
+        avatar: avatars.mia,
+        title: 'Forbidden Hearts',
+        subtitle: 'Chapter 9: No Way Back',
+        desc: 'She promised herself she\'d never fall for him again. That promise just broke.',
+        cover: avatars.forbidden,
+        likes: 210,
+        comments: 54,
+        shares: 20
+      },
+      // Premium promo
+      {
+        type: 'premium',
+        title: 'Unlock unlimited stories & perks',
+        perks: ['Ad-free reading', 'Early chapter access', 'Exclusive stories'],
+        image: avatars.premium
+      },
+      // Debate
+      {
+        type: 'debate',
+        time: '3h ago',
+        question: 'Should villains get redemption?',
+        prompt: 'Share your thoughts and join the debate!',
+        yesText: 'Yes, everyone deserves a second chance.',
+        noText: 'No, some actions are unforgivable.',
+        joined: 428
+      },
+      // Author Post - Alex Pierce
+      {
+        type: 'author',
+        author: 'Alex Pierce',
+        verified: true,
+        time: '4h ago',
+        avatar: avatars.alex,
+        text: 'Chapter 22 is almost ready! Dropping tomorrow at 8PM. Stay tuned!',
+        image: avatars.notebook,
+        likes: 156,
+        comments: 48,
+        shares: 18
+      },
+      // NEW: Poll - Sofia_Reads
+      {
+        type: 'poll',
+        author: 'Sofia_Reads',
+        time: '5h ago',
+        avatar: avatars.sofia,
+        question: 'Team Alex or Team Jaxon in "His Sweet Revenge"?',
+        options: [
+          { label: 'Team Alex', percent: 58, color: 'pink' },
+          { label: 'Team Jaxon', percent: 42, color: 'purple' }
+        ],
+        votes: 203,
+        timeLeft: '1d left'
+      },
+      // Writing Contest
+      {
+        type: 'contest',
+        time: '1d ago',
+        title: 'DroBoard Writing Contest',
+        prize: 'Win \u20a6100,000 + Featured Placement!'
+      },
+      // Sponsored Story
+      {
+        type: 'sponsored',
+        title: 'Bound to the Ruthless CEO',
+        author: 'By Ava Winters',
+        tags: ['Romance', 'Billionaire'],
+        desc: 'A deal. A marriage. A love she never saw coming.',
+        image: avatars.ceo
+      },
+      // NEW: Reaction - Jaxon
+      {
+        type: 'reaction',
+        author: 'Jaxon',
+        time: '5h ago',
+        avatar: avatars.jaxon,
+        text: 'The way this arc is building... I need Chapter 22 NOW.',
+        image: avatars.reaction2,
+        linked: { title: 'Forbidden Hearts', chapter: 'Chapter 9', cover: avatars.forbidden },
+        likes: 74,
+        comments: 15,
+        shares: 0
+      },
+      // BookAddict completed post
+      {
+        type: 'completed',
+        author: 'BookAddict',
+        time: '6h ago',
+        avatar: avatars.bookaddict,
+        text: 'Just finished this masterpiece! Recommend it to everyone!',
+        linked: { title: 'Burn For Me, Elsa', status: 'Completed', cover: avatars.burn },
+        likes: 82,
+        comments: 19,
+        shares: 0
+      },
+      // Invite
+      { type: 'invite' }
+    ];
+
+    /* =========================================================
+       NAV DATA
+    ========================================================= */
+    const navItems = [
+      { icon: 'home', label: 'Home' },
+      { icon: 'compass', label: 'Discover' },
+      { icon: 'search', label: 'Search' },
+      { icon: 'fileText', label: 'Feed', active: true },
+      { icon: 'user', label: 'Profile' }
+    ];
+
+    /* =========================================================
+       RENDER
+    ========================================================= */
+    function renderHeader() {
+      document.getElementById('bell-btn').innerHTML = icon('bell', { size: 22 }) + '<span class="badge">3</span>';
+      document.getElementById('gift-btn').innerHTML = icon('gift', { size: 22 });
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('bottom-nav');
+      nav.innerHTML = navItems.map(n => `
+        <div class="nav-item ${n.active ? 'active' : ''}">
+          ${icon(n.icon, { size: 22 })}
+          <span>${n.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderFeed() {
+      const container = document.getElementById('feed');
+      let html = '';
+
+      feedData.forEach(item => {
+        switch (item.type) {
+          case 'composer':
+            html += `
+              <div class="composer">
+                <div class="composer-top">
+                  <img class="avatar" src="${avatars.user}" alt="You">
+                  <input class="composer-input" placeholder="What's happening in your story world?" readonly>
+                  <div class="composer-send">${icon('send', { size: 16 })}</div>
+                </div>
+                <div class="composer-actions">
+                  <button class="action-btn photo">${icon('image', { size: 15 })} Photo</button>
+                  <button class="action-btn chapter">${icon('bookOpen', { size: 15 })} Chapter Drop</button>
+                  <button class="action-btn poll">${icon('barChart', { size: 15 })} Poll</button>
+                  <button class="action-btn debate">${icon('zap', { size: 15 })} Debate</button>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'stories':
+            html += `<div class="stories">`;
+            item.items.forEach(s => {
+              html += `
+                <div class="story-item">
+                  <div class="story-ring ${s.own ? 'own' : ''}">
+                    <img src="${s.avatar}" alt="${s.name}">
+                    ${s.own ? `<div class="story-add">${icon('send', { size: 0 })}<span style="font-size:13px;font-weight:700;line-height:1;">+</span></div>` : ''}
+                  </div>
+                  <div class="story-name">${s.name}</div>
+                </div>
+              `;
+            });
+            html += `</div>`;
+            break;
+
+          case 'chapter':
+            html += `
+              <div class="post">
+                <div class="post-type chapter">${icon('bookOpen', { size: 15 })} Chapter Drop</div>
+                <div class="post-header">
+                  <img class="avatar sm" src="${item.avatar}" alt="${item.author}">
+                  <div class="post-meta">
+                    <div class="post-author">${item.author} ${item.verified ? `<span class="verified">${icon('checkCircle', { size: 14 })}</span>` : ''}</div>
+                    <div class="post-time">${item.time}</div>
+                  </div>
+                  <div class="more-btn">${icon('moreHorizontal', { size: 18 })}</div>
+                </div>
+                <div class="chapter-card">
+                  <img class="chapter-cover" src="${item.cover}" alt="${item.title}">
+                  <div class="chapter-info">
+                    <div class="chapter-title">${item.title}</div>
+                    <div class="chapter-subtitle">${item.subtitle}</div>
+                    <div class="chapter-desc">${item.desc}</div>
+                    <button class="read-btn">${icon('bookOpen', { size: 14 })} Read Now</button>
+                  </div>
+                </div>
+                <div class="engagement">
+                  <div class="eng-item liked">${icon('heartFilled', { size: 17 })} ${item.likes}</div>
+                  <div class="eng-item">${icon('messageCircle', { size: 17 })} ${item.comments}</div>
+                  <div class="eng-item">${icon('share', { size: 16 })} ${item.shares}</div>
+                  <div class="eng-spacer"></div>
+                  <div class="bookmark-btn">${icon('bookmark', { size: 17 })}</div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'reaction':
+            html += `
+              <div class="post">
+                <div class="post-header">
+                  <img class="avatar sm" src="${item.avatar}" alt="${item.author}">
+                  <div class="post-meta">
+                    <div class="post-author">${item.author}</div>
+                    <div class="post-time">${item.time}</div>
+                  </div>
+                  <div class="more-btn">${icon('moreHorizontal', { size: 18 })}</div>
+                </div>
+                <div class="post-content">${item.text}</div>
+                <img class="post-image" src="${item.image}" alt="Post image">
+                <div class="linked-story">
+                  <img src="${item.linked.cover}" alt="${item.linked.title}">
+                  <div class="linked-info">
+                    <div class="linked-title">${item.linked.title}</div>
+                    <div class="linked-sub">${item.linked.chapter}</div>
+                  </div>
+                  <span class="chevron">${icon('chevronRight', { size: 18 })}</span>
+                </div>
+                <div class="engagement">
+                  <div class="eng-item liked">${icon('heartFilled', { size: 17 })} ${item.likes}</div>
+                  <div class="eng-item">${icon('messageCircle', { size: 17 })} ${item.comments}</div>
+                  <div class="eng-item">${icon('share', { size: 16 })}</div>
+                  <div class="eng-spacer"></div>
+                  <div class="bookmark-btn">${icon('bookmark', { size: 17 })}</div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'poll':
+            html += `
+              <div class="post">
+                <div class="post-header">
+                  <img class="avatar sm" src="${item.avatar}" alt="${item.author}">
+                  <div class="post-meta">
+                    <div class="post-author">${item.author} <span class="poll-tag">${icon('barChart', { size: 13 })} Poll</span></div>
+                    <div class="post-time">${item.time}</div>
+                  </div>
+                  <div class="more-btn">${icon('moreHorizontal', { size: 18 })}</div>
+                </div>
+                <div class="post-content"><strong>${item.question}</strong></div>
+                <div class="poll-options">
+                  ${item.options.map(o => `
+                    <div class="poll-option">
+                      <div class="poll-label">
+                        <span>${o.label}</span>
+                        <span>${o.percent}%</span>
+                      </div>
+                      <div class="poll-bar">
+                        <div class="poll-fill ${o.color}" style="width:${o.percent}%"></div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="poll-footer">
+                  <button class="vote-btn">${icon('checkSquare', { size: 15 })} Vote</button>
+                  <span>${item.votes} votes &bull; ${item.timeLeft}</span>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'premium':
+            html += `
+              <div class="post">
+                <div class="post-type sponsored">${icon('star', { size: 14 })} Sponsored</div>
+                <div class="premium-card">
+                  <img src="${item.image}" alt="Premium">
+                  <div class="premium-info">
+                    <h3>${item.title}</h3>
+                    <ul>
+                      ${item.perks.map(p => `<li><span class="icon">${icon('checkCircle', { size: 13 })}</span>${p}</li>`).join('')}
+                    </ul>
+                    <button class="premium-btn">Go Premium \u2192</button>
+                  </div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'debate':
+            html += `
+              <div class="post">
+                <div class="post-type debate">${icon('messageCircle', { size: 15 })} Be part of the conversation</div>
+                <div class="post-time" style="margin-bottom:8px;">${item.time}</div>
+                <div class="debate-question">${item.question}</div>
+                <div class="debate-prompt">${item.prompt}</div>
+                <div class="debate-options">
+                  <div class="debate-opt yes">
+                    <div class="debate-opt-text">${item.yesText}</div>
+                    <div class="debate-icon">${icon('thumbsUp', { size: 24 })}</div>
+                    <button class="join-btn">Join</button>
+                  </div>
+                  <div class="debate-opt no">
+                    <div class="debate-opt-text">${item.noText}</div>
+                    <div class="debate-icon">${icon('thumbsDown', { size: 24 })}</div>
+                    <button class="join-btn">Join</button>
+                  </div>
+                </div>
+                <div class="debate-footer">
+                  <div class="debate-avatars">
+                    <img src="${avatars.luna}" alt="">
+                    <img src="${avatars.alex}" alt="">
+                    <img src="${avatars.emily}" alt="">
+                    <span style="margin-left:8px;">${item.joined} joined the discussion</span>
+                  </div>
+                  <span class="view-disc">View Discussion ${icon('chevronRight', { size: 14 })}</span>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'author':
+            html += `
+              <div class="post">
+                <div class="post-type author">${icon('edit', { size: 15 })} Author Post</div>
+                <div class="post-header">
+                  <img class="avatar sm" src="${item.avatar}" alt="${item.author}">
+                  <div class="post-meta">
+                    <div class="post-author">${item.author} ${item.verified ? `<span class="verified">${icon('checkCircle', { size: 14 })}</span>` : ''}</div>
+                    <div class="post-time">${item.time}</div>
+                  </div>
+                  <div class="more-btn">${icon('moreHorizontal', { size: 18 })}</div>
+                </div>
+                <div class="post-content">${item.text}</div>
+                <img class="author-image" src="${item.image}" alt="Chapter preview">
+                <div class="engagement">
+                  <div class="eng-item liked">${icon('heartFilled', { size: 17 })} ${item.likes}</div>
+                  <div class="eng-item">${icon('messageCircle', { size: 17 })} ${item.comments}</div>
+                  <div class="eng-item">${icon('share', { size: 16 })} ${item.shares}</div>
+                  <div class="eng-spacer"></div>
+                  <div class="bookmark-btn">${icon('bookmark', { size: 17 })}</div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'contest':
+            html += `
+              <div class="post">
+                <div class="post-type contest">${icon('award', { size: 15 })} Writing Contest</div>
+                <div class="post-time" style="margin-bottom:8px;">${item.time}</div>
+                <div class="contest-banner">
+                  <h3>${item.title}</h3>
+                  <p>${item.prize}</p>
+                  <button class="enter-btn">Enter Contest ${icon('chevronRight', { size: 14 })}</button>
+                  <div class="trophy">${icon('award', { size: 64, stroke: 1.5 })}</div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'sponsored':
+            html += `
+              <div class="post">
+                <div class="post-type sponsored">${icon('volume', { size: 15 })} Sponsored Story</div>
+                <div class="sponsored-card">
+                  <img src="${item.image}" alt="${item.title}">
+                  <div class="sponsored-overlay">
+                    <div class="sponsored-title">${item.title}</div>
+                    <div class="sponsored-author">${item.author}</div>
+                    <div class="sponsored-tags">
+                      ${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                    </div>
+                    <div class="sponsored-desc">${item.desc}</div>
+                    <button class="read-now">Read Now ${icon('chevronRight', { size: 14 })}</button>
+                  </div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'completed':
+            html += `
+              <div class="post">
+                <div class="post-header">
+                  <img class="avatar sm" src="${item.avatar}" alt="${item.author}">
+                  <div class="post-meta">
+                    <div class="post-author">${item.author}</div>
+                    <div class="post-time">${item.time}</div>
+                  </div>
+                  <div class="more-btn">${icon('moreHorizontal', { size: 18 })}</div>
+                </div>
+                <div class="post-content">${item.text}</div>
+                <div class="linked-story">
+                  <img src="${item.linked.cover}" alt="${item.linked.title}">
+                  <div class="linked-info">
+                    <div class="linked-title">${item.linked.title}</div>
+                    <div class="linked-sub"><span class="completed-badge">${item.linked.status}</span></div>
+                  </div>
+                  <span class="chevron">${icon('chevronRight', { size: 18 })}</span>
+                </div>
+                <div class="engagement">
+                  <div class="eng-item liked">${icon('heartFilled', { size: 17 })} ${item.likes}</div>
+                  <div class="eng-item">${icon('messageCircle', { size: 17 })} ${item.comments}</div>
+                  <div class="eng-item">${icon('share', { size: 16 })}</div>
+                  <div class="eng-spacer"></div>
+                  <div class="bookmark-btn">${icon('bookmark', { size: 17 })}</div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'invite':
+            html += `
+              <div class="invite-card">
+                <div class="invite-text">
+                  <h4>Invite your friends and earn coins!</h4>
+                  <p>+50 coins per friend</p>
+                  <button class="invite-btn">Invite Now ${icon('chevronRight', { size: 14 })}</button>
+                </div>
+                <div class="invite-icons">
+                  ${icon('gift', { size: 28 })}
+                  <span class="coin">${icon('dollar', { size: 24 })}</span>
+                </div>
+              </div>
+            `;
+            break;
+        }
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    renderHeader();
+    renderNav();
+    renderFeed();
+  </script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DroBoard — Feed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#E91E63;        --pink-deep:#C2185B;    --pink-soft:#FCE7F3;
+    --purple:#7C3AED;      --purple-deep:#6D28D9;  --purple-soft:#F1EBFF;
+    --blue:#3B82F6;        --blue-soft:#E9F0FE;
+    --green:#10B981;       --green-soft:#E8FBF3;
+    --orange:#F59E0B;      --orange-soft:#FEF3E2;
+    --ink:#171522;         --ink-2:#3A3650;        --gray-600:#6B6880;
+    --gray-400:#9C99AE;    --line:#EDEBF3;         --bg:#F7F6FA;
+    --white:#FFFFFF;
+    --font-display:'Manrope',sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    --shadow-card: 0 1px 2px rgba(23,21,34,.04), 0 6px 18px rgba(23,21,34,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#EDEBF3;}
+  body{font-family:var(--font-body);color:var(--ink);display:flex;justify-content:center;min-height:100vh;}
+  button{font-family:inherit;border:none;background:none;cursor:pointer;}
+  img{display:block;}
+  svg.ic{display:block;flex-shrink:0;}
+  ::-webkit-scrollbar{display:none;}
+
+  .phone{width:100%;max-width:410px;min-height:100vh;background:var(--bg);position:relative;box-shadow:0 0 50px rgba(0,0,0,.12);display:flex;flex-direction:column;}
+
+  /* ===== HEADER ===== */
+  .topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+  .logo{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+  .logo span{color:var(--pink);}
+  .top-actions{display:flex;gap:10px;}
+  .icon-btn{width:38px;height:38px;border-radius:50%;background:var(--white);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative;color:var(--ink-2);transition:transform .15s;}
+  .icon-btn:active{transform:scale(.92);}
+  .icon-btn.pink{background:var(--pink-soft);border-color:transparent;color:var(--pink-deep);}
+  .badge-dot{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--pink);border:2px solid var(--white);}
+
+  /* ===== TABS ===== */
+  .tabs{display:flex;gap:22px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--white);overflow-x:auto;}
+  .tab{padding:11px 0;font-size:13.5px;font-weight:600;color:var(--gray-400);white-space:nowrap;position:relative;}
+  .tab.active{color:var(--pink);font-weight:700;}
+  .tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2.5px;border-radius:3px;background:var(--pink);}
+
+  .feed{flex:1;padding:14px 12px 96px;display:flex;flex-direction:column;gap:12px;}
+
+  /* ===== CARD BASE ===== */
+  .card{background:var(--white);border-radius:16px;box-shadow:var(--shadow-card);overflow:hidden;}
+  .pad{padding:14px 14px 12px;}
+
+  /* ===== COMPOSER ===== */
+  .composer-top{display:flex;align-items:center;gap:11px;}
+  .avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#ffb1c9,var(--pink));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
+  .avatar.sm{width:34px;height:34px;font-size:13px;}
+  .composer-input{flex:1;background:var(--bg);border-radius:22px;padding:11px 16px;font-size:14px;color:var(--gray-400);}
+  .composer-shortcuts{display:flex;justify-content:space-between;margin-top:13px;padding-top:12px;border-top:1px solid var(--line);}
+  .shortcut{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+  .shortcut-ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+  .shortcut:active .shortcut-ic{transform:scale(.9);}
+  .shortcut span{font-size:11px;font-weight:600;color:var(--gray-600);}
+  .sc-photo{background:var(--blue-soft);}.sc-photo svg{stroke:var(--blue);}
+  .sc-chapter{background:var(--purple-soft);}.sc-chapter svg{stroke:var(--purple-deep);}
+  .sc-poll{background:var(--green-soft);}.sc-poll svg{stroke:#0d9668;}
+  .sc-debate{background:var(--orange-soft);}.sc-debate svg{stroke:#c2610a;}
+
+  /* ===== STORIES ===== */
+  .stories{display:flex;gap:13px;padding:12px 14px;overflow-x:auto;}
+  .story-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:58px;}
+  .story-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,var(--pink),var(--purple),var(--orange));position:relative;}
+  .story-ring.own{background:var(--line);}
+  .story-ring .inner{width:100%;height:100%;border-radius:50%;background:#fff;padding:2px;}
+  .story-avatar{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;}
+  .story-add{position:absolute;bottom:-1px;right:-1px;width:19px;height:19px;background:var(--pink);border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;}
+  .story-name{font-size:10.5px;font-weight:600;color:var(--gray-600);max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* ===== POST HEADER ===== */
+  .post-head{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+  .post-meta{flex:1;min-width:0;}
+  .post-name-row{display:flex;align-items:center;gap:5px;}
+  .post-name{font-size:14px;font-weight:700;}
+  .verified{width:14px;height:14px;color:var(--blue);flex-shrink:0;}
+  .post-time{font-size:11.5px;color:var(--gray-400);margin-top:1px;}
+  .head-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+  .icon-plain{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gray-400);transition:.15s;}
+  .icon-plain:active{background:var(--bg);}
+  .icon-plain.on{color:var(--pink);}
+
+  /* type pills — this is the differentiation system */
+  .type-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;letter-spacing:.01em;padding:5px 10px 5px 8px;border-radius:20px;margin-bottom:10px;}
+  .type-pill svg{width:12px;height:12px;}
+  .tp-chapter{background:var(--purple-soft);color:var(--purple-deep);}
+  .tp-recommend{background:var(--blue-soft);color:#1d4ed8;}
+  .tp-poll{background:var(--green-soft);color:#0d9668;}
+  .tp-debate{background:var(--orange-soft);color:#c2610a;}
+  .tp-author{background:var(--pink-soft);color:var(--pink-deep);}
+  .tp-sponsor{background:var(--bg);color:var(--gray-600);}
+
+  .post-text{font-size:14px;line-height:1.55;margin-bottom:11px;color:var(--ink-2);}
+  .post-text strong{font-weight:700;color:var(--ink);}
+
+  /* ===== CHAPTER CARD ===== */
+  .chapter-card{display:flex;gap:0;border-radius:13px;overflow:hidden;background:linear-gradient(135deg,#241c38,#3a1e35);margin-bottom:11px;}
+  .chapter-cover{width:96px;flex-shrink:0;background:linear-gradient(160deg,#5b3268,#241c38);position:relative;}
+  .chapter-cover::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(255,140,180,.35),transparent 60%);}
+  .chapter-info{padding:13px 13px 13px 12px;color:#fff;flex:1;min-width:0;}
+  .chapter-eyebrow{font-size:10px;font-weight:800;color:#ffb0c8;letter-spacing:.05em;margin-bottom:3px;}
+  .chapter-title{font-family:var(--font-display);font-size:15px;font-weight:800;line-height:1.25;margin-bottom:5px;}
+  .chapter-desc{font-size:11.5px;color:#d6cde3;line-height:1.4;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .read-btn{background:var(--pink);color:#fff;border:none;padding:7px 16px;border-radius:10px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;}
+
+  /* ===== RECOMMENDATION / REACTION ===== */
+  .rec-card{display:flex;align-items:center;gap:11px;background:var(--bg);border-radius:12px;padding:9px 10px;margin-bottom:11px;}
+  .rec-thumb{width:46px;height:60px;border-radius:8px;flex-shrink:0;background:linear-gradient(160deg,#5b3268,#241c38);}
+  .rec-title{font-size:12.5px;font-weight:700;line-height:1.3;}
+  .rec-sub{font-size:11px;color:var(--gray-400);margin-top:2px;}
+  .rec-arrow{margin-left:auto;color:var(--gray-400);flex-shrink:0;}
+  .post-image{width:100%;border-radius:13px;margin-bottom:11px;max-height:220px;object-fit:cover;}
+
+  /* ===== ACTION ROW — centered like/comment/share ===== */
+  .post-actions{display:flex;align-items:center;justify-content:center;gap:34px;padding-top:11px;border-top:1px solid var(--line);}
+  .action{display:flex;align-items:center;gap:6px;color:var(--gray-600);}
+  .action svg{width:19px;height:19px;transition:transform .15s;}
+  .action span{font-size:12.5px;font-weight:600;}
+  .action:active svg{transform:scale(.85);}
+  .action.liked{color:var(--pink);}
+  .action.liked svg{fill:var(--pink);stroke:var(--pink);}
+
+  /* ===== POLL ===== */
+  .poll-q{font-size:14.5px;font-weight:700;margin-bottom:13px;line-height:1.4;}
+  .poll-row{margin-bottom:9px;}
+  .poll-label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:5px;}
+  .poll-track{height:9px;border-radius:6px;background:var(--bg);overflow:hidden;}
+  .poll-fill{height:100%;border-radius:6px;}
+  .pf-1{background:var(--purple);}.pf-2{background:var(--pink);}.pf-3{background:var(--blue);}
+  .vote-btn{width:100%;margin-top:9px;background:var(--purple-deep);color:#fff;font-size:13.5px;font-weight:700;padding:11px;border-radius:12px;}
+  .poll-meta{text-align:center;font-size:11.5px;color:var(--gray-400);margin-top:9px;}
+
+  /* ===== DEBATE ===== */
+  .debate-q{font-family:var(--font-display);font-size:16.5px;font-weight:800;margin-bottom:4px;}
+  .debate-prompt{font-size:12.5px;color:var(--gray-400);margin-bottom:13px;}
+  .debate-opts{display:flex;gap:9px;margin-bottom:11px;}
+  .debate-opt{flex:1;border-radius:13px;padding:13px 10px;text-align:center;}
+  .debate-opt.yes{background:var(--green-soft);}
+  .debate-opt.no{background:var(--pink-soft);}
+  .debate-opt-text{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:9px;}
+  .debate-opt.yes .debate-opt-text{color:#0d7a56;}
+  .debate-opt.no .debate-opt-text{color:var(--pink-deep);}
+  .debate-icon{display:flex;justify-content:center;margin-bottom:8px;}
+  .debate-opt.yes .debate-icon{color:var(--green);}
+  .debate-opt.no .debate-icon{color:var(--pink);}
+  .join-btn{border:none;padding:6px 15px;border-radius:20px;font-size:11.5px;font-weight:700;}
+  .debate-opt.yes .join-btn{background:#c9f3e0;color:#0d7a56;}
+  .debate-opt.no .join-btn{background:#fbd2e2;color:var(--pink-deep);}
+  .debate-footer{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--gray-400);}
+  .debate-avatars img,.debate-avatars .a{width:21px;height:21px;border-radius:50%;border:2px solid #fff;margin-left:-6px;}
+  .debate-avatars .a{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;}
+  .debate-avatars span:first-child{margin-left:0;}
+  .view-disc{color:var(--pink);font-weight:700;display:flex;align-items:center;gap:3px;}
+
+  /* ===== CONTEST BANNER ===== */
+  .contest-banner{background:linear-gradient(135deg,#6D28D9,#9333EA 60%,var(--pink));border-radius:16px;padding:20px 16px;color:#fff;position:relative;overflow:hidden;}
+  .contest-glow{position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12);top:-60px;right:-50px;}
+  .contest-trophy{width:52px;height:52px;border-radius:15px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;}
+  .contest-trophy svg{width:26px;height:26px;stroke:#fff;}
+  .contest-title{font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:9px;position:relative;line-height:1.25;}
+  .contest-tags{display:flex;gap:7px;margin-bottom:15px;position:relative;flex-wrap:wrap;}
+  .contest-tag{background:rgba(255,255,255,.2);font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;}
+  .enter-btn{background:#fff;color:var(--purple-deep);border:none;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:5px;position:relative;}
+
+  /* ===== SPONSORED STORY ===== */
+  .sponsored-cover{height:150px;border-radius:13px;position:relative;overflow:hidden;background:linear-gradient(160deg,#3a1e2e,#7a2d4a 55%,#1c1420);display:flex;align-items:flex-end;padding:14px;margin-bottom:11px;}
+  .sponsored-title{color:#fff;font-family:var(--font-display);font-size:17px;font-weight:800;line-height:1.25;position:relative;}
+  .genre-pills{display:flex;gap:7px;margin-bottom:9px;}
+  .genre-pill{background:var(--bg);color:var(--gray-600);font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;}
+  .sponsored-desc{font-size:13px;color:var(--gray-600);line-height:1.5;margin-bottom:12px;}
+  .read-now-btn{text-align:center;background:var(--pink);color:#fff;font-weight:700;font-size:13.5px;padding:11px;border-radius:12px;}
+
+  /* ===== PREMIUM AD ===== */
+  .premium-card{border-radius:16px;padding:17px;color:#fff;background:linear-gradient(135deg,#181329,#2c1a41);display:flex;gap:13px;}
+  .premium-cover{width:64px;height:82px;border-radius:9px;flex-shrink:0;background:linear-gradient(160deg,#5b3268,#241c38);}
+  .premium-info h3{font-family:var(--font-display);font-size:14.5px;font-weight:800;margin-bottom:9px;}
+  .premium-info ul{list-style:none;margin-bottom:11px;}
+  .premium-info li{font-size:11.5px;font-weight:500;margin-bottom:5px;display:flex;align-items:center;gap:6px;color:#e6e2ee;}
+  .premium-info li svg{width:13px;height:13px;color:var(--green);flex-shrink:0;}
+  .premium-btn{background:var(--pink);color:#fff;border:none;padding:8px 15px;border-radius:20px;font-size:12.5px;font-weight:700;}
+
+  /* ===== COMPLETED ===== */
+  .completed-pill{background:var(--green);color:#fff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px;display:inline-block;}
+
+  /* ===== INVITE — original ticket design ===== */
+  .invite-card{position:relative;background:var(--white);border-radius:16px;display:flex;box-shadow:var(--shadow-card);}
+  .invite-main{flex:1;padding:16px 14px;position:relative;}
+  .invite-eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--pink-deep);text-transform:uppercase;margin-bottom:6px;}
+  .invite-title{font-family:var(--font-display);font-size:15.5px;font-weight:800;color:var(--ink);line-height:1.3;margin-bottom:8px;}
+  .invite-faces{display:flex;align-items:center;margin-bottom:12px;}
+  .invite-faces .f{width:24px;height:24px;border-radius:50%;border:2px solid #fff;margin-left:-7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;}
+  .invite-faces .f:first-child{margin-left:0;}
+  .invite-faces .n{font-size:11.5px;color:var(--gray-400);margin-left:8px;font-weight:600;}
+  .invite-btn2{background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;padding:9px 17px;border-radius:11px;display:inline-flex;align-items:center;gap:6px;}
+  .invite-stub{width:104px;flex-shrink:0;border-left:2px dashed var(--line);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(180deg,var(--pink-soft),var(--purple-soft));}
+  .invite-stub::before,.invite-stub::after{content:'';position:absolute;left:-9px;width:18px;height:18px;border-radius:50%;background:var(--bg);}
+  .invite-stub::before{top:-9px;}
+  .invite-stub::after{bottom:-9px;}
+  .invite-coin{width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--orange);box-shadow:0 2px 6px rgba(0,0,0,.08);}
+  .invite-reward{font-size:12.5px;font-weight:800;color:var(--pink-deep);text-align:center;line-height:1.2;}
+  .invite-reward small{display:block;font-size:9.5px;font-weight:600;color:var(--gray-600);}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:410px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 0 22px;z-index:100;}
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--gray-400);padding:4px 12px;}
+  .nav-item.active{color:var(--pink);}
+  .nav-item svg{width:21px;height:21px;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <div class="logo">Dro<span>Board</span></div>
+    <div class="top-actions">
+      <div class="icon-btn" id="bell-btn"></div>
+      <div class="icon-btn pink" id="gift-btn"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Following</div>
+    <div class="tab">For You</div>
+    <div class="tab">Trending</div>
+    <div class="tab">My Circles</div>
+  </div>
+
+  <div class="feed" id="feed"></div>
+
+  <div class="bottom-nav" id="bottom-nav"></div>
+</div>
+
+<script>
+/* ============ ICONS — one consistent line-icon set ============ */
+const ICONS={
+  bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  home:'<path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v10h14V10"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  bar:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  swords:'<path d="M4 20l7-7"/><path d="M20 4l-7 7"/><path d="M4 4l16 16"/><path d="M9 9l-5-5H2v2l5 5"/><path d="M15 15l5 5h2v-2l-5-5"/>',
+  dots:'<circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/><circle cx="5" cy="12" r="1.4"/>',
+  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+  comment:'<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/>',
+  bookmark:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  checkCircle:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  chevronRight:'<polyline points="9 18 15 12 9 6"/>',
+  thumbUp:'<path d="M7 10v11"/><path d="M14 5l-1 5h7.5a1.5 1.5 0 0 1 1.45 1.87l-1.72 6.5A2 2 0 0 1 18.3 20H7"/>',
+  thumbDown:'<path d="M17 14V3"/><path d="M10 19l1-5H3.5A1.5 1.5 0 0 1 2.05 12.13l1.72-6.5A2 2 0 0 1 5.7 4H17"/>',
+  trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+  volume:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+  send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  thumbsUpFilled:'<path fill="currentColor" stroke="none" d="M2 9h4v12H2zM22 10.5c0-.83-.67-1.5-1.5-1.5H14l1-4.5C15.2 3 14.4 2 13.3 2c-.4 0-.8.16-1.06.44L7 8v13h11.5c.65 0 1.2-.4 1.42-1l2-5c.06-.2.08-.4.08-.6z"/>',
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 2.5-1.7c1.5 0 2.6 1 2.6 2.1 0 2.8-4.2 2.1-4.2 4.8 0 1.2 1.1 2.1 2.6 2.1a2.6 2.6 0 0 0 2.5-1.7"/><line x1="12" y1="6" x2="12" y2="18"/>'
+};
+function icon(name,{size=18,stroke=2,color}={}){
+  return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color||'currentColor'}" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
+function initials(name){return (name||'?').trim()[0].toUpperCase();}
+function grad(seed){
+  const palettes=['#ff8fab,#c084fc','#38bdf8,#818cf8','#fbbf24,#fb7185','#34d399,#22d3ee','#f472b6,#a78bfa'];
+  let h=0;for(const c of seed)h=(h*31+c.charCodeAt(0))>>>0;
+  return palettes[h%palettes.length];
+}
+function av(name,size=42){
+  return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*.33}px;background:linear-gradient(135deg,${grad(name)})">${initials(name)}</div>`;
+}
+
+/* ============ FEED DATA ============ */
+const stories=[
+  {name:'Your Story', you:true},
+  {name:'Luna Grey'}, {name:'Alex Pierce'}, {name:'Mia Clark'}, {name:'Jaxon'}, {name:'Sofia'}
+];
+
+const feed=[
+  {type:'chapter', author:'Luna Grey', verified:true, time:'2m ago',
+    eyebrow:'CHAPTER 21', title:'His Sweet Revenge', subtitle:'The Truth Hurts',
+    desc:'Everything changes when she discovers the truth he tried so hard to hide.',
+    likes:2412, comments:318, liked:false, saved:false},
+
+  {type:'recommend', author:'Emily Carter', time:'15m ago',
+    text:'This chapter just broke me. Luna Grey never disappoints — the pacing in the final scene is unreal.',
+    image:'https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?w=800&q=80&auto=format&fit=crop',
+    linked:{title:"His Sweet Revenge", sub:'Chapter 20 · Romance'},
+    likes:1102, comments:96, liked:false, saved:false},
+
+  {type:'poll', author:'BookLover_99', time:'1h ago',
+    question:'Which ending would you love for "The Billionaire\'s Regret"?',
+    options:[{label:'Happy Ending',percent:42,c:'pf-1'},{label:'Tragic Ending',percent:31,c:'pf-2'},{label:'Open Ending',percent:27,c:'pf-3'}],
+    votes:203, timeLeft:'2d left'},
+
+  {type:'chapter', author:'Mia Clark', verified:false, time:'32m ago',
+    eyebrow:'CHAPTER 9', title:'Forbidden Hearts', subtitle:'No Way Back',
+    desc:"She promised herself she'd never fall for him again. That promise just broke.",
+    likes:3210, comments:540, liked:false, saved:false},
+
+  {type:'premium', title:'Unlock unlimited stories & perks',
+    perks:['Ad-free reading','Early chapter access','Exclusive stories']},
+
+  {type:'debate', time:'3h ago', question:'Should villains get redemption?',
+    prompt:'Share your thoughts and join the debate.',
+    yesText:'Yes, everyone deserves a second chance.', noText:'No, some actions are unforgivable.',
+    joined:1204},
+
+  {type:'author', author:'Alex Pierce', verified:true, time:'4h ago',
+    text:'Chapter 22 is almost ready! Dropping tomorrow at 8PM. Stay tuned.',
+    image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80&auto=format&fit=crop',
+    likes:1560, comments:480, liked:false, saved:false},
+
+  {type:'recommend', author:'Jaxon', time:'5h ago',
+    text:'The way this arc is building… I need Chapter 22 right now.',
+    image:'https://images.unsplash.com/photo-1481277542470-605612bd2d61?w=800&q=80&auto=format&fit=crop',
+    linked:{title:'Forbidden Hearts', sub:'Chapter 9 · Romance'},
+    likes:740, comments:150, liked:false, saved:false},
+
+  {type:'contest', time:'1d ago', title:'DroBoard Writing Contest',
+    tags:['₦100,000 Prize','Featured Placement']},
+
+  {type:'sponsored', title:'Bound to the Ruthless CEO', author:'By Ava Winters',
+    tags:['Romance','Billionaire'], desc:'A deal. A marriage. A love she never saw coming.'},
+
+  {type:'completed', author:'BookAddict', time:'6h ago',
+    text:'Just finished this masterpiece! Recommend it to everyone.',
+    linked:{title:'Burn For Me, Elsa', status:'Completed'},
+    likes:820, comments:190, liked:false, saved:false},
+
+  {type:'invite'}
+];
+
+/* ============ RENDER ============ */
+function renderHeader(){
+  document.getElementById('bell-btn').innerHTML=icon('bell',{size:19})+'<span class="badge-dot"></span>';
+  document.getElementById('gift-btn').innerHTML=icon('gift',{size:19});
+}
+function renderNav(){
+  const items=[{i:'home',l:'Home'},{i:'compass',l:'Discover'},{i:'search',l:'Search'},{i:'layers',l:'Feed',on:true},{i:'user',l:'Profile'}];
+  document.getElementById('bottom-nav').innerHTML=items.map(it=>`
+    <div class="nav-item ${it.on?'active':''}">${icon(it.i,{size:21,stroke:it.on?2.4:2})}<span>${it.l}</span></div>
+  `).join('');
+}
+
+function actionRow(item){
+  return `<div class="post-actions">
+    <div class="action like-btn ${item.liked?'liked':''}" data-k="liked">
+      ${icon('heart',{size:19})}<span class="like-ct">${fmt(item.likes)}</span>
+    </div>
+    <div class="action">${icon('comment',{size:19})}<span>${fmt(item.comments)}</span></div>
+    <div class="action">${icon('share',{size:19})}<span>Share</span></div>
+  </div>`;
+}
+function headRight(item){
+  return `<div class="head-right">
+    <div class="icon-plain save-btn ${item.saved?'on':''}" data-k="saved">${icon('bookmark',{size:16})}</div>
+    <div class="icon-plain">${icon('dots',{size:17})}</div>
+  </div>`;
+}
+function fmt(n){return n>=1000?(n/1000).toFixed(1).replace('.0','')+'k':n;}
+
+function renderFeed(){
+  let html='';
+  // composer
+  html+=`<div class="card pad">
+    <div class="composer-top">${av('You')}<div class="composer-input">What's happening in your story world?</div></div>
+    <div class="composer-shortcuts">
+      <div class="shortcut"><div class="shortcut-ic sc-photo">${icon('camera',{size:16})}</div><span>Photo</span></div>
+      <div class="shortcut"><div class="shortcut-ic sc-chapter">${icon('book',{size:16})}</div><span>Chapter Drop</span></div>
+      <div class="shortcut"><div class="shortcut-ic sc-poll">${icon('bar',{size:16})}</div><span>Poll</span></div>
+      <div class="shortcut"><div class="shortcut-ic sc-debate">${icon('swords',{size:16})}</div><span>Debate</span></div>
+    </div>
+  </div>`;
+
+  // stories
+  html+=`<div class="card"><div class="stories">${stories.map(s=>`
+    <div class="story-item">
+      <div class="story-ring ${s.you?'own':''}"><div class="inner">
+        ${s.you?`<div style="width:100%;height:100%;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">${icon('search',{size:0})}<span style="font-size:18px;font-weight:800;color:var(--pink)">+</span></div>`
+        :`<div class="story-avatar" style="background:linear-gradient(135deg,${grad(s.name)})">${initials(s.name)}</div>`}
+      </div>${s.you?'':''}</div>
+      <div class="story-name">${s.name}</div>
+    </div>`).join('')}</div></div>`;
+
+  feed.forEach(item=>{
+    switch(item.type){
+
+      case 'chapter': html+=`<div class="card pad">
+        <div class="post-head">${av(item.author,42)}
+          <div class="post-meta">
+            <div class="post-name-row"><span class="post-name">${item.author}</span>${item.verified?`<span class="verified">${icon('checkCircle',{size:14})}</span>`:''}</div>
+            <div class="post-time">${item.time}</div>
+          </div>${headRight(item)}
+        </div>
+        <span class="type-pill tp-chapter">${icon('book',{size:12})}Chapter Drop</span>
+        <div class="chapter-card">
+          <div class="chapter-cover"></div>
+          <div class="chapter-info">
+            <div class="chapter-eyebrow">${item.eyebrow}</div>
+            <div class="chapter-title">${item.title}</div>
+            <div class="chapter-desc">${item.subtitle} — ${item.desc}</div>
+            <button class="read-btn">${icon('book',{size:13})}Read Now</button>
+          </div>
+        </div>
+        ${actionRow(item)}
+      </div>`; break;
+
+      case 'recommend': html+=`<div class="card pad">
+        <div class="post-head">${av(item.author,42)}
+          <div class="post-meta"><div class="post-name-row"><span class="post-name">${item.author}</span></div><div class="post-time">${item.time}</div></div>
+          ${headRight(item)}
+        </div>
+        <span class="type-pill tp-recommend">${icon('thumbUp',{size:12})}Recommendation</span>
+        <div class="post-text">${item.text}</div>
+        <img class="post-image" src="${item.image}" alt="">
+        <div class="rec-card">
+          <div class="rec-thumb"></div>
+          <div><div class="rec-title">${item.linked.title}</div><div class="rec-sub">${item.linked.sub}</div></div>
+          <span class="rec-arrow">${icon('chevronRight',{size:17})}</span>
+        </div>
+        ${actionRow(item)}
+      </div>`; break;
+
+      case 'poll': html+=`<div class="card pad">
+        <div class="post-head">${av(item.author,42)}
+          <div class="post-meta"><div class="post-name-row"><span class="post-name">${item.author}</span></div><div class="post-time">${item.time}</div></div>
+          ${headRight({saved:false})}
+        </div>
+        <span class="type-pill tp-poll">${icon('bar',{size:12})}Poll</span>
+        <div class="poll-q">${item.question}</div>
+        ${item.options.map(o=>`<div class="poll-row">
+          <div class="poll-label"><span>${o.label}</span><span>${o.percent}%</span></div>
+          <div class="poll-track"><div class="poll-fill ${o.c}" style="width:${o.percent}%"></div></div>
+        </div>`).join('')}
+        <button class="vote-btn">Vote Now</button>
+        <div class="poll-meta">${item.votes} votes &bull; ${item.timeLeft}</div>
+      </div>`; break;
+
+      case 'premium': html+=`<div class="card pad">
+        <span class="type-pill tp-sponsor">${icon('volume',{size:12})}Sponsored</span>
+        <div class="premium-card">
+          <div class="premium-cover"></div>
+          <div class="premium-info">
+            <h3>${item.title}</h3>
+            <ul>${item.perks.map(p=>`<li>${icon('check',{size:13})}${p}</li>`).join('')}</ul>
+            <button class="premium-btn">Go Premium →</button>
+          </div>
+        </div>
+      </div>`; break;
+
+      case 'debate': html+=`<div class="card pad">
+        <span class="type-pill tp-debate">${icon('swords',{size:12})}Debate</span>
+        <div class="post-time" style="margin-bottom:8px">${item.time}</div>
+        <div class="debate-q">${item.question}</div>
+        <div class="debate-prompt">${item.prompt}</div>
+        <div class="debate-opts">
+          <div class="debate-opt yes"><div class="debate-opt-text">${item.yesText}</div><div class="debate-icon">${icon('thumbUp',{size:22})}</div><button class="join-btn">Join</button></div>
+          <div class="debate-opt no"><div class="debate-opt-text">${item.noText}</div><div class="debate-icon">${icon('thumbDown',{size:22})}</div><button class="join-btn">Join</button></div>
+        </div>
+        <div class="debate-footer">
+          <div class="debate-avatars"><span class="a" style="background:linear-gradient(135deg,${grad('Luna')})">L</span><span class="a" style="background:linear-gradient(135deg,${grad('Alex')})">A</span><span class="a" style="background:linear-gradient(135deg,${grad('Emily')})">E</span>&nbsp;&nbsp;${fmt(item.joined)} joined</div>
+          <span class="view-disc">View ${icon('chevronRight',{size:13})}</span>
+        </div>
+      </div>`; break;
+
+      case 'author': html+=`<div class="card pad">
+        <div class="post-head">${av(item.author,42)}
+          <div class="post-meta"><div class="post-name-row"><span class="post-name">${item.author}</span>${item.verified?`<span class="verified">${icon('checkCircle',{size:14})}</span>`:''}</div><div class="post-time">${item.time}</div></div>
+          ${headRight(item)}
+        </div>
+        <span class="type-pill tp-author">${icon('edit',{size:12})}Author Update</span>
+        <div class="post-text">${item.text}</div>
+        <img class="post-image" src="${item.image}" alt="">
+        ${actionRow(item)}
+      </div>`; break;
+
+      case 'contest': html+=`<div class="card pad">
+        <div class="contest-banner">
+          <div class="contest-glow"></div>
+          <div class="contest-trophy">${icon('trophy',{size:26})}</div>
+          <div class="contest-title">${item.title}</div>
+          <div class="contest-tags">${item.tags.map(t=>`<span class="contest-tag">${t}</span>`).join('')}</div>
+          <button class="enter-btn">Enter Contest ${icon('chevronRight',{size:13})}</button>
+        </div>
+      </div>`; break;
+
+      case 'sponsored': html+=`<div class="card pad">
+        <span class="type-pill tp-sponsor">${icon('volume',{size:12})}Sponsored Story</span>
+        <div class="sponsored-cover"><div class="sponsored-title">${item.title}</div></div>
+        <div class="genre-pills">${item.tags.map(t=>`<span class="genre-pill">${t}</span>`).join('')}</div>
+        <div class="sponsored-desc">${item.author} — ${item.desc}</div>
+        <div class="read-now-btn">Read Now</div>
+      </div>`; break;
+
+      case 'completed': html+=`<div class="card pad">
+        <div class="post-head">${av(item.author,42)}
+          <div class="post-meta"><div class="post-name-row"><span class="post-name">${item.author}</span></div><div class="post-time">${item.time}</div></div>
+          ${headRight(item)}
+        </div>
+        <div class="post-text">${item.text}</div>
+        <div class="rec-card">
+          <div class="rec-thumb"></div>
+          <div><div class="rec-title">${item.linked.title}</div><span class="completed-pill">${item.linked.status}</span></div>
+          <span class="rec-arrow">${icon('chevronRight',{size:17})}</span>
+        </div>
+        ${actionRow(item)}
+      </div>`; break;
+
+      case 'invite': html+=`<div class="invite-card">
+        <div class="invite-main">
+          <div class="invite-eyebrow">Grow your circle</div>
+          <div class="invite-title">Invite friends, unlock<br>a free chapter together</div>
+          <div class="invite-faces">
+            <span class="f" style="background:linear-gradient(135deg,${grad('Luna')})">L</span>
+            <span class="f" style="background:linear-gradient(135deg,${grad('Alex')})">A</span>
+            <span class="f" style="background:linear-gradient(135deg,${grad('Mia')})">M</span>
+            <span class="n">+2.1k readers invited</span>
+          </div>
+          <div class="invite-btn2">${icon('send',{size:13,color:'#fff'})}Invite Now</div>
+        </div>
+        <div class="invite-stub">
+          <div class="invite-coin">${icon('coin',{size:20})}</div>
+          <div class="invite-reward">+50<small>coins each</small></div>
+        </div>
+      </div>`; break;
+    }
+  });
+
+  document.getElementById('feed').innerHTML=html;
+  attachEvents();
+}
+
+function attachEvents(){
+  document.querySelectorAll('.like-btn').forEach(el=>{
+    el.addEventListener('click',()=>{
+      el.classList.toggle('liked');
+      const ct=el.querySelector('.like-ct');
+      let n=parseFloat(ct.textContent);
+      const liked=el.classList.contains('liked');
+      ct.textContent=fmt(Math.round((liked? (n<100?n+1:n*1000+1) : (n<100?n-1:n*1000-1))));
+    });
+  });
+  document.querySelectorAll('.save-btn').forEach(el=>{
+    el.addEventListener('click',()=>el.classList.toggle('on'));
+  });
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');});
+  });
+}
+
+renderHeader();
+renderNav();
+renderFeed();
+</script>
+</body>
+</html>

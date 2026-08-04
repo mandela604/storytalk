@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DroBoard — Feed</title>
+<style>
+  :root{
+    --bg:#f4f4f6; --card:#fff; --ink:#0f1115; --muted:#6b7280; --line:#eceef2;
+    --pink:#ec2f6b; --purple:#7c3aed; --green:#10b981; --amber:#f59e0b; --blue:#2563eb;
+    --radius:16px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);font-family:var(--font);color:var(--ink)}
+  .phone{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-bottom:76px}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 18px 2px;font-size:13px;font-weight:700;background:#fff}
+  .statusbar .icons{letter-spacing:2px;font-size:12px}
+  header.top{background:#fff;padding:6px 16px 0;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line)}
+  .brandrow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding-bottom:8px}
+  .brand{font-size:22px;font-weight:900;letter-spacing:-.5px;min-width:0}
+  .brand span{color:var(--pink)}
+  .actions{display:flex;align-items:center;gap:14px;flex-shrink:0}
+  .iconbtn{position:relative;background:none;border:0;font-size:19px;cursor:pointer;line-height:1}
+  .badge{position:absolute;top:-6px;right:-8px;background:var(--pink);color:#fff;font-size:10px;font-weight:800;border-radius:999px;padding:1px 5px}
+  nav.tabs{display:flex;gap:22px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  nav.tabs button{background:none;border:0;padding:10px 0 12px;font-size:14px;font-weight:600;color:var(--muted);position:relative;white-space:nowrap;cursor:pointer}
+  nav.tabs button.active{color:var(--pink);font-weight:800}
+  nav.tabs button.active::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--pink)}
+  .stack{padding:12px 12px 0;display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 2px rgba(16,18,26,.06),0 6px 18px rgba(16,18,26,.04);overflow:hidden}
+  .pad{padding:14px}
+  .composer{display:flex;flex-direction:column;gap:12px}
+  .composer .row{display:flex;align-items:center;gap:10px}
+  .composer input{flex:1;min-width:0;border:0;background:#f6f7f9;border-radius:999px;padding:11px 14px;font-size:13.5px;font-family:var(--font)}
+  .composer input::placeholder{color:#9aa1ac}
+  .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 11px;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
+  .av{border-radius:999px;display:grid;place-items:center;color:#fff;font-weight:800;flex-shrink:0;background-size:cover;font-size:12px}
+  .stories{display:flex;gap:14px;overflow-x:auto;padding:14px;scrollbar-width:none}
+  .stories::-webkit-scrollbar{display:none}
+  .story{display:flex;flex-direction:column;align-items:center;gap:6px;width:62px;flex-shrink:0}
+  .ring{padding:2.5px;border-radius:999px;background:linear-gradient(135deg,var(--pink),var(--purple))}
+  .ring.plain{background:var(--line)}
+  .ring .av{width:52px;height:52px;border:2.5px solid #fff;font-size:15px}
+  .story small{font-size:10.5px;color:var(--muted);max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .kicker{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;padding:12px 14px 0}
+  .kicker.pink{color:var(--pink)} .kicker.purple{color:var(--purple)} .kicker.blue{color:var(--blue)}
+  .head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 14px}
+  .head .av{width:34px;height:34px}
+  .name{font-size:13.5px;font-weight:800;display:flex;align-items:center;gap:4px;min-width:0}
+  .name em{font-style:normal;color:var(--blue);font-size:11px}
+  .time{font-size:11px;color:var(--muted)}
+  .dots{background:none;border:0;color:var(--muted);font-size:17px;cursor:pointer}
+  .text{padding:0 14px 12px;font-size:14px;line-height:1.5}
+  .cover{margin:0 14px 12px;border-radius:12px;overflow:hidden;position:relative;color:#fff;padding:18px;background:linear-gradient(120deg,#2b1b3d,#5b1f45 55%,#8d2a4f)}
+  .cover h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.3px}
+  .cover .sub{font-size:12px;opacity:.85;margin-top:4px}
+  .cover p{font-size:12.5px;opacity:.9;line-height:1.5;margin:10px 0 14px;max-width:75%}
+  .btn{border:0;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:var(--font)}
+  .btn.pink{background:var(--pink);color:#fff}
+  .btn.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.4)}
+  .photo{margin:0 14px 12px;height:190px;border-radius:12px;background:linear-gradient(135deg,#1f2937,#4b5563)}
+  .attach{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 14px 12px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fafafb}
+  .attach .thumb{width:38px;height:48px;border-radius:6px;background:linear-gradient(135deg,#6d28d9,#db2777)}
+  .attach b{font-size:13px} .attach small{color:var(--muted);font-size:11.5px}
+  .bar{display:flex;align-items:center;gap:20px;padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);font-weight:700}
+  .bar button{background:none;border:0;display:flex;align-items:center;gap:6px;color:inherit;font:inherit;cursor:pointer}
+  .bar .save{margin-left:auto}
+  .poll{padding:0 14px 12px;display:flex;flex-direction:column;gap:12px}
+  .poll .q{font-size:14.5px;font-weight:800;line-height:1.4}
+  .opt small{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px}
+  .track{height:6px;border-radius:99px;background:#f0f1f4;overflow:hidden}
+  .fill{height:100%;border-radius:99px}
+  .debate{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 12px}
+  .side{border-radius:12px;padding:14px;text-align:center;font-size:12.5px;font-weight:700;line-height:1.4}
+  .side.yes{background:#effaf6;color:#0f766e} .side.no{background:#fef2f4;color:#b91c3c}
+  .side .em{display:grid;place-items:center;width:34px;height:34px;border-radius:999px;margin:10px auto;background:#fff;font-size:16px}
+  .join{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-weight:800;font-size:12.5px;cursor:pointer}
+  .joined{display:flex;align-items:center;gap:8px;padding:0 14px 14px;font-size:12px;color:var(--muted);font-weight:600}
+  .facepile{display:flex}
+  .facepile .av{width:22px;height:22px;border:2px solid #fff;margin-left:-7px;font-size:9px}
+  .facepile .av:first-child{margin-left:0}
+  .link{margin-left:auto;color:var(--pink);font-weight:800;white-space:nowrap}
+  .promo{margin:0 14px 14px;border-radius:12px;padding:18px;color:#fff;background:linear-gradient(120deg,#6d28d9,#a21caf 60%,#db2777)}
+  .promo h3{margin:0 0 4px;font-size:17px;font-weight:900}
+  .promo ul{margin:10px 0 14px;padding:0;list-style:none;font-size:12.5px;display:grid;gap:5px;opacity:.95}
+  .invite{margin:0 14px 14px;border-radius:12px;padding:16px;background:linear-gradient(120deg,#fff1f4,#ffe9d9);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+  .invite b{font-size:14px;display:block;line-height:1.35}
+  .invite a{color:var(--pink);font-weight:800;font-size:12.5px;text-decoration:none}
+  .dotsrow{display:flex;gap:5px;justify-content:center;padding:0 0 12px}
+  .dotsrow i{width:6px;height:6px;border-radius:99px;background:#e3e5ea}
+  .dotsrow i.on{background:var(--purple);width:16px}
+  .tag{display:inline-block;background:rgba(255,255,255,.2);border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:700;margin-right:6px}
+  footer.tabbar{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 0 14px}
+  footer.tabbar button{background:none;border:0;display:grid;justify-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer}
+  footer.tabbar button i{font-size:17px;font-style:normal}
+  footer.tabbar button.active{color:var(--pink)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span class="icons">▮▮▮ ᯤ 🔋</span></div>
+  <header class="top">
+    <div class="brandrow">
+      <div class="brand">Dro<span>Board</span></div>
+      <div class="actions">
+        <button class="iconbtn">🔔<span class="badge" id="notifCount">3</span></button>
+        <button class="iconbtn">🎁</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+  <main class="stack" id="feed"></main>
+</div>
+<footer class="tabbar" id="tabbar"></footer>
+
+<script>
+const TABS = ["Following","For You","Trending","My Circles"];
+const NAV = [["🏠","Home"],["🧭","Discover"],["🔍","Search"],["📰","Feed"],["👤","Profile"]];
+const C = ["#ec2f6b","#7c3aed","#2563eb","#f59e0b","#10b981","#0ea5e9","#f43f5e"];
+const hue = n => C[[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%C.length];
+const ini = n => n.replace(/[^a-zA-Z ]/g,"").trim().split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+const av = (n,cls="") => `<div class="av ${cls}" style="background:${hue(n)}">${ini(n)}</div>`;
+
+const STORIES = [
+  {name:"Your Story", plain:true},
+  {name:"Luna Grey"},{name:"Alex Pierce"},{name:"Mia Clark"},{name:"Jaxon"},{name:"Ren Oda"}
+];
+
+const POSTS = [
+  {type:"chapter", kicker:"📖 Chapter Drop", kc:"pink", user:"Luna Grey", verified:true, time:"2m ago",
+   book:"His Sweet Revenge", chapter:"Chapter 21: The Truth Hurts",
+   blurb:"Everything changes when she discovers the truth he tried so hard to hide…",
+   likes:128, comments:36, shares:12},
+  {type:"post", user:"Emily Carter", time:"15m ago",
+   text:"This chapter just broke me! ❤️‍🔥<br>Luna Grey never disappoints!",
+   photo:true, attach:{title:"His Sweet Revenge", sub:"Chapter 20"},
+   likes:98, comments:27, shares:0, labels:true},
+  {type:"poll", user:"BookLover_99", time:"1h ago", pill:"🗳 Poll",
+   q:"Which ending would you love for “The Billionaire’s Regret”?",
+   options:[["Happy Ending",42,"var(--pink)"],["Tragic Ending",31,"var(--purple)"],["Open Ending",27,"var(--amber)"]],
+   meta:"120 votes • 2d left"},
+  {type:"sponsored_premium", user:"DroBoard", time:"Sponsored",
+   title:"Unlock unlimited stories & perks",
+   perks:["Ad-free reading","Early chapter access","Exclusive stories"]},
+  {type:"debate", kicker:"💬 Be part of the conversation", kc:"purple", time:"3h ago",
+   q:"Should villains get redemption?", sub:"Share your thoughts and join the debate!",
+   yes:"Yes, everyone deserves a second chance.", no:"No, some actions are unforgivable.",
+   joined:"428 joined the discussion"},
+  {type:"author", kicker:"✍️ Author Post", kc:"pink", user:"Alex Pierce", verified:true, time:"4h ago",
+   text:"Chapter 22 is almost ready! 🔥<br>Dropping tomorrow at 8PM. Stay tuned!",
+   dark:"CHAPTER 22<br>Coming Soon", likes:156, comments:48, shares:18},
+  {type:"contest", kicker:"🏆 Writing Contest", kc:"purple", time:"1d ago",
+   title:"DroBoard Writing Contest", line:"Win ₦100,000 +<br>Featured Placement!"},
+  {type:"sponsored_story", kicker:"📣 Sponsored Story", kc:"pink", time:"Sponsored",
+   title:"Bound to the Ruthless CEO", author:"By Ava Winters", tags:["Romance","Billionaire"],
+   blurb:"A deal. A marriage. A love she never saw coming."},
+  {type:"post", user:"BookAddict", time:"6h ago",
+   text:"Just finished this masterpiece! 🤩❤️<br>Recommend it to everyone!",
+   attach:{title:"Burn For Me, Elsa", sub:"Completed", green:true},
+   likes:82, comments:19, shares:0},
+  {type:"invite"}
+];
+
+const head = p => `<div class="head">${av(p.user)}
+  <div style="min-width:0">
+    <div class="name">${p.user}${p.verified?"<em>✔</em>":""}${p.pill?`<span class="chip" style="padding:2px 7px;font-size:10.5px;color:var(--purple);margin-left:4px">${p.pill}</span>`:""}</div>
+    <div class="time">${p.time}</div>
+  </div><button class="dots">⋯</button></div>`;
+
+const kicker = p => p.kicker?`<div class="kicker ${p.kc}">${p.kicker}${p.user?"":`<span class="time" style="margin-left:auto;font-weight:600">${p.time}</span>`}</div>`:"";
+
+const bar = p => `<div class="bar">
+  <button>❤️ ${p.likes}</button><button>💬 ${p.comments}</button>${p.shares?`<button>↗ ${p.shares}</button>`:`<button>↗ Share</button>`}
+  <button class="save">🔖</button></div>`;
+
+function render(p){
+  if(p.type==="chapter") return `<article class="card">${kicker(p)}${head(p)}
+    <div class="cover"><h3>${p.book}</h3><div class="sub">${p.chapter}</div><p>${p.blurb}</p>
+    <button class="btn pink">📖 Read Now</button></div>${bar(p)}</article>`;
+
+  if(p.type==="post") return `<article class="card">${head(p)}<div class="text">${p.text}</div>
+    ${p.photo?`<div class="photo"></div>`:""}
+    ${p.attach?`<div class="attach"><div class="thumb"></div><div style="min-width:0"><b>${p.attach.title}</b><br><small style="${p.attach.green?"color:var(--green);font-weight:700":""}">${p.attach.sub}</small></div><span style="color:#c4c8d0">›</span></div>`:""}
+    ${bar(p)}</article>`;
+
+  if(p.type==="poll") return `<article class="card">${head(p)}
+    <div class="poll"><div class="q">${p.q}</div>
+    ${p.options.map(([l,v,c])=>`<div class="opt"><small><span>${l}</span><span>${v}%</span></small>
+      <div class="track"><div class="fill" style="width:${v}%;background:${c}"></div></div></div>`).join("")}</div>
+    <div class="bar"><button style="color:var(--pink)">🔥 Vote</button><span style="margin-left:auto;font-weight:600">${p.meta}</span></div></article>`;
+
+  if(p.type==="sponsored_premium") return `<article class="card">${head(p)}
+    <div class="promo"><h3>${p.title}</h3><ul>${p.perks.map(x=>`<li>✓ ${x}</li>`).join("")}</ul>
+    <button class="btn pink">Go Premium →</button></div></article>`;
+
+  if(p.type==="debate") return `<article class="card">${kicker(p)}
+    <div class="text" style="padding-top:10px"><div style="font-size:15px;font-weight:800">${p.q}</div>
+    <div style="color:var(--muted);font-size:12.5px;margin-top:4px">${p.sub}</div></div>
+    <div class="debate"><div class="side yes">${p.yes}<div class="em">👍</div><button class="join" style="color:#0f766e">Join</button></div>
+    <div class="side no">${p.no}<div class="em">👎</div><button class="join" style="color:#b91c3c">Join</button></div></div>
+    <div class="joined"><div class="facepile">${["Ana","Bo","Cy","Di"].map(n=>av(n)).join("")}</div>${p.joined}
+    <span class="link">View Discussion →</span></div></article>`;
+
+  if(p.type==="author") return `<article class="card">${kicker(p)}${head(p)}
+    <div class="text">${p.text}</div>
+    <div class="cover" style="background:linear-gradient(120deg,#1b1108,#3d2a14);text-align:center;padding:36px 18px">
+      <div style="font-family:Georgia,serif;font-size:19px;color:#f5d9a3;line-height:1.5">${p.dark}</div></div>
+    ${bar(p)}</article>`;
+
+  if(p.type==="contest") return `<article class="card">${kicker(p)}
+    <div class="promo" style="margin-top:12px"><h3>${p.title}</h3>
+    <div style="font-size:15px;font-weight:800;line-height:1.4;margin-top:4px">${p.line}</div>
+    <div style="font-size:34px;position:absolute"></div>
+    <button class="btn ghost" style="margin-top:14px">Enter Contest →</button></div>
+    <div class="dotsrow"><i class="on"></i><i></i><i></i><i></i></div></article>`;
+
+  if(p.type==="sponsored_story") return `<article class="card">${kicker(p)}
+    <div class="cover" style="margin-top:12px"><h3>${p.title}</h3><div class="sub">${p.author}</div>
+    <div style="margin-top:10px">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div></div>
+    <div class="text" style="color:var(--muted);font-size:12.5px">${p.blurb}</div>
+    <div style="padding:0 14px 14px"><button class="join" style="color:var(--pink);background:#fafafb">Read Now →</button></div></article>`;
+
+  return `<article class="card"><div class="invite"><div><b>Invite your friends<br>and earn coins!</b>
+    <a href="#">Invite Now →</a></div><div style="font-size:34px">🎁</div></div></article>`;
+}
+
+document.getElementById("tabs").innerHTML = TABS.map((t,i)=>`<button class="${i?"":"active"}">${t}</button>`).join("");
+document.getElementById("tabs").onclick = e => {
+  if(e.target.tagName!=="BUTTON") return;
+  [...e.currentTarget.children].forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+};
+document.getElementById("tabbar").innerHTML = NAV.map(([ic,l])=>`<button class="${l==="Feed"?"active":""}"><i>${ic}</i>${l}</button>`).join("");
+
+const composer = `<section class="card pad composer">
+  <div class="row">${av("Sam")}<input placeholder="What's happening in your story world?" /><span style="color:var(--pink)">🧭</span></div>
+  <div class="chips">
+    <span class="chip" style="color:var(--blue)">🖼 Photo</span>
+    <span class="chip" style="color:var(--purple)">📖 Chapter Drop</span>
+    <span class="chip" style="color:var(--green)">📊 Poll</span>
+    <span class="chip" style="color:var(--pink)">⚔ Debate</span>
+  </div></section>`;
+
+const stories = `<section class="card"><div class="stories">${STORIES.map(s=>`
+  <div class="story"><div class="ring ${s.plain?"plain":""}">${av(s.name)}</div><small>${s.name}</small></div>`).join("")}
+  <div class="story"><div class="ring plain"><div class="av" style="background:#eef0f4;color:#6b7280;width:52px;height:52px;border:2.5px solid #fff">⋯</div></div><small>More</small></div>
+</div></section>`;
+
+document.getElementById("feed").innerHTML = composer + stories + POSTS.map(render).join("");
+</script>
+</body>
+</html>

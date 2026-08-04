@@ -21,17 +21,14 @@
   --nav-h:60px;--top-h:54px;--status-h:74px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif}
-/* ── SINGLE SCROLL CONTAINER — body is the only scrollable element on the
-   page. Hero story-cards snap; everything else (rows, cards) just flows
-   between them. No nested scroll regions anywhere. ── */
-body{overflow-y:auto;scroll-snap-type:y proximity}
+html,body{height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{overflow-y:auto}
 ::-webkit-scrollbar{width:0;height:0}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 img{display:block}
 a{color:inherit;text-decoration:none}
 
-/* ── TOP BAR — fixed overlay, excluded from the scroll flow ── */
+/* ── TOP BAR — floats over the hero ── */
 .top-bar{
   position:fixed;top:0;left:0;right:0;z-index:300;
   padding:calc(var(--safe-t) + 10px) 16px 10px;
@@ -52,7 +49,7 @@ a{color:inherit;text-decoration:none}
 .top-right{display:flex;gap:8px}
 .notif-count{position:absolute;top:-3px;right:-3px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid #000}
 
-/* ── STATUS ROW — fixed overlay, excluded from the scroll flow ── */
+/* ── STATUS ROW — floats just below the top bar, over the hero ── */
 .status-strip{
   position:fixed;top:0;left:0;right:0;z-index:290;
   padding:calc(var(--safe-t) + 54px) 0 10px;
@@ -76,20 +73,23 @@ a{color:inherit;text-decoration:none}
 .s-add-icon{font-size:15px;color:rgba(255,255,255,.6)}
 .s-name{font-size:8.5px;font-weight:600;color:rgba(255,255,255,.7);max-width:46px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 
-/* ── FEED — the single unbroken flow: full-bleed story cards (snapped)
-   interleaved with normal-flow row sections (not snapped, not full-height).
-   #feed itself has no height/overflow of its own — it just sits in the
-   body's document flow, so body is the only thing that ever scrolls. ── */
-#feed{position:relative;background:var(--bg)}
-
+/* ── HERO — TikTok-style vertical snap cards: stories + chapter drops + ads ── */
+.hero{
+  position:relative;
+  height:calc(100dvh - var(--nav-h) - var(--safe-b));
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+}
+.hero::-webkit-scrollbar{display:none}
 .hero-slide{
   position:relative;height:calc(100dvh - var(--nav-h) - var(--safe-b));
-  width:100%;scroll-snap-align:start;
+  width:100%;scroll-snap-align:start;scroll-snap-stop:always;
   display:flex;flex-direction:column;justify-content:flex-end;
   background-size:cover;background-position:center 28%;
   overflow:hidden;
 }
-/* distinct border frame used only on sponsored (3rd-party) ad slides */
+/* distinct border frame used only on sponsored/ad slides */
 .hero-slide.ad-frame{box-shadow:inset 0 0 0 4px var(--gold)}
 .hero-scrim{
   position:absolute;inset:0;
@@ -106,6 +106,7 @@ a{color:inherit;text-decoration:none}
 .badge-tier{font-size:9.5px;font-weight:800;padding:5px 11px;border-radius:20px;letter-spacing:.03em}
 .badge-tier.premium{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#1a1000}
 .badge-tier.free{background:rgba(52,211,153,.18);color:#6ee7b0;border:1px solid rgba(52,211,153,.35)}
+.badge-tier.newch{background:rgba(56,189,248,.18);color:#bae6fd;border:1px solid rgba(56,189,248,.35)}
 .badge-ad{background:var(--gold);color:#1a1000;font-size:9.5px;font-weight:900;padding:5px 12px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
 
 .hero-content{position:relative;z-index:3;padding:0 20px calc(var(--safe-b) + 22px)}
@@ -143,63 +144,40 @@ a{color:inherit;text-decoration:none}
   display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;
 }
 
-/* ── Droboard official posts — the platform's own voice. Distinct from
-   3rd-party ads: no "AD" tag, a house badge instead, and a richer set of
-   post types (promo, debate, poll, news) so it reads like a real feed
-   presence rather than a single recurring banner. ── */
-.official-slide{background:linear-gradient(160deg,#1c0a22 0%,#4a0f3f 45%,var(--acc) 100%);position:relative}
-.official-glow1{position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.10);top:-90px;right:-70px}
-.official-glow2{position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07);bottom:130px;left:-40px}
-.official-logo{position:absolute;top:calc(var(--safe-t) + var(--status-h) + 62px);left:20px;z-index:3;font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:-.5px}
-.badge-official{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.14);backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.26);color:#fff;
-  font-size:9.5px;font-weight:900;padding:5px 12px;border-radius:20px;
-  letter-spacing:.05em;text-transform:uppercase;
-}
-.badge-official .dot{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.85)}
-.official-icon{
-  width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.14);backdrop-filter:blur(10px);
+/* Droboard house-ad slide (no photo — brand gradient) */
+.ad-drobrand-slide{background:linear-gradient(160deg,#2a0a1e 0%,#5c0f3a 45%,var(--acc) 100%);box-shadow:inset 0 0 0 4px var(--gold)}
+.ad-drobrand-glow1{position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.10);top:-80px;right:-60px}
+.ad-drobrand-glow2{position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.07);bottom:120px;left:-40px}
+.ad-drobrand-icon{
+  width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,.14);backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;
-  font-size:26px;color:#fff;margin-bottom:15px;position:relative;z-index:3;
+  font-size:28px;color:#fff;margin-bottom:16px;position:relative;z-index:3;
 }
-.official-eyebrow{font-size:10.5px;font-weight:800;color:rgba(255,255,255,.68);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-.official-headline{font-family:'Playfair Display',serif;font-weight:800;font-size:25px;line-height:1.2;color:#fff;margin-bottom:10px}
-.official-sub{font-size:13px;line-height:1.55;color:rgba(255,255,255,.75);margin-bottom:16px}
-.official-vote-row{display:flex;gap:10px;margin-bottom:6px}
-.official-vote-btn{
-  flex:1;position:relative;overflow:hidden;text-align:left;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  border-radius:14px;padding:12px 14px;color:#fff;
-}
-.official-vote-fill{position:absolute;inset:0;width:0;background:rgba(255,255,255,.16);z-index:0;transition:width .7s ease}
-.official-vote-label{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:800}
-.official-vote-pct{font-size:11px;color:rgba(255,255,255,.65);font-weight:700}
-.official-poll-chip{position:relative;overflow:hidden;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;margin-bottom:8px}
-.official-poll-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.14);z-index:0;transition:width .7s ease}
-.official-poll-row{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#fff}
+.ad-drobrand-logo{position:absolute;top:calc(var(--safe-t) + var(--status-h) + 62px);left:20px;z-index:3;font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:-.5px}
 
-/* swipe indicator — fixed overlay, independent of scroll flow */
+/* chapter-drop slide time pill */
+.chdrop-time{position:relative;font-size:11px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:6px}
+
+/* swipe indicator */
 .swipe-indicator{
-  position:fixed;right:14px;top:50%;transform:translateY(-50%);
-  z-index:250;display:flex;flex-direction:column;align-items:center;gap:5px;
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:5px;
   max-height:70vh;overflow:hidden;
 }
 .swipe-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);transition:.25s;flex-shrink:0}
 .swipe-dot.on{width:6px;height:16px;border-radius:4px;background:var(--acc)}
 .swipe-hint{
-  position:fixed;bottom:calc(var(--safe-b) + 130px);left:50%;transform:translateX(-50%);
-  z-index:250;display:flex;flex-direction:column;align-items:center;gap:3px;
+  position:absolute;bottom:calc(var(--safe-b) + 130px);left:50%;transform:translateX(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;
   color:rgba(255,255,255,.55);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   animation:swipeFloat 1.8s ease-in-out infinite;
   pointer-events:none;
 }
 @keyframes swipeFloat{0%,100%{transform:translate(-50%,0);opacity:.55}50%{transform:translate(-50%,-6px);opacity:1}}
 
-/* ── ROW SECTIONS — scattered between story cards in the same single
-   flow. Same exact markup/CSS as before, just relocated. ── */
-.section{padding:26px 16px;background:var(--bg)}
+/* ── BELOW-HERO SECTIONS ── */
+.sections{background:var(--bg);padding:26px 0 20px}
+.section{margin-bottom:28px;padding:0 16px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .section-head h2{font-family:'Playfair Display',serif;font-size:17px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:8px}
 .section-head .sub{font-size:11px;color:var(--tx-muted);font-weight:600;margin-top:2px}
@@ -274,6 +252,26 @@ a{color:inherit;text-decoration:none}
 .ptf-btn{width:100%;background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);color:var(--acc3);padding:6px 4px;border-radius:14px;font-size:10px;font-weight:800;cursor:pointer}
 .ptf-btn.on{background:var(--l3);border-color:var(--bd);color:var(--tx-muted)}
 
+/* Announcement */
+.ann-card{
+  display:flex;gap:13px;align-items:flex-start;
+  background:var(--l2);border:1px solid var(--bd);border-radius:18px;padding:16px;
+  cursor:pointer;
+}
+.ann-icon{
+  width:46px;height:46px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;
+  box-shadow:0 6px 16px var(--glow-sm);
+}
+.ann-body{flex:1;min-width:0}
+.ann-top-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.ann-badge{font-size:9px;font-weight:800;letter-spacing:.05em;color:var(--acc3);text-transform:uppercase;background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);padding:2px 8px;border-radius:8px}
+.ann-time{font-size:10px;color:var(--tx-faint);font-weight:600}
+.ann-title{font-size:14px;font-weight:800;color:var(--tx-high);margin-bottom:5px;line-height:1.35}
+.ann-text{font-size:12px;color:var(--tx-muted);line-height:1.55;margin-bottom:12px}
+.ann-cta{font-size:11.5px;font-weight:700;color:var(--acc3);display:inline-flex;align-items:center;gap:5px}
+
 /* toast */
 .toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -297,19 +295,84 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- STATUS ROW — floats over the feed, same ring system as feed/status-viewer -->
+<!-- STATUS ROW — floats over the hero, same ring system as feed/status-viewer -->
 <div class="status-strip">
   <div class="status-row" id="statusRow"></div>
 </div>
 
-<!-- Swipe affordance — fixed overlay -->
-<div class="swipe-indicator" id="swipeDots"></div>
-<div class="swipe-hint"><i class="fas fa-chevron-up" style="font-size:11px"></i>Swipe</div>
+<!-- HERO — TikTok-style swipeable feed: stories + chapter drops + ads -->
+<div class="hero" id="heroScroll">
+  <div class="swipe-indicator" id="swipeDots"></div>
+  <div class="swipe-hint"><i class="fas fa-chevron-up" style="font-size:11px"></i>Swipe</div>
+  <div id="heroSlides"></div>
+</div>
 
-<!-- THE SINGLE SCROLL CONTAINER: body scrolls this. Story cards + ads +
-     Droboard posts snap full-screen; row sections flow between them at
-     their natural height. Nothing in here has its own scrollbar. -->
-<div id="feed"></div>
+<!-- BELOW HERO -->
+<div class="sections">
+
+  <!-- Continue Reading -->
+  <div class="section fu">
+    <div class="section-head">
+      <div><h2>📚 Continue Reading</h2><div class="sub">Pick up where you left off</div></div>
+    </div>
+    <div class="cont-row" id="contRow"></div>
+  </div>
+
+  <!-- Trending Genres -->
+  <div class="section fu">
+    <div class="section-head">
+      <div><h2>🔥 Trending Genres</h2></div>
+    </div>
+    <div class="genre-row" id="genreRow"></div>
+  </div>
+
+  <!-- New Chapter Drops (with sponsored "AD" cards mixed in) -->
+  <div class="section fu">
+    <div class="section-head">
+      <div><h2>📖 New Chapter Drops</h2><div class="sub">From writers you follow</div></div>
+    </div>
+    <div class="drops-row" id="dropsRow"></div>
+  </div>
+
+  <!-- Featured Event -->
+  <div class="section fu">
+    <div class="event-card" onclick="toast('🏆 Opening challenge…')">
+      <div class="event-glow1"></div><div class="event-glow2"></div>
+      <div class="event-badge"><i class="fas fa-sun" style="font-size:10px"></i> Reading Challenge</div>
+      <div class="event-title">Summer Reading Challenge</div>
+      <div class="event-sub">Read for 30 minutes a day this week and unlock a free coin bundle plus a limited badge for your profile.</div>
+      <div class="event-foot">
+        <button class="event-cta" onclick="event.stopPropagation();toast('☀️ Joined the challenge!')">Join Now <i class="fas fa-arrow-right" style="font-size:10px"></i></button>
+        <div class="event-progress">
+          <div class="event-progress-track"><div class="event-progress-fill" style="width:42%"></div></div>
+          <span class="event-progress-txt">3/7 days</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Writers to Follow — plain avatars, no rectangle card -->
+  <div class="section fu">
+    <div class="section-head">
+      <div><h2>✍️ Writers to Follow</h2><div class="sub">Based on what you read</div></div>
+    </div>
+    <div class="ptf-row" id="ptfRow"></div>
+  </div>
+
+  <!-- Droboard Announcement -->
+  <div class="section fu" style="margin-bottom:6px">
+    <div class="ann-card" onclick="toast('📣 Opening announcement…')">
+      <div class="ann-icon"><i class="fas fa-bullhorn"></i></div>
+      <div class="ann-body">
+        <div class="ann-top-row"><span class="ann-badge">Droboard News</span><span class="ann-time">2d ago</span></div>
+        <div class="ann-title">Reading Streaks are here 🔥</div>
+        <div class="ann-text">Track your daily reading, earn badges, and keep your streak alive. Plus: a redesigned chapter reader with adjustable fonts and themes just shipped.</div>
+        <div class="ann-cta">See what's new <i class="fas fa-arrow-right" style="font-size:10px"></i></div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <!-- Bottom nav is now rendered by component/bottom-nav.js — no static markup needed here. -->
 
@@ -321,7 +384,7 @@ function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
 
 /* Wire the nav component to know this is the Home tab (it also
    auto-detects from the URL, but being explicit is cheap and safe). */
-if(window.DroboardNav) DroboardNav.configure({active:'home', localTheme:'dark'});
+if(window.DroboardNav) DroboardNav.configure({active:'home'});
 
 /* ══ STATUS ROW — same ring vocabulary as feed.html / status-viewer.js ══ */
 const STATUSES=[
@@ -353,16 +416,11 @@ function renderStatusRow(){
 renderStatusRow();
 
 /* ══════════════════════════════════════════════════════════════
-   THE FEED — one continuous flow. Story cards are full-bleed,
-   scroll-snapped slides (never a condensed "news row" — the story
-   itself always fills the screen). Roughly every 5 stories, a
-   sponsored ad / Droboard post and a row-widget (Continue Reading,
-   Trending Genres, Chapter Drops, etc.) are dropped in, so the
-   extras are scattered through the feed instead of dumped at the
-   bottom. Chapter-drop badges have been removed from story cards —
-   new chapters now surface only through the Chapter Drops row.
+   HERO FEED — 15 full story cards, with chapter-drop cards and
+   ad cards scattered evenly throughout instead of clustered late.
+   Sponsored story ads get a gold border frame + "AD" caption.
 ══════════════════════════════════════════════════════════════ */
-const S=[ // the 15 full story cards, in reading order
+const S=[ // the 15 story cards, in reading order
   {type:'story',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',genre:'💔 Betrayal',tier:'free',rating:'4.8',reads:'171k',
    title:"I Came Home Early and Caught My Husband Kissing My Late Sister's Photograph",
    author:'Ada_Writes',authorAv:'https://i.pravatar.cc/100?img=32',verified:true,
@@ -424,82 +482,103 @@ const S=[ // the 15 full story cards, in reading order
    author:'Kemi_A',authorAv:'https://i.pravatar.cc/100?img=28',verified:false,
    synopsis:'Every photo, every message, gone — on the day they were supposed to celebrate five years. She needed answers. He needed silence.'},
 ];
-
-const AD=[ // sponsored 3rd-party story ads — gold border frame + "Ad" caption
+const CD=[ // chapter-drop cards, scattered between the stories
+  {type:'chapterdrop',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',genre:'👑 Family',time:'6h ago',
+   title:"My Uncle's Stolen Will",chapterLabel:'Chapter 8 just dropped',
+   author:'Chiamaka_N',authorAv:'https://i.pravatar.cc/100?img=47',verified:false,
+   synopsis:'The lawyer opens the second envelope. What is inside changes who inherits the house — and who inherits the truth.'},
+  {type:'chapterdrop',cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg',genre:'✨ Twist',time:'2h ago',
+   title:'The Letter Never Sent',chapterLabel:'Chapter 3 just dropped',
+   author:'Efe_O',authorAv:'https://i.pravatar.cc/100?img=22',verified:true,
+   synopsis:'The mother he never called has answers. The letter he wrote has a stamp but never the courage to send it — until now.'},
+  {type:'chapterdrop',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',genre:'💔 Betrayal',time:'11h ago',
+   title:'She Found His Second Phone',chapterLabel:'Chapter 6 just dropped',
+   author:'Ada_Writes',authorAv:'https://i.pravatar.cc/100?img=32',verified:true,
+   synopsis:'The dinner is over. The questions are just beginning. This chapter picks up exactly where the silence left off.'},
+];
+const AD=[ // sponsored story ads — gold border frame + AD caption, scattered like the rest
   {type:'ad-story',cover:'https://i.postimg.cc/DJwFzKgd/4.jpg',brand:'Bound to the Ruthless CEO',genre:'Romance · Billionaire',
    sub:'A deal. A marriage. A love she never saw coming.',author:'Ava Winters'},
   {type:'ad-story',cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg',brand:'Married to the Enemy',genre:'Mafia · Revenge',
    sub:'She married him for the family name. She stayed for reasons even she doesn\'t understand.',author:'Zara_M'},
 ];
-
-/* Droboard's own posts — the platform speaking in its own voice. A
-   proper mix, not just a single recurring promo: a premium pitch, a
-   community debate, a poll, and a news update. Badged "Droboard",
-   never "Ad", and styled as the house's own brand moment. */
-const HD=[
-  {type:'official',subtype:'promo',icon:'fa-crown',eyebrow:'Droboard Premium',
-   headline:'Read Without Limits.',
+const HD=[ // Droboard house ads — gold border frame, brand gradient
+  {type:'ad-droboard',icon:'fa-crown',headline:'Go Premium. Read Without Limits.',
    sub:'Unlock unlimited stories, early chapter access and an ad-free reading experience — all for one low monthly price.',
    cta:'Try Premium Free'},
-  {type:'official',subtype:'debate',icon:'fa-comments',eyebrow:'Debate of the Week',
-   headline:'Should authors reveal the ending before the finale?',
-   sub:'Some readers want the twist kept sacred. Others say a teased ending builds the best kind of suspense. Cast your vote.',
-   options:[{label:'Never spoil it',pct:64},{label:'Tease it a little',pct:36}]},
-  {type:'official',subtype:'poll',icon:'fa-chart-simple',eyebrow:'Community Poll',
-   headline:'Which genre are you most hyped for this month?',
-   sub:'Over 40,000 readers have voted so far — tap a genre to add yours.',
-   poll:[{label:'🔥 Revenge',pct:38},{label:'💔 Betrayal',pct:27},{label:'🎓 Campus',pct:21},{label:'✨ Twist',pct:14}]},
-  {type:'official',subtype:'invite',icon:'fa-user-friends',eyebrow:'Droboard Rewards',
-   headline:'Invite Friends, Earn Coins',
+  {type:'ad-droboard',icon:'fa-user-friends',headline:'Invite Friends, Earn Coins',
    sub:'Every friend who joins with your link gets a free chapter — and you both earn 50 coins the moment they start reading.',
    cta:'Invite Now'},
-  {type:'official',subtype:'news',icon:'fa-bullhorn',eyebrow:'Droboard News',
-   headline:'Reading Streaks are here 🔥',
-   sub:'Track your daily reading, earn badges, and keep your streak alive. Plus: a redesigned chapter reader with adjustable fonts and themes just shipped.',
-   cta:'See What\'s New'},
 ];
 
-/* ── Row-widget data (unchanged layouts, just relocated into the feed) ── */
-const CONTINUE_READING=[
-  {cover:'https://i.postimg.cc/ftRZbhKx/3.jpg', title:"The Alpha's Obsession", ch:'Chapter 18', pct:43},
-  {cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg', title:'Falling for My Fake Husband', ch:'Chapter 12', pct:25},
-  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', title:"The Mafia's Secret Wife", ch:'Chapter 24', pct:60},
-  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'His Ruthless Obsession', ch:'Chapter 31', pct:78},
-  {cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:"My Uncle's Stolen Will", ch:'Chapter 8', pct:19},
-];
-const GENRES=[
-  {icon:'💔',name:'Betrayal',count:'1.2k'},{icon:'🎓',name:'Campus',count:'890'},
-  {icon:'👑',name:'Family',count:'740'},{icon:'🔥',name:'Revenge',count:'620'},
-  {icon:'✨',name:'Twist',count:'580'},{icon:'🌙',name:'Elegy',count:'310'},
-  {icon:'💍',name:'Romance',count:'950'},
-];
-const CHAPTER_DROPS=[
-  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', title:'His Sweet Revenge — Chapter 21', author:'Luna Grey', time:'2h ago'},
-  {cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg', title:'Forbidden Hearts — Chapter 9', author:'Mia Clark', time:'4h ago'},
-  {ad:true,cover:'https://i.postimg.cc/DJwFzKgd/4.jpg', title:'Bound to the Ruthless CEO', author:'Ava Winters'},
-  {cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:"My Uncle's Stolen Will — Chapter 8", author:'Chiamaka_N', time:'6h ago'},
-  {cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg', title:"Best Friend's Ring — Chapter 4", author:'Kemi_A', time:'9h ago'},
-  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'The Letter He Never Sent — Chapter 3', author:'Efe_O', time:'12h ago'},
-  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg', title:"Stepmother's Secret — Chapter 6", author:'Zara_M', time:'1d ago'},
-  {ad:true,cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg', title:'Married to the Enemy', author:'Zara_M'},
-  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg', title:'The Runaway Bride — Chapter 5', author:'Ifeanyi_Story', time:'1d ago'},
-  {cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg', title:"Grandmother's Will — Chapter 13", author:'Chiamaka_N', time:'2d ago'},
-];
-const PTF=[
-  {name:'Ada_Writes', meta:'12.4k followers', av:'https://i.pravatar.cc/100?img=32', following:false},
-  {name:'Ifeanyi_Story', meta:'31.7k followers', av:'https://i.pravatar.cc/100?img=53', following:false},
-  {name:'Chiamaka_N', meta:'19.2k followers', av:'https://i.pravatar.cc/100?img=47', following:false},
-  {name:'Zara_M', meta:'14.8k followers', av:'https://i.pravatar.cc/100?img=16', following:false},
-  {name:'Efe_O', meta:'22.3k followers', av:'https://i.pravatar.cc/100?img=22', following:false},
+/* Scatter pattern: 3 stories, then a special card, repeating — so chapter
+   drops and ads land roughly every 3–4 stories instead of bunched late. */
+const HERO_STORIES=[
+  S[0],S[1],S[2], CD[0],
+  S[3],S[4],S[5], AD[0],
+  S[6],S[7],S[8], HD[0],
+  S[9],S[10],S[11], CD[1],
+  S[12], AD[1],
+  S[13], HD[1],
+  S[14], CD[2],
 ];
 
-/* ── Slide renderers ── */
-function storySlideHTML(s){
+function heroSlideHTML(s){
+  if(s.type==='ad-droboard'){
+    return `<div class="hero-slide ad-drobrand-slide" onclick="toast('🌟 Opening Droboard Premium…')">
+      <div class="ad-drobrand-logo">Dro<span style="color:var(--acc)">●</span></div>
+      <div class="ad-drobrand-glow1"></div><div class="ad-drobrand-glow2"></div>
+      <div class="hero-badges-top"><span class="badge-ad">Ad · Droboard</span><span></span></div>
+      <div class="hero-content" style="display:flex;flex-direction:column;align-items:flex-start">
+        <div class="ad-drobrand-icon"><i class="fas ${s.icon}"></i></div>
+        <div class="hero-title" style="font-size:25px">${s.headline}</div>
+        <div class="hero-synopsis" style="-webkit-line-clamp:3">${s.sub}</div>
+        <div class="hero-cta-row">
+          <button class="btn-start" onclick="event.stopPropagation();toast('🌟 Here we go!')"><i class="fas fa-arrow-right" style="font-size:12px"></i> ${s.cta}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  if(s.type==='ad-story'){
+    return `<div class="hero-slide ad-frame" style="background-image:url('${s.cover}')" onclick="toast('📖 Opening sponsored story…')">
+      <div class="hero-scrim"></div>
+      <div class="hero-badges-top"><span class="badge-ad">Ad</span><span class="badge-genre">${s.genre}</span></div>
+      <div class="hero-content">
+        <div class="hero-title">${s.brand}</div>
+        <div class="hero-author-row"><span class="hero-author-name">By ${s.author}</span></div>
+        <div class="hero-synopsis">${s.sub}</div>
+        <div class="hero-cta-row">
+          <button class="btn-start" onclick="event.stopPropagation();toast('📖 Opening story…')"><i class="fas fa-book-open" style="font-size:12px"></i> Read Now</button>
+          <button class="btn-icon-only" onclick="event.stopPropagation();toast('📌 Saved to library')"><i class="far fa-bookmark"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }
+  if(s.type==='chapterdrop'){
+    return `<div class="hero-slide" style="background-image:url('${s.cover}')" onclick="toast('📖 Opening new chapter…')">
+      <div class="hero-scrim"></div>
+      <div class="hero-badges-top"><span class="badge-genre">${s.genre}</span><span class="badge-tier newch">🆕 ${s.chapterLabel}</span></div>
+      <div class="hero-content">
+        <div class="chdrop-time"><i class="far fa-clock" style="margin-right:4px"></i>${s.time}</div>
+        <div class="hero-title">${s.title}</div>
+        <div class="hero-author-row">
+          <img class="hero-av" src="${s.authorAv}" loading="lazy" alt=""/>
+          <span class="hero-author-name">@${s.author}${s.verified?' <i class="fas fa-circle-check"></i>':''}</span>
+        </div>
+        <div class="hero-synopsis">${s.synopsis}</div>
+        <div class="hero-cta-row">
+          <button class="btn-start" onclick="event.stopPropagation();toast('📖 Continuing…')"><i class="fas fa-play" style="font-size:12px"></i> Continue Reading</button>
+          <button class="btn-icon-only" onclick="event.stopPropagation();toast('🔔 Notifications on')"><i class="far fa-bell"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }
+  /* default: full story slide */
   return `<div class="hero-slide" style="background-image:url('${s.cover}')" onclick="toast('📖 Opening story…')">
     <div class="hero-scrim"></div>
     <div class="hero-badges-top">
       <span class="badge-genre">${s.genre}</span>
-      ${s.tier==='premium'?`<span class="badge-tier premium">⭐ Premium</span>`:'<span></span>'}
+      <span class="badge-tier ${s.tier}">${s.tier==='premium'?'⭐ Premium':'🎁 Free'}</span>
     </div>
     <div class="hero-content">
       <div class="hero-stats-row">
@@ -519,119 +598,92 @@ function storySlideHTML(s){
     </div>
   </div>`;
 }
-function adStorySlideHTML(s){
-  return `<div class="hero-slide ad-frame" style="background-image:url('${s.cover}')" onclick="toast('📖 Opening sponsored story…')">
-    <div class="hero-scrim"></div>
-    <div class="hero-badges-top"><span class="badge-ad">Ad</span><span class="badge-genre">${s.genre}</span></div>
-    <div class="hero-content">
-      <div class="hero-title">${s.brand}</div>
-      <div class="hero-author-row"><span class="hero-author-name">By ${s.author}</span></div>
-      <div class="hero-synopsis">${s.sub}</div>
-      <div class="hero-cta-row">
-        <button class="btn-start" onclick="event.stopPropagation();toast('📖 Opening story…')"><i class="fas fa-book-open" style="font-size:12px"></i> Read Now</button>
-        <button class="btn-icon-only" onclick="event.stopPropagation();toast('📌 Saved to library')"><i class="far fa-bookmark"></i></button>
-      </div>
-    </div>
-  </div>`;
-}
-function officialSlideHTML(s){
-  let body='';
-  if(s.subtype==='debate'){
-    body=`<div class="official-vote-row">
-      ${s.options.map(o=>`<button class="official-vote-btn" onclick="event.stopPropagation();toast('🗳️ Voted: ${o.label}')">
-        <div class="official-vote-fill" style="width:${o.pct}%"></div>
-        <div class="official-vote-label"><span>${o.label}</span><span class="official-vote-pct">${o.pct}%</span></div>
-      </button>`).join('')}
-    </div>`;
-  } else if(s.subtype==='poll'){
-    body=`<div>
-      ${s.poll.map(p=>`<div class="official-poll-chip" onclick="event.stopPropagation();toast('📊 Voted: ${p.label}')">
-        <div class="official-poll-fill" style="width:${p.pct}%"></div>
-        <div class="official-poll-row"><span>${p.label}</span><span>${p.pct}%</span></div>
-      </div>`).join('')}
-    </div>`;
-  } else {
-    body=`<div class="hero-cta-row">
-      <button class="btn-start" onclick="event.stopPropagation();toast('🌟 Here we go!')"><i class="fas fa-arrow-right" style="font-size:12px"></i> ${s.cta}</button>
-    </div>`;
-  }
-  return `<div class="hero-slide official-slide" onclick="toast('📣 Opening Droboard…')">
-    <div class="official-logo">Dro<span style="color:var(--acc)">●</span></div>
-    <div class="official-glow1"></div><div class="official-glow2"></div>
-    <div class="hero-badges-top"><span class="badge-official"><span class="dot"></span>${s.eyebrow}</span><span></span></div>
-    <div class="hero-content" style="display:flex;flex-direction:column;align-items:flex-start">
-      <div class="official-icon"><i class="fas ${s.icon}"></i></div>
-      <div class="official-headline">${s.headline}</div>
-      <div class="official-sub">${s.sub}</div>
-      ${body}
-    </div>
-  </div>`;
-}
 
-/* ── Row-widget section renderers (exact original layouts) ── */
-function continueReadingSection(){
-  return `<div class="section fu">
-    <div class="section-head"><div><h2>📚 Continue Reading</h2><div class="sub">Pick up where you left off</div></div></div>
-    <div class="cont-row">${CONTINUE_READING.map(c=>`
-      <div class="cont-card" onclick="toast('📖 Resuming…')">
-        <div class="cont-cover" style="background-image:url('${c.cover}')"></div>
-        <div class="cont-title">${c.title}</div>
-        <div class="cont-ch">${c.ch}</div>
-        <div class="prog-track"><div class="prog-fill" style="width:${c.pct}%"></div></div>
-      </div>`).join('')}</div>
-  </div>`;
+function renderHero(){
+  const dotsEl=document.getElementById('swipeDots');
+  dotsEl.innerHTML=HERO_STORIES.map((_,i)=>`<div class="swipe-dot${i===0?' on':''}"></div>`).join('');
+  document.getElementById('heroSlides').innerHTML=HERO_STORIES.map(heroSlideHTML).join('');
 }
-function genreSection(){
-  return `<div class="section fu">
-    <div class="section-head"><div><h2>🔥 Trending Genres</h2></div></div>
-    <div class="genre-row">${GENRES.map(g=>`
-      <div class="genre-pill" onclick="location.href='discover.html'"><span>${g.icon}</span> ${g.name} <span class="ct">${g.count}</span></div>`).join('')}</div>
-  </div>`;
-}
-function dropsSection(){
-  return `<div class="section fu">
-    <div class="section-head"><div><h2>📖 New Chapter Drops</h2><div class="sub">From writers you follow</div></div></div>
-    <div class="drops-row">${CHAPTER_DROPS.map(d=>{
-      const isAd=!!d.ad;
-      return `<div class="drop-card" onclick="toast('${isAd?'📖 Opening sponsored story…':'📖 Opening chapter…'}')">
-        <div class="drop-cover${isAd?' ad-border':''}" style="background-image:url('${d.cover}')">
-          <div class="drop-scrim"></div>
-          <div class="drop-time${isAd?' ad-tag':''}">${isAd?'AD':d.time}</div>
-          <div class="drop-cont"><i class="fas ${isAd?'fa-bullhorn':'fa-play'}" style="font-size:9px"></i> ${isAd?'Read Now':'Continue'}</div>
-        </div>
-        <div class="drop-title">${d.title}</div>
-        <div class="drop-author">@${d.author}</div>
-      </div>`;
-    }).join('')}</div>
-  </div>`;
-}
-function eventSection(){
-  return `<div class="section fu">
-    <div class="event-card" onclick="toast('🏆 Opening challenge…')">
-      <div class="event-glow1"></div><div class="event-glow2"></div>
-      <div class="event-badge"><i class="fas fa-sun" style="font-size:10px"></i> Reading Challenge</div>
-      <div class="event-title">Summer Reading Challenge</div>
-      <div class="event-sub">Read for 30 minutes a day this week and unlock a free coin bundle plus a limited badge for your profile.</div>
-      <div class="event-foot">
-        <button class="event-cta" onclick="event.stopPropagation();toast('☀️ Joined the challenge!')">Join Now <i class="fas fa-arrow-right" style="font-size:10px"></i></button>
-        <div class="event-progress">
-          <div class="event-progress-track"><div class="event-progress-fill" style="width:42%"></div></div>
-          <span class="event-progress-txt">3/7 days</span>
-        </div>
-      </div>
+renderHero();
+
+/* swipe dot sync */
+const heroScroll=document.getElementById('heroScroll');
+let heroTicking=false;
+heroScroll.addEventListener('scroll',()=>{
+  if(heroTicking)return;
+  heroTicking=true;
+  requestAnimationFrame(()=>{
+    const idx=Math.round(heroScroll.scrollTop/heroScroll.clientHeight);
+    document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
+    heroTicking=false;
+  });
+},{passive:true});
+
+/* ── CONTINUE READING ── */
+const CONTINUE_READING=[
+  {cover:'https://i.postimg.cc/ftRZbhKx/3.jpg', title:"The Alpha's Obsession", ch:'Chapter 18', pct:43},
+  {cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg', title:'Falling for My Fake Husband', ch:'Chapter 12', pct:25},
+  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', title:"The Mafia's Secret Wife", ch:'Chapter 24', pct:60},
+  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'His Ruthless Obsession', ch:'Chapter 31', pct:78},
+  {cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:"My Uncle's Stolen Will", ch:'Chapter 8', pct:19},
+];
+document.getElementById('contRow').innerHTML=CONTINUE_READING.map(c=>`
+  <div class="cont-card" onclick="toast('📖 Resuming…')">
+    <div class="cont-cover" style="background-image:url('${c.cover}')"></div>
+    <div class="cont-title">${c.title}</div>
+    <div class="cont-ch">${c.ch}</div>
+    <div class="prog-track"><div class="prog-fill" style="width:${c.pct}%"></div></div>
+  </div>`).join('');
+
+/* ── TRENDING GENRES ── */
+const GENRES=[
+  {icon:'💔',name:'Betrayal',count:'1.2k'},{icon:'🎓',name:'Campus',count:'890'},
+  {icon:'👑',name:'Family',count:'740'},{icon:'🔥',name:'Revenge',count:'620'},
+  {icon:'✨',name:'Twist',count:'580'},{icon:'🌙',name:'Elegy',count:'310'},
+  {icon:'💍',name:'Romance',count:'950'},
+];
+document.getElementById('genreRow').innerHTML=GENRES.map(g=>`
+  <div class="genre-pill" onclick="location.href='discover.html'">
+    <span>${g.icon}</span> ${g.name} <span class="ct">${g.count}</span>
+  </div>`).join('');
+
+/* ── CHAPTER DROPS ROW — includes 2 sponsored "AD" cards mixed in,
+   with a gold border and "AD" tag instead of a time pill ── */
+const CHAPTER_DROPS=[
+  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', title:'His Sweet Revenge — Chapter 21', author:'Luna Grey', time:'2h ago'},
+  {cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg', title:'Forbidden Hearts — Chapter 9', author:'Mia Clark', time:'4h ago'},
+  {ad:true,cover:'https://i.postimg.cc/DJwFzKgd/4.jpg', title:'Bound to the Ruthless CEO', author:'Ava Winters'},
+  {cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:"My Uncle's Stolen Will — Chapter 8", author:'Chiamaka_N', time:'6h ago'},
+  {cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg', title:"Best Friend's Ring — Chapter 4", author:'Kemi_A', time:'9h ago'},
+  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'The Letter He Never Sent — Chapter 3', author:'Efe_O', time:'12h ago'},
+  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg', title:"Stepmother's Secret — Chapter 6", author:'Zara_M', time:'1d ago'},
+  {ad:true,cover:'https://i.postimg.cc/fkdXzjSj/wife.jpg', title:'Married to the Enemy', author:'Zara_M'},
+  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg', title:'The Runaway Bride — Chapter 5', author:'Ifeanyi_Story', time:'1d ago'},
+  {cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg', title:"Grandmother's Will — Chapter 13", author:'Chiamaka_N', time:'2d ago'},
+];
+document.getElementById('dropsRow').innerHTML=CHAPTER_DROPS.map(d=>{
+  const isAd=!!d.ad;
+  return `<div class="drop-card" onclick="toast('${isAd?'📖 Opening sponsored story…':'📖 Opening chapter…'}')">
+    <div class="drop-cover${isAd?' ad-border':''}" style="background-image:url('${d.cover}')">
+      <div class="drop-scrim"></div>
+      <div class="drop-time${isAd?' ad-tag':''}">${isAd?'AD':d.time}</div>
+      <div class="drop-cont"><i class="fas ${isAd?'fa-bullhorn':'fa-play'}" style="font-size:9px"></i> ${isAd?'Read Now':'Continue'}</div>
     </div>
+    <div class="drop-title">${d.title}</div>
+    <div class="drop-author">@${d.author}</div>
   </div>`;
-}
-function writersSection(){
-  return `<div class="section fu">
-    <div class="section-head"><div><h2>✍️ Writers to Follow</h2><div class="sub">Based on what you read</div></div></div>
-    <div class="ptf-row" id="ptfRow"></div>
-  </div>`;
-}
+}).join('');
+
+/* ── PEOPLE TO FOLLOW — plain, no rectangle card background ── */
+const PTF=[
+  {name:'Ada_Writes', meta:'12.4k followers', av:'https://i.pravatar.cc/100?img=32', following:false},
+  {name:'Ifeanyi_Story', meta:'31.7k followers', av:'https://i.pravatar.cc/100?img=53', following:false},
+  {name:'Chiamaka_N', meta:'19.2k followers', av:'https://i.pravatar.cc/100?img=47', following:false},
+  {name:'Zara_M', meta:'14.8k followers', av:'https://i.pravatar.cc/100?img=16', following:false},
+  {name:'Efe_O', meta:'22.3k followers', av:'https://i.pravatar.cc/100?img=22', following:false},
+];
 function renderPtf(){
-  const el=document.getElementById('ptfRow');
-  if(!el)return;
-  el.innerHTML=PTF.map((p,i)=>`
+  document.getElementById('ptfRow').innerHTML=PTF.map((p,i)=>`
     <div class="ptf-card">
       <img class="ptf-av" src="${p.av}" loading="lazy" alt=""/>
       <div class="ptf-name">@${p.name}</div>
@@ -644,49 +696,7 @@ function togglePtf(i){
   renderPtf();
   toast(PTF[i].following?`✅ Following @${PTF[i].name}`:`Unfollowed @${PTF[i].name}`);
 }
-
-/* ── Assemble the single feed: 5 stories, then an ad + a row-widget,
-   then an official Droboard post + another row-widget, repeating —
-   so extras land roughly every 5 story cards, scattered rather than
-   clustered at the end. ── */
-function buildFeed(){
-  const blocks=[];
-  blocks.push(...S.slice(0,5).map(x=>({el:storySlideHTML(x),slide:true})));
-  blocks.push({el:adStorySlideHTML(AD[0]),slide:true});
-  blocks.push({el:continueReadingSection(),slide:false});
-  blocks.push({el:officialSlideHTML(HD[0]),slide:true});
-  blocks.push({el:genreSection(),slide:false});
-
-  blocks.push(...S.slice(5,10).map(x=>({el:storySlideHTML(x),slide:true})));
-  blocks.push({el:officialSlideHTML(HD[1]),slide:true});
-  blocks.push({el:dropsSection(),slide:false});
-  blocks.push({el:adStorySlideHTML(AD[1]),slide:true});
-  blocks.push({el:eventSection(),slide:false});
-
-  blocks.push(...S.slice(10,15).map(x=>({el:storySlideHTML(x),slide:true})));
-  blocks.push({el:officialSlideHTML(HD[2]),slide:true});
-  blocks.push({el:writersSection(),slide:false});
-  blocks.push({el:officialSlideHTML(HD[3]),slide:true});
-  blocks.push({el:officialSlideHTML(HD[4]),slide:true});
-
-  document.getElementById('feed').innerHTML=blocks.map(b=>b.el).join('');
-  renderPtf();
-
-  /* swipe dots track the full-bleed slides only */
-  const slideEls=[...document.querySelectorAll('.hero-slide')];
-  document.getElementById('swipeDots').innerHTML=slideEls.map((_,i)=>`<div class="swipe-dot${i===0?' on':''}"></div>`).join('');
-  const dots=[...document.querySelectorAll('.swipe-dot')];
-  const io=new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting && entry.intersectionRatio>0.55){
-        const idx=slideEls.indexOf(entry.target);
-        if(idx>-1) dots.forEach((d,i)=>d.classList.toggle('on',i===idx));
-      }
-    });
-  },{threshold:[0.55]});
-  slideEls.forEach(el=>io.observe(el));
-}
-buildFeed();
+renderPtf();
 </script>
 </body>
 </html>

@@ -6,6 +6,11 @@
 <title>Discover</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<!-- Reusable Droboard components. Each is self-contained: builds its own
+     UI, injects its own CSS, and appends itself to <body> on load. -->
+<script src="component/bottom-nav.js"></script>
+<script src="component/search-overlay.js"></script>
+<script src="component/browse-overlay.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -27,7 +32,7 @@ a{color:inherit;text-decoration:none}
 .search{
   flex:1;display:flex;align-items:center;gap:8px;
   background:#fff;border:1px solid var(--border);border-radius:22px;
-  padding:9px 14px;font-size:13px;color:var(--muted);
+  padding:9px 14px;font-size:13px;color:var(--muted);cursor:pointer;
 }
 .search i{font-size:13px;opacity:.7}
 .icon-btn{
@@ -86,17 +91,6 @@ a{color:inherit;text-decoration:none}
   font-size:10px;font-weight:600;padding:3px 9px;border-radius:12px;
   background:rgba(255,255,255,.15);color:#fff;backdrop-filter:blur(4px);
 }
-.hero-actions{display:flex;gap:8px}
-.btn-read{
-  background:var(--pink);color:#fff;border:none;border-radius:22px;
-  padding:10px 20px;font-size:13px;font-weight:700;
-  display:flex;align-items:center;gap:6px;
-  box-shadow:0 4px 14px rgba(255,45,85,.35);
-}
-.btn-list{
-  background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4);
-  border-radius:22px;padding:9px 16px;font-size:13px;font-weight:600;
-}
 .hero-dots{display:flex;justify-content:center;gap:5px;margin:10px 0 6px}
 .dot{width:6px;height:6px;border-radius:50%;background:#d1d1d6}
 .dot.on{width:16px;border-radius:3px;background:var(--pink)}
@@ -115,39 +109,40 @@ a{color:inherit;text-decoration:none}
 }
 .h-row::-webkit-scrollbar{display:none}
 
-.scard{flex:0 0 110px;width:110px;cursor:pointer}
+/* ── Story card — sized so 4 fit in one viewport width (was 3) ── */
+.scard{flex:0 0 calc((100% - 30px) / 4);width:calc((100% - 30px) / 4);cursor:pointer}
 .scard:active{opacity:.85}
 .scard-cover{
-  position:relative;width:110px;height:148px;
-  border-radius:10px;overflow:hidden;background:#e8e8ed;margin-bottom:6px;
+  position:relative;width:100%;aspect-ratio:110/148;
+  border-radius:9px;overflow:hidden;background:#e8e8ed;margin-bottom:6px;
   box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 .scard-cover img{width:100%;height:100%}
 .badge{
   position:absolute;top:5px;left:5px;
-  font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;
-  letter-spacing:.3px;text-transform:uppercase;z-index:2;
+  font-size:7px;font-weight:800;padding:2px 4px;border-radius:4px;
+  letter-spacing:.2px;text-transform:uppercase;z-index:2;
 }
 .badge.new{background:#22c55e;color:#fff}
 .badge.hot{background:#ef4444;color:#fff}
 .badge.update{background:var(--pink);color:#fff}
 .rank{
   position:absolute;top:5px;left:5px;
-  width:20px;height:20px;border-radius:6px;
-  background:var(--pink);color:#fff;font-size:11px;font-weight:800;
+  width:18px;height:18px;border-radius:5px;
+  background:var(--pink);color:#fff;font-size:10px;font-weight:800;
   display:flex;align-items:center;justify-content:center;z-index:2;
 }
 .scard-title{
-  font-size:11.5px;font-weight:600;line-height:1.3;
+  font-size:10.5px;font-weight:600;line-height:1.3;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;
 }
 .scard-author{
-  font-size:10px;color:var(--muted);font-weight:500;
+  font-size:9.5px;color:var(--muted);font-weight:500;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;
 }
-.scard-meta{font-size:10px;color:var(--muted);font-weight:500}
-.scard-rating{font-size:10px;color:#f59e0b;font-weight:600}
-.cont-ch{font-size:10px;color:var(--muted);margin-bottom:4px}
+.scard-meta{font-size:9.5px;color:var(--muted);font-weight:500}
+.scard-rating{font-size:9.5px;color:#f59e0b;font-weight:600}
+.cont-ch{font-size:9.5px;color:var(--muted);margin-bottom:4px}
 .prog-track{height:3px;background:#e5e5ea;border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--pink);border-radius:2px}
 
@@ -229,25 +224,23 @@ a{color:inherit;text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 #scrollSentinel{height:1px}
 
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:60;
-  background:var(--bg);border-top:1px solid var(--border);
-  display:flex;justify-content:space-around;align-items:center;
-  padding:8px 0 calc(var(--safe-b)+6px);min-height:var(--nav-h);
+.to-top-btn{
+  position:fixed;right:16px;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);z-index:55;
+  width:42px;height:42px;border-radius:50%;
+  background:#fff;color:var(--pink);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.14);
+  opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;
+  transition:opacity .22s ease,transform .22s ease;
 }
-.bn-item{
-  text-align:center;font-size:9px;font-weight:600;color:var(--muted);
-  padding:2px 8px;text-decoration:none;
-  display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px;
-}
-.bn-item i{font-size:20px;display:block}
-.bn-item.active{color:var(--pink)}
+.to-top-btn.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.to-top-btn:active{transform:scale(.92)}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="search">
+  <div class="search" data-search-trigger>
     <i class="fas fa-search"></i>
     <span>Search stories, genres...</span>
   </div>
@@ -258,11 +251,11 @@ a{color:inherit;text-decoration:none}
 <div class="tabs-wrap">
   <div class="tabs">
     <div class="tab active">For You</div>
-    <div class="tab">Romance</div>
-    <div class="tab">Werewolf</div>
-    <div class="tab">Mafia</div>
-    <div class="tab">Fantasy</div>
-    <div class="tab grid-icon"><i class="fas fa-th"></i></div>
+    <div class="tab" data-browse-trigger data-browse-title="Top Romance" data-browse-filter="romance">Romance</div>
+    <div class="tab" data-browse-trigger data-browse-title="Werewolf Stories" data-browse-filter="werewolf">Werewolf</div>
+    <div class="tab" data-browse-trigger data-browse-title="Mafia Stories" data-browse-filter="mafia">Mafia</div>
+    <div class="tab" data-browse-trigger data-browse-title="Fantasy Stories" data-browse-filter="fantasy">Fantasy</div>
+    <div class="tab grid-icon" data-browse-trigger data-browse-title="All Stories"><i class="fas fa-th"></i></div>
   </div>
 </div>
 
@@ -277,10 +270,6 @@ a{color:inherit;text-decoration:none}
         <div class="hero-title" id="heroTitle"></div>
         <div class="hero-author" id="heroAuthor"></div>
         <div class="hero-tags" id="heroTags"></div>
-        <div class="hero-actions">
-          <button class="btn-read"><i class="fas fa-play" style="font-size:10px"></i> Read Now</button>
-          <button class="btn-list">+ My List</button>
-        </div>
       </div>
     </div>
   </div>
@@ -292,12 +281,12 @@ a{color:inherit;text-decoration:none}
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Top Romance</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Top Romance</h2><button class="view-all" data-browse-trigger data-browse-title="Top Romance" data-browse-filter="romance" data-browse-sort="popular">View All ›</button></div>
     <div class="h-row" id="romanceRow"></div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Trending Today</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Trending Today</h2><button class="view-all" data-browse-trigger data-browse-title="Trending Today" data-browse-sort="popular">View All ›</button></div>
     <div class="h-row" id="trendingRow"></div>
   </section>
 
@@ -307,41 +296,41 @@ a{color:inherit;text-decoration:none}
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">New Releases</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">New Releases</h2><button class="view-all" data-browse-trigger data-browse-title="New Releases" data-browse-sort="new">View All ›</button></div>
     <div class="h-row" id="newRow"></div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Editor's Picks</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Editor's Picks</h2><button class="view-all" data-browse-trigger data-browse-title="Editor's Picks" data-browse-sort="rating">View All ›</button></div>
     <div class="h-row" id="editorRow"></div>
   </section>
 
   <section class="section">
     <div class="sec-head"><h2 class="sec-title">Popular Genres</h2></div>
     <div class="genre-grid">
-      <div class="genre-item"><div class="genre-icon" style="background:#ffe4ec;color:#ff2d55"><i class="fas fa-heart"></i></div><div class="genre-name">Romance</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#f3e8ff;color:#9333ea"><i class="fas fa-paw"></i></div><div class="genre-name">Werewolf</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#e8e8ed;color:#555"><i class="fas fa-gun"></i></div><div class="genre-name">Mafia</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-crown"></i></div><div class="genre-name">Fantasy</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#e0f2fe;color:#0284c7"><i class="fas fa-magnifying-glass"></i></div><div class="genre-name">Mystery</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#dbeafe;color:#2563eb"><i class="fas fa-atom"></i></div><div class="genre-name">Sci-Fi</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#f3e8ff;color:#7c3aed"><i class="fas fa-skull"></i></div><div class="genre-name">Horror</div></div>
-      <div class="genre-item"><div class="genre-icon" style="background:#f4f4f5;color:#71717a"><i class="fas fa-th"></i></div><div class="genre-name">More</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Romance Stories" data-browse-filter="romance"><div class="genre-icon" style="background:#ffe4ec;color:#ff2d55"><i class="fas fa-heart"></i></div><div class="genre-name">Romance</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Werewolf Stories" data-browse-filter="werewolf"><div class="genre-icon" style="background:#f3e8ff;color:#9333ea"><i class="fas fa-paw"></i></div><div class="genre-name">Werewolf</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Mafia Stories" data-browse-filter="mafia"><div class="genre-icon" style="background:#e8e8ed;color:#555"><i class="fas fa-gun"></i></div><div class="genre-name">Mafia</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Fantasy Stories" data-browse-filter="fantasy"><div class="genre-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-crown"></i></div><div class="genre-name">Fantasy</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Mystery Stories" data-browse-filter="mystery"><div class="genre-icon" style="background:#e0f2fe;color:#0284c7"><i class="fas fa-magnifying-glass"></i></div><div class="genre-name">Mystery</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Fantasy Stories" data-browse-filter="fantasy"><div class="genre-icon" style="background:#dbeafe;color:#2563eb"><i class="fas fa-atom"></i></div><div class="genre-name">Sci-Fi</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="Horror Stories" data-browse-filter="horror"><div class="genre-icon" style="background:#f3e8ff;color:#7c3aed"><i class="fas fa-skull"></i></div><div class="genre-name">Horror</div></div>
+      <div class="genre-item" data-browse-trigger data-browse-title="All Stories"><div class="genre-icon" style="background:#f4f4f5;color:#71717a"><i class="fas fa-th"></i></div><div class="genre-name">More</div></div>
     </div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Recommended For You</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Recommended For You</h2><button class="view-all" data-browse-trigger data-browse-title="Recommended For You" data-browse-sort="popular">View All ›</button></div>
     <div class="h-row" id="recRow"></div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Complete Stories</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Complete Stories</h2><button class="view-all" data-browse-trigger data-browse-title="Complete Stories" data-browse-filter="completed">View All ›</button></div>
     <div class="h-row" id="completeRow"></div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2 class="sec-title">Recently Updated</h2><span class="view-all">View All ›</span></div>
+    <div class="sec-head"><h2 class="sec-title">Recently Updated</h2><button class="view-all" data-browse-trigger data-browse-title="Recently Updated" data-browse-sort="updated">View All ›</button></div>
     <div class="h-row" id="updatedRow"></div>
   </section>
 
@@ -354,13 +343,11 @@ a{color:inherit;text-decoration:none}
 
 </div>
 
-<nav class="bottom-nav">
-  <a class="bn-item" href="index.html"><i class="fas fa-house"></i><span>Home</span></a>
-  <a class="bn-item active" href="discover.html"><i class="fas fa-compass"></i><span>Discover</span></a>
-  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i><span>Search</span></a>
-  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i><span>Feed</span></a>
-  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i><span>Profile</span></a>
-</nav>
+<button class="to-top-btn" id="toTopBtn" aria-label="Scroll to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Bottom nav is now injected by component/bottom-nav.js — it detects
+     "discover.html" as the active tab automatically and stays in sync
+     with search/browse overlay theming (shared localStorage key). -->
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -554,6 +541,9 @@ async function fetchMoreStories(page, limit) {
     if (!res.ok) throw new Error('Stories API failed');
     return res.json(); // { items: [], hasMore: boolean }
   }
+  // Small delay so the loading spinner has time to be seen, instead of
+  // items appearing to load instantly / all at once
+  await new Promise(r => setTimeout(r, 650));
   const data = getDemoData().moreStories;
   // Expand to ~50 by cycling for demo infinite feel
   const expanded = [];
@@ -645,6 +635,67 @@ async function loadMoreBatch() {
   moreLoading = false;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT WIRING — feed BrowseOverlay and DroboardSearch the
+   same story catalogue this page already has (moreStories, since
+   it's the one dataset with real genre tags + preview text), so
+   "View All" / genre tiles / search results show content that's
+   actually consistent with what's on the page. Swap this for a
+   real `fetchPage` / API-backed pool when the backend is ready —
+   see each component's own USAGE notes at the bottom of its file.
+═══════════════════════════════════════════════════════════ */
+const GENRE_LABEL_TO_ID = {
+  Drama: 'drama', Romance: 'romance', Family: 'family', Revenge: 'revenge',
+  Betrayal: 'betrayal', Campus: 'campus', Heartbreak: 'heartbreak',
+  Horror: 'horror', Mafia: 'mafia', Werewolf: 'werewolf',
+  Billionaire: 'billionaire', Mystery: 'mystery',
+};
+
+function buildStoryPool(moreStories) {
+  return moreStories.map((s, i) => ({
+    id: `ds-${i}`,
+    img: s.img,
+    title: s.title,
+    author: s.author,
+    genre: GENRE_LABEL_TO_ID[s.genre] || s.genre.toLowerCase(),
+    cat: s.genre,
+    preview: s.preview,
+    views: `${70 + (i * 9) % 260}k`,
+    likes: `${8 + (i * 3) % 40}k`,
+    badge: i % 6 === 0 ? 'hot' : i % 5 === 0 ? 'new' : '',
+    rating: (4.3 + (i % 7) * 0.08).toFixed(1),
+    chapters: 6 + (i % 20),
+    av: `https://i.pravatar.cc/100?img=${(i * 7 + 4) % 70}`,
+    keywords: [
+      (GENRE_LABEL_TO_ID[s.genre] || s.genre).toLowerCase(),
+      s.author.replace('@', '').toLowerCase(),
+      ...s.title.toLowerCase().split(' ').filter(w => w.length > 3).slice(0, 4),
+    ],
+  }));
+}
+
+function wireComponents(data) {
+  const pool = buildStoryPool(data.moreStories || []);
+
+  BrowseOverlay.configure({
+    stories: pool,
+    onOpenStory: story => { location.href = `bridge.html?id=${encodeURIComponent(story.id)}`; },
+    onOpenWriter: writer => { location.href = `profile.html?u=${encodeURIComponent((writer.handle || writer.name || '').replace('@', ''))}`; },
+  });
+
+  DroboardSearch.configure({
+    data: {
+      poolStories: pool.map(s => ({
+        type: 'story', img: s.img, cat: s.cat, title: s.title,
+        author: s.author.replace('@', ''), av: s.av, views: s.views,
+        likes: s.likes, badge: s.badge, keywords: s.keywords,
+      })),
+    },
+    onOpenStory: story => { location.href = `bridge.html?id=${encodeURIComponent(story.id || '')}`; },
+    onOpenWriter: writer => { location.href = `profile.html?u=${encodeURIComponent((writer.handle || writer.name || '').replace('@', ''))}`; },
+  });
+}
+
 /* ── Boot ── */
 async function init() {
   let data;
@@ -679,18 +730,44 @@ async function init() {
       </div>
     </div>`).join('');
 
-  document.querySelectorAll('.tab:not(.grid-icon)').forEach(t => {
+  document.querySelector('.tab.active').addEventListener('click', () => {}); // "For You" stays inline, no-op
+  document.querySelectorAll('.tab:not(.grid-icon):not([data-browse-trigger])').forEach(t => {
     t.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
       t.classList.add('active');
     });
   });
 
+  wireComponents(data);
+
   await loadMoreBatch();
 
+  // Small rootMargin so the sentinel only triggers a load once it's nearly
+  // in view — this keeps the spinner on screen briefly instead of the
+  // whole next batch appearing to load in one shot far ahead of the scroll.
   new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) loadMoreBatch();
-  }, { root: null, rootMargin: '200px 0px', threshold: 0 }).observe(document.getElementById('scrollSentinel'));
+  }, { root: null, rootMargin: '0px 0px 24px 0px', threshold: 0 }).observe(document.getElementById('scrollSentinel'));
+
+  initToTop();
+}
+
+/* ── Scroll-to-top button ── */
+function initToTop() {
+  const btn = document.getElementById('toTopBtn');
+  const SHOW_AFTER = 480;
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      btn.classList.toggle('show', window.scrollY > SHOW_AFTER);
+      ticking = false;
+    });
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 init();

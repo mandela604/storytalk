@@ -2,923 +2,309 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<meta name="theme-color" content="#000000"/>
-<title>Droboard — Discover</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DroBoard — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
-/* ─── DESIGN TOKENS ─────────────────────────────────────── */
 :root{
   --bg:#000000;
-  --section-bg:#07070b;
-  --surface:#111318;
-  --surface2:#1a1b20;
-  --acc:#ff0050;
-  --acc2:#ff4d7a;
-  --acc-grad:linear-gradient(135deg,#ff0050,#ff4d7a);
-  --acc-glow:rgba(255,0,80,.22);
-  --acc-dim:rgba(255,0,80,.10);
-  --acc-border:rgba(255,0,80,.28);
-  --tx:#ffffff;
-  --tx2:#a1a1aa;
-  --muted:#52525b;
-  --bd:rgba(255,255,255,.07);
-  --bd2:rgba(255,255,255,.04);
-  --blue:#00aaff;
-  --blue-glow:rgba(0,170,255,.4);
-  --gray-ring:rgba(80,80,90,.55);
-  --nav-h:60px;
-  --safe-b:env(safe-area-inset-bottom,14px);
-  --px:14px;
-  --r:12px;
-  --r-sm:8px;
-  --font-d:'Syne',sans-serif;
-  --font-b:'Instrument Sans',sans-serif;
-  --font-ser:'Playfair Display',serif;
-}
-[data-theme="light"]{
-  --bg:#f5f5f5;--section-bg:#ffffff;--surface:#ffffff;--surface2:#f0f0f0;
-  --tx:#1a1a1a;--tx2:#555555;--muted:#888888;--bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.05);
+  --pink:#ef1958;
+  --pink2:#ff3d78;
+  --purple:#7b2ff0;
+  --purple2:#a35bff;
+  --gold:#f2a900;
+  --gold2:#ffd35c;
+  --gray:#a9a9b2;
+  --gray2:#7a7a84;
+  --line:rgba(255,255,255,.09);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-b);overflow-x:hidden;transition:background .25s,color .25s}
-img{display:block;user-select:none}
-a{color:inherit;text-decoration:none}
-button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
-::-webkit-scrollbar{width:2px;height:2px}
-::-webkit-scrollbar-thumb{background:var(--acc-dim);border-radius:2px}
+html,body{background:#050505;color:#fff;font-family:'Inter',system-ui,sans-serif}
+img{display:block;max-width:100%}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+::-webkit-scrollbar{display:none}
 
-/* ─── TOPBAR ─────────────────────────────────────────────── */
-.topbar{
-  position:sticky;top:0;z-index:60;
-  display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:8px;
-  padding:10px var(--px) 9px;
-  background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);
-  backdrop-filter:blur(20px);
+.phone-wrap{display:flex;justify-content:center;padding:26px 12px}
+.phone{
+  width:390px;max-width:100%;background:var(--bg);border-radius:36px;
+  box-shadow:0 30px 90px -20px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);
+  overflow:hidden;position:relative;
 }
-[data-theme="light"] .topbar{background:rgba(255,255,255,.97)}
-.logo{
-  font-family:var(--font-d);font-size:22px;font-weight:800;letter-spacing:-1px;
-  background:var(--acc-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 18px 6px}
+.logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;letter-spacing:-.3px}
+.logo .b{color:var(--pink)}
+.top-right{display:flex;align-items:center;gap:10px}
+.coin-pill{
+  display:flex;align-items:center;gap:7px;background:#16161a;border:1px solid var(--line);
+  border-radius:20px;padding:6px 14px 6px 6px;font-size:13.5px;font-weight:800;color:#fff;
 }
-.search{
-  display:flex;align-items:center;gap:7px;
-  background:var(--section-bg);border:1.5px solid var(--bd);border-radius:24px;padding:7px 13px;
-  transition:border-color .2s;
+.coin-ico{
+  width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd35c,#f2a900);
+  color:#7a4a00;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;
 }
-.search:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-dim)}
-.search i{color:var(--muted);font-size:12px;flex-shrink:0}
-.search input{flex:1;background:none;border:none;outline:none;color:var(--tx);font-family:var(--font-b);font-size:13px;min-width:0}
-.search input::placeholder{color:var(--muted)}
-.icon-btn{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--section-bg);border:1.5px solid var(--bd);
-  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);
-  position:relative;cursor:pointer;flex-shrink:0;transition:.15s;
+.bell-btn{width:38px;height:38px;border-radius:50%;background:#16161a;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;position:relative}
+.bell-badge{position:absolute;top:-4px;right:-5px;background:var(--pink);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:10px;border:2px solid #050505;line-height:1.1}
+
+/* ── STORIES ── */
+.stories{display:flex;gap:16px;overflow-x:auto;padding:16px 18px 10px;scrollbar-width:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;width:60px}
+.story-add{
+  width:56px;height:56px;border-radius:50%;border:2px dashed var(--pink);display:flex;align-items:center;justify-content:center;
+  color:var(--pink);font-size:18px;
 }
-.icon-btn:active{transform:scale(.92);border-color:var(--acc)}
-.ndot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--acc);border:2px solid var(--bg)}
+.story-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,var(--pink),#ff6b93)}
+.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #050505;display:block}
+.story-name{font-size:10.5px;font-weight:600;color:#fff;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px}
 
-/* ─── GENRE PILLS ────────────────────────────────────────── */
-.genre-bar{
-  background:rgba(0,0,0,.97);border-bottom:1px solid var(--bd);
-  backdrop-filter:blur(12px);position:sticky;top:57px;z-index:55;
+/* ── TABS ── */
+.tabs{display:flex;align-items:center;gap:26px;padding:8px 18px 14px;border-bottom:1px solid var(--line)}
+.tab{font-size:14.5px;font-weight:700;color:var(--gray2);padding-bottom:12px;position:relative;display:flex;align-items:center;gap:5px}
+.tab.on{color:var(--pink)}
+.tab.on i{font-size:10px}
+.tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--pink)}
+
+.feed{padding:20px 16px 4px}
+
+/* ── DIVIDER BETWEEN CARDS ── */
+.feed-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14) 50%,transparent);margin:26px 0}
+
+/* ── STORY CARD ── */
+.story-card{
+  position:relative;border-radius:26px;overflow:hidden;border:1.5px solid var(--pink);
+  box-shadow:0 0 0 1px rgba(239,25,88,.15),0 20px 50px -18px rgba(239,25,88,.35);
+  height:780px;background-size:cover;background-position:center;
 }
-[data-theme="light"] .genre-bar{background:rgba(255,255,255,.97)}
-.gps{display:flex;gap:6px;padding:7px var(--px);overflow-x:auto;scrollbar-width:none}
-.gps::-webkit-scrollbar{display:none}
-.gp{
-  flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;
-  border:1.5px solid var(--bd);background:transparent;color:var(--muted);
-  cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--font-b);
+.card-top-row{position:absolute;top:16px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+.new-badge{
+  display:flex;align-items:center;gap:6px;background:var(--pink);color:#fff;font-size:11px;font-weight:800;
+  padding:7px 14px;border-radius:20px;box-shadow:0 6px 16px -4px rgba(239,25,88,.7);
 }
-.gp.on{background:var(--acc-grad);border-color:transparent;color:#fff;box-shadow:0 2px 12px var(--acc-glow)}
-.gp:active{transform:scale(.95)}
+.card-more{color:#fff;font-size:18px;letter-spacing:2px;padding:4px 6px}
 
-/* ─── BODY ───────────────────────────────────────────────── */
-.body{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 16px)}
+.card-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.15) 42%,rgba(0,0,0,.7) 68%,rgba(2,0,4,.97) 100%)}
 
-/* ─── SECTION WRAPPERS ───────────────────────────────────── */
-.section-block{
-  background:var(--section-bg);
-  border-radius:16px;
-  border:2px solid var(--bd2);
-  border-bottom:1px solid var(--bd2);
-  margin:0 6px 12px;
-  padding-bottom:16px;
+.card-body{position:absolute;left:0;right:0;bottom:0;padding:0 20px 22px;z-index:3}
+.card-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;line-height:1.28;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5);margin-bottom:14px}
+.card-author-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.card-author-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.card-author-name{font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
+.card-author-name i{color:var(--pink);font-size:12px}
+.card-chapter-row{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:10px}
+.card-chapter-row .dot{color:var(--gray2);margin:0 6px}
+.card-chapter-row .when{color:var(--pink);font-weight:700}
+.card-desc{font-size:13px;line-height:1.55;color:#d7d7dd;font-weight:500;margin-bottom:18px}
+
+.continue-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;font-size:15px;font-weight:800;
+  padding:16px 22px;border-radius:16px;box-shadow:0 12px 26px -8px rgba(239,25,88,.65);margin-bottom:12px;
 }
-.section-block.empty-state{padding-bottom:28px}
+.continue-btn i{font-size:17px}
 
-/* ─── SECTION HEADERS ────────────────────────────────────── */
-.sh{display:flex;align-items:center;justify-content:space-between;padding:18px var(--px) 12px;gap:8px}
-.sh-title{
-  font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--tx);
-  display:flex;align-items:center;gap:8px;min-width:0;
+.progress-lbl{font-size:11.5px;font-weight:700;color:var(--pink);margin-bottom:7px}
+.progress-track{height:5px;border-radius:5px;background:rgba(255,255,255,.15);overflow:hidden}
+.progress-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--pink),var(--pink2))}
+
+/* ── FLOATING ACTION RAIL ── */
+.action-rail{
+  position:absolute;right:14px;bottom:230px;z-index:4;
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  background:rgba(10,8,12,.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:18px 12px;
 }
-.sh-title.line{border-left:3px solid var(--acc);padding-left:9px}
-.sh-icon{
-  width:26px;height:26px;border-radius:8px;
-  background:var(--acc-dim);display:flex;align-items:center;justify-content:center;
-  font-size:13px;border:1px solid var(--acc-border);flex-shrink:0;
+.rail-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rail-ico{font-size:21px;color:#fff}
+.rail-ico.heart{color:var(--pink)}
+.rail-lbl{font-size:11px;font-weight:700;color:#fff}
+
+/* ── AD CARD ── */
+.ad-card{
+  position:relative;border-radius:24px;overflow:hidden;padding:26px 22px;
+  border:1.5px solid rgba(255,255,255,.1);
 }
-.sh-more{
-  font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;
-  display:flex;align-items:center;gap:3px;padding:4px 10px;flex-shrink:0;
-  border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--bd);
-  text-decoration:none;transition:background .18s;
+.ad-card.premium{background:linear-gradient(135deg,#3d0f96 0%,#5b1bc9 55%,#7b2ff0 100%);box-shadow:0 20px 50px -20px rgba(123,47,240,.5)}
+.ad-card.coins{background:linear-gradient(135deg,#3a2400 0%,#7a4a00 55%,#f2a900 130%);box-shadow:0 20px 50px -20px rgba(242,169,0,.4)}
+.ad-tag{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.35);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.2)}
+.ad-ico{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;margin-bottom:16px}
+.ad-title{font-size:20px;font-weight:800;line-height:1.3;color:#fff;margin-bottom:8px}
+.ad-sub{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:18px}
+.ad-list{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.ad-list div{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:rgba(255,255,255,.92)}
+.ad-list i{font-size:11px;color:#3ddc84}
+.ad-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;font-size:13px;font-weight:800;padding:11px 20px;border-radius:22px}
+.ad-btn.premium-btn{color:var(--purple)}
+.ad-btn.coins-btn{color:#7a4a00}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  display:flex;justify-content:space-around;align-items:center;padding:12px 0 10px;
+  background:#000;border-top:1px solid var(--line);position:sticky;bottom:0;
 }
-.sh-more:active{background:var(--surface2)}
-
-/* section empty-state (no stories for this genre yet) */
-.section-empty{padding:26px var(--px) 4px;text-align:center}
-.section-empty i{font-size:22px;color:var(--muted);margin-bottom:8px;display:block}
-.section-empty p{font-size:11.5px;color:var(--muted);line-height:1.5}
-
-/* ─── BANNER ─────────────────────────────────────────────── */
-.banner-wrap{
-  margin:14px var(--px) 0px;border-radius:var(--r);overflow:hidden;
-  position:relative;box-shadow:0 6px 28px rgba(0,0,0,.6);
-}
-.btk{display:flex;will-change:transform;transition:transform .38s cubic-bezier(.4,0,.2,1)}
-.bslide{flex:0 0 100%;height:215px;position:relative;background-size:cover;background-position:center 25%;cursor:pointer;}
-.bscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.4) 45%,rgba(0,0,0,.97) 100%);}
-.bcta{position:absolute;top:11px;right:11px;background:var(--acc-grad);color:#fff;padding:5px 13px;border-radius:20px;font-size:9px;font-weight:800;cursor:pointer;box-shadow:0 2px 12px var(--acc-glow);letter-spacing:.04em;border:none;}
-.bcontent{position:absolute;bottom:0;left:0;right:0;padding:10px 13px 14px}
-.btags{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
-.btag{font-size:8px;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:.03em}
-.btag-r{background:rgba(255,0,80,.3);color:var(--acc2);border:1px solid rgba(255,0,80,.45)}
-.btag-m{background:rgba(255,255,255,.12);backdrop-filter:blur(4px);color:rgba(255,255,255,.85)}
-.btitle{font-family:var(--font-d);font-size:14px;font-weight:800;line-height:1.28;color:#fff;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.6);}
-.bmeta{display:flex;align-items:center;gap:7px}
-.bav{width:19px;height:19px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.3);cursor:pointer}
-.bauthor{font-size:10px;color:rgba(255,255,255,.78);font-weight:700;flex:1;cursor:pointer}
-.bstats{display:flex;gap:8px}
-.bstat{font-size:9px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:3px;font-weight:600}
-.bdots{display:flex;gap:4px;justify-content:center;padding:8px 0 2px;margin-bottom:16px;}
-.bdot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:.25s;border:none}
-.bdot.on{width:18px;border-radius:3px;background:var(--acc)}
-
-/* ════════════════════════════════════════════════════
-   STORY CARD — 3-col (.sc in .g3)
-   4 explicit grid row tracks so cover / views / title /
-   author line up identically across every card, every row.
-════════════════════════════════════════════════════ */
-.sc{display:grid;grid-template-rows:auto 20px 30px 18px;align-items:start;cursor:pointer;transition:.18s;}
-.sc:active{transform:scale(.97)}
-.sc-cover{position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--section-bg);aspect-ratio:3/4;box-shadow:0 3px 10px rgba(0,0,0,.5);width:100%;}
-.sc-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.sc-scrim{position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,rgba(0,0,0,.92),transparent);}
-.sc-badge{position:absolute;top:5px;left:0;font-size:7px;font-weight:800;padding:2px 6px 2px 4px;border-radius:0 6px 6px 0;letter-spacing:.03em;text-transform:uppercase;z-index:2;}
-.badge-hot{background:var(--acc);color:#fff}
-.badge-free{background:#14532d;color:#86efac}
-.badge-new{background:#3b0764;color:#d8b4fe}
-.sc-views-row{display:flex;align-items:center;padding:4px 1px 0;}
-.sc-views{font-size:8px;font-weight:700;color:var(--tx2);display:flex;align-items:center;gap:2px;}
-.sc-title-wrap{overflow:hidden;}
-.sc-title{font-size:10.5px;font-weight:700;line-height:1.35;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.sc-author-row{display:flex;align-items:center;gap:4px;padding-top:2px;}
-.sc-av{width:13px;height:13px;border-radius:50%;object-fit:cover;border:1px solid var(--bd);flex-shrink:0;cursor:pointer;}
-.sc-sub{font-size:9px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;cursor:pointer;transition:color .15s;}
-.sc-sub:hover{color:var(--acc2)}
-
-/* ════════════════════════════════════════════════════
-   4-col STORY CARD (.sc4) — same alignment discipline
-════════════════════════════════════════════════════ */
-.sc4{display:grid;grid-template-rows:auto 20px 28px 17px;align-items:start;cursor:pointer;transition:.18s;}
-.sc4:active{transform:scale(.97)}
-.sc4-cover{position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--section-bg);aspect-ratio:3/4;box-shadow:0 3px 10px rgba(0,0,0,.5);width:100%;}
-.sc4-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.sc4-scrim{position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,rgba(0,0,0,.92),transparent);}
-.sc4-badge{position:absolute;top:4px;left:0;font-size:6.5px;font-weight:800;padding:2px 5px 2px 3px;border-radius:0 5px 5px 0;letter-spacing:.03em;text-transform:uppercase;z-index:2;}
-.sc4-rank{position:absolute;top:4px;right:0;font-family:var(--font-d);font-size:10px;font-weight:800;padding:2px 5px 2px 6px;border-radius:5px 0 0 5px;line-height:1.2;z-index:2;}
-.sc4-views-row{display:flex;align-items:center;padding:4px 1px 0;}
-.sc4-views{font-size:7.5px;font-weight:700;color:var(--tx2);display:flex;align-items:center;gap:2px;}
-.sc4-title-wrap{overflow:hidden;}
-.sc4-title{font-size:9.5px;font-weight:700;line-height:1.45;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.sc4-author-row{display:flex;align-items:center;gap:3px;padding-top:2px;}
-.sc4-av{width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--bd);flex-shrink:0;}
-.sc4-sub{font-size:8px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
-.rn-g{background:rgba(234,170,0,.25);color:#d4a017}
-.rn-s{background:rgba(140,140,160,.2);color:#9090b0}
-.rn-b{background:rgba(175,110,60,.2);color:#a07040}
-.rn-d{background:rgba(255,255,255,.1);color:var(--muted)}
-
-/* ─── GRIDS ──────────────────────────────────────────────── */
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 var(--px)}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 var(--px)}
-
-/* ─── RANKINGS ───────────────────────────────────────────── */
-.rank-tabs{display:flex;gap:0;background:rgba(255,255,255,.04);border-radius:10px;padding:3px;border:1.5px solid var(--bd);margin:0 var(--px) 12px;}
-.rtab{flex:1;text-align:center;padding:6px 0;font-size:10.5px;font-weight:700;color:var(--muted);border-radius:8px;cursor:pointer;transition:.18s;font-family:var(--font-b);}
-.rtab.on{background:var(--acc-grad);color:#fff;box-shadow:0 2px 10px var(--acc-glow)}
-
-/* ─── EDITOR'S PICKS ─────────────────────────────────────── */
-.ep-scroll{display:flex;gap:6px;padding:0 var(--px) 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.ep-scroll::-webkit-scrollbar{display:none}
-.ep-card{flex:0 0 calc((100vw - 40px) / 3);position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--section-bg);aspect-ratio:2/3;cursor:pointer;transition:transform .18s;box-shadow:0 3px 14px rgba(0,0,0,.55);}
-.ep-card:active{transform:scale(.97)}
-.ep-card img{width:100%;height:100%;object-fit:cover;display:block}
-.ep-card-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.15) 55%,transparent 100%);}
-.ep-cat{position:absolute;top:5px;left:5px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;padding:2px 5px;border-radius:4px;letter-spacing:.04em;line-height:1.4;}
-.ep-content{position:absolute;bottom:0;left:0;right:0;padding:5px 6px 7px}
-.ep-title{font-family:var(--font-ser);font-size:9px;font-weight:700;line-height:1.3;color:#fff;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.8);}
-.ep-stat{font-size:7px;color:rgba(255,255,255,.55);font-weight:600}
-
-/* ─── DEBATES ────────────────────────────────────────────── */
-.debate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 var(--px)}
-.dc{background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;display:flex;flex-direction:column;}
-.dc:active{transform:scale(.99)}
-.dc-thumb{position:relative;width:100%;height:70px}
-.dc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.dc-thumb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.88),rgba(0,0,0,.1) 55%)}
-.dc-badges{position:absolute;top:5px;left:5px;display:flex;gap:4px;flex-wrap:wrap}
-.db{font-size:7px;font-weight:800;padding:2px 6px;border-radius:5px}
-.db-live{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;gap:3px}
-.db-pulse{width:4px;height:4px;border-radius:50%;background:#fff;animation:pulse 1.2s ease-in-out infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
-.db-cat{background:rgba(255,255,255,.1);color:var(--tx2);border:1px solid rgba(255,255,255,.1)}
-.dc-body{padding:8px 9px;flex:1;display:flex;flex-direction:column;gap:6px}
-.dc-motion{font-size:9.5px;font-weight:600;color:var(--tx);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.dc-sides{display:flex;flex-direction:column;gap:4px}
-.dside{border-radius:6px;padding:5px 8px;position:relative;overflow:hidden}
-.dside.for{background:rgba(22,163,74,.08);border:1.5px solid rgba(22,163,74,.2)}
-.dside.against{background:rgba(80,80,80,.1);border:1.5px solid rgba(255,255,255,.1)}
-.dside-bar{position:absolute;left:0;top:0;bottom:0;z-index:0;border-radius:6px}
-.dside.for .dside-bar{background:rgba(22,163,74,.14)}
-.dside.against .dside-bar{background:rgba(120,120,120,.12)}
-.dside-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
-.dside-lbl{font-size:8px;font-weight:800}
-.dside.for .dside-lbl{color:#4ade80}
-.dside.against .dside-lbl{color:var(--tx2)}
-.dside-pct{font-size:10px;font-weight:900}
-.dside.for .dside-pct{color:#4ade80}
-.dside.against .dside-pct{color:var(--tx2)}
-.dc-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 9px 8px;border-top:1px solid var(--bd2);margin-top:auto}
-.dc-total{font-size:8.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:3px}
-.dc-join{background:rgba(255,255,255,.06);color:var(--tx2);border:1.5px solid rgba(255,255,255,.12);padding:4px 11px;border-radius:14px;font-size:8.5px;font-weight:800;cursor:pointer;font-family:var(--font-b);transition:.15s;}
-.dc-join:active{background:rgba(255,255,255,.12);color:var(--tx)}
-
-/* ─── EMO PILLS ──────────────────────────────────────────── */
-.emo-pills{display:flex;gap:6px;padding:0 var(--px);overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
-.emo-pills::-webkit-scrollbar{display:none}
-.emo-pill{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:10.5px;font-weight:700;border:1.5px solid var(--bd);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:.18s;}
-.emo-pill.on{background:var(--acc-dim);border-color:var(--acc-border);color:#ff9ab0}
-.emo-pill:active{transform:scale(.95)}
-
-/* ─── TOP WRITERS ────────────────────────────────────────── */
-.writers-scroll{display:flex;gap:12px;padding:0 var(--px) 2px;overflow-x:auto;scrollbar-width:none}
-.writers-scroll::-webkit-scrollbar{display:none}
-.wc{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px}
-.wc-ring-w{position:relative;width:54px;height:54px;flex-shrink:0}
-.wc-ring{width:54px;height:54px;border-radius:50%;padding:2.5px;cursor:pointer}
-.wc-ring.has-new{background:var(--blue);box-shadow:0 0 10px var(--blue-glow)}
-.wc-ring.has-viewed{background:var(--gray-ring)}
-.wc-ring.no-status{background:var(--acc);box-shadow:0 0 8px var(--acc-glow)}
-.wc-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg);border:2px solid var(--bg)}
-.wc-inner img{width:100%;height:100%;object-fit:cover;display:block}
-.wc-badge{position:absolute;bottom:0;right:0;font-size:6px;font-weight:900;padding:2px 4px;border-radius:4px;border:1.5px solid var(--bg);line-height:1.2}
-.wb-new{background:#1a3a6e;color:#93c5fd}
-.wb-live{background:var(--acc);color:#fff}
-.wc-name{font-size:9.5px;font-weight:800;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;color:var(--tx);cursor:pointer}
-.wc-name:hover{color:var(--acc2)}
-.wc-genre{font-size:8px;color:var(--muted);font-weight:600;text-align:center}
-
-/* ─── COLLECTIONS ────────────────────────────────────────── */
-.coll-scroll{display:flex;gap:9px;padding:0 var(--px) 4px;overflow-x:auto;scrollbar-width:none}
-.coll-scroll::-webkit-scrollbar{display:none}
-.coll-card{flex-shrink:0;width:148px;background:rgba(255,255,255,.03);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .18s;}
-.coll-card:active{transform:scale(.98)}
-.coll-card:hover{border-color:var(--acc-border)}
-.coll-covers{display:grid;grid-template-columns:1fr 1fr;height:68px;gap:1px}
-.coll-cover{background-size:cover;background-position:center}
-.coll-info{padding:8px 10px 10px}
-.coll-name{font-size:10.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;color:var(--tx)}
-.coll-meta{font-size:8.5px;color:var(--muted);font-weight:600}
-.coll-pub{display:inline-flex;align-items:center;gap:3px;margin-top:5px;font-size:8px;font-weight:800;padding:2px 7px;border-radius:5px;background:rgba(22,163,74,.08);color:#4ade80;border:1px solid rgba(22,163,74,.15)}
-
-/* ─── COUNTRY ────────────────────────────────────────────── */
-.flag-pills{display:flex;gap:6px;padding:0 var(--px);overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
-.flag-pills::-webkit-scrollbar{display:none}
-.fpill{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.03);border:1.5px solid var(--bd);font-size:10.5px;font-weight:700;cursor:pointer;transition:.18s;color:var(--muted);}
-.fpill.on{background:var(--acc-dim);border-color:var(--acc-border);color:#ff9ab0}
-.fpill:active{transform:scale(.95)}
-
-/* ─── SEARCH RESULTS ─────────────────────────────────────── */
-.sr-wrap{display:none;flex-direction:column;gap:8px;padding:12px var(--px)}
-.sr-wrap.show{display:flex}
-.sr-card{display:flex;gap:10px;background:var(--section-bg);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;cursor:pointer;transition:border-color .18s;}
-.sr-card:active{transform:scale(.99)}
-.sr-card:hover{border-color:var(--acc-border)}
-.sr-img{width:48px;height:60px;border-radius:var(--r-sm);object-fit:cover;flex-shrink:0}
-.sr-info{flex:1;min-width:0}
-.sr-cat{font-size:9px;font-weight:800;color:var(--acc2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-.sr-title{font-family:var(--font-d);font-size:12px;font-weight:700;line-height:1.3;margin-bottom:3px;color:var(--tx)}
-.sr-meta{font-size:10px;color:var(--muted);font-weight:600}
-.sr-empty{display:none;padding:48px 20px;text-align:center}
-.sr-empty.show{display:block}
-.empty-ico{font-size:38px;margin-bottom:10px}
-.empty-t{font-family:var(--font-d);font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)}
-.empty-s{font-size:12px;color:var(--muted);line-height:1.6}
-
-/* ─── BOTTOM NAV ─────────────────────────────────────────── */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.97);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 var(--safe-b);z-index:100;backdrop-filter:blur(16px);}
-[data-theme="light"] .bnav{background:rgba(255,255,255,.97)}
-.bn{text-align:center;font-size:9px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;padding:3px 8px;position:relative}
-.bn i{font-size:20px;display:block;margin-bottom:2px}
-.bn.on{color:var(--acc)}
-
-/* ─── TOAST ──────────────────────────────────────────────── */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface);color:var(--tx);padding:9px 18px;border-radius:28px;font-size:12px;font-weight:700;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:88vw;text-align:center;border:1px solid var(--bd);box-shadow:0 4px 24px rgba(0,0,0,.5);}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ─── ANIMATIONS ─────────────────────────────────────────── */
-@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.fu{animation:fu .3s ease both}
-.d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}
-.d4{animation-delay:.15s}.d5{animation-delay:.19s}.d6{animation-delay:.23s}
-.d7{animation-delay:.27s}.d8{animation-delay:.31s}.d9{animation-delay:.35s}
-.d10{animation-delay:.39s}.d11{animation-delay:.43s}
+.bn{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--gray2);position:relative}
+.bn i{font-size:20px}
+.bn.on{color:var(--pink)}
+.bn .dot{position:absolute;top:-2px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--pink)}
+.home-indicator{width:130px;height:5px;border-radius:5px;background:#fff;margin:6px auto 6px}
 </style>
 </head>
 <body>
+<div class="phone-wrap">
+<div class="phone">
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="logo">Dro</div>
-  <div class="search">
-    <i class="fas fa-search"></i>
-    <input id="sinput" placeholder="Search stories, writers…" autocomplete="off"/>
-    <i class="fas fa-times" id="sclear" style="color:var(--muted);font-size:12px;cursor:pointer;display:none"></i>
+  <div class="topbar">
+    <div class="logo">Dro<span class="b">Board</span></div>
+    <div class="top-right">
+      <div class="coin-pill"><span class="coin-ico">C</span>2,450</div>
+      <div class="bell-btn"><i class="fas fa-bell"></i><span class="bell-badge">9+</span></div>
+    </div>
   </div>
-  <div class="icon-btn" id="themeBtn" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></div>
-  <div class="icon-btn" onclick="toast('🔔 Notifications')">
-    <i class="fas fa-bell"></i>
-    <div class="ndot"></div>
+
+  <div class="stories">
+    <div class="story">
+      <div class="story-add"><i class="fas fa-plus"></i></div>
+      <div class="story-name">Add</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><img src="https://i.pravatar.cc/100?img=32" alt=""/></div>
+      <div class="story-name">@Ada_Writes</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><img src="https://i.pravatar.cc/100?img=68" alt=""/></div>
+      <div class="story-name">@Campfire&hellip;</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><img src="https://i.pravatar.cc/100?img=47" alt=""/></div>
+      <div class="story-name">@Ifeanyi_St&hellip;</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><img src="https://i.pravatar.cc/100?img=53" alt=""/></div>
+      <div class="story-name">@Dami_Reads</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><img src="https://i.pravatar.cc/100?img=44" alt=""/></div>
+      <div class="story-name">@Chiamaka_N</div>
+    </div>
   </div>
+
+  <div class="tabs">
+    <div class="tab on">Following <i class="fas fa-chevron-down"></i></div>
+    <div class="tab">For You</div>
+    <div class="tab">Latest</div>
+  </div>
+
+  <div class="feed" id="feed"></div>
+
+  <div class="bnav">
+    <div class="bn on"><i class="fas fa-house"></i>Home</div>
+    <div class="bn"><i class="fas fa-compass"></i>Discover</div>
+    <div class="bn"><i class="fas fa-magnifying-glass"></i>Search</div>
+    <div class="bn"><i class="far fa-comment"></i>Feed<span class="dot"></span></div>
+    <div class="bn"><i class="far fa-user"></i>Profile</div>
+  </div>
+  <div class="home-indicator"></div>
+
 </div>
-
-<!-- GENRE PILLS -->
-<div class="genre-bar">
-  <div class="gps" id="gps"></div>
 </div>
-
-<!-- BODY -->
-<div class="body" id="body">
-
-  <!-- 1. BANNER -->
-  <div class="fu d1" id="bannerSec">
-    <div class="banner-wrap"><div class="btk" id="btk"></div></div>
-    <div class="bdots" id="bdots"></div>
-  </div>
-
-  <!-- 2. POPULAR STORIES — 3-col, genre-filtered -->
-  <div class="section-block fu d2" id="popularSec">
-    <div class="sh">
-      <div class="sh-title line" id="popularTitle">Popular Stories</div>
-      <a class="sh-more" href="browse.html">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="g3" id="popularGrid"></div>
-  </div>
-
-  <!-- 3. STORY RANKINGS — 4-col -->
-  <div class="section-block fu d3">
-    <div class="sh">
-      <div class="sh-title line">Story Rankings</div>
-      <a class="sh-more" href="browse.html">Full list <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="rank-tabs" id="rankTabs"></div>
-    <div class="g4" id="rankGrid"></div>
-  </div>
-
-  <!-- 4. EDITOR'S PICKS -->
-  <div class="section-block fu d4">
-    <div class="sh">
-      <div class="sh-title"><div class="sh-icon">⭐</div>Editor's Picks</div>
-      <a class="sh-more" href="browse.html">More <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="ep-scroll" id="epScroll"></div>
-  </div>
-
-  <!-- 5. LIVE DEBATES -->
-  <div class="section-block fu d5">
-    <div class="sh">
-      <div class="sh-title line">Live Debates</div>
-      <a class="sh-more" href="browse.html">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="debate-grid" id="debateList"></div>
-  </div>
-
-  <!-- 6. BROWSE BY FEELING -->
-  <div class="section-block fu d6">
-    <div class="sh">
-      <div class="sh-title"><div class="sh-icon">😭</div>Browse by Feeling</div>
-      <a class="sh-more" href="browse.html">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="emo-pills" id="emoPills"></div>
-    <div class="g3" id="emoGrid"></div>
-  </div>
-
-  <!-- 7. GENRE SPOTLIGHT — 4-col, follows the active genre pill -->
-  <div class="section-block fu d7" id="spotlightSec">
-    <div class="sh">
-      <div class="sh-title line" id="spotlightTitle">🐺 Werewolf</div>
-      <a class="sh-more" href="browse.html">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="g4" id="spotlightGrid"></div>
-  </div>
-
-  <!-- 8. NEW RELEASES — 3-col, genre-filtered -->
-  <div class="section-block fu d8" id="newSec">
-    <div class="sh">
-      <div class="sh-title line" id="newTitle">New Releases</div>
-      <a class="sh-more" href="browse.html">Browse all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="g3" id="newGrid"></div>
-  </div>
-
-  <!-- 9. TOP WRITERS -->
-  <div class="section-block fu d9">
-    <div class="sh">
-      <div class="sh-title line">Top Writers</div>
-      <a class="sh-more" href="browse.html">All writers <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="writers-scroll" id="writersRow"></div>
-  </div>
-
-  <!-- 10. COLLECTIONS -->
-  <div class="section-block fu d10">
-    <div class="sh">
-      <div class="sh-title line">Collections</div>
-      <a class="sh-more" href="browse.html">See all <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
-    </div>
-    <div class="coll-scroll" id="collScroll"></div>
-  </div>
-
-  <!-- 11. BY COUNTRY — 4-col -->
-  <div class="section-block fu d11">
-    <div class="sh"><div class="sh-title line">Popular By Country</div></div>
-    <div class="flag-pills" id="flagPills"></div>
-    <div class="g4" id="countryGrid"></div>
-  </div>
-
-  <!-- SEARCH RESULTS -->
-  <div class="sr-wrap" id="srResults"></div>
-  <div class="sr-empty" id="srEmpty">
-    <div class="empty-ico">🔍</div>
-    <div class="empty-t">No results found</div>
-    <div class="empty-s">Try a different keyword, writer name or genre.</div>
-  </div>
-
-  <div style="height:20px"></div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bnav">
-  <div class="bn" onclick="location.href='index.html'"><i class="fas fa-house"></i>Home</div>
-  <div class="bn on"><i class="fas fa-compass"></i>Discover</div>
-  <div class="bn" onclick="sinput.focus()"><i class="fas fa-magnifying-glass"></i>Search</div>
-  <div class="bn" onclick="location.href='feed.html'"><i class="fas fa-rss"></i>Feed</div>
-  <div class="bn" onclick="location.href='profile.html'"><i class="fas fa-circle-user"></i>Profile</div>
-</div>
-
-<div class="toast" id="toastEl"></div>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   GENRES — order matters: All, Werewolf, Billionaire, then the rest.
-   Each has an emoji used across pills / section titles / badges.
-   ══════════════════════════════════════════════════════════════════ */
-const GENRES=[
-  {id:'all',        label:'All',         emoji:''},
-  {id:'werewolf',   label:'Werewolf',    emoji:'🐺'},
-  {id:'billionaire',label:'Billionaire', emoji:'💰'},
-  {id:'romance',    label:'Romance',     emoji:'💕'},
-  {id:'betrayal',   label:'Betrayal',    emoji:'💔'},
-  {id:'family',     label:'Family',      emoji:'👑'},
-  {id:'campus',     label:'Campus',      emoji:'🎓'},
-  {id:'revenge',    label:'Revenge',     emoji:'🔥'},
-  {id:'elegy',      label:'Elegy',       emoji:'🌙'},
-  {id:'twist',      label:'Twist',       emoji:'✨'},
-  {id:'comedy',     label:'Comedy',      emoji:'😂'},
-  {id:'dark',       label:'Dark',        emoji:'🖤'},
-  {id:'spiritual',  label:'Spiritual',   emoji:'🙏'},
-];
-const genreById = Object.fromEntries(GENRES.map(g=>[g.id,g]));
+const FEED_ITEMS = [
+  { type:'story', img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', title:"I came home early and caught my husband kissing my late sister's photograph",
+    author:'Ada Writes', av:'https://i.pravatar.cc/100?img=32', chapter:'Chapter 23', when:'Just now',
+    desc:'My body froze. He held the frame like someone begging forgiveness from a ghost.',
+    progress:68, likes:'24.3K', comments:'4.1K', saves:'2.8K' },
 
-/* ══════════════════════════════════════════════════════════════════
-   MASTER STORY DATASET — every card on this page (Popular, Spotlight,
-   New Releases, Search) reads from here so a genre tab filters the
-   whole page consistently instead of each section keeping its own
-   disconnected list.
-   ══════════════════════════════════════════════════════════════════ */
-const STORIES=[
-  // ── Werewolf (reuses the wolf cover art) ──
-  {id:'s-w1',genre:'werewolf',img:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',title:"I turned into a wolf on my own wedding night",author:'Nneka_Tales',av:'https://i.pravatar.cc/100?img=44',views:214000,badge:'hot',isNew:false},
-  {id:'s-w2',genre:'werewolf',img:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',title:"The rogue alpha who guarded the human girl",author:'Tolu_Writes',av:'https://i.pravatar.cc/100?img=51',views:158000,badge:'',isNew:true},
-  {id:'s-w3',genre:'werewolf',img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',title:"Chosen as his mate against my will",author:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',views:97000,badge:'new',isNew:true},
-  {id:'s-w4',genre:'werewolf',img:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',title:"My roommate disappears every full moon",author:'Nneka_Tales',av:'https://i.pravatar.cc/100?img=44',views:61000,badge:'',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/WF1j4Pnh/6.jpg', title:'Betrayed by the Mafia Prince',
+    author:'Marcus Webb Jr.', av:'https://i.pravatar.cc/100?img=15', chapter:'Chapter 8', when:'12m ago',
+    desc:'Dante trusted no one — until the one person he let in turned out to be working for the family that wants him dead.',
+    progress:34, likes:'18.7K', comments:'2.9K', saves:'1.6K' },
 
-  // ── Billionaire ──
-  {id:'s-b1',genre:'billionaire',img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',title:"My new driver secretly owned the company",author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:189000,badge:'hot',isNew:false},
-  {id:'s-b2',genre:'billionaire',img:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',title:"The contract marriage that turned real",author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:142000,badge:'',isNew:true},
-  {id:'s-b3',genre:'billionaire',img:'https://i.postimg.cc/cgLZJNmC/8.jpg',title:"I married the billionaire to save my father's hospital",author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:88000,badge:'new',isNew:true},
-  {id:'s-b4',genre:'billionaire',img:'https://i.postimg.cc/0MyxNqfz/7.jpg',title:"He was my billionaire boss, disguised as the intern",author:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',views:54000,badge:'',isNew:false},
+  { type:'story', img:'https://i.postimg.cc/fkdXzjS8/wolf.jpg', title:'Bound by the Ruthless Alpha',
+    author:'Chioma Okafor', av:'https://i.pravatar.cc/100?img=25', chapter:'Chapter 31', when:'40m ago',
+    desc:'Chained to an alpha who broke her trust once already, Amara must decide if loyalty is worth risking her heart again.',
+    progress:81, likes:'31.5K', comments:'5.4K', saves:'3.2K' },
 
-  // ── Romance ──
-  {id:'s-r1',genre:'romance',img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',title:"The runaway bride in her socked feet",author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',views:312000,badge:'hot',isNew:false},
-  {id:'s-r2',genre:'romance',img:'https://i.postimg.cc/0MyxNqfz/7.jpg',title:"He proposed with my best friend's ring",author:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',views:96000,badge:'',isNew:false},
-  {id:'s-r3',genre:'romance',img:'https://i.postimg.cc/cgLZJNmC/8.jpg',title:"The richest boy started sitting beside me",author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:134000,badge:'new',isNew:true},
+  { type:'ad', theme:'premium', tag:'SPONSORED', icon:'fa-crown',
+    title:'Unlock unlimited stories & perks', sub:'Go Premium and read without limits.',
+    perks:['Ad-free reading','Early chapter access','Exclusive stories'], cta:'Go Premium' },
 
-  // ── Betrayal ──
-  {id:'s-be1',genre:'betrayal',img:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',title:"Caught my husband kissing her photograph",author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:171000,badge:'',isNew:false},
-  {id:'s-be2',genre:'betrayal',img:'https://i.postimg.cc/JDzmhWqj/2.jpg',title:"She found his second phone at their anniversary dinner",author:'Ada_Writes',av:'https://i.pravatar.cc/100?img=32',views:171000,badge:'hot',isNew:false},
-  {id:'s-be3',genre:'betrayal',img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',title:"He deleted our anniversary photos the same night",author:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',views:96000,badge:'new',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/23WvkFLH/images-(2).jpg', title:"The CEO's Hidden Son",
+    author:'Luna Skye', av:'https://i.pravatar.cc/100?img=12', chapter:'Chapter 24', when:'1h ago',
+    desc:'One accidental meeting threatens to unravel a decade of carefully guarded secrets.',
+    progress:52, likes:'27.1K', comments:'3.8K', saves:'2.1K' },
 
-  // ── Family ──
-  {id:'s-f1',genre:'family',img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',title:"My grandmother's will revealed I wasn't blood",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',views:204000,badge:'free',isNew:false},
-  {id:'s-f2',genre:'family',img:'https://i.postimg.cc/DJwFzKgd/4.jpg',title:"My uncle claimed the inheritance using a stolen will",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',views:204000,badge:'new',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/tY7KnJyr/images.jpg', title:'The Runaway Bride in Socked Feet',
+    author:'Ifeanyi_Story', av:'https://i.pravatar.cc/100?img=53', chapter:'Chapter 22', when:'2h ago',
+    desc:'She walked out of her own wedding with nothing but her phone and a plan — but her new life comes with secrets of its own.',
+    progress:90, likes:'45.0K', comments:'6.7K', saves:'5.1K' },
 
-  // ── Campus ──
-  {id:'s-c1',genre:'campus',img:'https://i.postimg.cc/cgLZJNmC/8.jpg',title:"The richest boy chose the scholarship girl",author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:134000,badge:'new',isNew:true},
-  {id:'s-c2',genre:'campus',img:'https://i.postimg.cc/YGCkSw-33/1.jpg',title:"My roommate was secretly the lecturer's daughter",author:'CampusQueen',av:'https://i.pravatar.cc/100?img=12',views:77000,badge:'',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'The Letter He Never Sent',
+    author:'Efe_O', av:'https://i.pravatar.cc/100?img=22', chapter:'Chapter 15', when:'3h ago',
+    desc:'Ten years after he disappeared, a folded letter turns up in his old jacket pocket — and everything falls apart.',
+    progress:44, likes:'21.8K', comments:'3.6K', saves:'2.4K' },
 
-  // ── Revenge ──
-  {id:'s-v1',genre:'revenge',img:'https://i.postimg.cc/ftRZbhKx/3.jpg',title:"My stepmother stole my university fund",author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:192000,badge:'new',isNew:true},
-  {id:'s-v2',genre:'revenge',img:'https://i.postimg.cc/WF1j4Pnh/6.jpg',title:"I became his boss before I told him who I was",author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',views:128000,badge:'',isNew:false},
+  { type:'ad', theme:'coins', tag:'AD', icon:'fa-coins',
+    title:'Get 500 Bonus Coins', sub:'Limited time offer — top up today and unlock your next favorite chapter.',
+    perks:['Instant delivery','Use on any story','No expiry'], cta:'Buy Now' },
 
-  // ── Elegy ──
-  {id:'s-e1',genre:'elegy',img:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',title:"The letter he never sent",author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:218000,badge:'',isNew:false},
-  {id:'s-e2',genre:'elegy',img:'https://i.postimg.cc/N9jY0w4m/5.jpg',title:"The letter folded inside his old jacket pocket",author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:88000,badge:'',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/vDn9YLx5/wife2.jpg', title:'Caught Him Kissing Her Photograph',
+    author:'Ada_Writes', av:'https://i.pravatar.cc/100?img=32', chapter:'Chapter 19', when:'5h ago',
+    desc:"She came home early to celebrate their anniversary and found her husband kissing a photograph of a woman she'd never seen.",
+    progress:60, likes:'19.4K', comments:'2.7K', saves:'1.9K' },
 
-  // ── Twist ──
-  {id:'s-t1',genre:'twist',img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',title:"She left the altar in socked feet and opened a bakery",author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',views:312000,badge:'hot',isNew:false},
-
-  // ── Comedy ──
-  {id:'s-co1',genre:'comedy',img:'https://i.postimg.cc/YGCkSw-33/1.jpg',title:"My mother matched me with her own ex-boyfriend",author:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',views:41000,badge:'new',isNew:true},
-  {id:'s-co2',genre:'comedy',img:'https://i.postimg.cc/DJwFzKgd/4.jpg',title:"I accidentally proposed to the wrong sister",author:'Kemi_A',av:'https://i.pravatar.cc/100?img=28',views:33000,badge:'',isNew:true},
-
-  // ── Dark ──
-  {id:'s-d1',genre:'dark',img:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',title:"The basement my landlord told me never to open",author:'Nneka_Tales',av:'https://i.pravatar.cc/100?img=44',views:72000,badge:'new',isNew:true},
-  {id:'s-d2',genre:'dark',img:'https://i.postimg.cc/N9jY0w4m/5.jpg',title:"Every tenant before me disappeared in March",author:'Tolu_Writes',av:'https://i.pravatar.cc/100?img=51',views:39000,badge:'',isNew:true},
-
-  // ── Spiritual ──
-  {id:'s-sp1',genre:'spiritual',img:'https://i.postimg.cc/JDzmhWqj/2.jpg',title:"The prophet warned me three days before it happened",author:'Efe_O',av:'https://i.pravatar.cc/100?img=22',views:58000,badge:'new',isNew:true},
-  {id:'s-sp2',genre:'spiritual',img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',title:"My grandmother's prayers outlived her",author:'Chiamaka_N',av:'https://i.pravatar.cc/100?img=47',views:29000,badge:'',isNew:true},
+  { type:'story', img:'https://i.postimg.cc/DJwFzKgd/4.jpg', title:"My Grandmother's Will",
+    author:'Chiamaka_N', av:'https://i.pravatar.cc/100?img=44', chapter:'Chapter 27', when:'6h ago',
+    desc:"The will names her sole heir to a fortune she didn't know existed — on one condition.",
+    progress:76, likes:'22.6K', comments:'4.0K', saves:'2.5K' },
 ];
 
-function fmtViews(n){ return n>=1000 ? (n/1000).toFixed(n>=10000?0:1)+'k' : String(n); }
-function storiesForGenre(gid, {sortBy='views', limit}={}){
-  let list = gid==='all' ? STORIES.slice() : STORIES.filter(s=>s.genre===gid);
-  if (sortBy==='new') list = list.filter(s=>s.isNew).sort((a,b)=>b.views-a.views);
-  else list = list.sort((a,b)=>b.views-a.views);
-  return limit ? list.slice(0,limit) : list;
+function storyCardHtml(s){
+  return `
+  <div class="story-card" style="background-image:url('${s.img}')">
+    <div class="card-scrim"></div>
+    <div class="card-top-row">
+      <div class="new-badge"><i class="fas fa-bolt"></i>NEW CHAPTER</div>
+      <div class="card-more">&bull;&bull;&bull;</div>
+    </div>
+    <div class="action-rail">
+      <div class="rail-item"><i class="fas fa-heart rail-ico heart"></i><div class="rail-lbl">${s.likes}</div></div>
+      <div class="rail-item"><i class="far fa-comment rail-ico"></i><div class="rail-lbl">${s.comments}</div></div>
+      <div class="rail-item"><i class="far fa-bookmark rail-ico"></i><div class="rail-lbl">${s.saves}</div></div>
+      <div class="rail-item"><i class="fas fa-arrow-turn-up rail-ico" style="transform:rotate(90deg)"></i><div class="rail-lbl">Share</div></div>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${s.title}</div>
+      <div class="card-author-row">
+        <img class="card-author-av" src="${s.av}" alt=""/>
+        <div class="card-author-name">${s.author} <i class="fas fa-circle-check"></i></div>
+      </div>
+      <div class="card-chapter-row">${s.chapter} <span class="dot">&bull;</span> <span class="when">${s.when}</span></div>
+      <div class="card-desc">${s.desc}</div>
+      <div class="continue-btn">Continue Reading <i class="fas fa-book-open"></i></div>
+      <div class="progress-lbl">${s.progress}% complete</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${s.progress}%"></div></div>
+    </div>
+  </div>`;
 }
-
-/* ─── Everything else on the page (banner, rankings, editor's picks,
-   debates, feelings, writers, collections, country) is independently
-   curated — same pattern as a real discover feed, where those rows
-   are hand-picked rather than a raw genre filter. ─── */
-const BANNERS=[
-  {cover:'https://i.postimg.cc/tY7KnJyr/images.jpg',cat:'✨ TWIST',tag:'#1 THIS WEEK',title:'"I left the altar in my socked feet — and found my real life"',author:'Ifeanyi_Story',av:'https://i.pravatar.cc/100?img=53',reads:'312k',likes:'45k',id:'s-t1'},
-  {cover:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'🐺 WEREWOLF',tag:'TRENDING',title:'"Chosen as his mate against my will"',author:'Dami_Cole',av:'https://i.pravatar.cc/100?img=64',reads:'97k',likes:'14k',id:'s-w3'},
-  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💰 BILLIONAIRE',tag:'EDITOR PICK',title:'"My new driver secretly owned the company"',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'189k',likes:'31k',id:'s-b1'},
-  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',cat:'🔥 REVENGE',tag:'HOT',title:'"I became his boss before I told him who I was"',author:'Zara_M',av:'https://i.pravatar.cc/100?img=16',reads:'128k',likes:'22k',id:'s-v2'},
-];
-
-const RANK_TABS=['🔥 Hot','⭐ Top','🆕 New'];
-const RNC=['rn-g','rn-s','rn-b','rn-d','rn-d','rn-d','rn-d','rn-d'];
-
-const FEAT=[
-  {id:'s-b1',img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💰 BILLIONAIRE',title:"My new driver secretly owned the company",stat:'🔥 Top Rated'},
-  {id:'s-w3',img:'https://i.postimg.cc/MXBR6bfY/wolf3.jpg',cat:'🐺 WEREWOLF',title:'Chosen as his mate against my will',stat:'😱 41k Shocked'},
-  {id:'s-e1',img:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'🌙 ELEGY',title:'The letter folded inside his old jacket',stat:'💔 6k Heartbroken'},
-  {id:'s-f1',img:'https://i.postimg.cc/fkdXzjSj/wife.jpg',cat:'👑 FAMILY',title:"My grandmother's will — she left everything to me",stat:'🔥 Top Rated'},
-  {id:'s-t1',img:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'✨ TWIST',title:'She left the altar in socked feet and opened a bakery',stat:'😱 89k Shocked'},
-  {id:'s-v1',img:'https://i.postimg.cc/ftRZbhKx/3.jpg',cat:'🔥 REVENGE',title:'My stepmother stole my university fund — I exposed her',stat:'😡 22k Enraged'},
-  {id:'s-c1',img:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'🎓 CAMPUS',title:'The richest boy chose the scholarship girl',stat:'🥹 18k Emotional'},
-  {id:'s-be2',img:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'💔 BETRAYAL',title:'She found his second phone at their anniversary dinner',stat:'💔 31k Heartbroken'},
-];
-
-const DEBATES=[
-  {id:'s-be2',cover:'https://i.postimg.cc/JDzmhWqj/2.jpg',cat:'BETRAYAL',motion:'Ada should stay and fight for her marriage, not leave.',forV:2341,agV:3819,live:true},
-  {id:'s-t1',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'TWIST',motion:'Walking out publicly was brave, not dramatic.',forV:9800,agV:2100,live:true},
-  {id:'s-w3',cover:'https://i.postimg.cc/DJwFzKgd/4.jpg',cat:'WEREWOLF',motion:'She should have refused the mate bond entirely.',forV:5800,agV:900,live:false},
-  {id:'s-b1',cover:'https://i.postimg.cc/YGCkSw-33/1.jpg',cat:'BILLIONAIRE',motion:'He was right to test her before revealing the truth.',forV:3400,agV:5600,live:true},
-];
-
-const EMO_F=[
-  {e:'😭',lbl:'All Feels',val:'all'},{e:'💔',lbl:'Heartbreak',val:'heartbreak'},
-  {e:'😡',lbl:'Rage',val:'rage'},{e:'😱',lbl:'Shocked',val:'shocked'},
-  {e:'🥹',lbl:'Emotional',val:'emotional'},{e:'🔥',lbl:'Savage',val:'savage'},
-];
-const EMO_D={
-  all:['s-r1','s-e1','s-f1','s-v1','s-be2','s-c1'],
-  heartbreak:['s-be3','s-be2','s-e2'],
-  rage:['s-v1','s-be2','s-f2'],
-  shocked:['s-t1','s-w3','s-d1'],
-  emotional:['s-e1','s-f1','s-sp2'],
-  savage:['s-t1','s-v2','s-c1'],
-};
-function idsToStories(ids){ return ids.map(id=>STORIES.find(s=>s.id===id)).filter(Boolean); }
-
-const WRITERS=[
-  {name:'Ada_Writes',genre:'💔 Betrayal',av:'https://i.pravatar.cc/100?img=32',statusRing:'has-new',badge:'live'},
-  {name:'Ifeanyi_Story',genre:'✨ Twist',av:'https://i.pravatar.cc/100?img=53',statusRing:'has-new',badge:'new'},
-  {name:'Nneka_Tales',genre:'🐺 Werewolf',av:'https://i.pravatar.cc/100?img=44',statusRing:'has-new',badge:'live'},
-  {name:'Chiamaka_N',genre:'👑 Family',av:'https://i.pravatar.cc/100?img=47',statusRing:'has-viewed',badge:''},
-  {name:'Zara_M',genre:'💰 Billionaire',av:'https://i.pravatar.cc/100?img=16',statusRing:'has-viewed',badge:''},
-  {name:'Efe_O',genre:'🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',statusRing:'no-status',badge:''},
-  {name:'CampusQueen',genre:'🎓 Campus',av:'https://i.pravatar.cc/100?img=12',statusRing:'has-new',badge:''},
-  {name:'Tolu_Writes',genre:'🖤 Dark',av:'https://i.pravatar.cc/100?img=51',statusRing:'no-status',badge:'new'},
-];
-
-const COLLS=[
-  {name:'Werewolf Starter Pack',count:12,curator:'Nneka_Tales',covers:['https://i.postimg.cc/fkdXzjS8/wolf.jpg','https://i.postimg.cc/xqmHfyNR/wolf2.jpg','https://i.postimg.cc/MXBR6bfY/wolf3.jpg','https://i.postimg.cc/fkdXzjS8/wolf.jpg']},
-  {name:'Billionaire Romance Binge',count:9,curator:'Zara_M',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/cgLZJNmC/8.jpg','https://i.postimg.cc/0MyxNqfz/7.jpg']},
-  {name:'Stories That Wrecked Me',count:14,curator:'Chioma_R',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/23WvkFLH/images-(2).jpg','https://i.postimg.cc/fkdXzjSj/wife.jpg']},
-  {name:'Best Plot Twists 2025',count:8,curator:'Ada_Writes',covers:['https://i.postimg.cc/WF1j4Pnh/6.jpg','https://i.postimg.cc/ftRZbhKx/3.jpg','https://i.postimg.cc/cgLZJNmC/8.jpg','https://i.postimg.cc/0MyxNqfz/7.jpg']},
-  {name:'2am Crying Material',count:11,curator:'Kemi_A',covers:['https://i.postimg.cc/23WvkFLH/images-(2).jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/JDzmhWqj/2.jpg','https://i.postimg.cc/fkdXzjSj/wife.jpg']},
-];
-
-const COUNTRIES=[
-  {flag:'🇳🇬',name:'Nigeria',code:'ng'},{flag:'🇬🇭',name:'Ghana',code:'gh'},
-  {flag:'🇰🇪',name:'Kenya',code:'ke'},{flag:'🇿🇦',name:'S.Africa',code:'za'},{flag:'🇺🇬',name:'Uganda',code:'ug'},
-];
-const C_IDS={
-  ng:['s-r1','s-e1','s-f1','s-v1','s-be2','s-c1','s-w3','s-b1'],
-  gh:['s-b1','s-w3','s-c1','s-be2','s-v1','s-f1','s-e1','s-r1'],
-  ke:['s-r1','s-e1','s-f1','s-v1'],
-  za:['s-t1','s-be1','s-f1','s-v2'],
-  ug:['s-r1','s-e1','s-f1','s-v1','s-be2','s-c1'],
-};
-
-/* ─── UTILS ──────────────────────────────────────────────── */
-function toast(m){const t=document.getElementById('toastEl');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);}
-function fmt(n){return typeof n==='number'?fmtViews(n):n;}
-function goProfile(e){e.preventDefault();e.stopPropagation();location.href='profile.html'}
-function goStatus(e){e.preventDefault();e.stopPropagation();toast('📸 Viewing status…')}
-function storyHref(id){return 'story.html?story='+encodeURIComponent(id);}
-
-/* ─── 3-col SC CARD builder ──────────────────────────────── */
-function sc(s){
-  const bc=s.badge==='hot'?'badge-hot':s.badge==='free'?'badge-free':s.badge==='new'?'badge-new':'';
-  const av=s.av||'https://i.pravatar.cc/100?img=32';
-  return`<a class="sc" href="${storyHref(s.id)}">
-    <div class="sc-cover">
-      <img src="${s.img}" loading="lazy" alt=""/>
-      <div class="sc-scrim"></div>
-      ${s.badge?`<div class="sc-badge ${bc}">${s.badge.toUpperCase()}</div>`:''}
-    </div>
-    <div class="sc-views-row"><span class="sc-views"><i class="fas fa-eye" style="font-size:6px;margin-right:2px"></i>${fmt(s.views)}</span></div>
-    <div class="sc-title-wrap"><div class="sc-title">${s.title}</div></div>
-    <div class="sc-author-row">
-      <img class="sc-av" src="${av}" loading="lazy" alt="" onclick="goStatus(event)"/>
-      <span class="sc-sub" onclick="goProfile(event)">@${s.author}</span>
-    </div>
-  </a>`;
-}
-
-/* ─── 4-col SC4 CARD builder ─────────────────────────────── */
-function sc4(s, rankIdx){
-  const bc=s.badge==='hot'?'badge-hot':s.badge==='new'?'badge-new':'';
-  const av=s.av||'https://i.pravatar.cc/100?img=32';
-  let rankHtml='';
-  if(rankIdx!==undefined){ rankHtml=`<div class="sc4-rank ${RNC[rankIdx]||'rn-d'}">${rankIdx+1}</div>`; }
-  return`<a class="sc4" href="${storyHref(s.id)}">
-    <div class="sc4-cover">
-      <img src="${s.img}" loading="lazy" alt=""/>
-      <div class="sc4-scrim"></div>
-      ${rankHtml}
-      ${s.badge?`<div class="sc4-badge ${bc}">${s.badge.toUpperCase()}</div>`:''}
-    </div>
-    <div class="sc4-views-row"><span class="sc4-views"><i class="fas fa-eye" style="font-size:6px;margin-right:2px"></i>${fmt(s.views)}</span></div>
-    <div class="sc4-title-wrap"><div class="sc4-title">${s.title}</div></div>
-    <div class="sc4-author-row">
-      <img class="sc4-av" src="${av}" loading="lazy" alt=""/>
-      <span class="sc4-sub">@${s.author}</span>
-    </div>
-  </a>`;
-}
-function emptyStateHtml(genreLabel, msg){
-  return `<div class="section-empty" style="grid-column:1/-1">
-    <i class="fas fa-book-open"></i>
-    <p>${msg || ('No '+genreLabel+' stories yet — check back soon.')}</p>
+function adCardHtml(a){
+  return `
+  <div class="ad-card ${a.theme}">
+    <div class="ad-tag">${a.tag}</div>
+    <div class="ad-ico"><i class="fas ${a.icon}"></i></div>
+    <div class="ad-title">${a.title}</div>
+    <div class="ad-sub">${a.sub}</div>
+    <div class="ad-list">${a.perks.map(p=>`<div><i class="fas fa-check"></i>${p}</div>`).join('')}</div>
+    <div class="ad-btn ${a.theme==='premium'?'premium-btn':'coins-btn'}">${a.cta} <i class="fas fa-arrow-right"></i></div>
   </div>`;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   GENRE PILLS — actually filter the page
-   ══════════════════════════════════════════════════════════════════ */
-let activeGenre = 'all';
-document.getElementById('gps').innerHTML = GENRES.map(g=>
-  `<div class="gp${g.id==='all'?' on':''}" data-genre="${g.id}" onclick="setGenre('${g.id}')">${g.emoji?g.emoji+' ':''}${g.label}</div>`).join('');
-
-function setGenre(gid){
-  activeGenre = gid;
-  document.querySelectorAll('.gp').forEach(p=>p.classList.toggle('on', p.dataset.genre===gid));
-  renderPopular();
-  renderSpotlight();
-  renderNewReleases();
-  const g = genreById[gid];
-  toast(gid==='all' ? '📚 Showing everything' : `${g.emoji} ${g.label}`);
-}
-
-function renderPopular(){
-  const list = storiesForGenre(activeGenre, {sortBy:'views', limit:6});
-  document.getElementById('popularTitle').textContent = activeGenre==='all' ? 'Popular Stories' : `Popular in ${genreById[activeGenre].label}`;
-  const grid = document.getElementById('popularGrid');
-  grid.innerHTML = list.length ? list.map(sc).join('') : emptyStateHtml(genreById[activeGenre].label);
-}
-
-function renderSpotlight(){
-  // "All" defaults the spotlight to the flagship genre (Werewolf)
-  const gid = activeGenre==='all' ? 'werewolf' : activeGenre;
-  const g = genreById[gid];
-  document.getElementById('spotlightTitle').innerHTML = `${g.emoji} ${g.label}`;
-  const list = storiesForGenre(gid, {sortBy:'views', limit:8});
-  document.getElementById('spotlightGrid').innerHTML = list.length ? list.map((s,i)=>sc4(s)).join('') : emptyStateHtml(g.label);
-}
-
-function renderNewReleases(){
-  const list = storiesForGenre(activeGenre, {sortBy:'new', limit:6});
-  document.getElementById('newTitle').textContent = activeGenre==='all' ? 'New Releases' : `New in ${genreById[activeGenre].label}`;
-  const grid = document.getElementById('newGrid');
-  grid.innerHTML = list.length ? list.map(sc).join('') : emptyStateHtml(genreById[activeGenre].label, 'Nothing new here yet — you\'re all caught up.');
-}
-
-/* ─── BANNER ─────────────────────────────────────────────── */
-let bIdx=0,bTimer=null;
-(function(){
-  const tk=document.getElementById('btk'),dots=document.getElementById('bdots');
-  tk.innerHTML=BANNERS.map(b=>`
-    <div class="bslide" style="background-image:url('${b.cover}')" onclick="location.href='${storyHref(b.id)}'">
-      <div class="bscrim"></div>
-      <button class="bcta" onclick="event.stopPropagation();location.href='${storyHref(b.id)}'">Read Now</button>
-      <div class="bcontent">
-        <div class="btags"><span class="btag btag-r">${b.cat}</span><span class="btag btag-m">${b.tag}</span></div>
-        <div class="btitle">${b.title}</div>
-        <div class="bmeta">
-          <img class="bav" src="${b.av}" loading="lazy" alt="" onclick="goStatus(event)"/>
-          <span class="bauthor" onclick="goProfile(event)">@${b.author}</span>
-          <div class="bstats">
-            <span class="bstat"><i class="fas fa-eye" style="font-size:7px"></i>${b.reads}</span>
-            <span class="bstat"><i class="fas fa-heart" style="font-size:7px"></i>${b.likes}</span>
-          </div>
-        </div>
-      </div>
-    </div>`).join('');
-  dots.innerHTML=BANNERS.map((_,i)=>`<button class="bdot${i===0?' on':''}" data-i="${i}"></button>`).join('');
-  dots.querySelectorAll('.bdot').forEach(d=>d.addEventListener('click',()=>goBanner(+d.dataset.i)));
-  startBanner();
-  let sx=0;
-  document.getElementById('bannerSec').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;clearTimeout(bTimer);},{passive:true});
-  document.getElementById('bannerSec').addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>40)goBanner(dx<0?(bIdx+1)%BANNERS.length:(bIdx-1+BANNERS.length)%BANNERS.length);
-    else startBanner();
-  },{passive:true});
-})();
-function goBanner(i){
-  bIdx=i;
-  document.getElementById('btk').style.transform=`translateX(-${i*100}%)`;
-  document.querySelectorAll('.bdot').forEach((d,j)=>d.classList.toggle('on',j===i));
-  clearTimeout(bTimer);startBanner();
-}
-function startBanner(){bTimer=setTimeout(()=>goBanner((bIdx+1)%BANNERS.length),4200)}
-
-/* ─── RANKINGS — 4-col (curated, tab-switchable) ────────── */
-const RANK_SETS = {
-  0: storiesForGenre('all',{sortBy:'views',limit:8}),                          // 🔥 Hot
-  1: STORIES.slice().sort((a,b)=>b.views-a.views).slice(0,8),                  // ⭐ Top
-  2: storiesForGenre('all',{sortBy:'new',limit:8}),                            // 🆕 New
-};
-let aRT=0;
-document.getElementById('rankTabs').innerHTML=RANK_TABS.map((t,i)=>`<div class="rtab${i===0?' on':''}" onclick="setRT(${i})">${t}</div>`).join('');
-function setRT(i){ aRT=i; document.querySelectorAll('.rtab').forEach((t,j)=>t.classList.toggle('on',j===i)); renderRG(); }
-function renderRG(){ document.getElementById('rankGrid').innerHTML=(RANK_SETS[aRT]||[]).map((s,i)=>sc4(s,i)).join(''); }
-renderRG();
-
-/* ─── EDITOR'S PICKS ────────────────────────────────────── */
-document.getElementById('epScroll').innerHTML=FEAT.map(s=>`
-  <a class="ep-card" href="${storyHref(s.id)}">
-    <img src="${s.img}" loading="lazy" alt=""/>
-    <div class="ep-card-scrim"></div>
-    <div class="ep-cat">${s.cat}</div>
-    <div class="ep-content"><div class="ep-title">${s.title}</div><div class="ep-stat">${s.stat}</div></div>
-  </a>`).join('');
-
-/* ─── DEBATES ────────────────────────────────────────────── */
-document.getElementById('debateList').innerHTML=DEBATES.map(d=>{
-  const tot=(d.forV+d.agV)||1,fp=Math.round(d.forV/tot*100),ap=100-fp;
-  return`<div class="dc" onclick="location.href='${storyHref(d.id)}'">
-    <div class="dc-thumb">
-      <img src="${d.cover}" loading="lazy" alt=""/><div class="dc-thumb-scrim"></div>
-      <div class="dc-badges">${d.live?`<span class="db db-live"><span class="db-pulse"></span>LIVE</span>`:''}<span class="db db-cat">${d.cat}</span></div>
-    </div>
-    <div class="dc-body">
-      <div class="dc-motion">"${d.motion}"</div>
-      <div class="dc-sides">
-        <div class="dside for"><div class="dside-bar" style="width:${fp}%"></div><div class="dside-inner"><span class="dside-lbl">✅ FOR</span><span class="dside-pct">${fp}%</span></div></div>
-        <div class="dside against"><div class="dside-bar" style="width:${ap}%"></div><div class="dside-inner"><span class="dside-lbl">❌ AGAINST</span><span class="dside-pct">${ap}%</span></div></div>
-      </div>
-    </div>
-    <div class="dc-footer">
-      <span class="dc-total"><i class="fas fa-fire" style="color:var(--muted);font-size:8px"></i>${fmt(d.forV+d.agV)}</span>
-      <button class="dc-join" onclick="event.stopPropagation();toast('💬 Joining debate…')">Join →</button>
-    </div>
-  </div>`;
+document.getElementById('feed').innerHTML = FEED_ITEMS.map((item,i)=>{
+  const html = item.type==='story' ? storyCardHtml(item) : adCardHtml(item);
+  const divider = i < FEED_ITEMS.length-1 ? '<div class="feed-divider"></div>' : '';
+  return html + divider;
 }).join('');
-
-/* ─── EMO FEELING ────────────────────────────────────────── */
-document.getElementById('emoPills').innerHTML=EMO_F.map(f=>`<div class="emo-pill${f.val==='all'?' on':''}" onclick="setEmo(this,'${f.val}')">${f.e} ${f.lbl}</div>`).join('');
-function setEmo(el,val){
-  document.querySelectorAll('.emo-pill').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('emoGrid').innerHTML=idsToStories(EMO_D[val]||EMO_D.all).map(sc).join('');
-}
-document.getElementById('emoGrid').innerHTML=idsToStories(EMO_D.all).map(sc).join('');
-
-/* ─── GENRE SPOTLIGHT + NEW RELEASES + POPULAR — initial paint ─── */
-renderPopular();
-renderSpotlight();
-renderNewReleases();
-
-/* ─── TOP WRITERS ────────────────────────────────────────── */
-document.getElementById('writersRow').innerHTML=WRITERS.map(w=>`
-  <div class="wc">
-    <div class="wc-ring-w">
-      <div class="wc-ring ${w.statusRing}" onclick="goStatus(event)"><div class="wc-inner"><img src="${w.av}" loading="lazy" alt=""/></div></div>
-      ${w.badge==='new'?'<div class="wc-badge wb-new">NEW</div>':w.badge==='live'?'<div class="wc-badge wb-live">LIVE</div>':''}
-    </div>
-    <div class="wc-name" onclick="location.href='profile.html'">@${w.name.split('_')[0]}</div>
-    <div class="wc-genre">${w.genre}</div>
-  </div>`).join('');
-
-/* ─── COLLECTIONS ────────────────────────────────────────── */
-document.getElementById('collScroll').innerHTML=COLLS.map(c=>`
-  <div class="coll-card" onclick="toast('📚 Opening collection…')">
-    <div class="coll-covers">${c.covers.slice(0,4).map(img=>`<div class="coll-cover" style="background-image:url('${img}')"></div>`).join('')}</div>
-    <div class="coll-info">
-      <div class="coll-name">${c.name}</div>
-      <div class="coll-meta">${c.count} stories · @${c.curator}</div>
-      <div class="coll-pub">🌍 Public</div>
-    </div>
-  </div>`).join('');
-
-/* ─── COUNTRY — 4-col ───────────────────────────────────── */
-document.getElementById('flagPills').innerHTML=COUNTRIES.map(c=>`<div class="fpill${c.code==='ng'?' on':''}" onclick="setCountry(this,'${c.code}')">${c.flag} ${c.name}</div>`).join('');
-function setCountry(el,code){
-  document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('on',p===el));
-  document.getElementById('countryGrid').innerHTML=idsToStories(C_IDS[code]||[]).map(s=>sc4(s)).join('');
-}
-document.getElementById('countryGrid').innerHTML=idsToStories(C_IDS.ng).map(s=>sc4(s)).join('');
-
-/* ─── SEARCH (against the full master dataset) ──────────── */
-const sinput=document.getElementById('sinput'),sclear=document.getElementById('sclear');
-const srR=document.getElementById('srResults'),srE=document.getElementById('srEmpty');
-let mainNodes=[];
-setTimeout(()=>{ const b=document.getElementById('body'); mainNodes=[...b.children].filter(n=>n.id!=='srResults'&&n.id!=='srEmpty'); },200);
-function showMain(){ mainNodes.forEach(n=>n.style.display=''); srR.classList.remove('show'); srE.classList.remove('show'); sclear.style.display='none'; }
-function runSearch(q){
-  q=q.trim().toLowerCase(); if(!q){showMain();return;}
-  sclear.style.display='block';
-  mainNodes.forEach(n=>n.style.display='none');
-  srR.classList.remove('show'); srE.classList.remove('show');
-  const hits=STORIES.filter(s=>
-    s.title.toLowerCase().includes(q) ||
-    s.author.toLowerCase().includes(q) ||
-    genreById[s.genre].label.toLowerCase().includes(q));
-  if(!hits.length){ srE.classList.add('show'); return; }
-  srR.classList.add('show');
-  srR.innerHTML=hits.map(s=>`
-    <a class="sr-card" href="${storyHref(s.id)}">
-      <img class="sr-img" src="${s.img}" loading="lazy" alt=""/>
-      <div class="sr-info">
-        <div class="sr-cat">${genreById[s.genre].emoji} ${genreById[s.genre].label}</div>
-        <div class="sr-title">${s.title}</div>
-        <div class="sr-meta">@${s.author} · <i class="fas fa-eye" style="font-size:9px"></i> ${fmt(s.views)}</div>
-      </div>
-    </a>`).join('');
-}
-sinput.addEventListener('input',e=>runSearch(e.target.value));
-sclear.addEventListener('click',()=>{sinput.value='';showMain();sinput.focus();});
-
-/* ─── THEME TOGGLE (fixed: single compact icon button, no orphaned UI) ─── */
-(function(){
-  const saved = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  const btn = document.getElementById('themeBtn');
-  const icon = document.getElementById('themeIcon');
-  function paint(theme){ icon.className = theme==='dark' ? 'fas fa-moon' : 'fas fa-sun'; }
-  paint(saved);
-  btn.addEventListener('click', ()=>{
-    const next = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    paint(next);
-  });
-})();
 </script>
 </body>
 </html>

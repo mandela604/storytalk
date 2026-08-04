@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<meta name="theme-color" content="#f7f7f8"/>
+<title>DroBoard · Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — aligned with discover.html + feed.html
+   Light (white) is default. Dark via body.theme-dark.
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --pink:#ff2d55;
+  --pink-deep:#C2185B;
+  --pink-soft:rgba(255,45,85,.08);
+  --pink-mid:rgba(255,45,85,.14);
+  --pink-border:rgba(255,45,85,.28);
+
+  --purple:#7C3AED;
+  --purple-soft:#F1EBFF;
+  --blue:#3B82F6;
+  --blue-soft:#E9F0FE;
+  --green:#10B981;
+  --green-soft:#E8FBF3;
+  --orange:#F59E0B;
+  --orange-soft:#FEF3E2;
+  --gold:#d97706;
+
+  --bg:#f7f7f8;
+  --bg2:#f0f0f2;
+  --card:#ffffff;
+  --surface:#f5f5f7;
+  --ink:#1a1a1a;
+  --ink-2:#3A3650;
+  --muted:#8e8e93;
+  --muted2:#aeaeb2;
+  --line:#ebebed;
+  --line2:rgba(0,0,0,.04);
+
+  --font-d:'Manrope',sans-serif;
+  --font-b:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --shadow-card:0 1px 2px rgba(23,21,34,.04),0 6px 18px rgba(23,21,34,.05);
+  --r:14px;
+  --r-sm:10px;
+  --r-pill:999px;
+  --topbar:52px;
+  --dock:68px;
+  --safe-b:env(safe-area-inset-bottom,16px);
+}
+
+/* Dark theme */
+body.theme-dark{
+  --bg:#0e0e12;
+  --bg2:#16161c;
+  --card:#16161c;
+  --surface:#1c1c24;
+  --ink:#f5f5f7;
+  --ink-2:#c8c8d0;
+  --muted:#8e8e93;
+  --muted2:#636366;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(255,255,255,.05);
+  --pink-soft:rgba(255,45,85,.12);
+  --pink-mid:rgba(255,45,85,.18);
+  --shadow-card:0 1px 2px rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.25);
+}
+body.theme-dark .topbar,
+body.theme-dark .dock{background:rgba(14,14,18,.96)}
+body.theme-dark .hero-scrim{
+  background:linear-gradient(0deg,rgba(14,14,18,.98) 0%,rgba(14,14,18,.55) 42%,rgba(14,14,18,.12) 100%);
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--font-b);overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+img{display:block;user-select:none}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;height:var(--topbar);
+  background:rgba(247,247,248,.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  transition:background .25s;
+}
+.tb-back,.tb-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--ink-2);flex-shrink:0;
+  box-shadow:var(--shadow-card);transition:transform .15s;
+}
+.tb-back:active,.tb-btn:active{transform:scale(.92)}
+.tb-title{
+  flex:1;font-family:var(--font-d);font-size:13px;font-weight:800;
+  color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transition:opacity .25s;
+}
+.tb-title.vis{opacity:1}
+.tb-actions{display:flex;gap:8px;align-items:center}
+.tb-btn.saved{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+#tbLikeWrap .drp-trigger{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line);
+  justify-content:center;padding:0;gap:0;box-shadow:var(--shadow-card);
+}
+#tbLikeWrap .drp-trigger.liked{background:var(--pink-soft);border-color:var(--pink-border);color:var(--pink)}
+#tbLikeWrap .drp-like-count,#tbLikeWrap .drp-top3{display:none}
+
+/* ── SCROLL BODY ── */
+.scroll-body{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding-bottom:calc(var(--dock) + var(--safe-b));
+  height:calc(100vh - var(--topbar));
+}
+.scroll-body::-webkit-scrollbar{display:none}
+
+/* ── HERO ── */
+.hero{position:relative;height:260px;overflow:hidden;margin:0 0 0}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 25%}
+.hero-scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(247,247,248,.98) 0%,rgba(247,247,248,.4) 45%,rgba(0,0,0,.15) 100%);
+}
+body.theme-dark .hero-scrim{
+  background:linear-gradient(0deg,rgba(14,14,18,.98) 0%,rgba(14,14,18,.55) 42%,rgba(14,14,18,.12) 100%);
+}
+.hero-top{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:6px;flex-wrap:wrap;z-index:4}
+.hbadge{
+  font-size:10px;font-weight:800;padding:4px 10px;border-radius:var(--r-pill);
+  display:inline-flex;align-items:center;gap:4px;letter-spacing:.02em;
+}
+.hb-cat{background:var(--pink);color:#fff}
+.hb-type{background:rgba(255,255,255,.85);color:var(--ink-2);border:1px solid var(--line)}
+body.theme-dark .hb-type{background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2)}
+.hb-series{background:rgba(59,130,246,.9);color:#fff}
+.hero-body{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:14px 16px 18px}
+.hero-title{
+  font-family:var(--font-d);font-size:20px;font-weight:900;line-height:1.25;
+  color:var(--ink);margin-bottom:12px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.hero-writer{display:flex;align-items:center;gap:10px}
+.hw-av-ring{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  padding:2px;flex-shrink:0;cursor:pointer;
+}
+.hw-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111}
+.hw-av-inner img{width:100%;height:100%;object-fit:cover}
+.hw-info{flex:1;min-width:0}
+.hw-name{font-size:13px;font-weight:700;color:var(--ink);cursor:pointer}
+.hw-handle{font-size:11px;color:var(--muted)}
+.hw-follow{
+  background:var(--card);border:1px solid var(--line);color:var(--ink);
+  padding:6px 14px;border-radius:var(--r-pill);font-size:11px;font-weight:700;
+  box-shadow:var(--shadow-card);transition:.15s;white-space:nowrap;
+}
+.hw-follow.ing{background:var(--pink);border-color:var(--pink);color:#fff}
+.hw-follow:active{transform:scale(.96)}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  display:flex;background:var(--card);border-bottom:1px solid var(--line);
+  margin:0;box-shadow:var(--shadow-card);
+}
+.stat-cell{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:14px 6px;border-right:1px solid var(--line);cursor:pointer;gap:3px;
+}
+.stat-cell:last-child{border-right:none}
+.stat-cell:active{background:var(--bg2)}
+.sn{font-size:15px;font-weight:800;line-height:1;color:var(--ink)}
+.sn.acc{color:var(--pink)}
+.sn.gold{color:var(--gold)}
+.sl{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+
+/* ── SECTION ── */
+.sec{padding:18px 16px 0}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{
+  font-family:var(--font-d);font-size:16px;font-weight:800;color:var(--ink);
+  display:flex;align-items:center;gap:8px;
+}
+.sec-icon{
+  width:28px;height:28px;border-radius:8px;background:var(--pink-soft);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.sec-more{
+  font-size:11px;font-weight:700;color:var(--pink);
+  background:var(--pink-soft);padding:5px 11px;border-radius:var(--r-pill);cursor:pointer;
+}
+.divider{height:1px;background:var(--line);margin:18px 16px 0}
+
+/* ── SYNOPSIS ── */
+.synopsis-box{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 15px;box-shadow:var(--shadow-card);
+}
+.synopsis-text{font-size:13.5px;line-height:1.7;color:var(--ink-2);font-style:normal}
+.synopsis-more{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:700;color:var(--pink);margin-top:8px;cursor:pointer;
+}
+
+/* ── ENGAGEMENT ── */
+.eng-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.eng-row::-webkit-scrollbar{display:none}
+.eng-pill{
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:var(--r);cursor:pointer;
+  border:1px solid var(--line);background:var(--card);
+  box-shadow:var(--shadow-card);transition:all .18s;
+}
+.eng-pill:active{transform:scale(.97)}
+.eng-pill.active-poll{border-color:rgba(59,130,246,.35);background:var(--blue-soft)}
+.eng-pill.active-debate{border-color:var(--pink-border);background:var(--pink-soft)}
+.eng-pill.active-pred{border-color:rgba(124,58,237,.3);background:var(--purple-soft)}
+.ep-emoji{font-size:18px}
+.ep-body{display:flex;flex-direction:column;gap:1px}
+.ep-label{font-size:11px;font-weight:800;color:var(--ink)}
+.ep-sub{font-size:10px;color:var(--muted);font-weight:600}
+.eng-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;margin-top:10px;display:none;box-shadow:var(--shadow-card);
+}
+.eng-card.open{display:block}
+.ec-header{padding:12px 14px 10px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:8px}
+.ec-badge{font-size:9px;font-weight:800;padding:3px 9px;border-radius:var(--r-pill);flex-shrink:0;margin-top:2px}
+.ec-badge.poll{background:var(--blue-soft);color:var(--blue)}
+.ec-badge.debate{background:var(--pink-soft);color:var(--pink)}
+.ec-badge.pred{background:var(--purple-soft);color:var(--purple)}
+.ec-q{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.4;flex:1}
+.ec-opts{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.ec-opt{
+  position:relative;border-radius:var(--r-sm);padding:11px 13px;cursor:pointer;overflow:hidden;
+  border:1.5px solid var(--line);background:var(--surface);transition:border-color .2s;
+}
+.ec-opt.voted{border-color:var(--pink)}
+.ec-opt-bar{position:absolute;left:0;top:0;bottom:0;background:var(--pink-soft);transition:width .5s ease;z-index:0}
+.ec-opt-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ec-opt-text{font-size:13px;font-weight:600;color:var(--ink)}
+.ec-opt-pct{font-size:12px;font-weight:800;color:var(--pink)}
+.ec-footer{padding:9px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.ec-total{font-size:11px;color:var(--muted);font-weight:600}
+.ec-share{font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;display:flex;align-items:center;gap:4px}
+.debate-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px}
+.d-side{
+  border-radius:var(--r-sm);padding:14px 10px;cursor:pointer;
+  border:1.5px solid var(--line);background:var(--surface);text-align:center;transition:all .2s;
+}
+.d-side.for.chosen{border-color:rgba(16,185,129,.4);background:var(--green-soft)}
+.d-side.against.chosen{border-color:var(--pink-border);background:var(--pink-soft)}
+.d-emoji{font-size:20px;margin-bottom:4px}
+.d-label{font-size:11px;font-weight:800;margin-bottom:6px}
+.d-side.for .d-label{color:var(--green)}
+.d-side.against .d-label{color:var(--pink)}
+.d-bar-bg{height:4px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.d-bar{height:100%;border-radius:3px}
+.d-side.for .d-bar{background:var(--green)}
+.d-side.against .d-bar{background:var(--pink)}
+.d-pct{font-size:13px;font-weight:900;color:var(--ink)}
+.d-count{font-size:10px;color:var(--muted);margin-top:2px}
+.d-total{padding:0 14px 8px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:livep 1.3s ease-in-out infinite;flex-shrink:0}
+@keyframes livep{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+
+/* ── TIP LINE ── */
+.tip-line{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-pill);
+  padding:11px 16px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2);
+  box-shadow:var(--shadow-card);transition:.15s;
+}
+.tip-line:active{transform:scale(.98)}
+.tip-line i{color:var(--gold);font-size:14px}
+.tip-line b{color:var(--ink)}
+
+/* ── REACTIONS (read-only) ── */
+.rx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rx-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
+  box-shadow:var(--shadow-card);cursor:default;
+}
+.rx-card.picked{border-color:var(--pink-border);background:var(--pink-soft)}
+.rx-e{font-size:22px;line-height:1}
+.rx-l{font-size:9px;font-weight:700;color:var(--muted)}
+.rx-n{font-size:11px;font-weight:800;color:var(--ink)}
+.rx-card.picked .rx-n{color:var(--pink)}
+
+/* ── HUBS ── */
+.hub-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;cursor:pointer;box-shadow:var(--shadow-card);transition:.15s;margin-bottom:10px;
+}
+.hub-card:active{transform:scale(.99)}
+.hub-icon{
+  width:46px;height:46px;border-radius:12px;background:var(--pink-soft);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.hub-icon.circle-icon{border-radius:50%;overflow:hidden;background:var(--bg2);border:2px solid var(--gold);padding:0}
+.hub-icon.circle-icon img{width:100%;height:100%;object-fit:cover}
+.hub-body{flex:1;min-width:0}
+.hub-name{font-size:13.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:5px}
+.hub-sub{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:4px}
+.hub-join-btn{
+  flex-shrink:0;background:var(--bg2);color:var(--ink);border:1px solid var(--line);
+  padding:8px 14px;border-radius:var(--r-pill);font-size:11px;font-weight:800;transition:.18s;
+}
+.hub-join-btn.joined{background:var(--green-soft);border-color:transparent;color:var(--green)}
+.hub-join-btn.circle-btn{background:var(--pink);border-color:var(--pink);color:#fff}
+.hub-join-btn.circle-btn.joined{background:var(--orange-soft);border-color:transparent;color:var(--gold)}
+.hub-join-btn:active{transform:scale(.94)}
+
+/* ── WRITER CARD ── */
+.writer-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--shadow-card);
+}
+.wc-banner{
+  height:56px;
+  background:linear-gradient(120deg,#ffe1ec,#ffd0e0,#f1ebff);
+}
+body.theme-dark .wc-banner{background:linear-gradient(120deg,#1a0010,#2a0025,#0d0020)}
+.wc-body{padding:0 14px 14px}
+.wc-av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-22px;margin-bottom:10px}
+.wc-av-ring{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  padding:2.5px;box-shadow:0 0 12px rgba(255,45,85,.2);cursor:pointer;
+}
+.wc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#111}
+.wc-av-inner img{width:100%;height:100%;object-fit:cover}
+.wc-follow{
+  background:var(--bg2);color:var(--ink);padding:7px 16px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:800;border:1px solid var(--line);transition:.2s;
+}
+.wc-follow.ing{color:var(--muted)}
+.wc-follow:active{transform:scale(.95)}
+.wc-name{font-family:var(--font-d);font-size:16px;font-weight:900;color:var(--ink);margin-bottom:2px}
+.wc-handle{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.wc-vbadge{
+  font-size:9px;font-weight:800;padding:2px 7px;border-radius:var(--r-pill);
+  background:var(--blue-soft);color:var(--blue);
+}
+.wc-bio{font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-bottom:12px}
+.wc-stats{display:flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.ws{flex:1;text-align:center;padding:10px 4px;border-right:1px solid var(--line)}
+.ws:last-child{border-right:none}
+.ws-n{font-size:14px;font-weight:800;color:var(--ink);line-height:1}
+.ws-l{font-size:9px;font-weight:600;color:var(--muted);margin-top:3px}
+.wc-view-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:12px;font-weight:700;color:var(--pink);margin-top:12px;cursor:pointer;
+}
+
+/* ── COMMENTS ── */
+.cm-view-all{
+  width:100%;padding:12px;border-radius:var(--r-sm);
+  background:var(--card);border:1px solid var(--line);
+  font-size:13px;font-weight:700;color:var(--ink-2);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;margin-top:10px;box-shadow:var(--shadow-card);transition:.15s;
+}
+.cm-view-all:active{background:var(--bg2)}
+
+/* ── DETAILS ── */
+.details-tbl{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--shadow-card);
+}
+.dt-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line2)}
+.dt-row:last-child{border-bottom:none}
+.dt-icon{
+  width:30px;height:30px;border-radius:8px;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+}
+.dt-lbl{font-size:10.5px;color:var(--muted);font-weight:600;width:74px;flex-shrink:0}
+.dt-val{font-size:13px;font-weight:700;color:var(--ink);flex:1}
+.dt-val.acc{color:var(--pink)}
+
+/* ── TAGS ── */
+.tags-row{display:flex;gap:7px;flex-wrap:wrap}
+.tag{
+  padding:6px 12px;border-radius:var(--r-pill);font-size:11px;font-weight:700;
+  background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+  box-shadow:var(--shadow-card);cursor:pointer;transition:.15s;
+}
+.tag:active{background:var(--pink-soft);border-color:var(--pink-border);color:var(--pink)}
+
+/* ── SIMILAR ── */
+.sim-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.sim-scroll::-webkit-scrollbar{display:none}
+.sim-card{
+  flex-shrink:0;width:130px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-sm);overflow:hidden;cursor:pointer;
+  box-shadow:var(--shadow-card);transition:.15s;
+}
+.sim-card:active{transform:scale(.97)}
+.sim-thumb{width:100%;height:88px;background-size:cover;background-position:center;position:relative}
+.sim-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.45),transparent 55%)}
+.sim-body{padding:8px 9px 10px}
+.sim-cat{font-size:9px;font-weight:800;color:var(--pink);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.sim-title{
+  font-size:11px;font-weight:700;line-height:1.3;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.sim-author{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ── BOTTOM DOCK ── */
+.dock{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(247,247,248,.96);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  padding:10px 14px calc(10px + var(--safe-b));
+  display:flex;gap:9px;align-items:center;
+  transition:background .25s;
+}
+.dock-read{
+  flex:1;padding:13px;border-radius:var(--r-sm);
+  background:var(--pink);color:#fff;font-size:14.5px;font-weight:800;
+  cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  box-shadow:0 2px 12px rgba(255,45,85,.28);
+}
+.dock-read:active{transform:scale(.97)}
+.dock-icon{
+  width:48px;height:48px;border-radius:var(--r-sm);
+  background:var(--card);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;transition:.15s;flex-shrink:0;color:var(--ink-2);
+  box-shadow:var(--shadow-card);
+}
+.dock-icon:active{transform:scale(.93)}
+.dock-icon.saved{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+#dockLikeWrap{
+  width:48px;height:48px;border-radius:var(--r-sm);
+  background:var(--card);border:1px solid var(--line);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-card);
+}
+#dockLikeWrap.liked-outer{background:var(--pink-soft);border-color:var(--pink-border)}
+#dockLikeWrap .drp-trigger{flex-direction:column;gap:2px;padding:2px}
+#dockLikeWrap .drp-trigger i{font-size:15px}
+#dockLikeWrap .drp-like-count{font-size:9px}
+#dockLikeWrap .drp-top3{display:none}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:var(--card);color:var(--ink);padding:9px 18px;border-radius:var(--r-pill);
+  font-size:13px;font-weight:600;z-index:900;opacity:0;transition:.25s;pointer-events:none;
+  white-space:nowrap;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,.12);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .3s ease both}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}
+.d4{animation-delay:.16s}.d5{animation-delay:.2s}.d6{animation-delay:.24s}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-back" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+  <div class="tb-title" id="tbTitle"></div>
+  <div class="tb-actions">
+    <div id="tbLikeWrap"></div>
+    <div class="tb-btn" id="themeBtn" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></div>
+    <div class="tb-btn" id="tbSave" onclick="openSave()"><i class="far fa-bookmark"></i></div>
+    <div class="tb-btn" onclick="openShare()"><i class="fas fa-share-alt"></i></div>
+  </div>
+</div>
+
+<!-- SCROLL BODY -->
+<div class="scroll-body" id="scrollBody">
+
+  <!-- HERO -->
+  <div class="hero fu d1" id="heroSec"></div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip fu d1" id="statsStrip"></div>
+
+  <!-- SYNOPSIS -->
+  <div class="sec fu d2">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon">📖</div>Synopsis</div></div>
+    <div class="synopsis-box">
+      <div class="synopsis-text" id="synText"></div>
+      <div class="synopsis-more" id="synBtn" onclick="toggleSyn()"><i class="fas fa-chevron-down" style="font-size:9px"></i> Read more</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ENGAGEMENT -->
+  <div class="sec fu d3">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(255,45,85,.08)">⚡</div>Reader Engagement</div></div>
+    <div class="eng-row">
+      <div class="eng-pill" id="pill-poll" onclick="toggleEng('poll')">
+        <div class="ep-emoji">📊</div><div class="ep-body"><div class="ep-label">Poll</div><div class="ep-sub" id="pollSub">— votes</div></div>
+      </div>
+      <div class="eng-pill" id="pill-debate" onclick="toggleEng('debate')">
+        <div class="ep-emoji">⚔️</div><div class="ep-body"><div class="ep-label">Debate</div><div class="ep-sub" id="debateSub">— live</div></div>
+      </div>
+      <div class="eng-pill" id="pill-pred" onclick="toggleEng('pred')">
+        <div class="ep-emoji">🔮</div><div class="ep-body"><div class="ep-label">Prediction</div><div class="ep-sub" id="predSub">— locked</div></div>
+      </div>
+    </div>
+    <div class="eng-card" id="card-poll">
+      <div class="ec-header"><span class="ec-badge poll">📊 Poll</span><div class="ec-q" id="pollQ"></div></div>
+      <div class="ec-opts" id="pollOpts"></div>
+      <div class="ec-footer"><span class="ec-total" id="pollTotal"></span><span class="ec-share" onclick="toast('📤 Share poll…')"><i class="fas fa-share-alt" style="font-size:9px"></i> Share</span></div>
+    </div>
+    <div class="eng-card" id="card-debate">
+      <div class="ec-header"><span class="ec-badge debate"><span class="live-dot"></span> Live Debate</span><div class="ec-q" id="debateQ"></div></div>
+      <div class="debate-sides">
+        <div class="d-side for" id="dFor" onclick="voteDebate('for')">
+          <div class="d-emoji">✅</div><div class="d-label">FOR</div>
+          <div class="d-bar-bg"><div class="d-bar" id="forBar"></div></div>
+          <div class="d-pct" id="forPct"></div><div class="d-count" id="forCnt"></div>
+        </div>
+        <div class="d-side against" id="dAg" onclick="voteDebate('against')">
+          <div class="d-emoji">❌</div><div class="d-label">AGAINST</div>
+          <div class="d-bar-bg"><div class="d-bar" id="agBar"></div></div>
+          <div class="d-pct" id="agPct"></div><div class="d-count" id="agCnt"></div>
+        </div>
+      </div>
+      <div class="d-total"><span class="live-dot"></span> <span id="debateLiveTotal"></span> readers debating live right now</div>
+      <div class="ec-footer"><span class="ec-total" id="debateVoicesTotal"></span><span class="ec-share" onclick="toast('⚔️ Full debate…')"><i class="fas fa-gavel" style="font-size:9px"></i> Full Debate</span></div>
+    </div>
+    <div class="eng-card" id="card-pred">
+      <div class="ec-header"><span class="ec-badge pred">🔮 Prediction</span><div class="ec-q" id="predQ"></div></div>
+      <div class="ec-opts" id="predOpts"></div>
+      <div class="ec-footer"><span class="ec-total" id="predTotal"></span><span class="ec-share" onclick="toast('📤 Share…')"><i class="fas fa-share-alt" style="font-size:9px"></i> Share</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TIP LINE -->
+  <div class="sec fu d3">
+    <div class="tip-line" onclick="openTip()">
+      <i class="fas fa-coins"></i> <b id="tipCountLbl">— tips</b> · Tap to support this writer
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REACTIONS -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(236,72,153,.08)">😭</div>Reactions</div></div>
+    <div class="rx-grid" id="rxGrid"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMUNITIES -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(217,119,6,.08)">🧿</div>Communities</div></div>
+    <div id="hubsWrap"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT THE WRITER -->
+  <div class="sec fu d4">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(245,158,11,.08)">✍️</div>About the Writer</div></div>
+    <div class="writer-card">
+      <div class="wc-banner"></div>
+      <div class="wc-body" id="writerBody"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMENTS -->
+  <div class="sec fu d5" id="commentsSection">
+    <div id="commentsPlaceholder"></div>
+    <button class="cm-view-all" onclick="goToAllComments()">
+      <i class="fas fa-comment" style="font-size:11px;color:var(--pink)"></i> <span id="cmViewAllLbl">View full comment thread</span>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DETAILS -->
+  <div class="sec fu d5">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon">ℹ️</div>Details</div></div>
+    <div class="details-tbl" id="detailsTbl"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TAGS -->
+  <div class="sec fu d6">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(124,58,237,.08)">#</div>Tags</div></div>
+    <div class="tags-row" id="tagsRow"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SIMILAR -->
+  <div class="sec fu d6">
+    <div class="sec-hdr"><div class="sec-title"><div class="sec-icon" style="background:rgba(124,58,237,.08)">✨</div>More Like This</div></div>
+    <div class="sim-scroll" id="simScroll"></div>
+  </div>
+
+  <div style="height:16px"></div>
+</div>
+
+<!-- BOTTOM DOCK -->
+<div class="dock">
+  <div id="dockLikeWrap"></div>
+  <button class="dock-read" onclick="goToReader()">
+    <i class="fas fa-book-open" style="font-size:14px"></i> Read Now
+  </button>
+  <div class="dock-icon" id="dockSave" onclick="openSave()"><i class="far fa-bookmark"></i></div>
+  <div class="dock-icon" onclick="openShare()"><i class="fas fa-share-alt"></i></div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- Shared components (same load order as before) -->
+<script src="component/reaction-picker.js"></script>
+<script src="component/share-modal.js"></script>
+<script src="component/save-modal.js"></script>
+<script src="component/tip-picker.js"></script>
+<script src="component/comment-section.js"></script>
+<script src="data/comments-data.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   UTILS
+   ══════════════════════════════════════════════════════════════════ */
+function toast(m){
+  const t=document.getElementById('toastEl');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function fmtN(n){n=+n||0;return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ══════════════════════════════════════════════════════════════════
+   STORY ID
+   ══════════════════════════════════════════════════════════════════ */
+const params = new URLSearchParams(location.search);
+const STORY_ID = params.get('story') || 'story-5';
+
+const TEAMS = [
+  { id:'a', icon:'💔', name:'Team Leave',   col:'#ff2d55' },
+  { id:'b', icon:'🕊️', name:'Team Forgive', col:'#10B981' },
+  { id:'c', icon:'🤍', name:'Team Neither', col:'#3B82F6' },
+  { id:'d', icon:'👀', name:'Team Watching',col:'#7C3AED' },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA
+   ══════════════════════════════════════════════════════════════════ */
+const DEMO_STORY = {
+  id: STORY_ID,
+  title: "I came home early and caught my husband kissing my late sister's photograph",
+  cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&q=85',
+  category: { emoji:'💔', name:'Betrayal' },
+  type: 'Series',
+  seasonChapterLabel: 'S2 · Ch 4',
+  writer: {
+    name:'Ada_Writes', handle:'@ada_writes', avatar:'https://i.pravatar.cc/100?img=32',
+    followers: 12400, following:false, verified:true, stories:8, reads:171000, rating:4.7,
+    bio:"Telling stories that live in your chest long after you close the tab. Betrayal · Family · Redemption. Lagos-based, always online at 2am."
+  },
+  stats: { comments: 4100, reads: 171000, shares: 34000, rating: 4.7 },
+  synopsis: {
+    short: "A woman returns home early to find her husband in an intimate moment with a photograph of her deceased sister. What follows is not a fight — it is the slow unravelling of a marriage built on two griefs that never met.",
+    more: " Ada_Writes' most read series explores betrayal, grief, and the love that hides inside silence. Season 2 picks up a year after Ada moved back home — the husband has a new therapist, and Ada has a new question. Neither of them is ready for the answers."
+  },
+  engagement: {
+    poll: { q:'Who was truly at fault in this situation?', opts:[
+      {t:"💔 His grief doesn't excuse the betrayal", v:4812},
+      {t:'🕊️ He was grieving — it\'s complicated', v:2344},
+      {t:'🤷 Nobody is fully right here', v:1044},
+    ]},
+    debate: { q:'"Ada should stay and fight for her marriage, not leave."', dFor:2341, dAg:3819 },
+    pred: { q:'What happens next?', opts:[
+      {t:'💔 Ada confronts him and leaves', v:2201},
+      {t:'🕊️ They start couples therapy', v:1888},
+      {t:'📸 A secret about the sister is revealed', v:987},
+      {t:'🏠 Ada moves out quietly', v:574},
+    ]},
+  },
+  reactions: { userRx:null, love:9000, crying:6000, angry:0, shocked:2000, broken:4000, emotional:1500, savage:900, sus:500, twist:400, laughing:0 },
+  hubs: {
+    genre: { name:'Betrayal Hub', icon:'💔', members: 84200, joined:false },
+    circle: { name:"Ada_Writes' Inner Circle", members: 3200, joined:false, perks:'Early chapters, behind-the-scenes, live Q&As' },
+  },
+  details: [
+    { icon:'📚', lbl:'Type', val:'Series · Ongoing' },
+    { icon:'🏷️', lbl:'Category', val:'💔 Betrayal', acc:true },
+    { icon:'📅', lbl:'Seasons', val:'2 Seasons · 17 Chapters' },
+    { icon:'⏱️', lbl:'Read time', val:'~4 min/chapter' },
+    { icon:'📅', lbl:'Started', val:'Jan 2025' },
+    { icon:'✅', lbl:'Status', val:'Ongoing · Ch5 soon', acc:true },
+  ],
+  tags: ['#betrayal','#grief','#marriage','#secrets','#redemption','#nigeria'],
+  similar: [
+    {cover:'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=75',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",author:'Kemi_A'},
+    {cover:'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=75',cat:'🔥 Revenge',title:'My stepmother stole my university fund',author:'Zara_M'},
+    {cover:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=75',cat:'👑 Family',title:"Grandmother's will revealed I wasn't blood",author:'Chiamaka_N'},
+    {cover:'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=75',cat:'🌙 Elegy',title:'The letter he never sent',author:'Efe_O'},
+    {cover:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=75',cat:'✨ Twist',title:'The runaway bride in her socked feet',author:'Ifeanyi_Story'},
+  ],
+  tipCount: 1240,
+};
+
+let DATA = null;
+
+async function loadStory(){
+  let data = null;
+  try{
+    if (window.DroboardStoryAPI && typeof window.DroboardStoryAPI.getStory === 'function'){
+      data = await window.DroboardStoryAPI.getStory(STORY_ID);
+    }
+  }catch(err){ console.warn('[Droboard] Story API failed, falling back to demo data', err); }
+  DATA = data || DEMO_STORY;
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════════ */
+const S = { heroFollow:false, wcFollow:false, debateVote:null, pollVoted:-1, predVoted:-1, synExp:false, engOpen:null };
+const RX_KEY = 'story::' + STORY_ID;
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════════════════════════════════ */
+function renderAll(){
+  document.getElementById('tbTitle').textContent = DATA.title;
+  renderHero();
+  renderStats();
+  renderSynopsis();
+  renderEngagement();
+  document.getElementById('tipCountLbl').textContent = fmtN(DATA.tipCount) + ' tips';
+  renderReactionsAndTriggers();
+  renderHubs();
+  renderWriter();
+  renderComments();
+  renderDetails();
+  renderTags();
+  renderSimilar();
+
+  const sb=document.getElementById('scrollBody');
+  const tbT=document.getElementById('tbTitle');
+  sb.addEventListener('scroll',()=>tbT.classList.toggle('vis',sb.scrollTop>200),{passive:true});
+}
+
+function renderHero(){
+  const d=DATA;
+  document.getElementById('heroSec').innerHTML = `
+    <div class="hero-bg" style="background-image:url('${d.cover}')"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-top">
+      <span class="hbadge hb-cat">${d.category.emoji} ${esc(d.category.name)}</span>
+      ${d.type==='Series' ? '<span class="hbadge hb-series">Series</span>' : ''}
+      <span class="hbadge hb-type">${esc(d.seasonChapterLabel)}</span>
+    </div>
+    <div class="hero-body">
+      <div class="hero-title">${esc(d.title)}</div>
+      <div class="hero-writer">
+        <div class="hw-av-ring" onclick="toast('👤 ${esc(d.writer.handle)}')"><div class="hw-av-inner"><img src="${d.writer.avatar}" loading="lazy" alt=""/></div></div>
+        <div class="hw-info">
+          <div class="hw-name">${esc(d.writer.name)}</div>
+          <div class="hw-handle">${esc(d.writer.handle)} · ${fmtN(d.writer.followers)} followers</div>
+        </div>
+        <button class="hw-follow" id="heroFollow" onclick="toggleHeroFollow()">+ Follow</button>
+      </div>
+    </div>`;
+}
+
+function renderStats(){
+  const d=DATA;
+  document.getElementById('statsStrip').innerHTML = `
+    <div class="stat-cell" onclick="toast('❤️ '+document.getElementById('likesStatN').textContent+' likes')"><div class="sn acc" id="likesStatN">0</div><div class="sl">Likes</div></div>
+    <div class="stat-cell" onclick="scrollToComments()"><div class="sn">${fmtN(d.stats.comments)}</div><div class="sl">Comments</div></div>
+    <div class="stat-cell" onclick="toast('👁 '+fmtN(d.stats.reads)+' reads')"><div class="sn">${fmtN(d.stats.reads)}</div><div class="sl">Reads</div></div>
+    <div class="stat-cell" onclick="toast('📤 '+fmtN(d.stats.shares)+' shares')"><div class="sn">${fmtN(d.stats.shares)}</div><div class="sl">Shares</div></div>
+    <div class="stat-cell"><div class="sn gold">${d.stats.rating}★</div><div class="sl">Rating</div></div>`;
+}
+
+function goToReader(){
+  window.location.href = `full-reader.html?story=${encodeURIComponent(STORY_ID)}`;
+}
+function goToAllComments(){
+  window.location.href = `full-reader.html?story=${encodeURIComponent(STORY_ID)}#comments`;
+}
+
+function renderSynopsis(){
+  document.getElementById('synText').innerHTML = `${esc(DATA.synopsis.short)}<span id="synExt" style="display:none">${esc(DATA.synopsis.more)}</span>`;
+}
+function toggleSyn(){
+  S.synExp=!S.synExp;
+  document.getElementById('synExt').style.display=S.synExp?'inline':'none';
+  document.getElementById('synBtn').innerHTML=S.synExp
+    ?'<i class="fas fa-chevron-up" style="font-size:9px"></i> Show less'
+    :'<i class="fas fa-chevron-down" style="font-size:9px"></i> Read more';
+}
+
+function toggleHeroFollow(){
+  S.heroFollow=!S.heroFollow;
+  const b=document.getElementById('heroFollow');
+  b.textContent=S.heroFollow?'✓ Following':'+ Follow';
+  b.classList.toggle('ing',S.heroFollow);
+  const wc=document.getElementById('wcFollow');
+  if(wc){wc.textContent=S.heroFollow?'✓ Following':'+ Follow';wc.classList.toggle('ing',S.heroFollow);}
+  toast(S.heroFollow?`✅ Following ${DATA.writer.handle}`:'Unfollowed');
+}
+function toggleWcFollow(){
+  S.heroFollow=!S.heroFollow;
+  const wc=document.getElementById('wcFollow');
+  wc.textContent=S.heroFollow?'✓ Following':'+ Follow';
+  wc.classList.toggle('ing',S.heroFollow);
+  const hf=document.getElementById('heroFollow');
+  if(hf){hf.textContent=S.heroFollow?'✓ Following':'+ Follow';hf.classList.toggle('ing',S.heroFollow);}
+  toast(S.heroFollow?`✅ Following ${DATA.writer.handle}`:'Unfollowed');
+}
+
+/* ── ENGAGEMENT ── */
+function renderEngagement(){
+  const e=DATA.engagement;
+  document.getElementById('pollSub').textContent = fmtN(e.poll.opts.reduce((s,o)=>s+o.v,0))+' votes';
+  document.getElementById('debateSub').textContent = fmtN(e.debate.dFor+e.debate.dAg)+' live';
+  document.getElementById('predSub').textContent = fmtN(e.pred.opts.reduce((s,o)=>s+o.v,0))+' locked';
+  document.getElementById('pollQ').textContent = e.poll.q;
+  document.getElementById('debateQ').textContent = e.debate.q;
+  document.getElementById('predQ').textContent = e.pred.q;
+  renderPoll(); renderDebate(); renderPred();
+}
+function renderPoll(){
+  const opts=DATA.engagement.poll.opts;
+  const tot=opts.reduce((s,o)=>s+o.v,0)||1;
+  document.getElementById('pollOpts').innerHTML=opts.map((o,i)=>{
+    const pct=Math.round(o.v/tot*100);
+    return `<div class="ec-opt${S.pollVoted===i?' voted':''}" onclick="votePoll(${i})"><div class="ec-opt-bar" style="width:${pct}%"></div><div class="ec-opt-inner"><span class="ec-opt-text">${esc(o.t)}</span><span class="ec-opt-pct">${pct}%</span></div></div>`;
+  }).join('');
+  document.getElementById('pollTotal').textContent=fmtN(opts.reduce((s,o)=>s+o.v,0))+' votes';
+}
+function votePoll(i){ if(S.pollVoted>=0) return; DATA.engagement.poll.opts[i].v++; S.pollVoted=i; renderPoll(); toast('✅ Voted!'); }
+function renderDebate(){
+  const db=DATA.engagement.debate, tot=db.dFor+db.dAg||1, fp=Math.round(db.dFor/tot*100), ap=100-fp;
+  document.getElementById('forBar').style.width=fp+'%'; document.getElementById('agBar').style.width=ap+'%';
+  document.getElementById('forPct').textContent=fp+'%'; document.getElementById('agPct').textContent=ap+'%';
+  document.getElementById('forCnt').textContent=fmtN(db.dFor)+' readers'; document.getElementById('agCnt').textContent=fmtN(db.dAg)+' readers';
+  document.getElementById('debateLiveTotal').textContent=fmtN(db.dFor+db.dAg);
+  document.getElementById('debateVoicesTotal').textContent=fmtN(db.dFor+db.dAg)+' voices';
+}
+function voteDebate(side){
+  if(S.debateVote) return; S.debateVote=side;
+  const db=DATA.engagement.debate; if(side==='for')db.dFor++; else db.dAg++;
+  document.getElementById(side==='for'?'dFor':'dAg').classList.add('chosen');
+  renderDebate(); toast(side==='for'?"✅ You're FOR this!":"❌ You're AGAINST this!");
+}
+function renderPred(){
+  const opts=DATA.engagement.pred.opts, tot=opts.reduce((s,o)=>s+o.v,0)||1;
+  document.getElementById('predOpts').innerHTML=opts.map((o,i)=>{
+    const pct=Math.round(o.v/tot*100);
+    return `<div class="ec-opt${S.predVoted===i?' voted':''}" onclick="votePred(${i})"><div class="ec-opt-bar" style="width:${pct}%"></div><div class="ec-opt-inner"><span class="ec-opt-text">${esc(o.t)}</span><span class="ec-opt-pct">${pct}%</span></div></div>`;
+  }).join('');
+  document.getElementById('predTotal').textContent=fmtN(opts.reduce((s,o)=>s+o.v,0))+' predictions';
+}
+function votePred(i){ if(S.predVoted>=0) return; DATA.engagement.pred.opts[i].v++; S.predVoted=i; renderPred(); toast('🔮 Prediction locked!'); }
+function toggleEng(type){
+  const cards={poll:'card-poll',debate:'card-debate',pred:'card-pred'};
+  const pills={poll:'pill-poll',debate:'pill-debate',pred:'pill-pred'};
+  const activeClass={poll:'active-poll',debate:'active-debate',pred:'active-pred'};
+  const isOpen=S.engOpen===type;
+  Object.keys(cards).forEach(k=>{
+    document.getElementById(cards[k]).classList.remove('open');
+    document.getElementById(pills[k]).classList.remove('active-poll','active-debate','active-pred');
+  });
+  if(!isOpen){
+    document.getElementById(cards[type]).classList.add('open');
+    document.getElementById(pills[type]).classList.add(activeClass[type]);
+    S.engOpen=type;
+  } else S.engOpen=null;
+}
+
+/* ── REACTIONS ── */
+const RX_LABELS = { love:'Love', crying:'Crying', angry:'Angry', shocked:'Shocked', broken:'Heartbroken', emotional:'Emotional', savage:'Savage', sus:'Suspicious', twist:'Plot Twist', laughing:'Laughing' };
+const RX_EMOJI  = { love:'❤️', crying:'😭', angry:'😡', shocked:'😱', broken:'💔', emotional:'🥹', savage:'🔥', sus:'👀', twist:'🫢', laughing:'😂' };
+
+function rxTotal(){ return Object.keys(DATA.reactions).filter(k=>k!=='userRx').reduce((s,k)=>s+(DATA.reactions[k]||0),0); }
+
+function renderReactionsAndTriggers(){
+  window.__dcsRPRegistry = window.__dcsRPRegistry || {};
+  window.__dcsRPRegistry[RX_KEY] = {
+    comment: { rx: DATA.reactions },
+    onReact: () => { syncAfterReaction(); },
+  };
+
+  document.getElementById('tbLikeWrap').innerHTML = window.DroboardReactionPicker ? window.DroboardReactionPicker.renderTrigger(RX_KEY, {icon:'heart'}) : '';
+  document.getElementById('dockLikeWrap').innerHTML = window.DroboardReactionPicker ? window.DroboardReactionPicker.renderTrigger(RX_KEY, {icon:'heart'}) : '';
+  document.getElementById('dockLikeWrap').classList.toggle('liked-outer', !!DATA.reactions.userRx);
+
+  renderReactionsGrid();
+  document.getElementById('likesStatN').textContent = fmtN(rxTotal());
+}
+function renderReactionsGrid(){
+  document.getElementById('rxGrid').innerHTML = Object.keys(RX_LABELS).map(id=>`
+    <div class="rx-card${DATA.reactions.userRx===id?' picked':''}">
+      <div class="rx-e">${RX_EMOJI[id]}</div>
+      <div class="rx-l">${RX_LABELS[id]}</div>
+      <div class="rx-n">${fmtN(DATA.reactions[id]||0)}</div>
+    </div>`).join('');
+}
+function syncAfterReaction(){
+  renderReactionsGrid();
+  document.getElementById('likesStatN').textContent = fmtN(rxTotal());
+  document.getElementById('dockLikeWrap').classList.toggle('liked-outer', !!DATA.reactions.userRx);
+  if (window.DroboardReactionPicker) window.DroboardReactionPicker.update(RX_KEY, {});
+}
+
+/* ── HUBS ── */
+function renderHubs(){
+  const h = DATA.hubs;
+  document.getElementById('hubsWrap').innerHTML = `
+    <div class="hub-card" onclick="toggleHubJoin('genre')">
+      <div class="hub-icon">${h.genre.icon}</div>
+      <div class="hub-body">
+        <div class="hub-name">${esc(h.genre.name)}</div>
+        <div class="hub-sub"><i class="fas fa-users"></i> <span id="genreMembers">${fmtN(h.genre.members)}</span> members · Genre community</div>
+      </div>
+      <button class="hub-join-btn${h.genre.joined?' joined':''}" id="genreJoinBtn" onclick="event.stopPropagation();toggleHubJoin('genre')">${h.genre.joined?'✓ Joined':'Join'}</button>
+    </div>
+    <div class="hub-card" onclick="toggleHubJoin('circle')">
+      <div class="hub-icon circle-icon"><img src="${DATA.writer.avatar}" loading="lazy" alt=""/></div>
+      <div class="hub-body">
+        <div class="hub-name">${esc(h.circle.name)} <i class="fas fa-crown" style="color:var(--gold);font-size:10px"></i></div>
+        <div class="hub-sub"><i class="fas fa-users"></i> <span id="circleMembers">${fmtN(h.circle.members)}</span> members · ${esc(h.circle.perks)}</div>
+      </div>
+      <button class="hub-join-btn circle-btn${h.circle.joined?' joined':''}" id="circleJoinBtn" onclick="event.stopPropagation();toggleHubJoin('circle')">${h.circle.joined?'✓ In Circle':'Join Circle'}</button>
+    </div>`;
+}
+function toggleHubJoin(kind){
+  const h = kind==='genre' ? DATA.hubs.genre : DATA.hubs.circle;
+  h.joined = !h.joined;
+  h.members += h.joined ? 1 : -1;
+  renderHubs();
+  toast(h.joined ? `🧿 Joined ${h.name}!` : `Left ${h.name}`);
+}
+
+/* ── WRITER ── */
+function renderWriter(){
+  const w = DATA.writer;
+  document.getElementById('writerBody').innerHTML = `
+    <div class="wc-av-row">
+      <div class="wc-av-ring" onclick="window.location.href='profile.html?u='+encodeURIComponent('${w.handle}')"><div class="wc-av-inner"><img src="${w.avatar}" loading="lazy" alt=""/></div></div>
+      <button class="wc-follow" id="wcFollow" onclick="toggleWcFollow()">+ Follow</button>
+    </div>
+    <div class="wc-name">${esc(w.name)}</div>
+    <div class="wc-handle">${esc(w.handle)} ${w.verified?'<span class="wc-vbadge"><i class="fas fa-check" style="font-size:7px"></i> Verified</span>':''}</div>
+    <div class="wc-bio">${esc(w.bio)}</div>
+    <div class="wc-stats">
+      <div class="ws"><div class="ws-n" style="color:var(--pink)">${fmtN(w.followers)}</div><div class="ws-l">Followers</div></div>
+      <div class="ws"><div class="ws-n">${w.stories}</div><div class="ws-l">Stories</div></div>
+      <div class="ws"><div class="ws-n">${fmtN(w.reads)}</div><div class="ws-l">Reads</div></div>
+      <div class="ws"><div class="ws-n" style="color:var(--gold)">${w.rating}★</div><div class="ws-l">Rating</div></div>
+    </div>
+    <div class="wc-view-btn" onclick="window.location.href='profile.html?u='+encodeURIComponent('${w.handle}')">View profile <i class="fas fa-chevron-right" style="font-size:9px"></i></div>`;
+}
+
+/* ── COMMENTS ── */
+function mapSeedComment(c){
+  return Object.assign({}, c, {
+    statusRing: (c.statusRing || 'none').replace('ring-', ''),
+    replies: (c.replies || []).map(mapSeedComment),
+  });
+}
+const SEED_COMMENTS = (typeof COMMENTS_DATA !== 'undefined' ? COMMENTS_DATA : []).map(mapSeedComment);
+
+function renderComments(){
+  document.getElementById('cmViewAllLbl').textContent = `View full comment thread (${fmtN(DATA.stats.comments)})`;
+  if (!window.DroboardComments) return;
+  DroboardComments.attach('#commentsPlaceholder', {
+    storyId: STORY_ID,
+    title: 'Comments',
+    comments: SEED_COMMENTS,
+    teams: TEAMS,
+    currentUser: { name:'You', avatar:null, team:null },
+    requireTeam: false,
+    collapsible: true,
+    startOpen: false,
+    getCommentUrl: (c) => `https://droboard.app/story/${STORY_ID}#comment-${c.id}`,
+    onPost: (c) => console.log('posted', c),
+    onReply: (parentId,c) => console.log('replied', parentId, c),
+    onEdit: (c,oldT,newT) => console.log('edited', c.id, oldT, '->', newT),
+  });
+}
+function scrollToComments(){ document.getElementById('commentsSection').scrollIntoView({behavior:'smooth'}); }
+
+/* ── DETAILS / TAGS / SIMILAR ── */
+function renderDetails(){
+  document.getElementById('detailsTbl').innerHTML = DATA.details.map(r=>`
+    <div class="dt-row"><div class="dt-icon">${r.icon}</div><div class="dt-lbl">${esc(r.lbl)}</div><div class="dt-val${r.acc?' acc':''}">${esc(r.val)}</div></div>`).join('');
+}
+function renderTags(){
+  document.getElementById('tagsRow').innerHTML = DATA.tags.map(t=>`<div class="tag" onclick="toast('${esc(t)}')">${esc(t)}</div>`).join('');
+}
+function renderSimilar(){
+  document.getElementById('simScroll').innerHTML = DATA.similar.map(s=>`
+    <div class="sim-card" onclick="toast('📖 Opening…')">
+      <div class="sim-thumb" style="background-image:url('${s.cover}')"><div class="sim-scrim"></div></div>
+      <div class="sim-body"><div class="sim-cat">${esc(s.cat)}</div><div class="sim-title">${esc(s.title)}</div><div class="sim-author">@${esc(s.author)}</div></div>
+    </div>`).join('');
+}
+
+/* ── SAVE / SHARE / TIP ── */
+function openSave(){
+  if (window.openSaveModal) {
+    window.openSaveModal({ title: DATA.title, sub: 'by '+DATA.writer.handle, img: DATA.cover, storyId: STORY_ID });
+  } else {
+    toast('🔖 Saved');
+  }
+}
+function openShare(){
+  if (window.openShareModal) {
+    window.openShareModal({ title: DATA.title, sub: `by ${DATA.writer.handle} · ${fmtN(rxTotal())} likes`, img: DATA.cover, url: `https://droboard.app/story/${STORY_ID}` });
+  } else {
+    toast('📤 Share…');
+  }
+}
+window.onDroboardSaveChange = function(storyId, saved){
+  ['tbSave','dockSave'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.classList.toggle('saved', saved);
+    el.innerHTML = `<i class="${saved?'fas':'far'} fa-bookmark"></i>`;
+  });
+};
+if (window.DroboardTip) {
+  DroboardTip.attach({
+    getWriter: () => ({ name: DATA.writer.name, avatar: DATA.writer.avatar, handle: `${DATA.writer.handle} · ${fmtN(DATA.writer.followers)} followers` }),
+    onSend: (id, amount, note, mode) => {
+      DATA.tipCount++;
+      document.getElementById('tipCountLbl').textContent = fmtN(DATA.tipCount) + ' tips';
+    },
+  });
+}
+function openTip(){
+  if (window.DroboardTip) {
+    DroboardTip.open(STORY_ID, { name: DATA.writer.name, avatar: DATA.writer.avatar, handle: `${DATA.writer.handle} · ${fmtN(DATA.writer.followers)} followers` });
+  } else {
+    toast('💰 Tip sent');
+  }
+}
+
+/* ── THEME TOGGLE — light is default, dark via body.theme-dark ── */
+(function(){
+  const saved = localStorage.getItem('droboard-theme') || 'light';
+  document.body.classList.toggle('theme-dark', saved === 'dark');
+  const btn = document.getElementById('themeBtn');
+  const icon = document.getElementById('themeIcon');
+  function paint(theme){
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0e0e12' : '#f7f7f8');
+  }
+  paint(saved);
+  btn.addEventListener('click', ()=>{
+    const next = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
+    document.body.classList.toggle('theme-dark', next === 'dark');
+    localStorage.setItem('droboard-theme', next);
+    paint(next);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════════ */
+loadStory();
+</script>
+</body>
+</html>

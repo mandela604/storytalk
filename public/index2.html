@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#000000"/>
+<title>Droboard · Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
+  --glow:rgba(255,0,80,.28);--glow-sm:rgba(255,0,80,.14);
+  --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.22);
+  --tx-high:#f0f0f2;--tx-body:#c3c1cc;--tx-muted:#7d7a89;--tx-faint:#454350;
+  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;
+  --nav-h:60px;--top-h:54px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body{overflow-y:auto}
+::-webkit-scrollbar{width:0;height:0}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+img{display:block}
+a{color:inherit;text-decoration:none}
+
+/* ── TOP BAR — floats over the hero ── */
+.top-bar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  padding:calc(var(--safe-t) + 10px) 16px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.3) 60%,transparent 100%);
+  pointer-events:none;
+}
+.top-bar>*{pointer-events:auto}
+.top-logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:#fff;letter-spacing:-1px;display:flex;align-items:center;gap:3px}
+.top-logo .dot{width:6px;height:6px;border-radius:50%;background:var(--acc);margin-left:2px;box-shadow:0 0 8px var(--acc)}
+.top-icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#fff;position:relative;
+}
+.top-right{display:flex;gap:8px}
+.notif-count{position:absolute;top:-3px;right:-3px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid #000}
+
+/* ── HERO — TikTok-style vertical snap story cards ── */
+.hero{
+  position:relative;
+  height:calc(100dvh - var(--nav-h) - var(--safe-b));
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+}
+.hero::-webkit-scrollbar{display:none}
+.hero-slide{
+  position:relative;height:calc(100dvh - var(--nav-h) - var(--safe-b));
+  width:100%;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  background-size:cover;background-position:center 28%;
+  overflow:hidden;
+}
+.hero-scrim{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.1) 30%, rgba(0,0,0,.55) 62%, rgba(4,3,7,.97) 100%);
+}
+.hero-badges-top{position:absolute;top:calc(var(--safe-t) + 62px);left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:flex-start}
+.badge-genre{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);color:#fff;
+  font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:20px;
+}
+.badge-tier{font-size:9.5px;font-weight:800;padding:5px 11px;border-radius:20px;letter-spacing:.03em}
+.badge-tier.premium{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#1a1000}
+.badge-tier.free{background:rgba(52,211,153,.18);color:#6ee7b0;border:1px solid rgba(52,211,153,.35)}
+
+.hero-content{position:relative;z-index:3;padding:0 20px calc(var(--safe-b) + 22px)}
+.hero-stats-row{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.hero-stat{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:rgba(255,255,255,.82)}
+.hero-stat i{font-size:11px}
+.hero-stat.rating i{color:var(--gold)}
+.hero-title{
+  font-family:'Playfair Display',serif;font-weight:800;
+  font-size:29px;line-height:1.14;color:#fff;
+  text-shadow:0 3px 18px rgba(0,0,0,.55);
+  margin-bottom:11px;
+}
+.hero-author-row{display:flex;align-items:center;gap:9px;margin-bottom:13px}
+.hero-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.35);flex-shrink:0}
+.hero-author-name{font-size:13px;font-weight:700;color:#fff}
+.hero-author-name i{color:var(--blue);font-size:11px;margin-left:4px}
+.hero-synopsis{
+  font-size:13px;line-height:1.55;color:rgba(255,255,255,.72);
+  margin-bottom:18px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.hero-cta-row{display:flex;gap:10px;align-items:center}
+.btn-start{
+  flex:1;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#fff;border:none;padding:14px;border-radius:16px;
+  font-size:14.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 10px 28px var(--glow);
+}
+.btn-icon-only{
+  width:50px;height:50px;flex-shrink:0;border-radius:16px;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;
+}
+
+/* swipe indicator */
+.swipe-indicator{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:9px;
+}
+.swipe-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);transition:.25s}
+.swipe-dot.on{width:6px;height:20px;border-radius:4px;background:var(--acc)}
+.swipe-hint{
+  position:absolute;bottom:calc(var(--safe-b) + 130px);left:50%;transform:translateX(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:rgba(255,255,255,.55);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  animation:swipeFloat 1.8s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes swipeFloat{0%,100%{transform:translate(-50%,0);opacity:.55}50%{transform:translate(-50%,-6px);opacity:1}}
+
+/* ── BELOW-HERO SECTIONS ── */
+.sections{background:var(--bg);padding:26px 0 20px}
+.section{margin-bottom:28px;padding:0 16px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-head h2{font-family:'Playfair Display',serif;font-size:17px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:8px}
+.section-head .sub{font-size:11px;color:var(--tx-muted);font-weight:600;margin-top:2px}
+.section-more{font-size:11px;font-weight:700;color:var(--acc3);padding:4px 10px;border-radius:14px;background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)}
+
+/* Chapter drops */
+.drops-row{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.drops-row::-webkit-scrollbar{display:none}
+.drop-card{flex:0 0 148px;width:148px;cursor:pointer}
+.drop-cover{
+  position:relative;width:100%;aspect-ratio:3/3.7;border-radius:14px;overflow:hidden;
+  background-size:cover;background-position:center;
+  box-shadow:0 8px 22px rgba(0,0,0,.45);margin-bottom:9px;
+}
+.drop-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.88) 100%)}
+.drop-time{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px}
+.drop-cont{
+  position:absolute;bottom:9px;left:9px;right:9px;
+  background:rgba(255,255,255,.14);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);color:#fff;
+  font-size:10.5px;font-weight:700;padding:7px 0;border-radius:10px;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.drop-title{font-size:12px;font-weight:700;color:var(--tx-high);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:3px}
+.drop-author{font-size:10.5px;color:var(--tx-muted);font-weight:600}
+
+/* Featured event */
+.event-card{
+  position:relative;border-radius:20px;overflow:hidden;padding:22px 20px;
+  background:linear-gradient(135deg,#3a1250 0%,#6d1e6b 45%,var(--acc) 100%);
+  box-shadow:0 14px 36px rgba(150,20,90,.28);
+}
+.event-glow1{position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.10);top:-70px;right:-50px}
+.event-glow2{position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-40px;left:-30px}
+.event-badge{position:relative;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:10px;font-weight:800;padding:5px 12px;border-radius:20px;margin-bottom:13px;letter-spacing:.02em}
+.event-title{position:relative;font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:8px}
+.event-sub{position:relative;font-size:12.5px;color:rgba(255,255,255,.82);line-height:1.5;margin-bottom:17px;max-width:280px}
+.event-foot{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.event-cta{background:#fff;color:#6d1e6b;border:none;padding:10px 18px;border-radius:13px;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.event-progress{display:flex;align-items:center;gap:8px}
+.event-progress-track{width:60px;height:5px;border-radius:5px;background:rgba(255,255,255,.25);overflow:hidden}
+.event-progress-fill{height:100%;background:#fff;border-radius:5px}
+.event-progress-txt{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.9)}
+
+/* Announcement */
+.ann-card{
+  display:flex;gap:13px;align-items:flex-start;
+  background:var(--l2);border:1px solid var(--bd);border-radius:18px;padding:16px;
+}
+.ann-icon{
+  width:46px;height:46px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;
+  box-shadow:0 6px 16px var(--glow-sm);
+}
+.ann-body{flex:1;min-width:0}
+.ann-top-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.ann-badge{font-size:9px;font-weight:800;letter-spacing:.05em;color:var(--acc3);text-transform:uppercase;background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);padding:2px 8px;border-radius:8px}
+.ann-time{font-size:10px;color:var(--tx-faint);font-weight:600}
+.ann-title{font-size:14px;font-weight:800;color:var(--tx-high);margin-bottom:5px;line-height:1.35}
+.ann-text{font-size:12px;color:var(--tx-muted);line-height:1.55;margin-bottom:12px}
+.ann-cta{font-size:11.5px;font-weight:700;color:var(--acc3);display:inline-flex;align-items:center;gap:5px}
+
+/* ── BOTTOM NAV — identical to the rest of the platform ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);
+  display:flex;justify-content:space-around;
+  padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h);
+}
+.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn-item i{font-size:20px;display:block}
+.bn-item.active{color:var(--acc)}
+
+/* toast */
+.toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fu{animation:fadeUp .3s ease both}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-logo">Dro<span class="dot"></span></div>
+  <div class="top-right">
+    <div class="top-icon-btn"><i class="fas fa-magnifying-glass"></i></div>
+    <div class="top-icon-btn">
+      <i class="fas fa-bell"></i>
+      <div class="notif-count">3</div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO — TikTok-style swipeable story cards -->
+<div class="hero" id="heroScroll">
+  <div class="swipe-indicator" id="swipeDots"></div>
+  <div class="swipe-hint"><i class="fas fa-chevron-up" style="font-size:11px"></i>Swipe</div>
+  <div id="heroSlides"></div>
+</div>
+
+<!-- BELOW HERO -->
+<div class="sections">
+
+  <!-- New Chapter Drops -->
+  <div class="section fu">
+    <div class="section-head">
+      <div><h2>📖 New Chapter Drops</h2><div class="sub">From writers you follow</div></div>
+    </div>
+    <div class="drops-row" id="dropsRow"></div>
+  </div>
+
+  <!-- Featured Event -->
+  <div class="section fu">
+    <div class="event-card" onclick="toast('🏆 Opening challenge…')">
+      <div class="event-glow1"></div><div class="event-glow2"></div>
+      <div class="event-badge"><i class="fas fa-sun" style="font-size:10px"></i> Reading Challenge</div>
+      <div class="event-title">Summer Reading Challenge</div>
+      <div class="event-sub">Read for 30 minutes a day this week and unlock a free coin bundle plus a limited badge for your profile.</div>
+      <div class="event-foot">
+        <button class="event-cta" onclick="event.stopPropagation();toast('☀️ Joined the challenge!')">Join Now <i class="fas fa-arrow-right" style="font-size:10px"></i></button>
+        <div class="event-progress">
+          <div class="event-progress-track"><div class="event-progress-fill" style="width:42%"></div></div>
+          <span class="event-progress-txt">3/7 days</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Droboard Announcement -->
+  <div class="section fu" style="margin-bottom:6px">
+    <div class="ann-card" onclick="toast('📣 Opening announcement…')">
+      <div class="ann-icon"><i class="fas fa-bullhorn"></i></div>
+      <div class="ann-body">
+        <div class="ann-top-row"><span class="ann-badge">Droboard News</span><span class="ann-time">2d ago</span></div>
+        <div class="ann-title">Reading Streaks are here 🔥</div>
+        <div class="ann-text">Track your daily reading, earn badges, and keep your streak alive. Plus: a redesigned chapter reader with adjustable fonts and themes just shipped.</div>
+        <div class="ann-cta">See what's new <i class="fas fa-arrow-right" style="font-size:10px"></i></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a class="bn-item active" href="index.html"><i class="fas fa-house"></i>Home</a>
+  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
+  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
+  <a class="bn-item" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
+  <a class="bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toast(m,d=2200){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d)}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+
+/* ── HERO STORY DATA ── */
+const HERO_STORIES=[
+  {
+    cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+    genre:'💔 Betrayal', tier:'free', rating:'4.8', reads:'171k',
+    title:"I Came Home Early and Caught My Husband Kissing My Late Sister's Photograph",
+    author:'Ada_Writes', authorAv:'https://i.pravatar.cc/100?img=32', verified:true,
+    synopsis:'A woman returns home early to find her husband in an intimate moment with a photograph of her deceased sister — revealing a love triangle she never knew existed.',
+  },
+  {
+    cover:'https://i.postimg.cc/tY7KnJyr/images.jpg',
+    genre:'✨ Twist', tier:'premium', rating:'4.9', reads:'312k',
+    title:'The Runaway Bride — I Left the Altar in My Socked Feet',
+    author:'Ifeanyi_Story', authorAv:'https://i.pravatar.cc/100?img=53', verified:true,
+    synopsis:'In front of four hundred guests, a bride does the unthinkable — and discovers that the moment everyone thought would ruin her was the moment her real life began.',
+  },
+  {
+    cover:'https://i.postimg.cc/xqmHfyNR/wolf2.jpg',
+    genre:'👑 Family', tier:'free', rating:'4.7', reads:'204k',
+    title:"My Grandmother's Will Revealed I Wasn't Her Blood",
+    author:'Chiamaka_N', authorAv:'https://i.pravatar.cc/100?img=47', verified:false,
+    synopsis:'At the reading of a grandmother\'s will, a young woman discovers a truth that redefines her identity — and finds something more powerful than blood waiting at the end.',
+  },
+  {
+    cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg',
+    genre:'🔥 Revenge', tier:'premium', rating:'4.8', reads:'192k',
+    title:'My Stepmother Stole My University Fund',
+    author:'Zara_M', authorAv:'https://i.pravatar.cc/100?img=16', verified:true,
+    synopsis:'After years of silent suffering, a girl discovers her stepmother is not who she says she is — and uses patience and the law to reclaim everything taken from her.',
+  },
+  {
+    cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',
+    genre:'🌙 Elegy', tier:'free', rating:'4.9', reads:'218k',
+    title:'The Letter He Never Sent',
+    author:'Efe_O', authorAv:'https://i.pravatar.cc/100?img=22', verified:true,
+    synopsis:'A year after losing her first love, a woman discovers an unsent letter that explains the cruelty of his final months — and finds it heals her, even from the other side.',
+  },
+];
+
+function renderHero(){
+  const dotsEl=document.getElementById('swipeDots');
+  dotsEl.innerHTML=HERO_STORIES.map((_,i)=>`<div class="swipe-dot${i===0?' on':''}"></div>`).join('');
+
+  document.getElementById('heroSlides').innerHTML=HERO_STORIES.map(s=>`
+    <div class="hero-slide" style="background-image:url('${s.cover}')">
+      <div class="hero-scrim"></div>
+      <div class="hero-badges-top">
+        <span class="badge-genre">${s.genre}</span>
+        <span class="badge-tier ${s.tier}">${s.tier==='premium'?'⭐ Premium':'🎁 Free'}</span>
+      </div>
+      <div class="hero-content">
+        <div class="hero-stats-row">
+          <span class="hero-stat rating"><i class="fas fa-star"></i> ${s.rating}</span>
+          <span class="hero-stat"><i class="far fa-eye"></i> ${s.reads} reads</span>
+        </div>
+        <div class="hero-title">${s.title}</div>
+        <div class="hero-author-row">
+          <img class="hero-av" src="${s.authorAv}" loading="lazy" alt=""/>
+          <span class="hero-author-name">@${s.author}${s.verified?' <i class=\"fas fa-circle-check\"></i>':''}</span>
+        </div>
+        <div class="hero-synopsis">${s.synopsis}</div>
+        <div class="hero-cta-row">
+          <button class="btn-start" onclick="toast('📖 Opening story…')"><i class="fas fa-play" style="font-size:12px"></i> Start Reading</button>
+          <button class="btn-icon-only" onclick="toast('📌 Saved to library')"><i class="far fa-bookmark"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+renderHero();
+
+/* swipe dot sync */
+const heroScroll=document.getElementById('heroScroll');
+let heroTicking=false;
+heroScroll.addEventListener('scroll',()=>{
+  if(heroTicking)return;
+  heroTicking=true;
+  requestAnimationFrame(()=>{
+    const idx=Math.round(heroScroll.scrollTop/heroScroll.clientHeight);
+    document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
+    heroTicking=false;
+  });
+},{passive:true});
+
+/* ── CHAPTER DROPS DATA ── */
+const CHAPTER_DROPS=[
+  {cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', title:'His Sweet Revenge — Chapter 21', author:'Luna Grey', time:'2h ago'},
+  {cover:'https://i.postimg.cc/WF1j4Pnh/6.jpg', title:'Forbidden Hearts — Chapter 9', author:'Mia Clark', time:'4h ago'},
+  {cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:"My Uncle's Stolen Will — Chapter 8", author:'Chiamaka_N', time:'6h ago'},
+  {cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg', title:"Best Friend's Ring — Chapter 4", author:'Kemi_A', time:'9h ago'},
+  {cover:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'The Letter He Never Sent — Chapter 3', author:'Efe_O', time:'12h ago'},
+  {cover:'https://i.postimg.cc/fkdXzjS8/wolf.jpg', title:"Stepmother's Secret — Chapter 6", author:'Zara_M', time:'1d ago'},
+];
+document.getElementById('dropsRow').innerHTML=CHAPTER_DROPS.map(d=>`
+  <div class="drop-card" onclick="toast('📖 Opening chapter…')">
+    <div class="drop-cover" style="background-image:url('${d.cover}')">
+      <div class="drop-scrim"></div>
+      <div class="drop-time">${d.time}</div>
+      <div class="drop-cont"><i class="fas fa-play" style="font-size:9px"></i> Continue</div>
+    </div>
+    <div class="drop-title">${d.title}</div>
+    <div class="drop-author">@${d.author}</div>
+  </div>`).join('');
+</script>
+</body>
+</html>

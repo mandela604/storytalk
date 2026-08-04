@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>DroBoard — Feed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#ff4d7d;
+    --pink-deep:#ef2c62;
+    --pink-soft:#ffe4ec;
+    --pink-softer:#fff1f5;
+    --purple:#8b5cf6;
+    --purple-deep:#6d28d9;
+    --purple-soft:#f0ebff;
+    --blue:#0ea5e9;
+    --blue-deep:#0369a1;
+    --blue-soft:#e0f4fe;
+    --green:#16a34a;
+    --green-deep:#15803d;
+    --green-soft:#eafcf1;
+    --teal:#0d9488;
+    --teal-deep:#0f766e;
+    --teal-soft:#e6f7f5;
+    --orange:#f59e0b;
+    --orange-deep:#c2610a;
+    --orange-soft:#fff2e3;
+    --gray-deep:#4b5563;
+    --ink:#15131a;
+    --ink-2:#302c39;
+    --gray-700:#5c5768;
+    --gray-500:#8b8694;
+    --gray-300:#d9d6e0;
+    --gray-100:#f4f2f7;
+    --line:#eeecf3;
+    --card-radius:18px;
+    --shadow-sm: 0 1px 2px rgba(30,20,45,.04), 0 2px 8px rgba(30,20,45,.04);
+    --shadow-md: 0 4px 14px rgba(30,20,45,.07), 0 1px 3px rgba(30,20,45,.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:#f7f6f9;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+  }
+  ::-webkit-scrollbar{ width:0; height:0; }
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;border:none;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  img{display:block;}
+  svg{display:block;}
+
+  .app{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    background:#fff;
+    position:relative;
+    box-shadow:0 0 60px rgba(0,0,0,.06);
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ================= HEADER ================= */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px 12px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(14px);
+  }
+  .logo{ font-size:23px; font-weight:800; letter-spacing:-0.03em; }
+  .logo .dro{color:var(--ink);}
+  .logo .board{color:var(--pink);}
+
+  .top-actions{ display:flex; align-items:center; gap:10px; }
+  .icon-btn{
+    width:40px; height:40px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--gray-100);
+    position:relative;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .icon-btn:active{ transform:scale(.92); }
+  .icon-btn.pink{ background:var(--pink-soft); }
+  .icon-btn.pink svg{ stroke:var(--pink-deep); }
+  .icon-btn svg{ width:19px; height:19px; stroke:var(--ink-2); }
+  .badge-dot{
+    position:absolute; top:6px; right:7px;
+    width:9px; height:9px; border-radius:50%;
+    background:#ff3b30; border:2px solid #fff;
+  }
+
+  /* ================= TABS ================= */
+  .tabs{
+    display:flex; gap:22px;
+    padding:2px 18px 0;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .tab{
+    padding:10px 1px 12px;
+    font-size:14.5px; font-weight:600;
+    color:var(--gray-500);
+    white-space:nowrap;
+    position:relative;
+  }
+  .tab.active{ color:var(--pink); }
+  .tab.active::after{
+    content:''; position:absolute; left:0; right:0; bottom:-1px;
+    height:3px; border-radius:3px; background:var(--pink);
+  }
+
+  .feed{ padding:16px 14px 100px; display:flex; flex-direction:column; gap:16px; }
+
+  /* ================= CARD BASE ================= */
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--card-radius);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+
+  /* type accent strip — the visual language that tells posts apart at a glance */
+  .card.type-chapter{ border-top:3px solid var(--pink); }
+  .card.type-recommend{ border-top:3px solid var(--blue); }
+  .card.type-poll{ border-top:3px solid var(--purple); }
+  .card.type-debate{ border-top:3px solid var(--orange); }
+  .card.type-author{ border-top:3px solid var(--green); }
+  .card.type-completed{ border-top:3px solid var(--teal); }
+  .card.type-sponsor{ border-top:3px solid var(--gray-300); }
+
+  /* ================= COMPOSER ================= */
+  .composer{ padding:16px 16px 14px; position:relative; }
+  .composer-top{ display:flex; align-items:center; gap:12px; }
+  .avatar{
+    width:44px; height:44px; border-radius:50%;
+    background:linear-gradient(135deg,#ffd3e0,#ff9ebd);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:15px;
+    flex-shrink:0;
+  }
+  .composer-input{
+    flex:1;
+    background:var(--gray-100);
+    border-radius:22px;
+    padding:12px 46px 12px 16px;
+    color:var(--gray-500);
+    font-size:14.5px;
+    position:relative;
+  }
+  .composer-fab{
+    position:absolute; right:16px; top:12px;
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 16px rgba(255,77,125,.35);
+    transition:transform .15s ease;
+  }
+  .composer-fab:active{ transform:scale(.9) rotate(90deg); }
+  .composer-fab svg{ width:18px; height:18px; stroke:#fff; }
+
+  .composer-shortcuts{
+    display:flex; justify-content:space-between;
+    margin-top:16px; padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .shortcut{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    flex:1;
+  }
+  .shortcut-ic{
+    width:38px; height:38px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease;
+  }
+  .shortcut:active .shortcut-ic{ transform:scale(.9); }
+  .shortcut-ic svg{ width:18px; height:18px; }
+  .shortcut span{ font-size:11.5px; font-weight:600; color:var(--gray-700); }
+  .sc-photo{ background:var(--purple-soft); } .sc-photo svg{ stroke:var(--purple-deep); }
+  .sc-chapter{ background:var(--pink-soft); } .sc-chapter svg{ stroke:var(--pink-deep); }
+  .sc-poll{ background:var(--green-soft); } .sc-poll svg{ stroke:#15803d; }
+  .sc-debate{ background:var(--orange-soft); } .sc-debate svg{ stroke:#c2610a; }
+
+  /* ================= STATUS ROW ================= */
+  .statuses{
+    display:flex; gap:16px; overflow-x:auto;
+    padding:4px 2px 6px;
+  }
+  .status{ display:flex; flex-direction:column; align-items:center; gap:7px; flex-shrink:0; width:62px; }
+  .status-ring{
+    width:60px; height:60px; border-radius:50%;
+    padding:2.5px;
+    background:linear-gradient(135deg,var(--pink),#ffb199, var(--purple));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .status-ring.you{ background:var(--gray-300); }
+  .status-ring .inner{
+    width:100%; height:100%; border-radius:50%;
+    background:#fff; padding:2px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .status-avatar{
+    width:100%; height:100%; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:15px;
+  }
+  .status span{ font-size:11.5px; font-weight:500; color:var(--ink-2); }
+  .status-plus{
+    width:100%; height:100%; border-radius:50%;
+    background:var(--gray-100); display:flex; align-items:center; justify-content:center;
+  }
+  .status-more{
+    width:60px; height:60px; border-radius:50%; background:var(--gray-100);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+
+  /* ================= POST HEADER ================= */
+  .post{ padding:16px; }
+  .post-head{ display:flex; align-items:center; gap:11px; margin-bottom:12px; }
+  .post-head .avatar{ width:42px; height:42px; font-size:14px; }
+  .post-meta{ flex:1; min-width:0; }
+  .post-name-row{ display:flex; align-items:center; gap:5px; }
+  .post-name{ font-size:14.5px; font-weight:700; color:var(--ink); }
+  .verified{ width:15px; height:15px; flex-shrink:0; }
+  .post-time{ font-size:12.5px; color:var(--gray-500); margin-top:1px; }
+  .head-actions{ display:flex; align-items:center; gap:2px; flex-shrink:0; }
+  .more-btn, .head-bookmark{ width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .more-btn svg, .head-bookmark svg{ width:17px; height:17px; stroke:var(--gray-500); transition:stroke .15s ease, transform .15s ease; }
+  .head-bookmark:active svg{ transform:scale(.85); }
+  .head-bookmark.saved svg{ stroke:var(--pink); fill:var(--pink); }
+
+  .label-pill{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11.5px; font-weight:700;
+    padding:5px 10px; border-radius:20px;
+    margin-bottom:10px;
+  }
+  .label-pill svg{ width:12px; height:12px; }
+  .label-pink{ background:var(--pink-soft); color:var(--pink-deep); }
+  .label-purple{ background:var(--purple-soft); color:var(--purple-deep); }
+  .label-blue{ background:var(--blue-soft); color:var(--blue-deep); }
+  .label-orange{ background:var(--orange-soft); color:var(--orange-deep); }
+  .label-green{ background:var(--green-soft); color:var(--green-deep); }
+  .label-teal{ background:var(--teal-soft); color:var(--teal-deep); }
+  .label-sponsor{ background:var(--gray-100); color:var(--gray-700); }
+
+  .post-text{ font-size:14.5px; line-height:1.5; color:var(--ink-2); margin:0 0 12px; }
+
+  /* story card */
+  .story-card{
+    border-radius:16px; overflow:hidden; position:relative;
+    background:linear-gradient(135deg,#2a2438,#4a1e3d 55%, #1b1523);
+    display:flex; min-height:150px;
+    box-shadow:var(--shadow-md);
+  }
+  .story-cover{
+    width:110px; flex-shrink:0;
+    background:linear-gradient(160deg,#5b3268,#25203a);
+    position:relative;
+  }
+  .story-cover::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(255,255,255,.08), transparent 40%);
+  }
+  .story-cover-glow{
+    position:absolute; width:70px; height:70px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,120,160,.55), transparent 70%);
+    top:30px; left:20px; filter:blur(6px);
+  }
+  .story-info{ padding:16px 14px; display:flex; flex-direction:column; justify-content:center; gap:8px; flex:1; min-width:0; }
+  .story-chapter{ font-size:11px; font-weight:700; color:#ffb0c8; letter-spacing:.02em; }
+  .story-title{ font-size:16.5px; font-weight:800; color:#fff; line-height:1.25; }
+  .story-desc{ font-size:12.5px; color:#d8cfe0; line-height:1.4; }
+  .read-btn{
+    align-self:flex-start; margin-top:4px;
+    background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    color:#fff; font-size:13px; font-weight:700;
+    padding:9px 20px; border-radius:12px;
+    box-shadow:0 6px 14px rgba(255,77,125,.35);
+  }
+
+  .post-image{
+    width:100%; border-radius:16px; overflow:hidden;
+    box-shadow:var(--shadow-sm); margin-bottom:2px;
+  }
+  .post-image img{ width:100%; height:auto; display:block; }
+
+  .book-preview{
+    display:flex; gap:12px; align-items:center;
+    background:var(--gray-100); border-radius:14px; padding:10px;
+    margin-top:10px;
+  }
+  .book-mini-cover{
+    width:44px; height:60px; border-radius:8px; flex-shrink:0;
+    background:linear-gradient(160deg,#5b3268,#25203a);
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+  }
+  .book-mini-title{ font-size:13px; font-weight:700; color:var(--ink); }
+  .book-mini-sub{ font-size:11.5px; color:var(--gray-500); margin-top:2px; }
+
+  /* actions row — centered under the post, per request */
+  .post-actions{
+    display:flex; align-items:center; justify-content:center; gap:38px;
+    margin-top:13px; padding-top:12px; border-top:1px solid var(--line);
+  }
+  .action{ display:flex; align-items:center; gap:6px; }
+  .action svg{ width:19px; height:19px; stroke:var(--gray-700); transition:transform .15s ease; }
+  .action span{ font-size:12.5px; font-weight:600; color:var(--gray-700); }
+  .action:active svg{ transform:scale(.85); }
+  .action.liked svg{ stroke:var(--pink); fill:var(--pink); }
+  .action.liked span{ color:var(--pink); }
+
+  /* ================= POLL ================= */
+  .poll-question{ font-size:15px; font-weight:700; color:var(--ink); margin-bottom:14px; line-height:1.35; }
+  .poll-bar-row{ margin-bottom:10px; }
+  .poll-bar-labels{ display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:6px; }
+  .poll-bar-labels .pct{ color:var(--purple-deep); }
+  .poll-track{ height:10px; border-radius:6px; background:var(--gray-100); overflow:hidden; }
+  .poll-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--purple),#a78bfa); animation:growBar 1.1s cubic-bezier(.2,.7,.3,1) both; }
+  .poll-fill.f2{ background:linear-gradient(90deg,var(--pink),#ff8fab); }
+  .poll-fill.f3{ background:linear-gradient(90deg,#38bdf8,#818cf8); }
+  @keyframes growBar{ from{ width:0 !important; } }
+  .vote-btn{
+    width:100%; margin-top:10px;
+    background:var(--purple-deep); color:#fff;
+    font-size:14px; font-weight:700; padding:12px; border-radius:13px;
+    box-shadow:0 8px 16px rgba(109,40,217,.25);
+  }
+
+  /* ================= AD / PREMIUM ================= */
+  .ad-card{
+    border-radius:16px; overflow:hidden; position:relative;
+    background:linear-gradient(150deg,#2b1930,#4a1030 60%,#210f22);
+    padding:0; min-height:210px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    box-shadow:var(--shadow-md);
+  }
+  .ad-art{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,150,180,.35), transparent 55%),
+      radial-gradient(circle at 80% 0%, rgba(139,92,246,.35), transparent 50%);
+  }
+  .ad-body{ position:relative; padding:18px; }
+  .ad-headline{ font-size:18px; font-weight:800; color:#fff; margin:6px 0 10px; line-height:1.25; }
+  .ad-checklist{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .ad-checklist div{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:#f0e7f5; }
+  .ad-checklist svg{ width:15px; height:15px; stroke:#ffb0c8; flex-shrink:0; }
+  .premium-btn{
+    background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    color:#fff; font-weight:700; font-size:14px; padding:12px; border-radius:13px;
+    text-align:center; box-shadow:0 8px 18px rgba(255,77,125,.4);
+  }
+
+  /* ================= CONVERSATION / DEBATE ================= */
+  .conv-question{ font-size:15.5px; font-weight:700; margin-bottom:14px; line-height:1.35; }
+  .vote-panels{ display:flex; gap:10px; margin-bottom:12px; }
+  .vote-panel{
+    flex:1; border-radius:14px; padding:16px 10px; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .vote-panel.yes{ background:var(--green-soft); }
+  .vote-panel.no{ background:var(--pink-softer); }
+  .vote-ic{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .vote-panel.yes .vote-ic{ background:var(--green); }
+  .vote-panel.no .vote-ic{ background:var(--pink); }
+  .vote-ic svg{ width:17px; height:17px; stroke:#fff; }
+  .vote-panel strong{ font-size:14px; }
+  .vote-panel.yes strong{ color:var(--green-deep); }
+  .vote-panel.no strong{ color:var(--pink-deep); }
+  .join-btn{ font-size:12px; font-weight:700; padding:7px 16px; border-radius:10px; }
+  .vote-panel.yes .join-btn{ background:var(--green); color:#fff; }
+  .vote-panel.no .join-btn{ background:var(--pink); color:#fff; }
+  .disc-count{ text-align:center; font-size:12.5px; color:var(--gray-500); margin-bottom:10px; }
+  .view-disc-btn{
+    width:100%; border:1.5px solid var(--line); border-radius:13px; padding:11px;
+    font-size:13.5px; font-weight:700; color:var(--ink-2);
+  }
+
+  /* ================= WRITING CONTEST ================= */
+  .contest-card{
+    border-radius:18px; padding:22px 18px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#7c3aed,#a855f7 55%,#ec4899);
+    box-shadow:0 14px 30px rgba(124,58,237,.3);
+  }
+  .contest-glow{ position:absolute; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,.12); top:-60px; right:-60px; }
+  .trophy-wrap{
+    width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+    backdrop-filter:blur(4px);
+  }
+  .trophy-wrap svg{ width:32px; height:32px; stroke:#fff; }
+  .contest-title{ font-size:19px; font-weight:800; color:#fff; line-height:1.25; margin-bottom:10px; position:relative; }
+  .contest-tags{ display:flex; gap:8px; margin-bottom:18px; position:relative; flex-wrap:wrap; }
+  .contest-tag{ background:rgba(255,255,255,.2); color:#fff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:20px; }
+  .contest-btn{
+    background:#fff; color:var(--purple-deep); font-weight:800; font-size:14px;
+    padding:12px; border-radius:13px; text-align:center; position:relative;
+  }
+
+  /* ================= SPONSORED STORY ================= */
+  .sponsored-cover{
+    height:190px; border-radius:16px; position:relative; overflow:hidden;
+    background:linear-gradient(160deg,#3a1e2e,#7a2d4a 45%,#1c1420);
+    display:flex; align-items:flex-end; padding:16px; margin-bottom:14px;
+  }
+  .sponsored-cover::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 70% 20%, rgba(255,150,180,.35), transparent 55%);
+  }
+  .sponsored-cover-title{ position:relative; color:#fff; font-size:19px; font-weight:800; line-height:1.25; }
+  .genre-pills{ display:flex; gap:8px; margin-bottom:10px; }
+  .genre-pill{ background:var(--gray-100); color:var(--gray-700); font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:20px; }
+  .sponsored-desc{ font-size:13.5px; color:var(--gray-700); line-height:1.5; margin-bottom:14px; }
+  .read-now-center{
+    text-align:center; background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    color:#fff; font-weight:700; font-size:14px; padding:12px; border-radius:13px;
+    box-shadow:0 8px 16px rgba(255,77,125,.3);
+  }
+
+  /* ================= INVITE (custom ticket-stub design) ================= */
+  .invite-card{
+    display:flex; align-items:stretch; padding:0;
+    background:linear-gradient(120deg,#fff4e8,#ffe9ef 70%);
+  }
+  .invite-main{ flex:1; padding:18px 14px 18px 18px; min-width:0; }
+  .invite-avatars{ display:flex; margin-bottom:10px; }
+  .mini-av{
+    width:26px; height:26px; border-radius:50%; border:2px solid #fff;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:10.5px; font-weight:700; margin-left:-8px;
+    box-shadow:0 1px 3px rgba(0,0,0,.12);
+  }
+  .mini-av:first-child{ margin-left:0; }
+  .mini-av.more{ background:var(--ink); font-size:9.5px; }
+  .invite-heading{ font-size:14.5px; font-weight:800; color:var(--ink); margin-bottom:4px; line-height:1.3; }
+  .invite-sub{ font-size:12px; color:var(--gray-700); line-height:1.4; margin-bottom:14px; }
+  .invite-cta{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--ink); color:#fff; font-size:13px; font-weight:700;
+    padding:10px 16px; border-radius:12px;
+  }
+  .invite-cta svg{ width:14px; height:14px; stroke:#fff; }
+  .invite-stub{
+    width:92px; flex-shrink:0; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    background:rgba(255,255,255,.55);
+    border-left:2px dashed rgba(21,19,26,.14);
+  }
+  .invite-stub svg{ width:24px; height:24px; stroke:var(--orange); margin-bottom:3px; }
+  .stub-amount{ font-size:17px; font-weight:800; color:var(--ink); line-height:1; }
+  .stub-label{ font-size:10px; font-weight:600; color:var(--gray-500); margin-top:2px; }
+
+  /* ================= BOTTOM NAV ================= */
+  .bottom-nav{
+    position:sticky; bottom:0; z-index:50;
+    display:flex; justify-content:space-around; align-items:center;
+    background:rgba(255,255,255,.95); backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);
+    padding:10px 6px calc(10px + env(safe-area-inset-bottom));
+    max-width:430px; width:100%;
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; padding:4px 0; }
+  .nav-item svg{ width:22px; height:22px; stroke:var(--gray-500); transition:transform .15s ease; }
+  .nav-item span{ font-size:10.5px; font-weight:600; color:var(--gray-500); }
+  .nav-item.active svg{ stroke:var(--pink); }
+  .nav-item.active span{ color:var(--pink); font-weight:700; }
+  .nav-item:active svg{ transform:scale(.88); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+    <symbol id="i-bar" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+    <symbol id="i-swords" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l7-7"/><path d="M20 4l-7 7"/><path d="M4 4l16 16"/><path d="M9 9l-5-5H2v2l5 5"/><path d="M15 15l5 5h2v-2l-5-5"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/><circle cx="5" cy="12" r="1.4"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+    <symbol id="i-comment" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-badge" viewBox="0 0 24 24" fill="#ff4d7d" stroke="#fff" stroke-width="1.2"><path d="M12 2l2.4 1.4 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12l-1.4 2.4.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22l-2.4-1.4-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12l1.4-2.4-.4-2.7 2.5-1.2 1.2-2.5 2.7.4z"/><polyline points="8.5 12 11 14.5 15.5 9.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H3v2a4 4 0 0 0 4 4M17 5h4v2a4 4 0 0 1-4 4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v10h14V10"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-thumbup" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v11"/><path d="M14 5l-1 5h7.5a1.5 1.5 0 0 1 1.45 1.87l-1.72 6.5A2 2 0 0 1 18.3 20H7"/></symbol>
+    <symbol id="i-thumbdown" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V3"/><path d="M10 19l1-5H3.5A1.5 1.5 0 0 1 2.05 12.13l1.72-6.5A2 2 0 0 1 5.7 4H17"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 2.5-1.7c1.5 0 2.6 1 2.6 2.1 0 2.8-4.2 2.1-4.2 4.8 0 1.2 1.1 2.1 2.6 2.1a2.6 2.6 0 0 0 2.5-1.7"/><line x1="12" y1="6" x2="12" y2="18"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="logo"><span class="dro">Dro</span><span class="board">Board</span></div>
+    <div class="top-actions">
+      <button class="icon-btn"><svg><use href="#i-bell"/></svg><span class="badge-dot"></span></button>
+      <button class="icon-btn pink"><svg><use href="#i-gift"/></svg></button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <div class="tab active">Following</div>
+    <div class="tab">For You</div>
+    <div class="tab">Trending</div>
+    <div class="tab">My Circles</div>
+  </nav>
+
+  <div class="feed">
+
+    <!-- COMPOSER -->
+    <div class="card composer">
+      <div class="composer-top">
+        <div class="avatar">Y</div>
+        <div class="composer-input">What's happening in your story world?
+          <div class="composer-fab"><svg><use href="#i-plus"/></svg></div>
+        </div>
+      </div>
+      <div class="composer-shortcuts">
+        <div class="shortcut"><div class="shortcut-ic sc-photo"><svg><use href="#i-camera"/></svg></div><span>Photo</span></div>
+        <div class="shortcut"><div class="shortcut-ic sc-chapter"><svg><use href="#i-book"/></svg></div><span>Chapter Drop</span></div>
+        <div class="shortcut"><div class="shortcut-ic sc-poll"><svg><use href="#i-bar"/></svg></div><span>Poll</span></div>
+        <div class="shortcut"><div class="shortcut-ic sc-debate"><svg><use href="#i-swords"/></svg></div><span>Debate</span></div>
+      </div>
+    </div>
+
+    <!-- STATUS ROW -->
+    <div class="statuses">
+      <div class="status">
+        <div class="status-ring you"><div class="inner"><div class="status-plus"><svg style="width:18px;height:18px;stroke:var(--pink)"><use href="#i-plus"/></svg></div></div></div>
+        <span>Your Story</span>
+      </div>
+      <div class="status">
+        <div class="status-ring"><div class="inner"><div class="status-avatar" style="background:linear-gradient(135deg,#ff8fab,#c084fc)">L</div></div></div>
+        <span>Luna Grey</span>
+      </div>
+      <div class="status">
+        <div class="status-ring"><div class="inner"><div class="status-avatar" style="background:linear-gradient(135deg,#38bdf8,#818cf8)">A</div></div></div>
+        <span>Alex Pierce</span>
+      </div>
+      <div class="status">
+        <div class="status-ring"><div class="inner"><div class="status-avatar" style="background:linear-gradient(135deg,#fbbf24,#fb7185)">M</div></div></div>
+        <span>Mia Clark</span>
+      </div>
+      <div class="status">
+        <div class="status-ring"><div class="inner"><div class="status-avatar" style="background:linear-gradient(135deg,#34d399,#22d3ee)">J</div></div></div>
+        <span>Jaxon</span>
+      </div>
+      <div class="status-more"><svg style="width:17px;height:17px;stroke:var(--gray-500)"><use href="#i-dots"/></svg></div>
+    </div>
+
+    <!-- POST 1: Chapter Drop -->
+    <article class="card post type-chapter">
+      <div class="post-head">
+        <div class="avatar" style="background:linear-gradient(135deg,#ff8fab,#c084fc)">L</div>
+        <div class="post-meta">
+          <div class="post-name-row"><span class="post-name">Luna Grey</span><svg class="verified"><use href="#i-badge"/></svg></div>
+          <div class="post-time">2m ago</div>
+        </div>
+        <div class="head-actions">
+          <button class="head-bookmark"><svg><use href="#i-bookmark"/></svg></button>
+          <button class="more-btn"><svg><use href="#i-dots"/></svg></button>
+        </div>
+      </div>
+
+      <span class="label-pill label-pink"><svg><use href="#i-book"/></svg>Chapter Drop</span>
+
+      <div class="story-card">
+        <div class="story-cover"><div class="story-cover-glow"></div></div>
+        <div class="story-info">
+          <div class="story-chapter">CHAPTER 21</div>
+          <div class="story-title">His Sweet Revenge</div>
+          <div class="story-desc">She swore she'd never forgive him — but revenge has a way of turning into something else.</div>
+          <div class="read-btn">Read Now</div>
+        </div>
+      </div>
+
+      <div class="post-actions">
+        <div class="action liked"><svg><use href="#i-heart"/></svg><span>2.4k</span></div>
+        <div class="action"><svg><use href="#i-comment"/></svg><span>318</span></div>
+        <div class="action"><svg><use href="#i-share"/></svg><span>Share</span></div>
+      </div>
+    </article>
+
+    <!-- POST 2: Recommendation / reader reaction -->
+    <article class="card post type-recommend">
+      <div class="post-head">
+        <div class="avatar" style="background:linear-gradient(135deg,#fbbf24,#fb7185)">E</div>
+        <div class="post-meta">
+          <div class="post-name-row"><span class="post-name">Emily Carter</span></div>
+          <div class="post-time">15m ago</div>
+        </div>
+        <div class="head-actions">
+          <button class="more-btn"><svg><use href="#i-dots"/></svg></button>
+        </div>
+      </div>
+
+      <span class="label-pill label-blue"><svg><use href="#i-heart"/></svg>Recommendation</span>
+
+      <p class="post-text">This chapter just broke me! 💔🔥</p>
+
+      <div class="post-image">
+        <img src="https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?w=800&q=80&auto=format&fit=crop" alt="Story scene" loading="lazy"/>
+      </div>
+
+      <div class="book-preview">
+        <div class="book-mini-cover"></div>
+        <div>
+          <div class="book-mini-title">The Billionaire's Regret</div>
+          <div class="book-mini-sub">Chapter 14 · Romance</div>
+        </div>
+      </div>
+
+      <div class="post-actions">
+        <div class="action"><svg><use href="#i-heart"/></svg><span>1.1k</span></div>
+        <div class="action"><svg><use href="#i-comment"/></svg><span>96</span></div>
+        <div class="action"><svg><use href="#i-share"/></svg><span>Share</span></div>
+      </div>
+    </article>
+
+    <!-- POST 3: Poll -->
+    <article class="card post type-poll">
+      <div class="post-head">
+        <div class="avatar" style="background:linear-gradient(135deg,#a78bfa,#818cf8)">M</div>
+        <div class="post-meta">
+          <div class="post-name-row"><span class="post-name">Mia Clark</span></div>
+          <div class="post-time">32m ago</div>
+        </div>
+        <div class="head-actions">
+          <button class="more-btn"><svg><use href="#i-dots"/></svg></button>
+        </div>
+      </div>
+
+      <span class="label-pill label-purple"><svg><use href="#i-bar"/></svg>Poll</span>
+
+      <div class="poll-question">Which ending would you love for "The Billionaire's Regret"?</div>
+
+      <div class="poll-bar-row">
+        <div class="poll-bar-labels"><span>Happy Ending</span><span class="pct">42%</span></div>
+        <div class="poll-track"><div class="poll-fill" style="width:42%"></div></div>
+      </div>
+      <div class="poll-bar-row">
+        <div class="poll-bar-labels"><span>Tragic Ending</span><span class="pct">31%</span></div>
+        <div class="poll-track"><div class="poll-fill f2" style="width:31%"></div></div>
+      </div>
+      <div class="poll-bar-row">
+        <div class="poll-bar-labels"><span>Open Ending</span><span class="pct">27%</span></div>
+        <div class="poll-track"><div class="poll-fill f3" style="width:27%"></div></div>
+      </div>
+
+      <button class="vote-btn">Vote Now</button>
+    </article>
+
+    <!-- ADVERTISEMENT -->
+    <div class="card ad-card">
+      <div class="ad-art"></div>
+      <div class="ad-body">
+        <span class="label-pill label-pink" style="background:rgba(255,255,255,.16);color:#ffd6e3">Sponsored</span>
+        <div class="ad-headline">Unlock unlimited stories &amp; perks</div>
+        <div class="ad-checklist">
+          <div><svg><use href="#i-check"/></svg>Ad-free reading</div>
+          <div><svg><use href="#i-check"/></svg>Early chapter access</div>
+          <div><svg><use href="#i-check"/></svg>Exclusive stories</div>
+        </div>
+        <div class="premium-btn">Go Premium</div>
+      </div>
+    </div>
+
+    <!-- Conversation / Debate card -->
+    <div class="card post type-debate">
+      <span class="label-pill label-orange"><svg><use href="#i-swords"/></svg>Debate</span>
+      <div class="conv-question">Should villains get redemption?</div>
+      <div class="vote-panels">
+        <div class="vote-panel yes">
+          <div class="vote-ic"><svg><use href="#i-thumbup"/></svg></div>
+          <strong>Yes</strong>
+          <div class="join-btn">Join</div>
+        </div>
+        <div class="vote-panel no">
+          <div class="vote-ic"><svg><use href="#i-thumbdown"/></svg></div>
+          <strong>No</strong>
+          <div class="join-btn">Join</div>
+        </div>
+      </div>
+      <div class="disc-count">1,204 people are discussing this</div>
+      <button class="view-disc-btn">View Discussion</button>
+    </div>
+
+    <!-- AUTHOR POST -->
+    <article class="card post type-author">
+      <div class="post-head" style="margin-top:2px;">
+        <div class="avatar" style="background:linear-gradient(135deg,#38bdf8,#818cf8)">A</div>
+        <div class="post-meta">
+          <div class="post-name-row"><span class="post-name">Alex Pierce</span><svg class="verified"><use href="#i-badge"/></svg></div>
+          <div class="post-time">4h ago</div>
+        </div>
+        <div class="head-actions">
+          <button class="head-bookmark"><svg><use href="#i-bookmark"/></svg></button>
+          <button class="more-btn"><svg><use href="#i-dots"/></svg></button>
+        </div>
+      </div>
+
+      <span class="label-pill label-green"><svg><use href="#i-edit"/></svg>Author Post</span>
+
+      <p class="post-text">Chapter 22 is almost ready! Thank you all for being so patient with me 🥹 dropping tomorrow night.</p>
+
+      <div class="post-image">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80&auto=format&fit=crop" alt="Announcement" loading="lazy"/>
+      </div>
+
+      <div class="post-actions">
+        <div class="action"><svg><use href="#i-heart"/></svg><span>3.7k</span></div>
+        <div class="action"><svg><use href="#i-comment"/></svg><span>412</span></div>
+        <div class="action"><svg><use href="#i-share"/></svg><span>Share</span></div>
+      </div>
+    </article>
+
+    <!-- WRITING CONTEST -->
+    <div class="card contest-card" style="border:none;">
+      <div class="contest-glow"></div>
+      <div class="trophy-wrap"><svg><use href="#i-trophy"/></svg></div>
+      <div class="contest-title">DroBoard Writing Contest</div>
+      <div class="contest-tags">
+        <span class="contest-tag">₦100,000 Prize</span>
+        <span class="contest-tag">Featured Placement</span>
+      </div>
+      <div class="contest-btn">Enter Contest</div>
+    </div>
+
+    <!-- SPONSORED STORY -->
+    <div class="card post type-sponsor">
+      <span class="label-pill label-sponsor">Sponsored</span>
+      <div class="sponsored-cover">
+        <div class="sponsored-cover-title">Bound to the Ruthless CEO</div>
+      </div>
+      <div class="genre-pills">
+        <span class="genre-pill">Romance</span>
+        <span class="genre-pill">Billionaire</span>
+      </div>
+      <p class="sponsored-desc">She signed the contract to save her family. He signed it to claim what he'd always wanted — her.</p>
+      <div class="read-now-center">Read Now</div>
+    </div>
+
+    <!-- Finished reading / completed post -->
+    <article class="card post type-completed">
+      <div class="post-head">
+        <div class="avatar" style="background:linear-gradient(135deg,#34d399,#22d3ee)">B</div>
+        <div class="post-meta">
+          <div class="post-name-row"><span class="post-name">BookAddict</span></div>
+          <div class="post-time">6h ago</div>
+        </div>
+        <div class="head-actions">
+          <button class="more-btn"><svg><use href="#i-dots"/></svg></button>
+        </div>
+      </div>
+
+      <span class="label-pill label-teal"><svg><use href="#i-check"/></svg>Finished Reading</span>
+
+      <p class="post-text">Just finished this masterpiece 😭❤️ I'm never going to be the same.</p>
+
+      <div class="book-preview">
+        <div class="book-mini-cover"></div>
+        <div>
+          <div class="book-mini-title">His Sweet Revenge</div>
+          <div class="book-mini-sub">Completed · 32 chapters</div>
+        </div>
+      </div>
+
+      <div class="post-actions">
+        <div class="action"><svg><use href="#i-heart"/></svg><span>842</span></div>
+        <div class="action"><svg><use href="#i-comment"/></svg><span>63</span></div>
+        <div class="action"><svg><use href="#i-share"/></svg><span>Share</span></div>
+      </div>
+    </article>
+
+    <!-- INVITE CARD — custom ticket-stub design -->
+    <div class="card invite-card">
+      <div class="invite-main">
+        <div class="invite-avatars">
+          <div class="mini-av" style="background:linear-gradient(135deg,#ff8fab,#c084fc)">L</div>
+          <div class="mini-av" style="background:linear-gradient(135deg,#38bdf8,#818cf8)">A</div>
+          <div class="mini-av" style="background:linear-gradient(135deg,#fbbf24,#fb7185)">M</div>
+          <div class="mini-av more">+12</div>
+        </div>
+        <div class="invite-heading">Invite friends, earn coins</div>
+        <div class="invite-sub">You both get 50 coins when they join DroBoard</div>
+        <div class="invite-cta">Invite Friends<svg><use href="#i-plus"/></svg></div>
+      </div>
+      <div class="invite-stub">
+        <svg><use href="#i-coin"/></svg>
+        <div class="stub-amount">+50</div>
+        <div class="stub-label">coins</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <div class="nav-item"><svg><use href="#i-home"/></svg><span>Home</span></div>
+    <div class="nav-item"><svg><use href="#i-compass"/></svg><span>Discover</span></div>
+    <div class="nav-item"><svg><use href="#i-search"/></svg><span>Search</span></div>
+    <div class="nav-item active"><svg><use href="#i-layers"/></svg><span>Feed</span></div>
+    <div class="nav-item"><svg><use href="#i-user"/></svg><span>Profile</span></div>
+  </nav>
+
+</div>
+
+<script>
+  // Like toggle
+  document.querySelectorAll('.action').forEach(el=>{
+    if(el.querySelector('svg use[href="#i-heart"]')){
+      el.addEventListener('click', ()=> el.classList.toggle('liked'));
+    }
+  });
+  // Bookmark toggle (now lives in the post header)
+  document.querySelectorAll('.head-bookmark').forEach(btn=>{
+    btn.addEventListener('click', ()=> btn.classList.toggle('saved'));
+  });
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  // Bottom nav switching
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click', function(){
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
