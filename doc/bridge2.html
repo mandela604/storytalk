@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>DroBoard — The Billionaire's Regret</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Dancing+Script:wght@700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<!-- Reusable Droboard component: builds its own UI, injects its own
+     CSS, and appends itself to <body> on load. -->
+<script src="component/bottom-nav.js"></script>
+<style>
+:root{
+  --pink:#FF2D6A; --pink-deep:#D6165A; --pink-soft:#FDE3EC; --pink-line:#FBCADB;
+  --green:#16A34A; --green-soft:#E4F8EA;
+  --ink:#17151B; --ink-2:#2E2B34; --gray-600:#635F6E; --gray-400:#9A96A3;
+  --line:#EFEDF2; --divider:#F3F1F5; --white:#FFFFFF;
+  --font-display:'Playfair Display',serif;
+  --font-script:'Dancing Script',cursive;
+  --font-body:'DM Sans',-apple-system,sans-serif;
+  --nav-h:64px; --safe-b:env(safe-area-inset-bottom,12px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--divider)}
+body{font-family:var(--font-body);color:var(--ink);display:flex;justify-content:center;min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--nav-h) + var(--safe-b))}
+button{font-family:inherit;border:none;background:none;cursor:pointer}
+img{display:block;object-fit:cover}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{display:none}
+
+.phone{width:100%;max-width:420px;min-height:100vh;background:var(--white);position:relative;box-shadow:0 0 50px rgba(0,0,0,.10);display:flex;flex-direction:column;overflow-x:hidden}
+
+/* ===== TOP BAR ===== */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,0);display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;transition:background .2s ease,border-color .2s ease;border-bottom:1px solid transparent}
+.topbar.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom-color:var(--line)}
+.topbar-title{
+  position:absolute;left:56px;right:56px;text-align:center;font-family:var(--font-display);
+  font-size:16.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transition:opacity .2s ease;pointer-events:none
+}
+.topbar.scrolled .topbar-title{opacity:1}
+.topbar.scrolled .icon-btn{box-shadow:none;border-color:var(--line)}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:var(--white);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.icon-btn:active{transform:scale(.93)}
+.top-right{display:flex;gap:9px}
+
+.content{flex:1;padding-bottom:26px}
+
+/* ===== COVER ===== */
+.cover-section{padding:6px 16px 0;display:flex;flex-direction:column;align-items:center}
+.cover-wrap{
+  position:relative;width:min(78%,232px);aspect-ratio:232/300;border-radius:20px;overflow:hidden;
+  box-shadow:0 16px 34px rgba(0,0,0,.22);background-size:cover;background-position:center;
+}
+.cover-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.86) 0%,rgba(0,0,0,.25) 46%,rgba(0,0,0,.15) 70%,rgba(0,0,0,.35) 100%)}
+.cover-status{
+  position:absolute;top:11px;right:11px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;
+  letter-spacing:.04em;padding:5px 11px;border-radius:9px;z-index:2
+}
+.cover-text{position:absolute;left:16px;right:16px;bottom:16px;z-index:2}
+.cover-title-1{font-family:var(--font-display);font-size:24px;font-weight:800;color:#fff;line-height:1.08}
+.cover-title-2{font-family:var(--font-script);font-size:40px;font-weight:700;color:var(--pink-soft);line-height:1;margin-top:2px;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.cover-tag{font-family:var(--font-display);font-style:italic;font-size:11.5px;color:rgba(255,255,255,.85);margin-top:8px}
+.cover-author{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.18em;margin-top:9px}
+
+.cover-dots{display:flex;justify-content:center;gap:6px;margin:12px 0 4px}
+.cover-dot{width:6px;height:6px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
+.cover-dot.on{background:var(--pink);width:16px;border-radius:3px}
+
+/* ===== TITLE / META ===== */
+.title-block{padding:8px 20px 0;text-align:center}
+.story-title{font-family:var(--font-display);font-size:26px;font-weight:800;line-height:1.15;margin-bottom:7px}
+.story-author{font-size:14px;color:var(--gray-600);margin-bottom:9px}
+.story-author strong{color:var(--ink);font-weight:700}
+.story-author i{color:var(--pink);font-size:11.5px;margin-left:3px}
+.rating-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:11px}
+.rating-row i{color:var(--pink);font-size:13px}
+.rating-num{font-size:14px;font-weight:800;color:var(--ink)}
+.rating-count{font-size:12.5px;color:var(--gray-400)}
+
+.meta-row{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;font-size:12.5px;color:var(--gray-600);font-weight:600;margin-bottom:20px}
+.meta-row i{font-size:11.5px;color:var(--gray-400);margin-right:4px}
+.meta-sep{color:var(--line)}
+.meta-status{color:var(--green);font-weight:700}
+
+/* ===== CTA ===== */
+.cta-row{padding:0 16px 14px}
+.btn-continue{
+  width:100%;background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:#fff;
+  border-radius:16px;padding:14px 16px 13px;text-align:center;box-shadow:0 10px 22px rgba(255,45,106,.3)
+}
+.btn-continue:active{transform:scale(.99)}
+.btn-continue-top{display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:800}
+.btn-continue-sub{font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;margin-top:3px}
+
+/* ===== QUICK ACTIONS ===== */
+.quick-row{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 16px 16px}
+.quick-item{
+  background:var(--white);border:1px solid var(--line);border-radius:15px;padding:13px 6px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer
+}
+.quick-item:active{transform:scale(.96);background:var(--divider)}
+.quick-item i{font-size:16px;color:var(--pink)}
+.quick-item span{font-size:11px;font-weight:700;color:var(--ink-2)}
+
+/* ===== SYNOPSIS ===== */
+.synopsis-card{margin:0 16px 16px;background:var(--divider);border-radius:16px;padding:16px}
+.synopsis-title{font-size:14.5px;font-weight:800;margin-bottom:9px}
+.synopsis-text{font-size:13px;color:var(--ink-2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.synopsis-text.expanded{-webkit-line-clamp:unset}
+.synopsis-toggle{display:inline-flex;align-items:center;gap:5px;color:var(--pink);font-size:12.5px;font-weight:700;margin-top:8px;cursor:pointer}
+
+/* ===== STATS ===== */
+.stats-card{margin:0 16px 16px;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px 6px;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-cell{display:flex;flex-direction:column;align-items:center;gap:6px}
+.stat-cell i{font-size:16px;color:var(--pink)}
+.stat-cell .n{font-size:15.5px;font-weight:800;color:var(--ink)}
+.stat-cell .l{font-size:10.5px;color:var(--gray-400);font-weight:600}
+
+/* ===== CHAPTERS ===== */
+.chapters-section{padding:0 16px 8px}
+.chapters-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.chapters-title{font-size:16px;font-weight:800}
+.chapters-viewall{font-size:12.5px;font-weight:700;color:var(--pink)}
+.chapter-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.chapter-item:last-child{border-bottom:none}
+.chapter-icon{
+  width:38px;height:38px;border-radius:11px;background:var(--pink-soft);color:var(--pink);
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0
+}
+.chapter-icon.locked{background:var(--divider);color:var(--gray-400)}
+.chapter-body{flex:1;min-width:0}
+.chapter-title{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chapter-sub{font-size:11.5px;color:var(--gray-400);margin-top:2px}
+.chapter-btn{
+  flex-shrink:0;padding:7px 15px;border-radius:20px;font-size:12px;font-weight:700;
+  border:1.5px solid var(--pink-line);color:var(--pink);background:var(--white)
+}
+.chapter-btn.locked{border-color:var(--line);color:var(--gray-400)}
+.chapter-btn:active{transform:scale(.96)}
+
+/* Simple (locked / unread) chapter row — no icon box, no button */
+.chapter-row-simple{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.chapter-row-simple:last-child{border-bottom:none}
+.chapter-row-title{font-size:14px;font-weight:700;color:var(--ink)}
+.chapter-row-lock{color:var(--gray-400);font-size:14px}
+
+/* ===== SECTION SHELL (matches Chapters card styling) ===== */
+.section-card{margin:16px 16px 0;background:var(--divider);border:1px solid var(--line);border-radius:16px;padding:16px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:16px;font-weight:800}
+.section-viewall{font-size:12.5px;font-weight:700;color:var(--pink)}
+
+/* ===== READERS ALSO ENJOY ===== */
+.rae-row{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.rae-row::-webkit-scrollbar{display:none}
+.rae-card{flex:0 0 130px;width:130px;cursor:pointer}
+.rae-cover{
+  position:relative;width:100%;aspect-ratio:130/172;border-radius:12px;overflow:hidden;
+  background-size:cover;background-position:center;box-shadow:0 6px 16px rgba(0,0,0,.14);margin-bottom:8px
+}
+.rae-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.15) 55%,transparent 75%)}
+.rae-cover-title{
+  position:absolute;left:9px;right:9px;bottom:10px;font-family:var(--font-display);
+  font-weight:800;color:#fff;font-size:13.5px;line-height:1.2;text-transform:uppercase;letter-spacing:.01em
+}
+.rae-title{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rae-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--gray-600);font-weight:600}
+.rae-meta i{font-size:10px;margin-right:3px}
+.rae-meta .star{color:var(--pink)}
+.rae-meta .eye{color:var(--gray-400)}
+
+/* ===== ABOUT THE AUTHOR ===== */
+.author-card{display:flex;gap:13px}
+.author-av{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.author-body{flex:1;min-width:0}
+.author-name-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.author-name{font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px}
+.author-name i{color:var(--pink);font-size:12px}
+.author-bio{font-size:12.5px;color:var(--gray-600);line-height:1.5;margin-bottom:12px}
+.btn-follow-sm{
+  flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:#fff;
+  font-size:12.5px;font-weight:800;padding:9px 18px;border-radius:14px;box-shadow:0 6px 14px rgba(255,45,106,.28)
+}
+.btn-follow-sm:active{transform:scale(.96)}
+.author-stats{display:flex;align-items:flex-start}
+.author-stat{flex:1;text-align:left}
+.author-stat .n{font-size:15px;font-weight:800;color:var(--ink)}
+.author-stat .l{font-size:11px;color:var(--gray-400);font-weight:600;margin-top:2px}
+.author-stat-div{width:1px;background:var(--line);margin:2px 16px}
+
+/* ===== REVIEWS ===== */
+.review-card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px}
+.review-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.review-stars{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.review-stars i.fa-star{color:var(--pink);font-size:11px}
+.review-name{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px}
+.review-name i.fa-circle-check{color:var(--pink);font-size:11px}
+.review-time{font-size:11px;color:var(--gray-400);flex-shrink:0}
+.review-text{font-size:13px;color:var(--ink-2);line-height:1.55;margin-bottom:11px}
+.review-foot{display:flex;align-items:center;justify-content:space-between}
+.review-actions{display:flex;align-items:center;gap:16px}
+.review-action{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600);font-weight:600}
+.review-action i{font-size:13px}
+.review-more{color:var(--gray-400);font-size:13px}
+
+/* ===== TIP BANNER ===== */
+.tip-banner{margin:16px 16px 0;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px}
+.tip-icon{
+  width:46px;height:46px;border-radius:13px;background:var(--pink-soft);color:var(--pink);
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0
+}
+.tip-body{flex:1;min-width:0}
+.tip-title{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:2px}
+.tip-sub{font-size:12px;color:var(--gray-600);line-height:1.4}
+.btn-tip{
+  flex-shrink:0;display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  color:#fff;font-size:12.5px;font-weight:800;padding:10px 16px;border-radius:14px;box-shadow:0 6px 14px rgba(255,45,106,.28)
+}
+.btn-tip:active{transform:scale(.96)}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:360px){
+  .cover-wrap{width:82%}
+  .story-title{font-size:22px}
+  .quick-row{gap:7px}
+}
+@media (min-width:421px){
+  .phone{border-radius:0}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <div class="icon-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></div>
+    <div class="topbar-title">The Billionaire's Regret</div>
+    <div class="top-right">
+      <div class="icon-btn" id="bookmarkBtn"><i class="far fa-bookmark"></i></div>
+      <div class="icon-btn"><i class="fas fa-ellipsis"></i></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- COVER -->
+    <div class="cover-section">
+      <div class="cover-wrap" id="coverWrap" style="background-image:url('https://i.postimg.cc/RqtfSQJJ/wife3.jpg')">
+        <div class="cover-scrim"></div>
+        <div class="cover-status">COMPLETED</div>
+        <div class="cover-text">
+          <div class="cover-title-1">The Billionaire's</div>
+          <div class="cover-title-2">Regret</div>
+          <div class="cover-tag">Some loves come too late.</div>
+          <div class="cover-author">ADA_WRITES</div>
+        </div>
+      </div>
+      <div class="cover-dots" id="coverDots"></div>
+    </div>
+
+    <!-- TITLE / META -->
+    <div class="title-block">
+      <div class="story-title">The Billionaire's Regret</div>
+      <div class="story-author">by <strong>Ada_Writes</strong> <i class="fas fa-circle-check"></i></div>
+      <div class="rating-row"><i class="fas fa-star"></i><span class="rating-num">4.9</span><span class="rating-count">(12.8K Ratings)</span></div>
+      <div class="meta-row">
+        <span><i class="far fa-eye"></i>1.4M Reads</span>
+        <span class="meta-sep">|</span>
+        <span><i class="fas fa-book"></i>287 Chapters</span>
+        <span class="meta-sep">|</span>
+        <span class="meta-status">Completed</span>
+        <span class="meta-sep">|</span>
+        <span>Romance</span>
+      </div>
+    </div>
+
+    <!-- CONTINUE READING CTA -->
+    <div class="cta-row">
+      <button class="btn-continue" id="continueBtn">
+        <div class="btn-continue-top"><i class="fas fa-book-open"></i> Continue Reading</div>
+        <div class="btn-continue-sub">Chapter 19: The Truth Unveiled</div>
+      </button>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-row">
+      <div class="quick-item" id="libraryBtn"><i class="fas fa-book-bookmark"></i><span>Library</span></div>
+      <div class="quick-item" id="downloadBtn"><i class="fas fa-arrow-down-to-line"></i><span>Download</span></div>
+      <div class="quick-item"><i class="fas fa-gift"></i><span>Tip Author</span></div>
+      <div class="quick-item"><i class="fas fa-arrow-turn-up" style="transform:rotate(90deg)"></i><span>Share</span></div>
+    </div>
+
+    <!-- SYNOPSIS -->
+    <div class="synopsis-card">
+      <div class="synopsis-title">Synopsis</div>
+      <div class="synopsis-text" id="synopsisText">Two years after walking away from the man she loved, Elena is forced to return to the city—and to him. But the billionaire is no longer the charming man she once knew. Secrets. Betrayal. Regret. Can they rewrite their ending or is it already too late? Every chapter peels back another layer of what really happened the night she left — and what it will cost them both to try again.</div>
+      <div class="synopsis-toggle" id="synopsisToggle">Read More <i class="fas fa-chevron-down"></i></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-card">
+      <div class="stat-cell"><i class="far fa-eye"></i><div class="n">1.4M</div><div class="l">Reads</div></div>
+      <div class="stat-cell"><i class="far fa-heart"></i><div class="n">189K</div><div class="l">Likes</div></div>
+      <div class="stat-cell"><i class="far fa-comment"></i><div class="n">12.6K</div><div class="l">Comments</div></div>
+      <div class="stat-cell"><i class="fas fa-list-ul"></i><div class="n">287</div><div class="l">Chapters</div></div>
+    </div>
+
+    <!-- CHAPTERS -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">Chapters</div>
+        <a class="section-viewall" href="#" id="viewAllChapters">View All</a>
+      </div>
+      <div id="chapterList"></div>
+    </div>
+
+    <!-- READERS ALSO ENJOY -->
+    <div class="section-card" style="background:var(--white)">
+      <div class="section-head">
+        <div class="section-title">Readers also enjoy</div>
+        <a class="section-viewall" href="#" id="viewAllRae">View All</a>
+      </div>
+      <div class="rae-row" id="raeRow"></div>
+    </div>
+
+    <!-- ABOUT THE AUTHOR -->
+    <div class="section-card" style="background:var(--white)">
+      <div class="author-card">
+        <img class="author-av" src="https://i.pravatar.cc/160?img=32" alt="Ada_Writes"/>
+        <div class="author-body">
+          <div class="author-name-row">
+            <div>
+              <div class="section-title" style="margin-bottom:3px">About the Author</div>
+              <div class="author-name">Ada_Writes <i class="fas fa-circle-check"></i></div>
+            </div>
+            <button class="btn-follow-sm" id="authorFollowBtn">Follow</button>
+          </div>
+          <div class="author-bio">Romance author who believes in characters that break, heal, and love fiercely.</div>
+          <div class="author-stats">
+            <div class="author-stat"><div class="n">12</div><div class="l">Stories</div></div>
+            <div class="author-stat-div"></div>
+            <div class="author-stat"><div class="n">1.4M</div><div class="l">Followers</div></div>
+            <div class="author-stat-div"></div>
+            <div class="author-stat"><div class="n">8.7M</div><div class="l">Total Reads</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP REVIEWS -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">Top Reviews</div>
+        <a class="section-viewall" href="#" id="viewAllReviews">View All</a>
+      </div>
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            <span class="review-name">Luna_Reader <i class="fas fa-circle-check"></i></span>
+          </div>
+          <div class="review-time">2d ago</div>
+        </div>
+        <div class="review-text">Absolutely hooked from the first chapter! The emotions, the twists, the characters—everything is perfect.</div>
+        <div class="review-foot">
+          <div class="review-actions">
+            <div class="review-action"><i class="far fa-heart"></i> 232</div>
+            <div class="review-action"><i class="far fa-comment"></i> Reply</div>
+          </div>
+          <i class="fas fa-ellipsis review-more"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIP AUTHOR BANNER -->
+    <div class="tip-banner">
+      <div class="tip-icon"><i class="fas fa-gem"></i></div>
+      <div class="tip-body">
+        <div class="tip-title">Enjoying the story?</div>
+        <div class="tip-sub">Support the author and help keep amazing stories coming.</div>
+      </div>
+      <button class="btn-tip"><i class="fas fa-gift"></i> Tip Author</button>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav is injected by component/bottom-nav.js -->
+</div>
+
+<script>
+/* ============ COVER CAROUSEL — 3 dots, swap background art ============ */
+const COVER_IMAGES = [
+  'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
+  'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
+  'https://i.postimg.cc/fkdXzjSj/wife.jpg',
+];
+let coverIndex = 0;
+function renderCoverDots(){
+  document.getElementById('coverDots').innerHTML = COVER_IMAGES.map((_,i)=>
+    `<div class="cover-dot${i===0?' on':''}" data-i="${i}"></div>`
+  ).join('');
+  document.querySelectorAll('.cover-dot').forEach(d=>{
+    d.addEventListener('click', ()=> goToCover(+d.dataset.i));
+  });
+}
+function goToCover(i){
+  coverIndex = i;
+  document.getElementById('coverWrap').style.backgroundImage = `url('${COVER_IMAGES[i]}')`;
+  document.querySelectorAll('.cover-dot').forEach((d,idx)=> d.classList.toggle('on', idx===i));
+}
+renderCoverDots();
+
+/* ============ CHAPTERS — only the in-progress chapter gets the full
+   icon+subtitle+button card; upcoming locked chapters are plain
+   numbered rows with just a lock glyph, matching the reference. ============ */
+const CHAPTERS = [
+  { num:19, title:'Chapter 19: The Truth Unveiled', sub:'Last read 2 days ago', state:'continue' },
+  { num:20, title:'20. The Lies We Tell', state:'locked' },
+  { num:21, title:'21. Choices and Consequences', state:'locked' },
+];
+
+function renderChapters(){
+  document.getElementById('chapterList').innerHTML = CHAPTERS.map(ch => {
+    if (ch.state === 'continue') {
+      return `<div class="chapter-item">
+        <div class="chapter-icon"><i class="fas fa-chart-simple"></i></div>
+        <div class="chapter-body">
+          <div class="chapter-title">${ch.title}</div>
+          <div class="chapter-sub">${ch.sub}</div>
+        </div>
+        <button class="chapter-btn">Continue</button>
+      </div>`;
+    }
+    return `<div class="chapter-row-simple">
+      <div class="chapter-row-title">${ch.title}</div>
+      <i class="fas fa-lock chapter-row-lock"></i>
+    </div>`;
+  }).join('');
+}
+renderChapters();
+
+/* ============ READERS ALSO ENJOY ============ */
+const RAE = [
+  { img:'https://i.postimg.cc/N9jY0w4m/5.jpg', title:'Bound By His Vow', label:'BOUND BY<br>HIS VOW', rating:4.8, views:'1.2M' },
+  { img:'https://i.postimg.cc/JDzmhWqj/2.jpg', title:'Falling for the Enemy', label:'FALLING FOR<br>THE ENEMY', rating:4.7, views:'985K' },
+  { img:'https://i.postimg.cc/DJwFzKgd/4.jpg', title:"The CEO's Secret Baby", label:"THE CEO'S<br>SECRET BABY", rating:4.9, views:'1.6M' },
+  { img:'https://i.postimg.cc/cgLZJNmC/8.jpg', title:'Broken But Not Defeated', label:'BROKEN<br>BUT NOT<br>DEFEATED', rating:4.6, views:'812K' },
+];
+function renderRae(){
+  document.getElementById('raeRow').innerHTML = RAE.map(s => `
+    <div class="rae-card">
+      <div class="rae-cover" style="background-image:url('${s.img}')">
+        <div class="rae-scrim"></div>
+        <div class="rae-cover-title">${s.label}</div>
+      </div>
+      <div class="rae-title">${s.title}</div>
+      <div class="rae-meta">
+        <span class="star"><i class="fas fa-star"></i>${s.rating}</span>
+        <span class="eye"><i class="far fa-eye"></i>${s.views}</span>
+      </div>
+    </div>
+  `).join('');
+}
+renderRae();
+
+/* ============ INTERACTIONS ============ */
+document.getElementById('synopsisToggle').addEventListener('click', function(){
+  const text = document.getElementById('synopsisText');
+  const expanded = text.classList.toggle('expanded');
+  this.innerHTML = expanded
+    ? 'Read Less <i class="fas fa-chevron-up"></i>'
+    : 'Read More <i class="fas fa-chevron-down"></i>';
+});
+
+const bookmarkBtn = document.getElementById('bookmarkBtn');
+let saved = false;
+bookmarkBtn.addEventListener('click', ()=>{
+  saved = !saved;
+  bookmarkBtn.innerHTML = saved ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
+  bookmarkBtn.style.color = saved ? 'var(--pink)' : 'var(--ink)';
+});
+
+document.getElementById('continueBtn').addEventListener('click', ()=>{
+  location.href = 'reader.html?ch=19';
+});
+document.getElementById('viewAllChapters').addEventListener('click', e => e.preventDefault());
+document.getElementById('viewAllRae').addEventListener('click', e => e.preventDefault());
+document.getElementById('viewAllReviews').addEventListener('click', e => e.preventDefault());
+
+/* Sticky title reveal — solid bar + centered title once the cover
+   has scrolled out from under the top bar. */
+const topbarEl = document.getElementById('topbar');
+const coverSectionEl = document.querySelector('.cover-section');
+let scrollTicking = false;
+window.addEventListener('scroll', () => {
+  if (scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    const revealAt = coverSectionEl.offsetTop + coverSectionEl.offsetHeight - 60;
+    topbarEl.classList.toggle('scrolled', window.scrollY > revealAt);
+    scrollTicking = false;
+  });
+}, { passive: true });
+
+/* Author follow toggle */
+const authorFollowBtn = document.getElementById('authorFollowBtn');
+let followingAuthor = false;
+authorFollowBtn.addEventListener('click', () => {
+  followingAuthor = !followingAuthor;
+  authorFollowBtn.textContent = followingAuthor ? '✓ Following' : 'Follow';
+});
+
+// This is a story detail page reached from Discover/Library, so force
+// the shared bottom nav to highlight "Library" rather than defaulting
+// to Home (the URL doesn't match any of the five main tabs).
+if (window.DroboardNav) {
+  DroboardNav.configure({ active: 'library' });
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.DroboardNav) DroboardNav.configure({ active: 'library' });
+  });
+}
+</script>
+</body>
+</html>

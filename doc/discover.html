@@ -11,6 +11,10 @@
 <script src="component/bottom-nav.js"></script>
 <script src="component/search-overlay.js"></script>
 <script src="component/browse-overlay.js"></script>
+<!-- All demo/placeholder content lives here, separate from the page's
+     rendering logic. See mockData.js — this is the only file that
+     should ever need deleting once a real backend exists. -->
+<script src="mockData.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -106,11 +110,18 @@ a{color:inherit;text-decoration:none}
 .h-row{
   display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  min-height:60px;
 }
 .h-row::-webkit-scrollbar{display:none}
+.row-empty{
+  display:flex;align-items:center;gap:8px;padding:14px 4px;
+  color:var(--muted);font-size:12.5px;font-weight:500;
+}
+.row-empty i{font-size:13px;opacity:.7}
 
 /* ── Story card — sized so 4 fit in one viewport width (was 3) ── */
-.scard{flex:0 0 calc((100% - 30px) / 4);width:calc((100% - 30px) / 4);cursor:pointer}
+.scard{flex:0 0 calc((100% - 30px) / 4);width:calc((100% - 30px) / 4)}
+.scard-link{display:block;cursor:pointer}
 .scard:active{opacity:.85}
 .scard-cover{
   position:relative;width:100%;aspect-ratio:110/148;
@@ -139,6 +150,7 @@ a{color:inherit;text-decoration:none}
 .scard-author{
   font-size:9.5px;color:var(--muted);font-weight:500;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;
+  display:inline-block;cursor:pointer;
 }
 .scard-meta{font-size:9.5px;color:var(--muted);font-weight:500}
 .scard-rating{font-size:9.5px;color:#f59e0b;font-weight:600}
@@ -149,6 +161,7 @@ a{color:inherit;text-decoration:none}
 .coll-row{
   display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  min-height:60px;
 }
 .coll-row::-webkit-scrollbar{display:none}
 .coll-card{
@@ -175,42 +188,55 @@ a{color:inherit;text-decoration:none}
 }
 .genre-name{font-size:11px;font-weight:600}
 
-/* ── More Stories list (cover = same 110×148 as carousel) ── */
+/* ══════════════════════════════════════════════════════════════
+   More Stories — SAME list-card system as component/browse-overlay.js
+   (its "genre mode" list). Class names are kept identical
+   (bro-list-*) on purpose so this is a drop-in match, not a
+   look-alike — both places can eventually share one stylesheet.
+   Cover is 76×102 here (vs the old 110×148 more-item), matching
+   the size used inside the Browse overlay.
+═══════════════════════════════════════════════════════════════ */
 .more-section{padding:0 16px 8px}
 .more-title{font-size:16px;font-weight:700;margin-bottom:12px}
-.more-list{display:flex;flex-direction:column;gap:0}
-.more-item{
-  display:flex;gap:12px;padding:14px 0;
-  border-bottom:1px solid var(--border);cursor:pointer;
+
+:root{
+  --bro-gold:#c9a227;--bro-gold-soft:#fdf7e6;--bro-shadow:rgba(0,0,0,.08);
 }
-.more-item:active{opacity:.85}
-.more-cover{
-  width:110px;height:148px;border-radius:10px;overflow:hidden;
-  flex-shrink:0;background:#e8e8ed;box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-.more-cover img{width:100%;height:100%}
-.more-body{flex:1;min-width:0;display:flex;flex-direction:column;padding-top:2px}
-.more-name{
-  font-size:15px;font-weight:700;line-height:1.3;margin-bottom:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.more-preview{
-  font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:10px;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-  flex:1;
-}
-.more-foot{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;
-}
-.more-genre{
-  font-size:11px;font-weight:600;color:var(--pink);
-  background:rgba(255,45,85,.08);padding:3px 9px;border-radius:10px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%;
-}
-.more-author{
-  font-size:12px;color:var(--muted);font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;
-}
+.bro-list{display:flex;flex-direction:column}
+.bro-list-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);position:relative}
+.bro-list-cover{width:76px;height:102px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#e8e8ed;box-shadow:0 2px 8px var(--bro-shadow);position:relative}
+.bro-list-cover img{width:100%;height:100%}
+.bro-list-cover-link,.bro-list-title-link{display:block;cursor:pointer}
+.bro-list-cover-link:active .bro-list-cover,.bro-list-title-link:active .bro-list-title{opacity:.7}
+.bro-list-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.bro-list-genre{font-size:9px;font-weight:800;color:var(--pink);text-transform:uppercase;letter-spacing:.05em}
+.bro-list-title{font-size:13.5px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bro-list-preview{font-size:11.5px;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bro-list-foot{display:flex;align-items:center;gap:10px;margin-top:2px;flex-wrap:wrap}
+.bro-list-stat{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:600}
+.bro-list-author{color:var(--pink);font-weight:800;cursor:pointer}
+
+/* platform (house) ad — filled gold-tint box with CTA */
+.bro-list-item.bro-ad{border:1.5px solid var(--bro-gold);border-radius:12px;background:var(--bro-gold-soft);padding:12px;margin:6px 0;border-bottom:1.5px solid var(--bro-gold)}
+.bro-ad-tag{position:absolute;top:6px;left:6px;z-index:2;font-size:7px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--bro-gold);color:#fff}
+.bro-ad .bro-list-cover{border:1.5px solid var(--bro-gold)}
+.bro-ad-cta{align-self:flex-start;margin-top:4px;font-size:10.5px;font-weight:800;color:#fff;background:var(--bro-gold);padding:5px 12px;border-radius:14px}
+
+/* book ad — a writer's promoted book, looks like a normal card + gold border + tag */
+.bro-list-item.bro-book-ad{border:1.5px solid var(--bro-gold);border-radius:12px;padding:10px;margin:4px 0}
+
+/* top writers row — plain avatars, no card frame, inserted once near the top */
+.bro-writers-row{padding:14px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.bro-writers-head{font-size:12.5px;font-weight:800;margin-bottom:10px}
+.bro-writers-scroll{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.bro-writers-scroll::-webkit-scrollbar{display:none}
+.bro-writer{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:64px;text-align:center}
+.bro-writer-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover}
+.bro-writer-name{font-size:10.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+
+@keyframes broIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.bro-list-item,.bro-writers-row{animation:broIn .2s ease both}
+
 .more-loader{
   text-align:center;padding:20px;color:var(--muted);font-size:13px;
   display:flex;align-items:center;justify-content:center;gap:8px;
@@ -235,9 +261,67 @@ a{color:inherit;text-decoration:none}
 }
 .to-top-btn.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 .to-top-btn:active{transform:scale(.92)}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE LOADER — shown while fetchDiscoverData() resolves. Blocks
+   the page behind it so nothing renders half-built. Swap the book
+   icon / copy for your real splash asset whenever you like; the
+   important part is #pageLoader.hidden being toggled from init().
+═══════════════════════════════════════════════════════════════ */
+#pageLoader{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  transition:opacity .35s ease,visibility .35s ease;
+}
+#pageLoader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.book-loader{position:relative;width:64px;height:50px}
+.book-loader .cover{
+  position:absolute;inset:0;border-radius:4px 8px 8px 4px;
+  background:linear-gradient(135deg,var(--pink),#ff6b8f);
+  box-shadow:0 8px 20px rgba(255,45,85,.25);
+}
+.book-loader .page{
+  position:absolute;top:3px;right:2px;bottom:3px;left:34px;
+  background:#fff;border-radius:2px 6px 6px 2px;
+  transform-origin:left center;
+  animation:pageFlip 1.1s ease-in-out infinite;
+}
+.book-loader .page:nth-child(2){animation-delay:.18s;opacity:.85}
+.book-loader .page:nth-child(3){animation-delay:.36s;opacity:.65}
+@keyframes pageFlip{
+  0%{transform:rotateY(0deg)}
+  50%{transform:rotateY(-140deg)}
+  100%{transform:rotateY(0deg)}
+}
+.loader-text{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTENT PROTECTION (deterrents only — see chat notes: nothing
+   client-side can make a page un-screenshottable or un-scrapable,
+   this just raises the casual-copying bar).
+═══════════════════════════════════════════════════════════════ */
+.no-copy, .scard, .bro-list-item, .more-cover, .hero, .coll-card{
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
+.search input, .search-bar input, [data-searchable-input]{-webkit-user-select:text;user-select:text}
+
+@media print{ body *{ display:none !important; } }
 </style>
 </head>
 <body>
+
+<!-- Full-page loader — blocks render until fetchDiscoverData() resolves -->
+<div id="pageLoader">
+  <div class="book-loader">
+    <div class="cover"></div>
+    <div class="page"></div>
+    <div class="page"></div>
+    <div class="page"></div>
+  </div>
+  <div class="loader-text">Loading stories…</div>
+</div>
 
 <div class="topbar">
   <div class="search" data-search-trigger>
@@ -336,7 +420,7 @@ a{color:inherit;text-decoration:none}
 
   <section class="more-section">
     <h2 class="more-title">More Stories</h2>
-    <div class="more-list" id="moreList"></div>
+    <div class="bro-list" id="moreList"></div>
     <div class="more-loader" id="moreLoader"><div class="spinner"></div> Loading more…</div>
     <div id="scrollSentinel"></div>
   </section>
@@ -352,172 +436,48 @@ a{color:inherit;text-decoration:none}
 <script>
 /* ═══════════════════════════════════════════════════════════
    API LAYER — switch USE_API to true and set API_BASE when ready.
-   All page data flows through fetchDiscoverData() so production
-   only needs a real endpoint that returns the same shape.
+   All page data flows through fetchDiscoverData() / fetchMoreStories()
+   / fetchAds(), so production only needs real endpoints that return
+   the same shapes getDemoData()/getDemoAds() do — nothing in the
+   render code below needs to change.
 ═══════════════════════════════════════════════════════════ */
 const USE_API = false;
 const API_BASE = '/api'; // e.g. 'https://api.droboard.app'
 
-const COVERS = [
-  'https://i.postimg.cc/vDn9YLx5/wife2.jpg',
-  'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',
-  'https://i.postimg.cc/ftRZbhKx/3.jpg',
-  'https://i.postimg.cc/N9jY0w4m/5.jpg',
-  'https://i.postimg.cc/JDzmhWqj/2.jpg',
-  'https://i.postimg.cc/DJwFzKgd/4.jpg',
-  'https://i.postimg.cc/cgLZJNmC/8.jpg',
-  'https://i.postimg.cc/0MyxNqfz/7.jpg',
-  'https://i.postimg.cc/WF1j4Pnh/6.jpg',
-  'https://i.postimg.cc/fkdXzjSj/wife.jpg',
-];
-const c = i => COVERS[i % COVERS.length];
+/* Demo data now lives entirely in mockData.js (loaded above). Local
+   aliases just keep the rest of this file's code unchanged. */
+const { COVERS, c } = MockData;
 
-/* ── Demo payload (same shape the API should return) ── */
-function getDemoData() {
-  return {
-    heroes: [
-      { img: c(0), title: 'HIS <em>Sweet</em><br>REVENGE', author: 'By Luna Grey', tags: ['Mafia', 'Romance'] },
-      { img: c(1), title: 'UNTIL YOU<br>REGRET', author: 'By Ada Writes', tags: ['Revenge', 'Romance'] },
-      { img: c(2), title: 'CLAIMING HIS<br>LUNA', author: 'By Ifeanyi Story', tags: ['Werewolf', 'Romance'] },
-      { img: c(3), title: 'BOUND<br>BY HER', author: 'By Efe O', tags: ['Romance', 'Drama'] },
-    ],
-    continueReading: [
-      { img: c(2), title: "The Alpha's Obsession", author: '@Ifeanyi_Story', ch: 'Chapter 18', pct: 43 },
-      { img: c(0), title: 'Falling for My Fake Husband', author: '@Ada_Writes', ch: 'Chapter 12', pct: 25 },
-      { img: c(1), title: "The Mafia's Secret Wife", author: '@Chiamaka_N', ch: 'Chapter 24', pct: 60 },
-      { img: c(3), title: 'His Ruthless Obsession', author: '@Zara_M', ch: 'Chapter 31', pct: 78 },
-      { img: c(4), title: 'Bound by Her Silence', author: '@Kemi_A', ch: 'Chapter 9', pct: 15 },
-      { img: c(5), title: 'Claimed at Midnight', author: '@Efe_O', ch: 'Chapter 42', pct: 55 },
-      { img: c(6), title: 'The Contract Bride', author: '@CampusQueen', ch: 'Chapter 16', pct: 33 },
-      { img: c(7), title: 'Luna of the North', author: '@Dami_Cole', ch: 'Chapter 28', pct: 70 },
-    ],
-    topRomance: [
-      { img: c(0), title: "The CEO's Hidden Heir", author: '@Ada_Writes', badge: 'new', rating: '4.8' },
-      { img: c(1), title: 'Devil in a Suit', author: '@Zara_M', badge: 'hot', rating: '4.7' },
-      { img: c(2), title: 'Protected by the Billionaire', author: '@Chiamaka_N', badge: 'new', rating: '4.9' },
-      { img: c(3), title: 'Broken Vows', author: '@Kemi_A', badge: 'new', rating: '4.6' },
-      { img: c(4), title: 'His Second Chance', author: '@Efe_O', rating: '4.5' },
-      { img: c(5), title: 'Married for Revenge', author: '@Ifeanyi_Story', badge: 'hot', rating: '4.8' },
-      { img: c(6), title: 'The Billionaire Next Door', author: '@CampusQueen', rating: '4.4' },
-      { img: c(7), title: 'Love in Disguise', author: '@Dami_Cole', badge: 'new', rating: '4.7' },
-      { img: c(8), title: 'Her Secret Admirer', author: '@Ada_Writes', rating: '4.3' },
-      { img: c(9), title: 'Twisted Hearts', author: '@Zara_M', badge: 'hot', rating: '4.9' },
-    ],
-    trending: [
-      { img: c(0), title: 'The Ruthless Billionaire', author: '@Ada_Writes', rank: 1 },
-      { img: c(2), title: 'Second Chance for the Luna', author: '@Ifeanyi_Story', rank: 2 },
-      { img: c(1), title: "Mafia's Little Angel", author: '@Chiamaka_N', rank: 3 },
-      { img: c(3), title: 'Entangled Hearts', author: '@Kemi_A', rank: 4 },
-      { img: c(4), title: 'The Forbidden Alpha', author: '@Zara_M', rank: 5 },
-      { img: c(5), title: 'She Was His Weakness', author: '@Efe_O', rank: 6 },
-      { img: c(6), title: 'Vengeance & Vows', author: '@CampusQueen', rank: 7 },
-      { img: c(7), title: 'The Silent Bride', author: '@Dami_Cole', rank: 8 },
-      { img: c(8), title: 'Blood and Roses', author: '@Ada_Writes', rank: 9 },
-      { img: c(9), title: 'His Dark Promise', author: '@Ifeanyi_Story', rank: 10 },
-    ],
-    collections: [
-      { name: 'Stories That Wrecked Me', count: 14, covers: [c(1), c(0), c(4), c(2)] },
-      { name: 'Best Plot Twists 2026', count: 8, covers: [c(5), c(3), c(6), c(7)] },
-      { name: '2am Crying Material', count: 11, covers: [c(4), c(0), c(8), c(1)] },
-      { name: 'Campus & CEO Classics', count: 6, covers: [c(6), c(9), c(3), c(5)] },
-      { name: 'Revenge Arc Masterclass', count: 9, covers: [c(1), c(2), c(0), c(4)] },
-    ],
-    newReleases: [
-      { img: c(4), title: 'Untouchable Desire', author: '@Zara_M', badge: 'new' },
-      { img: c(5), title: "Fate's Revenge", author: '@Ada_Writes', badge: 'new' },
-      { img: c(6), title: 'Not Your Princess', author: '@CampusQueen', badge: 'new' },
-      { img: c(7), title: 'Married to the Enemy', author: '@Chiamaka_N', badge: 'new' },
-      { img: c(8), title: 'The Last Confession', author: '@Efe_O', badge: 'new' },
-      { img: c(9), title: 'Whispers of Betrayal', author: '@Kemi_A', badge: 'new' },
-      { img: c(0), title: 'Crown of Thorns', author: '@Ifeanyi_Story', badge: 'new' },
-      { img: c(1), title: 'Her Hidden Truth', author: '@Dami_Cole', badge: 'new' },
-      { img: c(2), title: 'The Stranger at Midnight', author: '@Zara_M', badge: 'new' },
-      { img: c(3), title: 'Love After Ruin', author: '@Ada_Writes', badge: 'new' },
-    ],
-    editorsPicks: [
-      { img: c(1), title: 'Until You Regret', author: '@Ada_Writes' },
-      { img: c(0), title: 'I Will Never Be Yours', author: '@Chiamaka_N' },
-      { img: c(2), title: "Carrying The Mafia Lord's Baby", author: '@Zara_M' },
-      { img: c(3), title: 'Reclaimed by My Alpha', author: '@Ifeanyi_Story' },
-      { img: c(4), title: 'The Night She Returned', author: '@Kemi_A' },
-      { img: c(5), title: 'His Untamed Luna', author: '@Efe_O' },
-      { img: c(6), title: 'Broken by Him', author: '@CampusQueen' },
-      { img: c(7), title: 'The Price of Love', author: '@Dami_Cole' },
-      { img: c(8), title: 'Shadows of Desire', author: '@Ada_Writes' },
-      { img: c(9), title: 'When Hearts Collide', author: '@Zara_M' },
-    ],
-    recommended: [
-      { img: c(4), title: "His Choice Wasn't Me", author: '@Kemi_A' },
-      { img: c(0), title: 'Bound by Obsession', author: '@Ada_Writes' },
-      { img: c(1), title: 'The Wife He Threw Away', author: '@Chiamaka_N' },
-      { img: c(2), title: "My Sister's Best Friend", author: '@Zara_M' },
-      { img: c(5), title: 'The Man She Left Behind', author: '@Efe_O' },
-      { img: c(6), title: 'Stolen Moments', author: '@CampusQueen' },
-      { img: c(7), title: 'Her Ruthless King', author: '@Ifeanyi_Story' },
-      { img: c(8), title: 'A Love Like Fire', author: '@Dami_Cole' },
-      { img: c(9), title: 'Never Look Back', author: '@Ada_Writes' },
-      { img: c(3), title: 'The Softest Rejection', author: '@Kemi_A' },
-    ],
-    complete: [
-      { img: c(2), title: 'Alpha Stefano', author: '@Ifeanyi_Story' },
-      { img: c(0), title: 'The Secret Heir', author: '@Ada_Writes' },
-      { img: c(1), title: 'Bound by Darkness', author: '@Zara_M' },
-      { img: c(3), title: "The Billionaire's Contract", author: '@Chiamaka_N' },
-      { img: c(4), title: 'Complete Surrender', author: '@Kemi_A' },
-      { img: c(5), title: 'The Final Vow', author: '@Efe_O' },
-      { img: c(6), title: 'Ends With Us', author: '@CampusQueen' },
-      { img: c(7), title: 'Forever His', author: '@Dami_Cole' },
-      { img: c(8), title: 'The Last Chapter', author: '@Ada_Writes' },
-      { img: c(9), title: 'Home at Last', author: '@Ifeanyi_Story' },
-    ],
-    recentlyUpdated: [
-      { img: c(1), title: 'Ruthless Desires', author: '@Ada_Writes', badge: 'update', meta: 'Ch. 86' },
-      { img: c(2), title: 'Claimed by The Alpha', author: '@Ifeanyi_Story', badge: 'update', meta: 'Ch. 72' },
-      { img: c(0), title: "The CEO's Obsession", author: '@Zara_M', badge: 'update', meta: 'Ch. 54' },
-      { img: c(3), title: 'Hidden Truths Unveiled', author: '@Chiamaka_N', badge: 'update', meta: 'Ch. 97' },
-      { img: c(4), title: 'Her Silent War', author: '@Kemi_A', badge: 'update', meta: 'Ch. 41' },
-      { img: c(5), title: 'Bloodline Secrets', author: '@Efe_O', badge: 'update', meta: 'Ch. 63' },
-      { img: c(6), title: 'The Pack Divided', author: '@CampusQueen', badge: 'update', meta: 'Ch. 29' },
-      { img: c(7), title: 'Empire of Lies', author: '@Dami_Cole', badge: 'update', meta: 'Ch. 105' },
-      { img: c(8), title: 'After the Fall', author: '@Ada_Writes', badge: 'update', meta: 'Ch. 18' },
-      { img: c(9), title: 'Rise of the Luna', author: '@Ifeanyi_Story', badge: 'update', meta: 'Ch. 77' },
-    ],
-    /* List stories: title, preview, genre, author, cover */
-    moreStories: [
-      { title: 'The Letter Never Sent', author: '@Efe_O', genre: 'Drama', preview: 'She found the letter in his drawer three years after he left. What it said changed everything she thought she knew about their last night together.', img: c(8) },
-      { title: 'Socks at the Altar', author: '@Ifeanyi_Story', genre: 'Romance', preview: 'The bride ran in socks. The groom followed. Neither expected the storm — or the truth — waiting outside the church doors.', img: c(5) },
-      { title: "Grandmother's Hidden Will", author: '@Chiamaka_N', genre: 'Family', preview: 'The will named someone no one in the family had ever heard of. Finding her would unlock a secret older than the house itself.', img: c(5) },
-      { title: 'Stepmother Stole My Future', author: '@Zara_M', genre: 'Revenge', preview: 'She took the scholarship, the inheritance, and the man. Now the real daughter is back — and the game has changed.', img: c(3) },
-      { title: 'Kissing Her Photograph', author: '@Ada_Writes', genre: 'Betrayal', preview: 'He kissed the photo every night. She thought it was devotion. She was wrong — and the truth would destroy them both.', img: c(4) },
-      { title: 'Richest Boy in Class', author: '@CampusQueen', genre: 'Campus', preview: 'He owned half the campus before he turned twenty. She was the scholarship girl who refused to look at him. Until the project paired them.', img: c(6) },
-      { title: 'Deleted on Our Anniversary', author: '@Kemi_A', genre: 'Heartbreak', preview: 'Every photo, every message, gone. On the day they were supposed to celebrate five years. She needed answers. He needed silence.', img: c(7) },
-      { title: 'Three Times She Said No', author: '@Dami_Cole', genre: 'Romance', preview: 'He asked three times. She said no three times. The fourth time, it was her turn to ask — and the answer surprised them both.', img: c(9) },
-      { title: 'The House on Willow Lane', author: '@Efe_O', genre: 'Horror', preview: 'The house had been empty for twelve years. The new tenants lasted three nights. What they left behind was worse than what they found.', img: c(8) },
-      { title: 'Scholarship Girl Rising', author: '@CampusQueen', genre: 'Campus', preview: 'One scholarship. One secret. One boy who knew both. She came for an education — and found a war she never signed up for.', img: c(6) },
-      { title: 'Boss Before Revealing', author: '@Zara_M', genre: 'Revenge', preview: 'She worked under him for two years. He never knew she was the one he ruined. Until the merger put her name on the board.', img: c(0) },
-      { title: 'Left Everything Behind', author: '@Ada_Writes', genre: 'Drama', preview: 'Passport. One bag. No goodbye. She vanished on a Tuesday. Six months later, the letter arrived — and nothing would be the same.', img: c(1) },
-      { title: 'The Softest Goodbye', author: '@Kemi_A', genre: 'Romance', preview: 'They agreed it was over. No fighting. No blame. Just the softest goodbye either of them had ever given — and the hardest to keep.', img: c(3) },
-      { title: 'Blood in the Boardroom', author: '@Chiamaka_N', genre: 'Mafia', preview: 'The deal was clean on paper. In the room, nothing was. She walked in as the lawyer. She walked out as the only one who knew the truth.', img: c(2) },
-      { title: 'Moonlight Betrayal', author: '@Ifeanyi_Story', genre: 'Werewolf', preview: 'The pack called her luna. The alpha called her his. Under the full moon, she learned she was neither — and everything shifted.', img: c(2) },
-      { title: 'Contract Without Love', author: '@Dami_Cole', genre: 'Billionaire', preview: 'A one-year marriage. No feelings. No questions. The contract was perfect — until year one ended and neither wanted to leave.', img: c(0) },
-      { title: 'Her Name Was Vengeance', author: '@Zara_M', genre: 'Revenge', preview: 'They took her family. They took her name. They left her alive. That was their first mistake — and their last.', img: c(1) },
-      { title: 'The Quiet Twin', author: '@Efe_O', genre: 'Mystery', preview: 'One twin died. One twin lived. The living one started wearing the dead one’s clothes — and answering to her name.', img: c(5) },
-      { title: 'Fire in the Rain', author: '@Ada_Writes', genre: 'Romance', preview: 'They met in a storm. She needed a ride. He needed a reason to stay. Neither expected the fire that started when the rain stopped.', img: c(4) },
-      { title: 'Alpha Without a Pack', author: '@Ifeanyi_Story', genre: 'Werewolf', preview: 'He lost everything in one night. No pack. No mate. No name worth speaking. Then she found him — and the war found them both.', img: c(2) },
-      { title: 'The Heiress Who Ran', author: '@Chiamaka_N', genre: 'Drama', preview: 'Billions waiting. A wedding planned. She ran at dawn with nothing but a train ticket and a secret the family would kill to bury.', img: c(7) },
-      { title: 'Paper Rings & Lies', author: '@Kemi_A', genre: 'Romance', preview: 'Paper rings in a parking lot. A promise they never meant to keep. Ten years later, the lie still held — until the truth walked in.', img: c(9) },
-      { title: 'Night of the Rogues', author: '@CampusQueen', genre: 'Werewolf', preview: 'The border fell at midnight. Rogues poured in. She was the only one who could stop them — if the pack still trusted her.', img: c(8) },
-      { title: 'His Cold Empire', author: '@Dami_Cole', genre: 'Mafia', preview: 'He built an empire on silence and fear. She was the only person who made him speak. That made her the most dangerous person in the city.', img: c(0) },
-      { title: 'When She Stopped Waiting', author: '@Ada_Writes', genre: 'Heartbreak', preview: 'Five years of waiting. One letter that never came. The day she stopped waiting was the day he finally showed up — too late.', img: c(3) },
-    ],
-  };
+const AD_INTERVAL = 6;
+const AD_CYCLE = ['book', 'book', 'book', 'book', 'platform'];
+let moreGlobalIndex = 0;   // running count of story slots rendered so far (persists across pages)
+let moreAdCounter = 0;     // running count of ad slots inserted so far
+let writersRowInserted = false;
+
+/* Ads fetched once at boot (see fetchAds() below) and stored here.
+   interleaveExtras() reads from this instead of a hardcoded const,
+   so ads follow the same demo→API swap as everything else. */
+let ADS = { platformAds: [], bookAds: [] };
+
+/** Builds a small "Top Writers" list by de-duping authors out of the real feed,
+ *  so the row reflects actual writers on the page instead of a hardcoded list. */
+function buildTopWriters(rawStories) {
+  const seen = new Set(), out = [];
+  rawStories.forEach((s, i) => {
+    const handle = (s.author || '').replace('@', '');
+    if (!handle || seen.has(handle) || out.length >= 6) return;
+    seen.add(handle);
+    out.push({ name: handle.replace(/_/g, ' '), handle, avatar: `https://i.pravatar.cc/100?img=${(i * 7 + 11) % 70}` });
+  });
+  return out;
 }
+let TOP_WRITERS = [];
 
 /**
  * Single entry point for all discover data.
  * When USE_API is true, calls the backend; otherwise returns demo data.
  * Production: set USE_API = true and ensure GET {API_BASE}/discover
- * returns the same object shape as getDemoData().
+ * returns the same object shape as MockData.getDemoData().
  */
 async function fetchDiscoverData() {
   if (USE_API) {
@@ -527,24 +487,47 @@ async function fetchDiscoverData() {
   }
   // Simulate network delay in demo so loaders feel real
   await new Promise(r => setTimeout(r, 120));
-  return getDemoData();
+  return MockData.getDemoData();
 }
 
 /**
- * Paginated "more stories" for infinite scroll.
- * Demo: slices the moreStories array.
- * Production: GET {API_BASE}/discover/stories?page=&limit=
+ * Ads shown inside the "More Stories" feed (platform house ads + writers'
+ * promoted books). Same fetch-with-fallback shape as the rest of the page:
+ * production just needs GET {API_BASE}/discover/ads returning
+ * { platformAds: [...], bookAds: [...] } in the same item shape
+ * MockData.getDemoAds() uses.
  */
-async function fetchMoreStories(page, limit) {
+async function fetchAds() {
   if (USE_API) {
-    const res = await fetch(`${API_BASE}/discover/stories?page=${page}&limit=${limit}`);
-    if (!res.ok) throw new Error('Stories API failed');
-    return res.json(); // { items: [], hasMore: boolean }
+    const res = await fetch(`${API_BASE}/discover/ads`);
+    if (!res.ok) throw new Error('Ads API failed');
+    return res.json();
   }
+  await new Promise(r => setTimeout(r, 80));
+  return MockData.getDemoAds();
+}
+
+/**
+ * Paginated "more stories" for infinite scroll — live path.
+ * Production: GET {API_BASE}/discover/stories?page=&limit=
+ * returning { items: [], hasMore: boolean }.
+ */
+async function fetchMoreStoriesFromAPI(page, limit) {
+  const res = await fetch(`${API_BASE}/discover/stories?page=${page}&limit=${limit}`);
+  if (!res.ok) throw new Error('Stories API failed');
+  return res.json();
+}
+
+/**
+ * Paginated "more stories" — demo path. Also used as the fallback if
+ * the live API call above fails, so a flaky/unavailable backend degrades
+ * to demo content instead of an empty error state.
+ */
+async function fetchMoreStoriesDemo(page, limit) {
   // Small delay so the loading spinner has time to be seen, instead of
   // items appearing to load instantly / all at once
   await new Promise(r => setTimeout(r, 650));
-  const data = getDemoData().moreStories;
+  const data = MockData.getDemoData().moreStories;
   // Expand to ~50 by cycling for demo infinite feel
   const expanded = [];
   while (expanded.length < 50) {
@@ -558,7 +541,34 @@ async function fetchMoreStories(page, limit) {
   return { items, hasMore: start + limit < expanded.length };
 }
 
+/** Single entry point loadMoreBatch() calls — routes to API or demo. */
+async function fetchMoreStories(page, limit) {
+  if (USE_API) return fetchMoreStoriesFromAPI(page, limit);
+  return fetchMoreStoriesDemo(page, limit);
+}
+
 /* ── UI helpers ── */
+
+/**
+ * Slug fallback for demo stories that don't carry a real `id` yet.
+ * Once USE_API is on, real story objects from the backend should include
+ * a proper `id` field — that's preferred over the slug automatically.
+ */
+function slugify(str) {
+  return (str || '').toString().toLowerCase()
+    .replace(/<[^>]*>/g, '')          // strip any embedded HTML (hero titles use <em>/<br>)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+function storyHref(s) {
+  const id = s.id || slugify(s.title);
+  return `bridge.html?id=${encodeURIComponent(id)}`;
+}
+function profileHref(author) {
+  const handle = (author || '').replace('@', '');
+  return `profile.html?u=${encodeURIComponent(handle)}`;
+}
+
 function scard(s) {
   let badge = '';
   if (s.badge === 'new') badge = '<span class="badge new">NEW</span>';
@@ -569,27 +579,135 @@ function scard(s) {
   if (s.rating) extra = `<div class="scard-rating">★ ${s.rating}</div>`;
   else if (s.ch) extra = `<div class="cont-ch">${s.ch}</div>${s.pct != null ? `<div class="prog-track"><div class="prog-fill" style="width:${s.pct}%"></div></div>` : ''}`;
   else if (s.meta) extra = `<div class="scard-meta">${s.meta}</div>`;
-  const author = s.author ? `<div class="scard-author">${s.author}</div>` : '';
+  const author = s.author
+    ? `<a class="scard-author" href="${profileHref(s.author)}" onclick="event.stopPropagation()">${_esc(s.author)}</a>`
+    : '';
   return `<div class="scard">
-    <div class="scard-cover"><img src="${s.img}" loading="lazy" alt=""/>${badge}</div>
-    <div class="scard-title">${s.title}</div>
+    <a class="scard-link" href="${storyHref(s)}">
+      <div class="scard-cover"><img src="${_esc(s.img)}" loading="lazy" alt=""/>${badge}</div>
+      <div class="scard-title">${_esc(s.title)}</div>
+    </a>
     ${author}
     ${extra}
   </div>`;
 }
 
+function _esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function _authorLink(s) {
+  return `<a class="bro-list-stat bro-list-author" href="${profileHref(s.author)}" onclick="event.stopPropagation()">${_esc(s.author || '')}</a>`;
+}
+
+/**
+ * Renders a horizontal-scroll row (`#continueRow`, `#romanceRow`, etc).
+ * Falls back to a small inline message instead of leaving a blank strip
+ * when the section genuinely has no items — the "empty state" the row
+ * markup didn't otherwise account for.
+ */
+function renderRow(elId, items, mapFn, emptyText) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = (items && items.length)
+    ? items.map(mapFn).join('')
+    : `<div class="row-empty"><i class="fas fa-circle-info"></i>${_esc(emptyText || 'Nothing here yet.')}</div>`;
+}
+
+/** Regular story row — same markup/classes as browse-overlay.js's genre-mode list item. */
 function listItem(s) {
-  return `<div class="more-item">
-    <div class="more-cover"><img src="${s.img}" loading="lazy" alt=""/></div>
-    <div class="more-body">
-      <div class="more-name">${s.title}</div>
-      <div class="more-preview">${s.preview || ''}</div>
-      <div class="more-foot">
-        <span class="more-genre">${s.genre || ''}</span>
-        <span class="more-author">${s.author || ''}</span>
+  const href = storyHref(s);
+  return `<div class="bro-list-item">
+    <a class="bro-list-cover-link" href="${href}"><div class="bro-list-cover"><img src="${_esc(s.img)}" loading="lazy" alt=""/></div></a>
+    <div class="bro-list-body">
+      <div class="bro-list-genre">${_esc(s.genre || '')}</div>
+      <a class="bro-list-title-link" href="${href}"><div class="bro-list-title">${_esc(s.title)}</div></a>
+      ${s.preview ? `<div class="bro-list-preview">${_esc(s.preview)}</div>` : ''}
+      <div class="bro-list-foot">${_authorLink(s)}</div>
+    </div>
+  </div>`;
+}
+
+/** DroBoard house ad — filled gold-tint card + CTA button. */
+function platformAdItem(ad) {
+  return `<div class="bro-list-item bro-ad" data-ad="platform">
+    <div class="bro-list-cover"><span class="bro-ad-tag">Ad</span><img src="${_esc(ad.img)}" loading="lazy" alt=""/></div>
+    <div class="bro-list-body">
+      <div class="bro-list-genre">${_esc(ad.sponsor || 'DroBoard')}</div>
+      <div class="bro-list-title">${_esc(ad.title)}</div>
+      <div class="bro-ad-cta">${_esc(ad.cta || 'Learn More')}</div>
+    </div>
+  </div>`;
+}
+
+/** Book ad — a writer promoting their own book: looks like a normal card, gold border + "Promoted" tag. */
+function bookAdItem(ad) {
+  const href = storyHref(ad);
+  return `<div class="bro-list-item bro-book-ad" data-ad="book">
+    <a class="bro-list-cover-link" href="${href}"><div class="bro-list-cover"><span class="bro-ad-tag">Promoted</span><img src="${_esc(ad.img)}" loading="lazy" alt=""/></div></a>
+    <div class="bro-list-body">
+      <div class="bro-list-genre">${_esc(ad.genre || '')}</div>
+      <a class="bro-list-title-link" href="${href}"><div class="bro-list-title">${_esc(ad.title)}</div></a>
+      ${ad.preview ? `<div class="bro-list-preview">${_esc(ad.preview)}</div>` : ''}
+      <div class="bro-list-foot">
+        ${_authorLink(ad)}
+        ${ad.rating ? `<div class="bro-list-stat"><i class="fas fa-star" style="color:#f59e0b"></i> ${_esc(ad.rating)}</div>` : ''}
+        ${ad.chapters ? `<div class="bro-list-stat"><i class="fas fa-book-open"></i> ${ad.chapters} ch</div>` : ''}
       </div>
     </div>
   </div>`;
+}
+
+/** One-time "Top Writers" avatar row — no card frame, matches browse-overlay.js exactly. */
+function writersRowItem() {
+  return `<div class="bro-writers-row">
+    <div class="bro-writers-head">Top Writers</div>
+    <div class="bro-writers-scroll">
+      ${TOP_WRITERS.map(w => `<a class="bro-writer" href="profile.html?u=${_esc(w.handle)}">
+        <img class="bro-writer-avatar" src="${_esc(w.avatar)}" loading="lazy" alt=""/>
+        <div class="bro-writer-name">${_esc(w.name)}</div>
+      </a>`).join('')}
+    </div>
+  </div>`;
+}
+
+/**
+ * Mixes ads + the one-time writers row into a page of story items, using a
+ * *global* running index/counter (moreGlobalIndex / moreAdCounter) so the
+ * "every 6th slot" ad cadence stays correct across paginated fetches instead
+ * of resetting each page. Reads from the module-level `ADS` (populated by
+ * fetchAds() at boot) rather than a hardcoded const, so ad content follows
+ * the same demo→API swap as stories. If ADS came back empty (e.g. an ads
+ * endpoint with nothing configured yet), ad slots are simply skipped rather
+ * than crashing on an empty array.
+ */
+function interleaveExtras(items) {
+  const out = [];
+  items.forEach(item => {
+    out.push({ kind: 'story', data: item });
+    moreGlobalIndex++;
+
+    if (!writersRowInserted && moreGlobalIndex === 3 && TOP_WRITERS.length) {
+      out.push({ kind: 'writers' });
+      writersRowInserted = true;
+    }
+
+    if (moreGlobalIndex % AD_INTERVAL === 0 && (ADS.platformAds.length || ADS.bookAds.length)) {
+      const adType = AD_CYCLE[moreAdCounter % AD_CYCLE.length];
+      if (adType === 'platform' && ADS.platformAds.length) {
+        out.push({ kind: 'platformAd', data: ADS.platformAds[moreAdCounter % ADS.platformAds.length] });
+      } else if (ADS.bookAds.length) {
+        out.push({ kind: 'bookAd', data: ADS.bookAds[moreAdCounter % ADS.bookAds.length] });
+      }
+      moreAdCounter++;
+    }
+  });
+  return out;
+}
+
+function renderFeedEntry(entry) {
+  if (entry.kind === 'writers') return writersRowItem();
+  if (entry.kind === 'platformAd') return platformAdItem(entry.data);
+  if (entry.kind === 'bookAd') return bookAdItem(entry.data);
+  return listItem(entry.data);
 }
 
 /* ── Hero ── */
@@ -615,6 +733,22 @@ const MORE_LIMIT = 8;
 let moreHasMore = true;
 let moreLoading = false;
 
+/** Appends a fetched page of items (+ interleaved extras) to the feed. */
+function appendMoreBatch(items, hasMore) {
+  moreHasMore = hasMore;
+  morePage++;
+  const feed = interleaveExtras(items);
+  document.getElementById('moreList').insertAdjacentHTML('beforeend', feed.map(renderFeedEntry).join(''));
+}
+
+/**
+ * Loads the next page of "More Stories". If the live API call fails
+ * (USE_API === true and the request errors or the endpoint is down),
+ * falls back to demo content instead of just showing an error — the
+ * feed keeps scrolling with placeholder stories rather than dead-ending.
+ * A genuinely empty result (no items on either path) shows an inline
+ * empty-state message instead of a bare "reached the end".
+ */
 async function loadMoreBatch() {
   if (moreLoading || !moreHasMore) return;
   moreLoading = true;
@@ -622,15 +756,41 @@ async function loadMoreBatch() {
   loader.classList.remove('hidden');
   loader.innerHTML = '<div class="spinner"></div> Loading more…';
 
+  let items = [], hasMore = false, usedFallback = false;
   try {
-    const { items, hasMore } = await fetchMoreStories(morePage, MORE_LIMIT);
-    moreHasMore = hasMore;
-    morePage++;
-    document.getElementById('moreList').insertAdjacentHTML('beforeend', items.map(listItem).join(''));
-    if (!hasMore) loader.innerHTML = "You've reached the end";
-    else loader.classList.add('hidden');
+    ({ items, hasMore } = await fetchMoreStories(morePage, MORE_LIMIT));
   } catch (e) {
-    loader.innerHTML = 'Could not load more';
+    console.error('[More Stories] API failed, falling back to demo feed:', e);
+    try {
+      ({ items, hasMore } = await fetchMoreStoriesDemo(morePage, MORE_LIMIT));
+      usedFallback = true;
+    } catch (e2) {
+      console.error('[More Stories] Demo fallback also failed:', e2);
+      moreHasMore = false;
+      const isEmpty = document.getElementById('moreList').children.length === 0;
+      loader.innerHTML = isEmpty
+        ? '<i class="fas fa-book" style="opacity:.5"></i>&nbsp; Nothing to show right now — check back soon.'
+        : "You've reached the end";
+      moreLoading = false;
+      return;
+    }
+  }
+
+  appendMoreBatch(items, hasMore);
+
+  if (!hasMore) {
+    const isEmpty = document.getElementById('moreList').children.length === 0;
+    loader.innerHTML = isEmpty
+      ? '<i class="fas fa-book" style="opacity:.5"></i>&nbsp; Nothing to show right now — check back soon.'
+      : "You've reached the end";
+  } else {
+    loader.classList.add('hidden');
+  }
+  if (usedFallback) {
+    // Demo content is now mixed into a "live" session — keep every
+    // subsequent page on the same (demo) path rather than retrying the
+    // broken API on each scroll tick.
+    fetchMoreStories = fetchMoreStoriesDemo;
   }
   moreLoading = false;
 }
@@ -698,37 +858,53 @@ function wireComponents(data) {
 
 /* ── Boot ── */
 async function init() {
+  const pageLoader = document.getElementById('pageLoader');
+
   let data;
   try {
     data = await fetchDiscoverData();
   } catch (e) {
-    console.error(e);
-    data = getDemoData();
+    console.error('[Discover] API failed, falling back to demo data:', e);
+    data = MockData.getDemoData();
   }
+
+  try {
+    ADS = await fetchAds();
+  } catch (e) {
+    console.error('[Ads] API failed, falling back to demo ads:', e);
+    ADS = MockData.getDemoAds();
+  }
+  ADS.platformAds = ADS.platformAds || [];
+  ADS.bookAds = ADS.bookAds || [];
+
+  TOP_WRITERS = buildTopWriters(data.moreStories || []);
 
   heroes = data.heroes || [];
   document.getElementById('heroDots').innerHTML = heroes.map((_, i) => `<div class="dot${i === 0 ? ' on' : ''}"></div>`).join('');
   document.querySelectorAll('#heroDots .dot').forEach((d, i) => d.addEventListener('click', () => { goHero(i); startHero(); }));
-  goHero(0);
-  startHero();
+  if (heroes.length) { goHero(0); startHero(); }
 
-  document.getElementById('continueRow').innerHTML = (data.continueReading || []).map(scard).join('');
-  document.getElementById('romanceRow').innerHTML = (data.topRomance || []).map(scard).join('');
-  document.getElementById('trendingRow').innerHTML = (data.trending || []).map(scard).join('');
-  document.getElementById('newRow').innerHTML = (data.newReleases || []).map(scard).join('');
-  document.getElementById('editorRow').innerHTML = (data.editorsPicks || []).map(scard).join('');
-  document.getElementById('recRow').innerHTML = (data.recommended || []).map(scard).join('');
-  document.getElementById('completeRow').innerHTML = (data.complete || []).map(scard).join('');
-  document.getElementById('updatedRow').innerHTML = (data.recentlyUpdated || []).map(scard).join('');
+  renderRow('continueRow', data.continueReading, scard, 'No books in progress yet.');
+  renderRow('romanceRow', data.topRomance, scard, 'No romance picks right now.');
+  renderRow('trendingRow', data.trending, scard, 'Nothing trending right now.');
+  renderRow('newRow', data.newReleases, scard, 'No new releases yet.');
+  renderRow('editorRow', data.editorsPicks, scard, "No editor's picks yet.");
+  renderRow('recRow', data.recommended, scard, 'No recommendations yet.');
+  renderRow('completeRow', data.complete, scard, 'No completed stories yet.');
+  renderRow('updatedRow', data.recentlyUpdated, scard, 'No recent updates.');
 
-  document.getElementById('collRow').innerHTML = (data.collections || []).map(col => `
-    <div class="coll-card">
-      <div class="coll-covers">${(col.covers || []).map(img => `<div style="background-image:url('${img}')"></div>`).join('')}</div>
-      <div class="coll-info">
-        <div class="coll-name">${col.name}</div>
-        <div class="coll-meta">${col.count} stories</div>
-      </div>
-    </div>`).join('');
+  const collRow = document.getElementById('collRow');
+  const collections = data.collections || [];
+  collRow.innerHTML = collections.length
+    ? collections.map(col => `
+      <div class="coll-card">
+        <div class="coll-covers">${(col.covers || []).map(img => `<div style="background-image:url('${img}')"></div>`).join('')}</div>
+        <div class="coll-info">
+          <div class="coll-name">${col.name}</div>
+          <div class="coll-meta">${col.count} stories</div>
+        </div>
+      </div>`).join('')
+    : `<div class="row-empty"><i class="fas fa-circle-info"></i>No collections yet.</div>`;
 
   document.querySelector('.tab.active').addEventListener('click', () => {}); // "For You" stays inline, no-op
   document.querySelectorAll('.tab:not(.grid-icon):not([data-browse-trigger])').forEach(t => {
@@ -750,6 +926,11 @@ async function init() {
   }, { root: null, rootMargin: '0px 0px 24px 0px', threshold: 0 }).observe(document.getElementById('scrollSentinel'));
 
   initToTop();
+  initContentProtection();
+
+  // Reveal the page only now that everything above is actually in the DOM.
+  pageLoader.classList.add('hidden');
+  setTimeout(() => pageLoader.remove(), 400);
 }
 
 /* ── Scroll-to-top button ── */
@@ -767,6 +948,36 @@ function initToTop() {
   }, { passive: true });
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTENT PROTECTION — deterrents, not guarantees.
+   Screenshotting (mobile or desktop) happens at the OS level,
+   outside the browser sandbox entirely — no JS, CSS, or meta tag
+   can detect or block it, so this deliberately doesn't try. What's
+   left below only adds friction against casual right-click-save /
+   drag-out / copy-paste / print — nothing here stops a determined
+   scraper hitting the API or page source directly either.
+═══════════════════════════════════════════════════════════════ */
+function initContentProtection() {
+  // Disable right-click / long-press context menu on the page.
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Disable native image dragging (separate from CSS user-drag, for browsers
+  // that ignore it).
+  document.addEventListener('dragstart', e => {
+    if (e.target.tagName === 'IMG') e.preventDefault();
+  });
+
+  // Block common "save/print/view-source" keyboard shortcuts. Anyone who
+  // wants the HTML can still get it from network requests, so treat this as
+  // friction, not a lock.
+  document.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    const blocked =
+      (e.ctrlKey || e.metaKey) && ['s', 'u', 'p'].includes(k);
+    if (blocked) e.preventDefault();
   });
 }
 

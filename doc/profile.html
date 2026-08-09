@@ -3,199 +3,187 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<meta name="theme-color" content="#ffffff"/>
-<title>Droboard · @Ada_Writes</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet"/>
+<meta name="theme-color" content="#d8d8d8"/>
+<title>Droboard · Profile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SHARED, SELF-CONTAINED DROBOARD COMPONENTS
+     Every one of these builds its own UI/behaviour and either appends
+     itself to <body> or exposes an attach()/render() API — this page
+     never hand-rolls markup or logic that one of these already owns.
+     (No component/dots-menu.js exists in the library, so the post
+     "⋯" menu on this page is a small page-local popover instead — see
+     openPostMenu() below — built on top of ProfileData.pinPost /
+     ProfileData.deletePost, the two real mutations that apply to it.)
+═══════════════════════════════════════════════════════════════════ -->
+<script src="component/search-overlay.js"></script>
+<script src="component/bottom-nav.js"></script>
+<script src="component/collection-card.js"></script>
+<script src="component/library.js"></script>
+<script src="component/post-composer.js"></script>
+<script src="component/reaction-picker.js"></script>
+<script src="component/post-card.js"></script>
+<script src="component/save-modal.js"></script>
+<script src="component/share-modal.js"></script>
 <style>
 :root{
   --acc:#ff0050;--acc2:#ff4d7a;--acc3:#ff7a9a;
   --glow:rgba(255,0,80,.22);--glow-sm:rgba(255,0,80,.12);
+  --bg:#d8d8d8;--l1:#ffffff;--l2:#eeeeee;--l3:#ffffff;--l4:#e2e2e2;
+  --bd:rgba(0,0,0,.12);--bd2:rgba(0,0,0,.06);--bd-acc:rgba(255,0,80,.25);
+  --tx-high:#161616;--tx-body:#3a3a3a;--tx-muted:#666666;--tx-faint:#8a8a8a;
+  --blue:#38bdf8;--green:#34d399;--gold:#f0a800;--gold-soft:rgba(240,168,0,.12);--purple:#a78bfa;--orange:#fb923c;
+  --nav-h:64px;--safe-b:env(safe-area-inset-bottom,12px);
+}
+[data-theme="dark"]{
   --bg:#000000;--l1:#08090c;--l2:#0e0f13;--l3:#13141a;--l4:#1a1b22;
-  --card:#000000;
   --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.04);--bd-acc:rgba(255,0,80,.20);
   --tx-high:#e0e0e0;--tx-body:#c0c0c0;--tx-muted:#71717a;--tx-faint:#3f3f46;
-  --tx-title:#e0e0e0;
-  --blue:#38bdf8;--green:#34d399;--gold:#fbbf24;--purple:#a78bfa;--orange:#fb923c;
-  --post-sep:#1a1b22;
-  --nav-h:60px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+  --gold-soft:rgba(240,168,0,.14);
 }
-
-/* ═══════════════════════════════
-   LIGHT MODE — platform-wide default, tokens matched to discover.html / feed.html / library.html
-═══════════════════════════════ */
-[data-theme="light"]{
-  --bg:#f5f5f5;--l1:#ffffff;--l2:#f1f1f1;--l3:#ffffff;--l4:#e8e8e8;
-  --card:#ffffff;
-  --bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.05);--bd-acc:rgba(255,0,80,.25);
-  --tx-high:#161616;--tx-body:#3a3a3a;--tx-muted:#666666;--tx-faint:#8a8a8a;
-  --tx-title:#161616;
-  --post-sep:#e5e5e5;
-}
-[data-theme="light"] body{background:var(--bg);color:var(--tx-body)}
-[data-theme="light"] .top-bar,
-[data-theme="light"] .profile-tabs,
-[data-theme="light"] .bottom-nav{background:rgba(255,255,255,.97);border-color:var(--bd)}
-[data-theme="light"] .top-icon-btn{background:var(--l2);color:#555;border-color:var(--bd)}
-[data-theme="light"] .menu-close,
-[data-theme="light"] .overlay-close,
-[data-theme="light"] .dsv-close{background:rgba(0,0,0,.05);color:#555;border-color:var(--bd)}
-[data-theme="light"] .pact.edit,
-[data-theme="light"] .pact.msg{background:rgba(0,0,0,.05);color:#333;border-color:var(--bd)}
-[data-theme="light"] .genre-pill.inactive{background:rgba(0,0,0,.04);color:#888}
-[data-theme="light"] .anlyt-period{color:#888}
-[data-theme="light"] .follow-btn{background:rgba(0,0,0,.05);color:#333;border-color:var(--bd)}
-[data-theme="light"] .menu-item:active{background:rgba(0,0,0,.03)}
-[data-theme="light"] .stat-item:active{background:rgba(0,0,0,.03)}
-[data-theme="light"] .composer-audience,
-[data-theme="light"] .scs-audience{background:rgba(0,0,0,.04);border-color:var(--bd);color:#555}
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{min-height:100%;background:var(--bg);color:var(--tx-body);font-family:'DM Sans',sans-serif;overflow-x:hidden}
-body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px);transition:background .25s ease,color .25s ease}
-::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
+html,body{background:var(--bg)}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--tx-body);display:flex;justify-content:center;min-height:100vh;overflow-x:hidden;transition:background .25s ease,color .25s ease}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{display:none}
+
+/* ── PHONE FRAME ── */
+.phone{width:100%;max-width:420px;min-height:100vh;background:var(--l1);position:relative;box-shadow:0 0 50px rgba(0,0,0,.10);display:flex;flex-direction:column;overflow-x:hidden;padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px)}
+@media (min-width:421px){ .phone{ box-shadow:0 0 50px rgba(0,0,0,.14) } }
 
 /* ── TOP BAR ── */
 .top-bar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
-.top-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;cursor:pointer}
+[data-theme="dark"] .top-bar{background:rgba(0,0,0,.97)}
+.top-logo{font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;cursor:pointer}
 .top-right{display:flex;align-items:center;gap:8px}
-.top-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#555;transition:.15s;position:relative;flex-shrink:0}
+.top-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--l2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:var(--tx-muted);transition:.15s;position:relative;flex-shrink:0}
 .top-icon-btn:active{transform:scale(.9)}
-.notif-count{position:absolute;top:4px;right:4px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff}
+.notif-count{position:absolute;top:4px;right:4px;background:var(--acc);color:#fff;font-size:7px;font-weight:800;min-width:14px;height:14px;border-radius:7px;padding:0 3px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--l1)}
+
+/* ── LOADING SKELETON ── */
+#loadingState{padding:16px 14px}
+.sk{background:linear-gradient(90deg,var(--l2) 25%,var(--l4) 37%,var(--l2) 63%);background-size:400% 100%;animation:skShimmer 1.4s ease infinite;border-radius:10px}
+@keyframes skShimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.sk-hero{height:150px;border-radius:14px;margin-bottom:16px}
+.sk-av{width:82px;height:82px;border-radius:50%;margin-bottom:14px}
+.sk-line{height:12px;border-radius:6px;margin-bottom:9px}
+
+/* ── EMPTY / ERROR STATE ── */
+#emptyState{display:none;padding:70px 24px;text-align:center}
+.empty-icon{width:64px;height:64px;border-radius:18px;background:rgba(255,0,80,.08);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--acc);font-size:24px}
+.empty-title{font-size:18px;font-weight:800;margin-bottom:6px;color:var(--tx-high)}
+.empty-sub{font-size:13px;color:var(--tx-muted);line-height:1.5}
+
+/* ── PROFILE CONTENT WRAPPER ── */
+#profileRoot{display:none}
 
 /* ── HERO ── */
-.profile-hero{position:relative;width:100%;height:180px;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80');background-size:cover;background-position:center 30%}
+.profile-hero{position:relative;width:100%;height:180px;overflow:hidden;background:#111}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%}
 .hero-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.35) 55%,rgba(0,0,0,.05) 100%)}
-.hero-edit-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+.hero-edit-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none}
 
 /* ── PROFILE INFO ── */
 .profile-info{padding:0 14px;margin-top:-8px;position:relative;z-index:5}
 .av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
 .av-outer{position:relative;flex-shrink:0}
-.av-ring{width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:3px;box-shadow:0 0 24px var(--glow)}
+.av-ring{width:82px;height:82px;border-radius:50%;padding:3px;box-shadow:0 0 24px var(--glow)}
+.av-ring.role-writer{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.av-ring.role-reader{background:linear-gradient(135deg,var(--blue),var(--acc))}
 .av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000}
 .av-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 .verified-badge-av{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--blue);border:2.5px solid var(--l1);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:800}
 .action-row{display:flex;gap:7px;align-items:center}
-.pact{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.pact{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:.2s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .pact:active{transform:scale(.96)}
-.pact.edit{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:#333}
+.pact.edit,.pact.msg{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:var(--tx-body)}
+[data-theme="dark"] .pact.edit,[data-theme="dark"] .pact.msg{background:rgba(255,255,255,.06)}
 .pact.follow{background:var(--acc);color:#fff;box-shadow:0 0 14px var(--glow-sm)}
-.pact.follow.ing{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:#333;box-shadow:none}
-.pact.msg{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:#333;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.pact.follow.ing{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:var(--tx-body);box-shadow:none}
+.pact.msg{width:34px;height:34px;padding:0;border-radius:50%}
 
-.profile-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:2px;display:flex;align-items:center;gap:7px;color:var(--tx-high)}
-.writer-tag{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc3);font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.05em;font-family:'DM Sans',sans-serif}
+.profile-name{font-size:21px;font-weight:800;line-height:1.1;margin-bottom:2px;display:flex;align-items:center;gap:7px;color:var(--tx-high)}
+.role-tag{font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:.05em}
+.role-tag.writer{background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc3)}
+.role-tag.reader{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--blue)}
 .profile-handle{font-size:12px;color:var(--tx-muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .verified-inline{font-size:9px;font-weight:700;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);padding:1px 7px;border-radius:8px}
 .profile-bio{font-size:13px;color:var(--tx-body);line-height:1.55;margin-bottom:8px;max-width:340px}
 .profile-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .genre-pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(255,0,80,.07);border:1px solid var(--bd-acc);color:var(--acc3);cursor:pointer}
-.genre-pill.inactive{background:rgba(0,0,0,.04);border-color:var(--bd);color:#888}
+.genre-pill.inactive{background:rgba(0,0,0,.04);border-color:var(--bd);color:var(--tx-faint)}
 
 /* ── STATS ROW ── */
 .stats-row{display:flex;border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:14px;background:var(--l1)}
 .stat-item{flex:1;text-align:center;padding:11px 4px;border-right:1px solid var(--bd);cursor:pointer;transition:.15s}
 .stat-item:last-child{border-right:none}
 .stat-item:active{background:rgba(0,0,0,.03)}
-.stat-num{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high);line-height:1}
-.stat-num.r{color:var(--acc)}
-.stat-num.b{color:var(--blue)}
-.stat-num.g{color:var(--green)}
+.stat-num{font-size:16px;font-weight:800;color:var(--tx-high);line-height:1}
+.stat-num.r{color:var(--acc)}.stat-num.b{color:var(--blue)}.stat-num.g{color:var(--green)}
 .stat-label{font-size:8px;color:var(--tx-muted);margin-top:2px;font-weight:600}
 
 /* ── ACHIEVEMENT CHIPS ── */
 .ach-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
-.ach-row::-webkit-scrollbar{display:none}
-.ach-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap;border:1px solid;flex-shrink:0;cursor:pointer}
-.ach-chip.gold{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#b57e00}
+.ach-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap;border:1px solid;flex-shrink:0}
+.ach-chip.gold{background:var(--gold-soft);border-color:rgba(240,168,0,.3);color:#8a6200}
 .ach-chip.blue{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2);color:#0284c7}
 .ach-chip.red{background:rgba(255,0,80,.07);border-color:var(--bd-acc);color:var(--acc)}
 .ach-chip.purple{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);color:#7c3aed}
 .ach-chip.green{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:#0d9668}
 
-/* ── AD MOUNT (rendered via DroboardAdCard.renderBanner) ── */
-#profileAdMount{margin:0 0 14px}
+/* ── BECOME A WRITER CTA ── */
+.upgrade-strip{display:none;align-items:center;gap:11px;background:linear-gradient(135deg,rgba(255,0,80,.06),rgba(167,139,250,.05));border:1px solid var(--bd-acc);border-radius:14px;padding:12px 13px;margin-bottom:14px}
+.upgrade-strip i{font-size:18px;color:var(--acc);flex-shrink:0}
+.upgrade-strip-text{flex:1;min-width:0}
+.upgrade-strip-title{font-size:12.5px;font-weight:800;color:var(--tx-high)}
+.upgrade-strip-sub{font-size:10.5px;color:var(--tx-muted);margin-top:1px}
+.upgrade-strip-btn{background:var(--acc);color:#fff;border:none;padding:8px 14px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 0 12px var(--glow-sm)}
 
 /* ── TABS ── */
 .profile-tabs{display:flex;border-bottom:1px solid var(--bd);position:sticky;top:57px;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);overflow-x:auto;scrollbar-width:none}
-.profile-tabs::-webkit-scrollbar{display:none}
+[data-theme="dark"] .profile-tabs{background:rgba(0,0,0,.97)}
 .ptab{flex-shrink:0;padding:10px 12px;font-size:11px;font-weight:700;color:var(--tx-faint);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
 .ptab.active{color:var(--tx-high);border-bottom-color:var(--acc)}
 .ptab-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,0,80,.1);color:var(--acc);font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;vertical-align:middle}
-.ptab-badge.b{background:rgba(56,189,248,.12);color:#0284c7}
-.ptab-badge.g{background:rgba(52,211,153,.12);color:#0d9668}
 
-/* ── PANELS ── */
+/* ── PANELS — visibility controlled ONLY by the .active class. ── */
 .tab-panel{display:none;padding:14px}
 .tab-panel.active{display:block}
 #panel-feed.active{padding:0}
-.sdiv{height:1px;background:var(--bd);margin:14px 0}
-
-/* ── SECTION HEADERS ── */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.sh-title{font-size:11px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.sh-title{font-size:11px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em}
 .sh-more{font-size:10px;font-weight:700;color:var(--acc);cursor:pointer;white-space:nowrap;padding:3px 8px;border-radius:10px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)}
+.panel-empty{padding:36px 10px;text-align:center;color:var(--tx-muted);font-size:12.5px}
+.panel-empty i{font-size:20px;display:block;margin-bottom:8px;opacity:.5}
 
-/* ═══════════════════════════════
-   BOOK CARD (used on Books tab)
-═══════════════════════════════ */
-.book-card{display:flex;gap:12px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.book-card:active{border-color:var(--bd-acc)}
-.book-cover{width:74px;height:100px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.12)}
-.book-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.book-cat{font-size:9px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em}
-.book-title{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;line-height:1.35;color:var(--tx-high);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.book-meta{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:1px}
-.book-meta-item{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--tx-muted);font-weight:600}
-.book-meta-item i{font-size:10px}
-.book-meta-item.rating{color:#b57e00}
-.book-meta-item.rating i{color:var(--gold)}
+/* ── BOOK CARD (page-local — no shared "book card" component exists yet) ── */
+.book-card{display:flex;gap:12px;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.book-cover{width:64px;height:88px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.book-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.book-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.book-title{font-size:13.5px;font-weight:700;line-height:1.3;color:var(--tx-high)}
+.book-chev{color:var(--tx-faint);font-size:11px;margin-top:2px;flex-shrink:0}
+.book-genre{font-size:10.5px;color:var(--acc);font-weight:700;text-transform:uppercase;margin-top:2px;margin-bottom:7px}
+.book-stats{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:auto}
+.book-stat{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--tx-muted)}
+.book-stat i{font-size:9px}
+.book-foot{display:flex;align-items:center;margin-top:8px}
+.status-badge{font-size:8.5px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.03em;text-transform:uppercase}
+.status-badge.completed{background:rgba(52,211,153,.12);color:#0d9668}
+.status-badge.ongoing{background:rgba(255,0,80,.1);color:var(--acc)}
+.status-badge.paused{background:rgba(0,0,0,.06);color:var(--tx-muted)}
+[data-theme="dark"] .status-badge.paused{background:rgba(255,255,255,.08)}
 
-/* ═══════════════════════════════
-   COLLECTIONS TAB — grid populated by DroboardCollectionCard
-═══════════════════════════════ */
-.new-coll-btn{width:100%;padding:10px;border-radius:13px;background:rgba(0,0,0,.02);border:1px dashed var(--bd);color:var(--tx-faint);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
-.new-coll-btn:hover{background:rgba(255,0,80,.04);border-color:var(--bd-acc);color:var(--acc)}
+/* ── COLLECTIONS mount point — card styling from collection-card.js (cc-) ── */
+.new-coll-btn{width:100%;padding:10px;border-radius:13px;background:rgba(0,0,0,.02);border:1px dashed var(--bd);color:var(--tx-faint);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px}
 
-/* ═══════════════════════════════
-   ANALYTICS CARDS
-═══════════════════════════════ */
-.analytics-period-btns{display:flex;gap:6px;margin-bottom:14px}
-.anlyt-period{padding:5px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:transparent;color:#888;transition:.2s;font-family:'DM Sans',sans-serif}
-.anlyt-period.active{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc)}
-.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.anlyt-card{background:var(--l1);border:1px solid var(--bd);border-radius:13px;padding:13px 12px}
-.anlyt-label{font-size:9px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-.anlyt-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--tx-high);line-height:1}
-.anlyt-sub{font-size:9px;color:var(--acc);margin-top:3px;font-weight:600}
-.anlyt-bar{height:3px;background:rgba(0,0,0,.06);border-radius:3px;overflow:hidden;margin-top:7px}
-.anlyt-bar-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px;transition:.4s}
+/* ── LIBRARY mount point — card styling from library.js (dlb-) ── */
+#libraryMount{width:100%}
+#libSubtitle{font-size:11px;color:var(--tx-muted);margin-bottom:2px}
+#libFootnote{font-size:10px;color:var(--tx-faint);margin-bottom:10px}
 
-.top-series-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2);cursor:pointer}
-.top-series-item:last-child{border-bottom:none}
-.top-series-rank{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;width:22px;text-align:center;flex-shrink:0}
-.top-series-img{width:38px;height:44px;border-radius:7px;background-size:cover;background-position:center;flex-shrink:0;border:1px solid var(--bd)}
-.top-series-body{flex:1;min-width:0}
-.top-series-title{font-size:11px;font-weight:700;color:var(--tx-high);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.top-series-cat{font-size:9px;color:var(--tx-muted);margin-top:2px}
-.top-series-reads{text-align:right;flex-shrink:0}
-.top-series-reads strong{display:block;font-size:11px;font-weight:800;color:var(--acc)}
-.top-series-reads span{font-size:8px;color:var(--tx-muted)}
-
-/* ═══════════════════════════════
-   GENRE EDIT
-═══════════════════════════════ */
-.genre-tog-grid{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 14px}
-.genre-tog{font-size:10px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(0,0,0,.02);color:#777;transition:.2s;user-select:none;display:flex;align-items:center;gap:5px}
-.genre-tog.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc)}
-.genre-tog.on::before{content:'✓';font-size:9px;font-weight:900}
-.genre-save-btn{width:calc(100% - 32px);margin:0 16px 14px;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 18px var(--glow-sm)}
-
-/* ═══════════════════════════════
-   FOLLOWING LIST
-═══════════════════════════════ */
+/* ── FOLLOWING / ABOUT (page-local — no shared component covers these) ── */
 .follow-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd2)}
 .follow-item:last-child{border-bottom:none}
 .follow-av{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--l2)}
@@ -203,1347 +191,984 @@ body{padding-bottom:calc(var(--safe-b) + var(--nav-h) + 12px);transition:backgro
 .follow-info{flex:1;min-width:0}
 .follow-name{font-size:12px;font-weight:700;color:var(--tx-high)}
 .follow-meta{font-size:10px;color:var(--tx-muted);margin-top:1px}
-.follow-btn{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:#333;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;font-family:'DM Sans',sans-serif}
+.follow-btn{background:rgba(0,0,0,.05);border:1.5px solid var(--bd);color:var(--tx-body);padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap}
 .follow-btn.ing{background:var(--acc);border-color:var(--acc);color:#fff}
 
-/* ═══════════════════════════════
-   ABOUT
-═══════════════════════════════ */
 .about-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd2)}
 .about-item:last-child{border-bottom:none}
 .about-icon{width:32px;height:32px;border-radius:9px;background:rgba(255,0,80,.06);border:1px solid var(--bd-acc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px}
 .about-label{font-size:10px;font-weight:600;color:var(--tx-muted)}
 .about-val{font-size:12px;font-weight:600;color:var(--tx-high);margin-top:1px;line-height:1.4}
 
-/* ═══════════════════════════════
-   OVERLAYS / SHEETS  (composer, status composer, new collection, genre edit)
-═══════════════════════════════ */
-.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);display:none;align-items:flex-end}
-.overlay-bg.open{display:flex}
-.overlay-sheet{width:100%;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
-.overlay-sheet::-webkit-scrollbar{display:none}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.overlay-handle{width:36px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;margin:12px auto 0}
-.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
-.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:7px}
-.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.05);border:none;color:#666;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-/* Status composer */
-.scs-types{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
-.scs-types::-webkit-scrollbar{display:none}
-.scs-type{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#777;transition:.2s}
-.scs-type.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.scs-preview{margin:0 16px 12px;border-radius:14px;height:130px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--bd)}
-.scs-preview-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent)}
-.scs-preview-change{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 9px;border-radius:10px;font-size:9px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
-.scs-text-area{margin:0 16px 12px;background:rgba(0,0,0,.02);border:1px solid var(--bd);border-radius:12px}
-.scs-textarea{width:100%;background:transparent;border:none;color:var(--tx-high);font-family:'Playfair Display',serif;font-size:14px;font-weight:700;outline:none;resize:none;padding:12px 13px;line-height:1.5;min-height:60px}
-.scs-textarea::placeholder{color:#999;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400}
-.scs-caption{width:100%;background:transparent;border:none;border-top:1px solid var(--bd);color:#333;font-family:'DM Sans',sans-serif;font-size:11px;outline:none;resize:none;padding:8px 13px;min-height:36px}
-.scs-caption::placeholder{color:#999}
-.scs-bottom{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px}
-.scs-audience{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:10px;font-weight:700;color:#555}
-.scs-post-btn{background:var(--acc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 16px var(--glow-sm)}
-
-/* Post composer */
-.composer-body{padding:0 16px 14px}
-.composer-types{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
-.composer-types::-webkit-scrollbar{display:none}
-.ctype{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:#777;transition:.2s}
-.ctype.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.composer-textarea{width:100%;background:rgba(0,0,0,.02);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;line-height:1.55;min-height:80px;margin-bottom:10px}
-.composer-textarea::placeholder{color:#999}
-.composer-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.composer-media-row{display:flex;gap:7px}
-.cmedia-btn{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.04);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#666}
-.composer-right{display:flex;gap:8px;align-items:center}
-.composer-audience{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.04);border:1px solid var(--bd);border-radius:20px;padding:5px 10px;cursor:pointer;font-size:9px;font-weight:700;color:#555}
-.composer-post-btn{background:var(--acc);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 14px var(--glow-sm)}
-
-/* New collection — private, public, followers */
-.new-coll-body{padding:0 16px 14px}
-.nc-input{width:100%;background:rgba(0,0,0,.03);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;color:var(--tx-high);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px}
-.nc-input::placeholder{color:#999}
-.nc-privacy-row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
-.nc-privacy-btn{flex:1;min-width:80px;padding:8px 4px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:transparent;color:#777;font-family:'DM Sans',sans-serif;transition:.2s;text-align:center}
-.nc-privacy-btn.active{background:rgba(255,0,80,.08);border-color:var(--bd-acc);color:var(--acc)}
-.nc-create-btn{width:100%;background:var(--acc);color:#fff;border:none;padding:11px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
-
-/* Menu sheet (hamburger account menu) */
-.menu-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:none;align-items:flex-end}
-.menu-overlay.open{display:flex}
-.menu-sheet{width:100%;background:var(--l1);border-radius:24px 24px 0 0;animation:slideUp .28s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;scrollbar-width:none;padding-bottom:env(safe-area-inset-bottom,20px)}
-.menu-sheet::-webkit-scrollbar{display:none}
-.menu-profile-mini{display:flex;align-items:center;gap:11px;padding:12px 18px 14px;border-bottom:1px solid var(--bd)}
-.menu-mini-av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--acc)}
-.menu-mini-av img{width:100%;height:100%;object-fit:cover;display:block}
-.menu-mini-name{font-size:13px;font-weight:800;color:var(--tx-high)}
-.menu-mini-handle{font-size:10px;color:var(--tx-muted);margin-top:1px}
-.menu-mini-badge{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px;background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc);margin-top:3px;display:inline-block}
-.menu-close{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#666;flex-shrink:0}
-.menu-section{padding:8px 0 4px}
-.menu-section-label{font-size:9px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.12em;padding:0 18px 6px}
-.menu-item{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
-.menu-item:active{background:rgba(0,0,0,.02)}
-.menu-item-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.menu-item-title{font-size:13px;font-weight:700;color:var(--tx-high)}
-.menu-item-sub{font-size:10px;color:var(--tx-muted);margin-top:1px}
-.menu-item-right{font-size:10px;font-weight:700;color:var(--tx-muted);margin-left:auto}
-.menu-badge-sm{background:var(--acc);color:#fff;font-size:8px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
-.menu-badge-sm.b{background:var(--blue)}
-.menu-badge-sm.g{background:var(--green)}
-.menu-divider{height:1px;background:var(--bd);margin:4px 18px}
-.menu-wallet-strip{margin:4px 18px 8px;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(255,0,80,.05));border:1px solid rgba(251,191,36,.25);border-radius:12px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
-.mws-info{display:flex;flex-direction:column;gap:1px}
-.mws-label{font-size:9px;font-weight:700;color:#b57e00;text-transform:uppercase;letter-spacing:.08em}
-.mws-amount-row{display:flex;align-items:center;gap:7px}
-.mws-amount{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tx-high)}
-.mws-fund{background:var(--gold);color:#07070b;border:none;padding:6px 13px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
-
-/* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0 calc(var(--safe-b) + 8px);min-height:var(--nav-h)}
-.bn-item{text-align:center;font-size:9px;font-weight:600;color:var(--tx-faint);cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
-.bn-item i{font-size:20px;display:block}
-.bn-item.active{color:var(--acc)}
-
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(var(--safe-b) + var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--l3);border:1px solid var(--bd);color:var(--tx-body);padding:8px 18px;border-radius:28px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.1)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ═══════════════════════════════════════════════════════
-   FEED POST CARDS — same card layout language as feed.html
-   (full-width blocks, thick page-colored divider, type pill,
-   chapter cover card, recommendation link card, poll bars,
-   debate yes/no cards, bottom action row)
-═══════════════════════════════════════════════════════ */
-.pc-post{width:100%;padding:14px 16px;border-bottom:8px solid var(--bg);background:var(--l1)}
-.pc-post:last-child{border-bottom:none}
+/* ── OVERLAYS (upgrade wizard / genre edit — bottom sheets) ── */
+.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);display:none;align-items:flex-end;justify-content:center}
+.overlay-bg.open{display:flex}
+.overlay-sheet{width:100%;max-width:420px;background:var(--l1);border-radius:20px 20px 0 0;animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-handle{width:36px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;margin:12px auto 0}
+.overlay-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.overlay-hdr h3{font-size:14px;font-weight:800;color:var(--tx-high);display:flex;align-items:center;gap:7px}
+.overlay-close{width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.05);border:none;color:var(--tx-muted);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.uw-body{padding:0 16px 16px}
+.uw-step-label{font-size:10px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.uw-input{width:100%;background:rgba(0,0,0,.03);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;color:var(--tx-high);font-size:13px;outline:none;margin-bottom:14px;font-family:inherit}
+[data-theme="dark"] .uw-input{background:rgba(255,255,255,.04)}
+.uw-genre-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.uw-genre{font-size:10px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(0,0,0,.02);color:var(--tx-faint)}
+.uw-genre.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc)}
+.uw-submit{width:100%;background:linear-gradient(135deg,var(--acc),var(--purple));color:#fff;border:none;padding:13px;border-radius:14px;font-size:13.5px;font-weight:800;cursor:pointer}
+.genre-tog-grid{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 14px}
+.genre-tog{font-size:10px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--bd);background:rgba(0,0,0,.02);color:var(--tx-faint)}
+.genre-tog.on{background:rgba(255,0,80,.1);border-color:var(--bd-acc);color:var(--acc)}
+.genre-save-btn{width:calc(100% - 32px);margin:0 16px 14px;background:var(--acc);color:#fff;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:800;cursor:pointer}
 
-.pc-head{display:flex;align-items:center;gap:10px;margin-bottom:11px}
-.pc-avatar-wrap{position:relative;flex-shrink:0}
-.pc-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;cursor:pointer}
-.pc-avatar-wrap.live .pc-avatar{padding:2px;border:2px solid var(--acc);box-sizing:border-box}
-.pc-pin-badge{position:absolute;bottom:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:#08090c;display:flex;align-items:center;justify-content:center;font-size:8px;border:2px solid var(--l1)}
-.pc-meta{flex:1;min-width:0}
-.pc-name-row{display:flex;align-items:center;gap:5px}
-.pc-name{font-size:14px;font-weight:700;color:var(--tx-high)}
-.pc-verified{color:var(--blue);font-size:11px}
-.pc-rank{font-size:9px;font-weight:800;color:var(--acc);background:rgba(255,0,80,.08);border:1px solid var(--bd-acc);padding:1px 7px;border-radius:8px;margin-left:2px}
-.pc-time{font-size:11.5px;color:var(--tx-muted);margin-top:1px}
-.pc-dots{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--tx-muted);cursor:pointer;flex-shrink:0;background:transparent;border:none;font-size:14px}
-.pc-dots:active{background:rgba(0,0,0,.05)}
+/* ── LEFT-SLIDING ACCOUNT DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .22s ease}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;z-index:501;width:82%;max-width:320px;background:var(--l1);box-shadow:2px 0 30px rgba(0,0,0,.18);transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+.drawer.open{transform:translateX(0)}
+.drawer-profile{display:flex;align-items:center;gap:11px;padding:16px 16px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.drawer-av{width:46px;height:46px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--acc)}
+.drawer-av img{width:100%;height:100%;object-fit:cover;display:block}
+.drawer-name{font-size:13.5px;font-weight:800;color:var(--tx-high)}
+.drawer-handle{font-size:10.5px;color:var(--tx-muted);margin-top:1px}
+.drawer-badge{font-size:8px;font-weight:800;padding:1px 7px;border-radius:8px;background:rgba(255,0,80,.1);border:1px solid var(--bd-acc);color:var(--acc);margin-top:3px;display:inline-block}
+.drawer-close{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--tx-muted);flex-shrink:0}
+.drawer-body{flex:1;overflow-y:auto;padding:6px 8px 24px}
+.drawer-section{margin-bottom:2px}
+.drawer-section-title{font-size:9.5px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;padding:14px 12px 6px}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;cursor:pointer;border:none;background:transparent;width:100%;text-align:left}
+.drawer-item:active{background:rgba(0,0,0,.03)}
+[data-theme="dark"] .drawer-item:active{background:rgba(255,255,255,.04)}
+.drawer-item-icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.drawer-item-title{font-size:12.5px;font-weight:700;color:var(--tx-high)}
+.drawer-item-sub{font-size:9.5px;color:var(--tx-muted);margin-top:1px}
+.drawer-item-right{font-size:10px;font-weight:700;color:var(--tx-muted);margin-left:auto}
+.drawer-badge-sm{background:var(--acc);color:#fff;font-size:8px;font-weight:800;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
+.drawer-divider{height:1px;background:var(--bd);margin:6px 12px}
 
-.type-pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.01em;padding:5px 10px;border-radius:20px;margin-bottom:10px;border:1px solid}
-.type-pill i{font-size:10px}
-.tp-chapter{background:rgba(167,139,250,.08);color:var(--purple);border-color:rgba(167,139,250,.25)}
-.tp-ama{background:rgba(255,0,80,.08);color:var(--acc);border-color:var(--bd-acc)}
-.tp-quote{background:rgba(251,191,36,.08);color:#b57e00;border-color:rgba(251,191,36,.25)}
-.tp-repost{background:rgba(56,189,248,.08);color:#0284c7;border-color:rgba(56,189,248,.25)}
-.tp-poll{background:rgba(52,211,153,.08);color:#0d9668;border-color:rgba(52,211,153,.25)}
-.tp-debate{background:rgba(251,146,60,.08);color:#c2610a;border-color:rgba(251,146,60,.25)}
-.tp-post{background:rgba(255,0,80,.08);color:var(--acc);border-color:var(--bd-acc)}
-
-.pc-text{font-size:14px;line-height:1.55;margin-bottom:11px;color:var(--tx-body);white-space:pre-line}
-.pc-image{width:100%;border-radius:12px;margin-bottom:11px;max-height:280px;object-fit:cover;border:1px solid var(--bd);display:block}
-
-/* Chapter drop card */
-.pc-chapter-card{border-radius:12px;overflow:hidden;margin-bottom:11px;border:1px solid var(--bd)}
-.pc-chapter-cover{width:100%;height:170px;position:relative;background-size:cover;background-position:center}
-.pc-chapter-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.15) 55%,transparent 100%)}
-.pc-chapter-textwrap{position:absolute;left:14px;right:14px;bottom:12px;color:#fff}
-.pc-chapter-eyebrow{font-size:10px;font-weight:800;color:var(--acc3);letter-spacing:.05em;margin-bottom:3px;text-transform:uppercase}
-.pc-chapter-title{font-family:'Playfair Display',serif;font-size:16.5px;font-weight:800;line-height:1.25}
-.pc-chapter-sub{font-size:12px;font-weight:600;opacity:.9;margin-top:2px}
-.pc-chapter-panel{padding:12px 14px;background:var(--l1)}
-.pc-chapter-desc{font-size:12.5px;color:var(--tx-muted);line-height:1.5;margin-bottom:11px}
-.pc-read-btn{background:var(--acc);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 0 14px var(--glow-sm);font-family:'DM Sans',sans-serif}
-
-/* Recommendation / repost link card */
-.pc-rec-card{display:flex;align-items:center;gap:11px;background:var(--l2);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;margin-bottom:11px;cursor:pointer}
-.pc-rec-thumb{width:42px;height:56px;border-radius:6px;flex-shrink:0;object-fit:cover;background:var(--bd)}
-.pc-rec-title{font-size:12.5px;font-weight:700;color:var(--tx-high);line-height:1.3}
-.pc-rec-sub{font-size:11px;color:var(--tx-muted);margin-top:2px}
-.pc-rec-arrow{margin-left:auto;color:var(--tx-muted);flex-shrink:0}
-
-/* Quote card */
-.pc-quote-card{background:linear-gradient(135deg,rgba(255,0,80,.05),rgba(167,139,250,.05));border:1px solid var(--bd-acc);border-radius:14px;padding:20px 16px 16px;margin-bottom:11px;position:relative}
-.pc-quote-mark{position:absolute;top:6px;left:14px;font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--acc);opacity:.25;line-height:1}
-.pc-quote-text{font-family:'Playfair Display',serif;font-style:italic;font-size:14.5px;font-weight:700;color:var(--tx-high);line-height:1.55;margin:10px 0 8px 8px}
-.pc-quote-caption{font-size:11.5px;color:var(--tx-muted);font-weight:600;margin-left:8px}
-
-/* AMA live card */
-.pc-ama-card{border-radius:14px;overflow:hidden;margin-bottom:11px;background:linear-gradient(135deg,rgba(255,0,80,.08),rgba(167,139,250,.05));border:1px solid var(--bd-acc);padding:16px}
-.pc-ama-live-row{display:flex;align-items:center;gap:7px;margin-bottom:10px}
-.pc-ama-live-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pcPulse 1.4s infinite}
-.pc-ama-live-text{font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
-.pc-ama-viewers{font-size:10px;color:var(--tx-muted);margin-left:auto;font-weight:600;display:flex;align-items:center;gap:4px}
-.pc-ama-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:var(--tx-high);margin-bottom:4px}
-.pc-ama-meta{font-size:12px;color:var(--tx-body);line-height:1.5;margin-bottom:12px}
-.pc-ama-join{background:var(--acc);color:#fff;border:none;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 0 14px var(--glow-sm);font-family:'DM Sans',sans-serif}
-@keyframes pcPulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* Poll */
-.pc-poll-q{font-size:14.5px;font-weight:700;margin-bottom:13px;line-height:1.4;color:var(--tx-high)}
-.pc-poll-row{margin-bottom:9px;cursor:pointer}
-.pc-poll-label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:5px;color:var(--tx-body)}
-.pc-poll-track{height:8px;border-radius:6px;background:var(--l2);overflow:hidden}
-.pc-poll-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
-.pc-poll-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11.5px;color:var(--tx-muted)}
-.pc-poll-voted{color:var(--acc);font-weight:700}
-
-/* Debate */
-.pc-debate-q{font-family:'Playfair Display',serif;font-size:16.5px;font-weight:800;margin-bottom:4px;color:var(--tx-high)}
-.pc-debate-prompt{font-size:12.5px;color:var(--tx-muted);margin-bottom:13px}
-.pc-debate-opts{display:flex;gap:9px;margin-bottom:13px}
-.pc-debate-opt{flex:1;border-radius:12px;padding:14px 10px;text-align:center;border:1.5px solid;cursor:pointer;transition:.15s}
-.pc-debate-opt.for{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.25)}
-.pc-debate-opt.against{background:rgba(255,0,80,.06);border-color:var(--bd-acc)}
-.pc-debate-opt.picked{outline:2px solid currentColor}
-.pc-debate-opt-text{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:9px}
-.pc-debate-opt.for .pc-debate-opt-text{color:#0d9668}
-.pc-debate-opt.against .pc-debate-opt-text{color:var(--acc)}
-.pc-debate-icon{margin-bottom:8px;font-size:18px}
-.pc-debate-opt.for .pc-debate-icon{color:var(--green)}
-.pc-debate-opt.against .pc-debate-icon{color:var(--acc)}
-.pc-debate-footer{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--tx-muted)}
-
-/* Action row */
-.pc-actions{display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--bd)}
-.pc-action-group{display:flex;align-items:center;gap:22px}
-.pc-action{display:flex;align-items:center;gap:6px;color:var(--tx-muted);cursor:pointer;background:none;border:none;font-family:inherit;padding:0}
-.pc-action i{font-size:16px}
-.pc-action span{font-size:12.5px;font-weight:600}
-.pc-action.liked{color:var(--acc)}
-.pc-action.liked i{font-weight:900}
-.pc-save{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--tx-muted);cursor:pointer;background:none;border:none;font-size:15px}
-.pc-save.on{color:var(--gold)}
+/* ── PAGE-LOCAL POST OPTIONS MENU (dots menu, pom- prefixed) ── */
+.pom-overlay{position:fixed;inset:0;z-index:898;display:none}
+.pom-overlay.open{display:block}
+.pom-menu{position:fixed;z-index:899;background:var(--l1);border:1px solid var(--bd);border-radius:14px;padding:6px;min-width:190px;box-shadow:0 10px 32px rgba(0,0,0,.18);display:none}
+[data-theme="dark"] .pom-menu{box-shadow:0 10px 32px rgba(0,0,0,.6)}
+.pom-menu.open{display:block}
+.pom-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--tx-body);cursor:pointer;transition:.12s}
+.pom-item:active{background:rgba(0,0,0,.04)}
+[data-theme="dark"] .pom-item:active{background:rgba(255,255,255,.05)}
+.pom-item.danger{color:#dc2626}
+.pom-item i{font-size:12px;width:14px;text-align:center;color:var(--tx-muted)}
+.pom-item.danger i{color:#dc2626}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="top-logo" onclick="location.href='index.html'">D</div>
-  <div class="top-right">
-    <div class="top-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></div>
-    <div class="top-icon-btn" id="searchBtn" data-search-trigger title="Search"><i class="fas fa-magnifying-glass"></i></div>
-    <div class="top-icon-btn" id="bellBtn" onclick="location.href='alerts.html'">
-      <i class="fas fa-bell"></i>
-      <div class="notif-count" id="notifCount" style="display:none">0</div>
-    </div>
-    <div class="top-icon-btn" onclick="toast('🛍️ Opening store…')" title="Store"><i class="fas fa-store"></i></div>
-    <div class="top-icon-btn" onclick="openMenu()"><i class="fas fa-bars"></i></div>
-  </div>
-</div>
+<div class="phone">
 
-<!-- HERO -->
-<div class="profile-hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grad"></div>
-  <button class="hero-edit-btn"><i class="fas fa-camera"></i> Edit Cover</button>
-</div>
-
-<!-- PROFILE INFO -->
-<div class="profile-info">
-  <div class="av-row">
-    <div class="av-outer">
-      <div class="av-ring">
-        <div class="av-inner"><img src="https://i.pravatar.cc/100?img=32" alt="Ada_Writes"/></div>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-logo" onclick="location.href='index.html'">D</div>
+    <div class="top-right">
+      <div class="top-icon-btn" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></div>
+      <div class="top-icon-btn" data-search-trigger title="Search"><i class="fas fa-magnifying-glass"></i></div>
+      <div class="top-icon-btn" onclick="location.href='notifications.html'" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <div class="notif-count" id="notifCount" style="display:none">0</div>
       </div>
-      <div class="verified-badge-av"><i class="fas fa-check" style="font-size:7px"></i></div>
-    </div>
-    <div class="action-row">
-      <button class="pact edit" id="profileActionBtn" onclick="toggleOwnerAction()">Edit Profile</button>
-      <button class="pact msg" onclick="toast('💬 Opening DM…')"><i class="fas fa-paper-plane"></i></button>
+      <div class="top-icon-btn" onclick="openDrawer()" title="Menu"><i class="fas fa-bars"></i></div>
     </div>
   </div>
 
-  <div class="profile-name">
-    Ada_Writes
-    <span class="writer-tag">✍️ Writer</span>
-  </div>
-  <div class="profile-handle">
-    @ada_writes
-    <span class="verified-inline">✓ Verified</span>
-  </div>
-  <div class="profile-bio">The writer who makes Lagos cry on their commute. Betrayal, family and the love you didn't see coming. 5 ongoing series. Write at 2am, publish at 5am. 🖊️</div>
-
-  <div class="profile-genres" id="genrePillsDisplay">
-    <div class="genre-pill">💔 Betrayal</div>
-    <div class="genre-pill">👑 Family</div>
-    <div class="genre-pill">✨ Twist</div>
-    <div class="genre-pill">🏙️ Urban</div>
-    <div class="genre-pill">💍 Marriage</div>
-    <div class="genre-pill inactive" onclick="openGenreEdit()" style="cursor:pointer">+ Edit</div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-item" onclick="switchTab('following')">
-      <div class="stat-num">89</div><div class="stat-label">Following</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num r">12.4k</div><div class="stat-label">Followers</div>
-    </div>
-    <div class="stat-item" onclick="switchTab('books')">
-      <div class="stat-num b">5</div><div class="stat-label">Books</div>
-    </div>
-    <div class="stat-item" onclick="switchTab('analytics')">
-      <div class="stat-num r">1.1M</div><div class="stat-label">Reads</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num g">24.3k</div><div class="stat-label">Likes</div>
+  <!-- LOADING SKELETON -->
+  <div id="loadingState">
+    <div class="sk sk-hero"></div>
+    <div style="padding:0 14px">
+      <div class="sk sk-av"></div>
+      <div class="sk sk-line" style="width:55%"></div>
+      <div class="sk sk-line" style="width:35%"></div>
+      <div class="sk sk-line" style="width:80%"></div>
     </div>
   </div>
 
-  <!-- Achievements -->
-  <div class="ach-row">
-    <div class="ach-chip gold"><i class="fas fa-trophy"></i> Top Writer '25</div>
-    <div class="ach-chip red"><i class="fas fa-fire"></i> 1M Reads</div>
-    <div class="ach-chip blue"><i class="fas fa-star"></i> Editor's Pick</div>
-    <div class="ach-chip purple"><i class="fas fa-gavel"></i> Debate Legend</div>
-    <div class="ach-chip green"><i class="fas fa-book"></i> 48 Stories</div>
+  <!-- EMPTY / NOT FOUND STATE -->
+  <div id="emptyState">
+    <div class="empty-icon"><i class="fas fa-user-slash"></i></div>
+    <div class="empty-title">Profile not found</div>
+    <div class="empty-sub">This account doesn't exist or may have been removed.</div>
   </div>
 
-  <!-- Ad — rendered via DroboardAdCard.renderBanner (small banner ad type) -->
-  <div id="profileAdMount"></div>
-</div>
+  <!-- PROFILE ROOT — pure render surface, filled entirely from ProfileData -->
+  <div id="profileRoot">
 
-<!-- TABS -->
-<div class="profile-tabs" id="profileTabs">
-  <div class="ptab active" data-tab="feed" onclick="switchTab('feed')">🏠 Feed</div>
-  <div class="ptab" data-tab="books" onclick="switchTab('books')">📖 Books <span class="ptab-badge b" id="booksTabBadge">5</span></div>
-  <div class="ptab" data-tab="collections" onclick="switchTab('collections')">📂 Collections <span class="ptab-badge g">4</span></div>
-  <div class="ptab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</div>
-  <div class="ptab" data-tab="following" onclick="switchTab('following')">👥 Following</div>
-  <div class="ptab" data-tab="about" onclick="switchTab('about')">✦ About</div>
-</div>
-
-<!-- ════ FEED TAB — post cards, feed.html-style layout ════ -->
-<div class="tab-panel active" id="panel-feed">
-  <div id="feedList"></div>
-</div>
-
-<!-- ════ BOOKS TAB ════ -->
-<div class="tab-panel" id="panel-books">
-  <div class="sh" style="margin-bottom:8px">
-    <div class="sh-title" style="flex:1" id="storiesCountTitle">5 Books</div>
-    <div style="display:flex;gap:6px">
-      <div class="sh-more" onclick="location.href='story-management.html'">View</div>
-      <div class="sh-more" onclick="toast('📚 + New Book')">+ Book</div>
+    <div class="profile-hero">
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-grad"></div>
+      <a class="hero-edit-btn" id="heroEditBtn" href="edit-profile.html" style="display:none"><i class="fas fa-camera"></i> Edit Cover</a>
     </div>
-  </div>
-  <div id="seriesList"></div>
-</div>
 
-<!-- ════ COLLECTIONS TAB — rendered via DroboardCollectionCard, cards open collection.html ════ -->
-<div class="tab-panel" id="panel-collections">
-  <div class="sh" style="margin-bottom:10px">
-    <div class="sh-title" style="flex:1">My Collections</div>
-    <div class="sh-more" onclick="openNewCollection()">+ New</div>
-  </div>
-  <div id="collectionsGrid"></div>
-  <button class="new-coll-btn" onclick="openNewCollection()"><i class="fas fa-plus-circle"></i> Create New Collection</button>
-</div>
-
-<!-- ════ ANALYTICS TAB ════ -->
-<div class="tab-panel" id="panel-analytics">
-  <div class="sh" style="margin-bottom:8px">
-    <div class="sh-title">Writer Dashboard</div>
-  </div>
-  <div class="analytics-period-btns">
-    <button class="anlyt-period active" onclick="switchAnalyticsPeriod('today',this)">Today</button>
-    <button class="anlyt-period" onclick="switchAnalyticsPeriod('week',this)">This Week</button>
-    <button class="anlyt-period" onclick="switchAnalyticsPeriod('month',this)">This Month</button>
-  </div>
-  <div class="analytics-grid" id="analyticsGrid"></div>
-  <div class="sdiv"></div>
-  <div class="sh" style="margin-bottom:10px"><div class="sh-title">Top Performing Series</div></div>
-  <div id="topSeriesList"></div>
-</div>
-
-<!-- ════ FOLLOWING TAB ════ -->
-<div class="tab-panel" id="panel-following">
-  <div style="margin-bottom:10px;font-size:11px;color:var(--tx-muted)">Following <strong style="color:var(--tx-high)">89</strong> writers, readers &amp; creators</div>
-  <div id="followingList"></div>
-</div>
-
-<!-- ════ ABOUT TAB ════ -->
-<div class="tab-panel" id="panel-about">
-  <div style="font-size:13px;color:var(--tx-body);line-height:1.65;padding:2px 0 14px">
-    Lagos-based fiction writer. Started writing at 19, published first story on Droboard in 2021 and never stopped. Known for the kind of betrayal plots that make readers delete their own DMs out of suspicion. Writes at 2am, proof-reads at 5am, publishes at 6am.
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-map-marker-alt" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Location</div><div class="about-val">Lagos, Nigeria 🇳🇬</div></div>
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-calendar-alt" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Joined Droboard</div><div class="about-val">March 2021 · 4 years writing</div></div>
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-book" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Writing Genres</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px" id="aboutGenreDisplay"></div>
-      <div style="font-size:9px;color:var(--acc);cursor:pointer;margin-top:5px;font-weight:600;display:inline-flex;align-items:center;gap:3px" onclick="openGenreEdit()"><i class="fas fa-pen" style="font-size:8px"></i> Edit genres</div>
-    </div>
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-fire" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Current Series</div><div class="about-val">5 active · 2 completed · 1 paused</div></div>
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-heart" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Most-Liked Story</div><div class="about-val">"I came home early and caught my husband kissing my late sister's photograph" — 24.3k likes</div></div>
-  </div>
-  <div class="about-item">
-    <div class="about-icon"><i class="fas fa-link" style="color:var(--acc)"></i></div>
-    <div><div class="about-label">Links</div>
-      <div class="about-val" style="display:flex;gap:10px;margin-top:5px">
-        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-instagram"></i> @ada_writes_ng</span>
-        <span style="color:var(--blue);cursor:pointer;font-size:12px"><i class="fab fa-x-twitter"></i> @ada_writes</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <a class="bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
-  <a class="bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
-  <a class="bn-item" href="library.html"><i class="fas fa-layer-group"></i>Library</a>
-  <a class="bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
-  <a class="bn-item active" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
-</div>
-
-<!-- ════ POST COMPOSER ════ -->
-<div class="overlay-bg" id="postComposerOv" onclick="if(event.target===this)closePostComposer()">
-  <div class="overlay-sheet">
-    <div class="overlay-handle"></div>
-    <div class="overlay-hdr">
-      <h3><i class="fas fa-plus-circle" style="color:var(--acc);font-size:13px"></i> Create Post</h3>
-      <button class="overlay-close" onclick="closePostComposer()">✕</button>
-    </div>
-    <div class="composer-body">
-      <div class="composer-types">
-        <div class="ctype active" data-ct="text">📝 Text</div>
-        <div class="ctype" data-ct="photo">📸 Photo</div>
-        <div class="ctype" data-ct="chapter">📖 Chapter Drop</div>
-        <div class="ctype" data-ct="ama">🎙️ AMA</div>
-        <div class="ctype" data-ct="poll">📊 Poll</div>
-        <div class="ctype" data-ct="quote">💬 Quote</div>
-      </div>
-      <textarea class="composer-textarea" id="composerText" placeholder="What do you want to share? A teaser, update, thoughts…"></textarea>
-      <div class="composer-actions">
-        <div class="composer-media-row">
-          <div class="cmedia-btn"><i class="fas fa-image"></i></div>
-          <div class="cmedia-btn"><i class="fas fa-at"></i></div>
-          <div class="cmedia-btn"><i class="fas fa-hashtag"></i></div>
-          <div class="cmedia-btn"><i class="fas fa-laugh"></i></div>
+    <div class="profile-info">
+      <div class="av-row">
+        <div class="av-outer">
+          <div class="av-ring" id="avRing">
+            <div class="av-inner"><img id="avImg" src="" alt=""/></div>
+          </div>
+          <div class="verified-badge-av" id="verifiedBadge" style="display:none"><i class="fas fa-check" style="font-size:7px"></i></div>
         </div>
-        <div class="composer-right">
-          <div class="composer-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
-          <button class="composer-post-btn" onclick="submitPost()">Post →</button>
+        <div class="action-row" id="actionRow"></div>
+      </div>
+
+      <div class="profile-name">
+        <span id="profileName"></span>
+        <span class="role-tag" id="roleTag"></span>
+      </div>
+      <div class="profile-handle">
+        <span id="profileHandle"></span>
+        <span class="verified-inline" id="verifiedInline" style="display:none">✓ Verified</span>
+      </div>
+      <div class="profile-bio" id="profileBio"></div>
+      <div class="profile-genres" id="genrePillsDisplay"></div>
+
+      <div class="stats-row" id="statsRow"></div>
+      <div class="ach-row" id="achRow"></div>
+
+      <div class="upgrade-strip" id="upgradeStrip">
+        <i class="fas fa-feather-pointed"></i>
+        <div class="upgrade-strip-text">
+          <div class="upgrade-strip-title">Ready to publish?</div>
+          <div class="upgrade-strip-sub">Turn on writer tools — your reading history stays exactly as it is.</div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════ STATUS COMPOSER ════ -->
-<div class="overlay-bg" id="statusComposerOv" onclick="if(event.target===this)closeStatusComposer()">
-  <div class="overlay-sheet">
-    <div class="overlay-handle"></div>
-    <div class="overlay-hdr">
-      <h3><i class="fas fa-circle-notch" style="color:var(--acc);font-size:13px"></i> Post Status</h3>
-      <button class="overlay-close" onclick="closeStatusComposer()">✕</button>
-    </div>
-    <div class="scs-types">
-      <div class="scs-type active" data-type="reading">📖 Reading Update</div>
-      <div class="scs-type" data-type="quote">💬 Quote</div>
-      <div class="scs-type" data-type="teaser">🔥 Chapter Teaser</div>
-      <div class="scs-type" data-type="thought">🖊️ Thought</div>
-    </div>
-    <div class="scs-preview" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=700&q=80')">
-      <div class="scs-preview-grad"></div>
-      <div class="scs-preview-change" onclick="toast('🖼️ Choose background…')">Change BG</div>
-    </div>
-    <div class="scs-text-area">
-      <textarea class="scs-textarea" rows="3" placeholder="Write your quote or thought…">"Sometimes love is just grief wearing a familiar face."</textarea>
-      <textarea class="scs-caption" rows="2" placeholder="Add a caption…"></textarea>
-    </div>
-    <div class="scs-bottom">
-      <div class="scs-audience"><i class="fas fa-globe-africa" style="color:var(--acc)"></i> Everyone</div>
-      <button class="scs-post-btn" onclick="toast('✅ Status posted!');closeStatusComposer()">Post ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ NEW COLLECTION — private, public, followers ════ -->
-<div class="overlay-bg" id="newCollOv" onclick="if(event.target===this)closeNewColl()">
-  <div class="overlay-sheet">
-    <div class="overlay-handle"></div>
-    <div class="overlay-hdr">
-      <h3><i class="fas fa-folder-plus" style="color:var(--acc3);font-size:13px"></i> New Collection</h3>
-      <button class="overlay-close" onclick="closeNewColl()">✕</button>
-    </div>
-    <div class="new-coll-body">
-      <input class="nc-input" id="newCollName" placeholder="Collection name…"/>
-      <textarea class="nc-input" rows="2" style="resize:none;min-height:48px;font-size:12px" placeholder="Description (optional)"></textarea>
-      <div style="font-size:10px;color:var(--tx-muted);margin-bottom:6px;font-weight:600">Privacy</div>
-      <div class="nc-privacy-row">
-        <button class="nc-privacy-btn active" onclick="setNcPrivacy('private',this)"><i class="fas fa-lock" style="color:var(--acc)"></i> Private</button>
-        <button class="nc-privacy-btn" onclick="setNcPrivacy('public',this)"><i class="fas fa-globe-africa" style="color:var(--green)"></i> Public</button>
-        <button class="nc-privacy-btn" onclick="setNcPrivacy('followers',this)"><i class="fas fa-user-friends" style="color:var(--blue)"></i> Followers</button>
-      </div>
-      <button class="nc-create-btn" onclick="createCollection()">Create Collection ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ GENRE EDIT ════ -->
-<div class="overlay-bg" id="genreEditOv" onclick="if(event.target===this)closeGenreEdit()">
-  <div class="overlay-sheet">
-    <div class="overlay-handle"></div>
-    <div class="overlay-hdr">
-      <h3><i class="fas fa-book" style="color:var(--acc3);font-size:13px"></i> My Writing Genres</h3>
-      <button class="overlay-close" onclick="closeGenreEdit()">✕</button>
-    </div>
-    <div style="font-size:11px;color:#666;padding:0 16px 12px;line-height:1.5">Select genres that describe your writing. These appear on your profile.</div>
-    <div class="genre-tog-grid" id="genreTogGrid"></div>
-    <button class="genre-save-btn" onclick="saveGenres()">Save Genres ✓</button>
-  </div>
-</div>
-
-<!-- ════ ACCOUNT MENU ════ -->
-<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()">
-  <div class="menu-sheet" onclick="event.stopPropagation()">
-    <div class="overlay-handle"></div>
-    <div class="menu-profile-mini">
-      <div class="menu-mini-av"><img src="https://i.pravatar.cc/100?img=32" alt=""/></div>
-      <div style="flex:1">
-        <div class="menu-mini-name">Ada_Writes</div>
-        <div class="menu-mini-handle">@ada_writes · 12.4k followers</div>
-        <div class="menu-mini-badge">✍️ Verified Writer</div>
-      </div>
-      <div class="menu-close" onclick="closeMenu()">✕</div>
-    </div>
-
-    <div class="menu-wallet-strip">
-      <div class="mws-info">
-        <div class="mws-label">Wallet Balance</div>
-        <div class="mws-amount-row">
-          <div class="mws-amount" id="walletAmount">🪙 8,750</div>
-        </div>
-      </div>
-      <button class="mws-fund" onclick="toast('💰 Withdraw earnings…');closeMenu()">Withdraw</button>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-label">Create</div>
-      <div class="menu-item" onclick="openPostComposer('text');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)"><i class="fas fa-pen" style="color:var(--acc)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">New Post</div><div class="menu-item-sub">Text, photo, update or AMA</div></div>
-      </div>
-      <div class="menu-item" onclick="openPostComposer('chapter');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.12)"><i class="fas fa-book-open" style="color:var(--green)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">New Chapter Drop</div><div class="menu-item-sub">Announce or tease a new chapter</div></div>
-      </div>
-      <div class="menu-item" onclick="openStatusComposer();closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.12)"><i class="fas fa-circle-notch" style="color:var(--blue)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Post Status</div><div class="menu-item-sub">Quote, update or chapter teaser</div></div>
+        <button class="upgrade-strip-btn" onclick="openUpgradeWizard()">Become a Writer</button>
       </div>
     </div>
 
-    <div class="menu-divider"></div>
+    <div class="profile-tabs" id="profileTabs"></div>
 
-    <div class="menu-section">
-      <div class="menu-section-label">My Content</div>
-      <div class="menu-item" onclick="switchTabFromMenu('books')">
-        <div class="menu-item-icon" style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)"><i class="fas fa-book" style="color:var(--acc)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Books</div><div class="menu-item-sub">5 published books</div></div>
-        <div class="menu-item-right"><span class="menu-badge-sm">5</span></div>
-      </div>
-      <div class="menu-item" onclick="switchTabFromMenu('analytics')">
-        <div class="menu-item-icon" style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.1)"><i class="fas fa-chart-line" style="color:var(--gold)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Analytics</div><div class="menu-item-sub">1.1M total reads this month</div></div>
-        <div class="menu-item-right" style="color:#b57e00;font-weight:800">↑ 24%</div>
-      </div>
-      <div class="menu-item" onclick="location.href='writer-dashboard.html';closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.12)"><i class="fas fa-gauge-high" style="color:var(--purple)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Dashboard</div><div class="menu-item-sub">Full writer dashboard</div></div>
-      </div>
+    <!-- Exactly ONE of these panels is ever visible — controlled purely
+         by the .active class. Tab list itself is data-driven (writers
+         get Books, readers get Library). -->
+    <div class="tab-panel active" id="panel-feed"><div id="feedList"></div></div>
+
+    <div class="tab-panel" id="panel-books">
+      <div class="sh"><div class="sh-title" id="booksCountTitle">Books</div><div class="sh-more" id="newBookBtn">+ Book</div></div>
+      <div id="booksList"></div>
     </div>
 
-    <div class="menu-divider"></div>
-
-    <div class="menu-section">
-      <div class="menu-section-label">Account</div>
-      <div class="menu-item" onclick="toast('✏️ Edit profile…');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(0,0,0,.04);border:1px solid var(--bd)"><i class="fas fa-user-edit" style="color:#888"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Edit Profile</div><div class="menu-item-sub">Name, bio, avatar, genres</div></div>
-      </div>
-      <div class="menu-item" onclick="toast('⚙️ Settings…');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(0,0,0,.04);border:1px solid var(--bd)"><i class="fas fa-cog" style="color:#888"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Settings</div><div class="menu-item-sub">Privacy, notifications, payout</div></div>
-      </div>
-      <div class="menu-item" onclick="toast('🤝 Refer a friend…');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.1)"><i class="fas fa-share-alt" style="color:var(--gold)"></i></div>
-        <div style="flex:1"><div class="menu-item-title">Refer a Friend</div><div class="menu-item-sub">Earn ₦500 per referral</div></div>
-      </div>
-      <div class="menu-item" onclick="toast('👋 Signed out!');closeMenu()">
-        <div class="menu-item-icon" style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15)"><i class="fas fa-sign-out-alt" style="color:#dc2626"></i></div>
-        <div style="flex:1"><div class="menu-item-title" style="color:#dc2626">Sign Out</div></div>
-      </div>
+    <div class="tab-panel" id="panel-library">
+      <div id="libSubtitle"></div>
+      <div id="libFootnote"></div>
+      <div id="libraryMount"></div>
     </div>
-    <div style="height:8px"></div>
+
+    <div class="tab-panel" id="panel-collections">
+      <div class="sh"><div class="sh-title" style="flex:1">Collections</div></div>
+      <div id="collectionsList"></div>
+      <button class="new-coll-btn" id="newCollBtn"><i class="fas fa-plus-circle"></i> Create New Collection</button>
+    </div>
+
+    <div class="tab-panel" id="panel-following">
+      <div style="margin-bottom:10px;font-size:11px;color:var(--tx-muted)" id="followingIntro"></div>
+      <div id="followingList"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-about">
+      <div style="font-size:13px;color:var(--tx-body);line-height:1.65;padding:2px 0 14px" id="aboutIntro"></div>
+      <div class="about-item"><div class="about-icon"><i class="fas fa-map-marker-alt" style="color:var(--acc)"></i></div>
+        <div><div class="about-label">Location</div><div class="about-val" id="aboutLocation"></div></div></div>
+      <div class="about-item"><div class="about-icon"><i class="fas fa-calendar-alt" style="color:var(--acc)"></i></div>
+        <div><div class="about-label">Joined Droboard</div><div class="about-val" id="aboutJoined"></div></div></div>
+      <div class="about-item"><div class="about-icon"><i class="fas fa-book" style="color:var(--acc)"></i></div>
+        <div style="flex:1"><div class="about-label">Genres</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px" id="aboutGenreDisplay"></div>
+          <div style="font-size:9px;color:var(--acc);cursor:pointer;margin-top:5px;font-weight:600" id="aboutEditGenresBtn"><i class="fas fa-pen" style="font-size:8px"></i> Edit genres</div>
+        </div></div>
+      <div id="aboutExtra"></div>
+    </div>
+
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- ══ SHARED COMPONENTS ══ -->
-<script src="component/save-modal.js"></script>
-<script src="component/share-modal.js"></script>
-<script src="component/status-viewer.js"></script>
-<script src="component/ad-card.js"></script>
-<script src="component/collection-card.js"></script>
-<script src="component/search-overlay.js"></script>
+<!-- ════ POST OPTIONS MENU (page-local "⋯" popover for feed posts) ════ -->
+<div class="pom-overlay" id="pomOverlay"></div>
+<div class="pom-menu" id="pomMenu"></div>
 
-<!-- ══ SHARED DATA ══ -->
-<script src="data/post-data.js"></script>
-<script src="data/ad-data.js"></script>
+<!-- ════ BECOME-A-WRITER WIZARD — mutates via ProfileData.becomeWriter ════ -->
+<div class="overlay-bg" id="upgradeOv">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-feather-pointed" style="color:var(--acc);font-size:13px"></i> Become a Writer</h3>
+      <button class="overlay-close" id="upgradeCloseBtn">✕</button>
+    </div>
+    <div class="uw-body">
+      <div class="uw-step-label">Title of your first book</div>
+      <input class="uw-input" id="uwTitle" placeholder="e.g. The letter I never sent…"/>
+      <div class="uw-step-label">Main genre</div>
+      <div class="uw-genre-grid" id="uwGenreGrid"></div>
+      <button class="uw-submit" id="uwSubmitBtn">Publish &amp; Unlock Writer Tools ✓</button>
+    </div>
+  </div>
+</div>
 
+<!-- ════ GENRE EDIT — mutates via ProfileData.updateGenres ════ -->
+<div class="overlay-bg" id="genreEditOv">
+  <div class="overlay-sheet">
+    <div class="overlay-handle"></div>
+    <div class="overlay-hdr">
+      <h3><i class="fas fa-book" style="color:var(--acc3);font-size:13px"></i> My Genres</h3>
+      <button class="overlay-close" id="genreCloseBtn">✕</button>
+    </div>
+    <div class="genre-tog-grid" id="genreTogGrid"></div>
+    <button class="genre-save-btn" id="genreSaveBtn">Save Genres ✓</button>
+  </div>
+</div>
+
+<!-- ════ LEFT-SLIDING ACCOUNT DRAWER — navigation + entry points only ════ -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-profile">
+    <div class="drawer-av"><img id="drawerAv" src="" alt=""/></div>
+    <div style="flex:1;min-width:0">
+      <div class="drawer-name" id="drawerName"></div>
+      <div class="drawer-handle" id="drawerHandle"></div>
+      <div class="drawer-badge" id="drawerBadge"></div>
+    </div>
+    <div class="drawer-close" id="drawerCloseBtn"><i class="fas fa-xmark"></i></div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- Demo seed → services (load order matters: seed, then auth, then profile-data) -->
+<script src="data/profile-demo-seed.js"></script>
+<script src="services/auth-session.js"></script>
+<script src="services/profile-data.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════
-   BACKEND API — real calls with demo data fallback
-═══════════════════════════════════════════════════════ */
-const API_BASE = 'https://api.droboard.app';
-
-async function apiFetch(endpoint, demoData) {
-  try {
-    const res = await fetch(API_BASE + endpoint, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) throw new Error('non-2xx');
-    return await res.json();
-  } catch (_) {
-    return demoData;
-  }
-}
-
-async function loadNotifCount() {
-  const data = await apiFetch('/v1/notifications/unread-count', { count: 5 });
-  const count = data?.count ?? 5;
-  const badge = document.getElementById('notifCount');
-  if (count > 0) {
-    badge.textContent = count > 99 ? '99+' : String(count);
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-loadNotifCount();
-
-async function loadCoinBalance() {
-  const data = await apiFetch('/v1/wallet/balance', { coins: 8750 });
-  const coins = data?.coins ?? 8750;
-  const fmtCoins = coins.toLocaleString();
-  const walletEl = document.getElementById('walletAmount');
-  if (walletEl) walletEl.innerHTML = '🪙 ' + fmtCoins;
-}
-loadCoinBalance();
-
-/* ═══════════════════════════════════════════════════════
-   THEME TOGGLE (light / dark)
-═══════════════════════════════════════════════════════ */
-function applyThemeIcon(theme){
-  const icon = document.getElementById('themeIcon');
-  if (icon) icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-  const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) metaTheme.setAttribute('content', theme === 'light' ? '#ffffff' : '#000000');
-}
-function toggleTheme(){
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme') || 'light';
-  const next = current === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', next);
-  applyThemeIcon(next);
-  toast(next === 'light' ? '☀️ Light mode on' : '🌙 Dark mode on');
-}
-applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
-
 /* ═══════════════════════════════════════════════════════
    UTILS
 ═══════════════════════════════════════════════════════ */
-function toast(msg, dur=2500) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), dur);
+function toast(msg, dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
-function fmtN(n) {
-  if(typeof n==='string') return n;
-  return n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n);
+// Shared with save-modal.js / share-modal.js / library.js / collection-card.js,
+// all of which look for window.toast before falling back to their own.
+window.toast = toast;
+
+function fmtN(n){ if(typeof n==='string') return n; return n>=1000?(n/1000).toFixed(1)+'k':String(n); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ═══════════════════════════════════════════════════════
+   THEME — shared localStorage key with search-overlay.js / bottom-nav.js
+═══════════════════════════════════════════════════════ */
+const THEME_KEY = 'dro_search_theme_v1';
+function loadSavedTheme(){ try{ return localStorage.getItem(THEME_KEY)==='dark'?'dark':'light'; }catch(e){ return 'light'; } }
+function saveTheme(t){ try{ localStorage.setItem(THEME_KEY,t); }catch(e){} }
+function applyThemeIcon(t){ document.getElementById('themeIcon').className = t==='light'?'fas fa-moon':'fas fa-sun'; }
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=(html.getAttribute('data-theme')||'light')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  applyThemeIcon(next);
+  saveTheme(next);
+  if(window.DroboardSearch) DroboardSearch.setTheme(next);
+  if(window.DroboardNav) DroboardNav.setTheme(next);
 }
-function escAttr(s){ return String(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
-
-const WRITER_AV = 'https://i.pravatar.cc/100?img=32';
-const WRITER_NAME = 'Ada_Writes';
-const WRITER_WID = 'w1'; // matches WRITER_STATUSES entry from data/post-data.js
-
-/* ══════════════════════════════
-   GENRES
-══════════════════════════════ */
-const GENRES_ALL = [
-  {id:'betrayal',label:'💔 Betrayal'},{id:'family',label:'👑 Family'},
-  {id:'twist',label:'✨ Twist'},{id:'urban',label:'🏙️ Urban Love'},
-  {id:'marriage',label:'💍 Marriage'},{id:'campus',label:'🎓 Campus'},
-  {id:'revenge',label:'🔥 Revenge'},{id:'heartbreak',label:'💔 Heartbreak'},
-  {id:'comedy',label:'😂 Comedy'},{id:'thriller',label:'😱 Thriller'},
-  {id:'friendship',label:'🤝 Friendship'},{id:'mystery',label:'🔍 Mystery'},
-  {id:'inspirational',label:'✨ Inspirational'},{id:'faith',label:'🙏 Faith'},
-  {id:'elegy',label:'🌙 Elegy'},
-];
-let activeGenres = new Set(['betrayal','family','twist','urban','marriage']);
-
-/* ══════════════════════════════
-   BOOKS DATA (feeds the Books tab)
-══════════════════════════════ */
-const SERIES_DATA = [
-  {id:'s1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",seasons:2,chapters:14,reads:'171k',likes:'24.3k',rating:'4.8',complete:false},
-  {id:'s2',cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",seasons:1,chapters:3,reads:'96k',likes:'19.2k',rating:'4.6',complete:false},
-  {id:'s3',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",seasons:3,chapters:21,reads:'138k',likes:'21k',rating:'4.7',complete:false},
-  {id:'s4',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',seasons:2,chapters:12,reads:'88k',likes:'14k',rating:'4.5',complete:false},
-  {id:'s5',cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',seasons:1,chapters:8,reads:'312k',likes:'45k',rating:'4.9',complete:true},
-];
-
-/* Matches the shape DroboardCollectionCard expects: {id,name,count,covers,privacy} */
-const COLLECTIONS_DATA = [
-  {id:'c1',name:'Best Betrayal Arcs',covers:['https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/N9jY0w4m/5.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg','https://i.postimg.cc/23WvkFLH/images-(2).jpg'],count:12,privacy:'public'},
-  {id:'c2',name:'Plot Twists That Wrecked Me',covers:['https://i.postimg.cc/WF1j4Pnh/6.jpg','https://i.postimg.cc/vDn9YLx5/wife2.jpg'],count:8,privacy:'public'},
-  {id:'c3',name:'My Reading Drafts',covers:['https://i.postimg.cc/cgLZJNmC/8.jpg'],count:4,privacy:'private'},
-  {id:'c4',name:'Must-Reads for Lagos Readers',covers:['https://i.postimg.cc/fkdXzjSj/wife.jpg','https://i.postimg.cc/0MyxNqfz/7.jpg','https://i.postimg.cc/RqtfSQJJ/wife3.jpg','https://i.postimg.cc/N9jY0w4m/5.jpg'],count:9,privacy:'followers'},
-];
-
-const FOLLOWING_DATA = [
-  {name:'Chiamaka_N',meta:'Writer · 19.2k followers · 👑 Family',av:'https://i.pravatar.cc/100?img=47',following:true},
-  {name:'Ifeanyi_Story',meta:'Writer · 31.7k followers · ✨ Twist',av:'https://i.pravatar.cc/100?img=53',following:true},
-  {name:'Efe_O',meta:'Writer · 22.3k followers · 🌙 Elegy',av:'https://i.pravatar.cc/100?img=22',following:true},
-  {name:'CampusQueen',meta:'Writer · 8.1k followers · 🎓 Campus',av:'https://i.pravatar.cc/100?img=12',following:true},
-  {name:'Zara_M',meta:'Writer · 14.8k followers · 🔥 Revenge',av:'https://i.pravatar.cc/100?img=16',following:true},
-  {name:'Kemi_A',meta:'Writer · 6.5k followers · 💔 Heartbreak',av:'https://i.pravatar.cc/100?img=28',following:true},
-  {name:'Dami_Cole',meta:'Writer · 9.4k followers · 🏙️ Urban Love',av:'https://i.pravatar.cc/100?img=64',following:true},
-];
-
-const ANALYTICS_DATA = {
-  today: [
-    {label:'Today\'s Reads',num:'4.2k',sub:'↑ 18% vs yesterday',bar:42},
-    {label:'Likes Today',num:'312',sub:'↑ 9% vs yesterday',bar:31},
-    {label:'Comments',num:'87',sub:'↑ 22% vs yesterday',bar:28},
-    {label:'New Followers',num:'+34',sub:'Today',bar:34},
-    {label:'Tip Income',num:'₦1,200',sub:'Today',bar:24},
-    {label:'Story Saves',num:'148',sub:'Today',bar:38},
-  ],
-  week: [
-    {label:'Weekly Reads',num:'31k',sub:'↑ 24% vs last week',bar:78},
-    {label:'Weekly Likes',num:'2.1k',sub:'↑ 12% vs last week',bar:62},
-    {label:'Comments',num:'480',sub:'↑ 31% vs last week',bar:45},
-    {label:'New Followers',num:'+217',sub:'This week',bar:55},
-    {label:'Tip Income',num:'₦4,800',sub:'This week',bar:55},
-    {label:'Story Saves',num:'1.4k',sub:'This week',bar:70},
-  ],
-  month: [
-    {label:'Monthly Reads',num:'1.1M',sub:'↑ 38% vs last month',bar:88},
-    {label:'Monthly Likes',num:'24.3k',sub:'↑ 15% vs last month',bar:72},
-    {label:'Comments',num:'4.1k',sub:'↑ 28% vs last month',bar:55},
-    {label:'New Followers',num:'+847',sub:'This month',bar:78},
-    {label:'Tip Income',num:'₦12,500',sub:'This month',bar:68},
-    {label:'Story Saves',num:'6.2k',sub:'This month',bar:82},
-  ]
-};
-let currentAnalyticsPeriod = 'week';
-
-const TOP_SERIES = [
-  {id:'s5',cover:'https://i.postimg.cc/vDn9YLx5/wife2.jpg',cat:'✨ Twist',title:'The runaway bride — I left at the altar in my socked feet',reads:'312k',trend:'↑ 8%'},
-  {id:'s1',cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg',cat:'💔 Betrayal',title:"I came home early and caught my husband kissing my late sister's photograph",reads:'171k',trend:'↑ 24%'},
-  {id:'s3',cover:'https://i.postimg.cc/cgLZJNmC/8.jpg',cat:'👑 Family',title:"My uncle claimed the inheritance using my late mother's stolen will",reads:'138k',trend:'↑ 11%'},
-  {id:'s4',cover:'https://i.postimg.cc/N9jY0w4m/5.jpg',cat:'💔 Betrayal',title:'She found his second phone at their anniversary dinner',reads:'88k',trend:'↑ 6%'},
-  {id:'s2',cover:'https://i.postimg.cc/23WvkFLH/images-(2).jpg',cat:'💔 Heartbreak',title:"He proposed with my best friend's ring",reads:'96k',trend:'↑ 19%'},
-];
-
-/* ══════════════════════════════
-   FEED POSTS
-══════════════════════════════ */
-let FEED_POSTS = [
-  {
-    id:'p1', type:'ama', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'2h ago', mine:true,
-    amaData:{ isLive:true, viewers:847, title:'Ask Ada_Writes Anything 🎙',
-      meta:'Writing process · Betrayal series secrets · Where Season 3 is going — bring your questions' },
-    likes:842, liked:false, comments:134,
-  },
-  {
-    id:'p2', type:'chapter-drop', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'5h ago', mine:true,
-    statusUpdate:'Just finished Chapter 5 draft 🖊️ Posting at midnight!',
-    text:"Chapter 5 of Season 2 just dropped 🔥 I cried writing the last scene. You will cry reading it. No spoilers but... Ada is done being patient.",
-    chapterRef:{ cat:'💔 Betrayal', title:"I came home early and caught my husband kissing my late sister's photograph", ch:'S2 · Chapter 5', cover:'https://i.postimg.cc/RqtfSQJJ/wife3.jpg' },
-    likes:1240, liked:false, comments:287,
-  },
-  {
-    id:'p3', type:'post', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'1d ago', mine:true,
-    text:"Writing at 2am has a different energy. The city is quiet. The grief is louder. That's where the best chapters come from. 🌙",
-    image:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80',
-    likes:612, liked:false, comments:89,
-  },
-  {
-    id:'p4', type:'quote', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'1d ago', mine:true,
-    quote:'"She didn\'t ask for an explanation. She just picked up her bag, pressed her lips together so her voice wouldn\'t shake, and walked out like she had planned it for years. She hadn\'t. But some exits become perfect the moment you commit to them."',
-    caption:'— Chapter 3, Season 2 of The Runaway Bride',
-    likes:3200, liked:true, comments:412,
-  },
-  {
-    id:'p5', type:'repost', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'2d ago', mine:true,
-    note:'This is why I write. This story by @Chiamaka_N broke me at 3am. Read it.',
-    storyRef:{ cat:'👑 Family', title:"My grandmother's will revealed I wasn't her blood — but she left everything to me", cover:'https://i.postimg.cc/cgLZJNmC/8.jpg', writer:'Chiamaka_N' },
-    likes:289, liked:false, comments:44,
-  },
-  {
-    id:'p6', type:'post', name:WRITER_NAME, wid:WRITER_WID, avatar:WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'3d ago', mine:true, pinned:true,
-    text:"For everyone asking: yes, Season 3 of the Betrayal series is coming. The wait was because I needed it to be right. It is right now. 🫀\n\nDropping next Friday. Midnight. Set your alarms.",
-    likes:2100, liked:false, comments:567,
-  },
-];
-
-/* ══════════════════════════════
-   TAB SWITCHING
-══════════════════════════════ */
-function switchTab(tab) {
-  document.querySelectorAll('.ptab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  const panel = document.getElementById('panel-' + tab);
-  if (panel) panel.classList.add('active');
-  const active = document.querySelector('.ptab.active');
-  if (active) active.scrollIntoView({ inline:'center', behavior:'smooth' });
-}
-function switchTabFromMenu(tab) { closeMenu(); setTimeout(() => switchTab(tab), 180); }
-
-/* ══════════════════════════════
-   ACCOUNT MENU
-══════════════════════════════ */
-function openMenu() { document.getElementById('menuOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeMenu() { document.getElementById('menuOverlay').classList.remove('open'); document.body.style.overflow=''; }
-
-/* ══════════════════════════════
-   IS_OWNER toggle
-══════════════════════════════ */
-let IS_OWNER = true;
-let isFollowing = false;
-
-function toggleOwnerAction() {
-  if (IS_OWNER) { toast('✏️ Edit profile…'); }
-  else {
-    isFollowing = !isFollowing;
-    const btn = document.getElementById('profileActionBtn');
-    btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
-    btn.className = 'pact follow' + (isFollowing ? ' ing' : '');
-    toast(isFollowing ? '✅ Following @Ada_Writes!' : 'Unfollowed @Ada_Writes');
-  }
-}
-(function initProfileBtn(){
-  const btn = document.getElementById('profileActionBtn');
-  if (IS_OWNER) { btn.textContent = 'Edit Profile'; btn.className = 'pact edit'; }
-  else { btn.textContent = '+ Follow'; btn.className = 'pact follow'; }
+(function initTheme(){
+  const saved = loadSavedTheme();
+  document.documentElement.setAttribute('data-theme', saved);
+  applyThemeIcon(saved);
 })();
 
-/* ══════════════════════════════
-   AD — DroboardAdCard.renderBanner (small banner ad type)
-══════════════════════════════ */
-function initAdBanner(){
-  const ad = BANNER_ADS[0];
-  const mount = document.getElementById('profileAdMount');
-  mount.innerHTML = DroboardAdCard.renderBanner(ad);
-  DroboardAdCard.attach(mount, {
-    getAds: () => BANNER_ADS,
-    onOpen(adItem){ toast('Opening ' + adItem.brand + '…'); },
-    onCta(adItem){ toast('Opening ' + adItem.brand + '…'); },
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+let PROFILE = null;
+let VIEW_HANDLE = null;
+let ME_HANDLE = null;
+let IS_OWNER = false;
+let RENDERED = {};           // per-tab lazy-render cache
+const GENRES_ALL = window.ProfileData ? ProfileData.GENRES_ALL : [];
+const BOOK_STATUSES = ['ongoing','completed','paused'];
+const STATUS_LABEL = { ongoing:'Ongoing', completed:'Completed', paused:'Paused' };
+
+function bookStatus(b, i){
+  if (b.status && STATUS_LABEL[b.status]) return b.status;
+  return BOOK_STATUSES[i % BOOK_STATUSES.length];
+}
+
+/* ═══════════════════════════════════════════════════════
+   TAB / STAT CONFIG
+═══════════════════════════════════════════════════════ */
+function getTabsForProfile(p){
+  const tabs = [{ id:'feed', label:'🏠 Feed' }];
+  if (p.isWriter) tabs.push({ id:'books', label:'📖 Books', badge:(p.books||[]).length });
+  else tabs.push({ id:'library', label:'📚 Library', badge:(p.library||[]).length });
+  tabs.push({ id:'collections', label:'📂 Collections', badge:(p.collections||[]).length });
+  tabs.push({ id:'following', label:'👥 Following' });
+  tabs.push({ id:'about', label:'✦ About' });
+  return tabs;
+}
+function getStatsForProfile(p){
+  const s = p.stats || {};
+  if (p.isWriter){
+    return [
+      { label:'Following', value:s.following, cls:'' },
+      { label:'Followers', value:s.followers, cls:'r' },
+      { label:'Books', value:s.books, cls:'b' },
+      { label:'Reads', value:s.reads, cls:'r' },
+      { label:'Likes', value:s.likes, cls:'g' },
+    ];
+  }
+  return [
+    { label:'Following', value:s.following, cls:'' },
+    { label:'Followers', value:s.followers, cls:'r' },
+    { label:'Saved', value:s.saved, cls:'b' },
+    { label:'Reactions', value:s.reactions, cls:'g' },
+    { label:'Comments', value:s.comments, cls:'' },
+  ];
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER — HEADER / ACTIONS / STATS
+   Pure display — every value comes straight from PROFILE.
+═══════════════════════════════════════════════════════ */
+function renderHeader(p){
+  document.getElementById('heroBg').style.backgroundImage = `url('${p.cover}')`;
+  document.getElementById('avImg').src = p.avatar;
+  document.getElementById('avImg').alt = p.name;
+  document.getElementById('avRing').className = 'av-ring ' + (p.isWriter ? 'role-writer' : 'role-reader');
+  document.getElementById('verifiedBadge').style.display = p.verified ? 'flex' : 'none';
+  document.getElementById('profileName').textContent = p.name;
+  document.getElementById('roleTag').className = 'role-tag ' + (p.isWriter ? 'writer' : 'reader');
+  document.getElementById('roleTag').textContent = p.isWriter ? '✍️ Writer' : '📖 Reader';
+  document.getElementById('profileHandle').textContent = '@' + p.handle;
+  document.getElementById('verifiedInline').style.display = p.verified ? 'inline-flex' : 'none';
+  document.getElementById('profileBio').textContent = p.bio;
+  document.getElementById('heroEditBtn').style.display = IS_OWNER ? 'flex' : 'none';
+
+  const shown = (p.genres||[]).slice(0,5);
+  document.getElementById('genrePillsDisplay').innerHTML = shown.map(id=>{
+    const g = GENRES_ALL.find(x=>x.id===id);
+    return g ? `<div class="genre-pill">${g.label}</div>` : '';
+  }).join('') + (IS_OWNER ? `<div class="genre-pill inactive" id="editGenresPill">+ Edit</div>` : '');
+  const pill = document.getElementById('editGenresPill');
+  if (pill) pill.addEventListener('click', openGenreEdit);
+}
+
+/* Owner sees Edit Profile + Settings (navigation only).
+   Visitor sees Follow/Following + Message — Follow calls the existing
+   ProfileData.followUser/unfollowUser service, nothing local/fake. */
+function renderActionRow(){
+  const el = document.getElementById('actionRow');
+  if (IS_OWNER){
+    el.innerHTML = `
+      <a class="pact edit" href="edit-profile.html">Edit Profile</a>
+      <a class="pact msg" href="settings.html" title="Settings"><i class="fas fa-gear"></i></a>`;
+    return;
+  }
+  const startedFollowing = (PROFILE.following||[]).some(f => f.name === ME_HANDLE && f.following);
+  _following = startedFollowing;
+  el.innerHTML = `
+    <button class="pact follow${startedFollowing?' ing':''}" id="followBtn">${startedFollowing?'✓ Following':'+ Follow'}</button>
+    <button class="pact msg" id="dmBtn" title="Message"><i class="fas fa-paper-plane"></i></button>`;
+  document.getElementById('followBtn').addEventListener('click', toggleFollowOwner);
+  document.getElementById('dmBtn').addEventListener('click', () => toast('💬 Messaging isn\'t wired up yet'));
+}
+let _following = false;
+async function toggleFollowOwner(){
+  const btn = document.getElementById('followBtn');
+  const willFollow = !_following;
+  btn.disabled = true;
+  const call = willFollow ? ProfileData.followUser : ProfileData.unfollowUser;
+  const result = await call(ME_HANDLE, VIEW_HANDLE);
+  btn.disabled = false;
+  if (!result){ toast('Something went wrong — try again.'); return; }
+  _following = willFollow;
+  btn.textContent = _following ? '✓ Following' : '+ Follow';
+  btn.className = 'pact follow' + (_following?' ing':'');
+  toast(_following ? `✅ Following @${PROFILE.handle}` : `Unfollowed @${PROFILE.handle}`);
+}
+
+function renderStats(p){
+  document.getElementById('statsRow').innerHTML = getStatsForProfile(p).map(s=>
+    `<div class="stat-item"><div class="stat-num ${s.cls}">${fmtN(s.value)}</div><div class="stat-label">${s.label}</div></div>`
+  ).join('');
+}
+function renderAchievements(p){
+  document.getElementById('achRow').innerHTML = (p.achievements||[]).map(a=>
+    `<div class="ach-chip ${a.cls||a.color}"><i class="fas ${a.icon||'fa-star'}"></i> ${a.label}</div>`
+  ).join('');
+}
+function renderUpgradeStrip(p){
+  document.getElementById('upgradeStrip').style.display = (IS_OWNER && !p.isWriter) ? 'flex' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABS — lazy render on demand.
+═══════════════════════════════════════════════════════ */
+function renderTabs(p){
+  const tabs = getTabsForProfile(p);
+  document.getElementById('profileTabs').innerHTML = tabs.map((t,i)=>
+    `<div class="ptab${i===0?' active':''}" data-tab="${t.id}">${t.label}${t.badge?`<span class="ptab-badge">${t.badge}</span>`:''}</div>`
+  ).join('');
+  document.querySelectorAll('.ptab').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+  RENDERED = {};
+  switchTab('feed');
+}
+function switchTab(tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.tab-panel').forEach(pnl=>pnl.classList.toggle('active', pnl.id === 'panel-'+tab));
+  if (!RENDERED[tab]){
+    renderTabContent(tab);
+    RENDERED[tab] = true;
+  }
+}
+function renderTabContent(tab){
+  if (!PROFILE) return;
+  if (tab==='feed') renderFeed(PROFILE);
+  else if (tab==='books') renderBooks(PROFILE);
+  else if (tab==='library') renderLibrary(PROFILE);
+  else if (tab==='collections') renderCollections(PROFILE);
+  else if (tab==='following') renderFollowing(PROFILE);
+  else if (tab==='about') renderAbout(PROFILE);
+}
+
+/* ── BOOKS (writer profiles) — page-local card (no shared "book card"
+   component exists in the library). ── */
+function renderBooks(p){
+  document.getElementById('booksCountTitle').textContent = (p.books||[]).length + ' Books';
+  const el = document.getElementById('booksList');
+  if (!p.books || !p.books.length){ el.innerHTML = `<div class="panel-empty"><i class="fas fa-book"></i>No books published yet.</div>`; return; }
+  el.innerHTML = p.books.map((b,i)=>{
+    const status = bookStatus(b,i);
+    return `
+    <div class="book-card" data-book="${i}">
+      <div class="book-cover" style="background-image:url('${b.cover}')"></div>
+      <div class="book-info">
+        <div class="book-title-row">
+          <div class="book-title">${esc(b.title)}</div>
+          <i class="fas fa-chevron-right book-chev"></i>
+        </div>
+        <div class="book-genre">${b.cat}</div>
+        <div class="book-stats">
+          <span class="book-stat"><i class="far fa-eye"></i> ${b.reads}</span>
+          <span class="book-stat"><i class="fas fa-list-ul"></i> ${b.chapters} ch</span>
+          <span class="book-stat"><i class="fas fa-star" style="color:var(--gold)"></i> ${b.rating}</span>
+        </div>
+        <div class="book-foot"><span class="status-badge ${status}">${STATUS_LABEL[status]}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.book-card').forEach(c => c.addEventListener('click', () => toast('📖 Opening book…')));
+}
+
+/* ── LIBRARY (reader profiles) — component/library.js.
+   profile-data.js's library items don't carry id/status/progress, so the
+   closest available fields are mapped in. ── */
+let LIB_INSTANCE = null;
+function renderLibrary(p){
+  document.getElementById('libSubtitle').textContent = `${(p.library||[]).length} saved ${((p.library||[]).length===1)?'story':'stories'}`;
+  document.getElementById('libFootnote').textContent = '';
+  const items = (p.library||[]).map((it, i) => ({
+    id: it.id || ('lib_' + i),
+    cover: it.cover,
+    cat: it.cat,
+    title: it.title,
+    author: it.author,
+    status: it.badge === 'new' ? 'saved' : 'reading',
+    progress: 0,
+    lastCh: it.ch || '',
+  }));
+  LIB_INSTANCE = DroboardLibrary.attach('#libraryMount', {
+    items,
+    subtitleEl: '#libSubtitle',
+    footnoteEl: '#libFootnote',
+    onOpen: () => toast('📖 Opening story…'),
   });
 }
 
-/* ══════════════════════════════════════════════════════════
-   FEED POST CARDS — rendered inline in the same visual
-   language as feed.html (full-width blocks, thick divider,
-   type pill, chapter cover card, rec-card, poll, debate,
-   bottom action row)
-══════════════════════════════════════════════════════════ */
-function pcHead(post){
-  const ring = post.avatarRing === 'ring-live' ? ' live' : '';
-  return `
-    <div class="pc-head">
-      <div class="pc-avatar-wrap${ring}">
-        <img class="pc-avatar" src="${post.avatar}" alt="${escAttr(post.name)}" data-pc-avatar>
-        ${post.pinned ? `<div class="pc-pin-badge"><i class="fas fa-thumbtack"></i></div>` : ''}
-      </div>
-      <div class="pc-meta">
-        <div class="pc-name-row">
-          <span class="pc-name">${post.name}</span>
-          ${post.verified ? `<i class="fas fa-circle-check pc-verified"></i>` : ''}
-          ${post.rank ? `<span class="pc-rank">${post.rank}</span>` : ''}
-        </div>
-        <div class="pc-time">${post.time}${post.pinned ? ' · 📌 Pinned' : ''}</div>
-      </div>
-      <button class="pc-dots" data-pc-dots><i class="fas fa-ellipsis"></i></button>
-    </div>`;
+/* ── COLLECTIONS — component/collection-card.js.
+   profile-data.js collections have no id, so one is derived here. ── */
+let COLLECTIONS_ATTACHED = false;
+function renderCollections(p){
+  if (!COLLECTIONS_ATTACHED){
+    DroboardCollectionCard.attach(document.getElementById('collectionsList'), {
+      onOpen:  (c) => toast(`📂 Opening "${c.name}"…`),
+      onShare: (c) => openShareModal({ title: c.name, sub: `${c.count} stories · ${p.name}`, img: (c.covers||[])[0], url: 'https://droboard.app/collection/' + c.id }),
+      onCreateNew: () => toast('📂 Collection creation isn\'t wired up yet'),
+      createButtonEl: document.getElementById('newCollBtn'),
+    });
+    COLLECTIONS_ATTACHED = true;
+  }
+  const withIds = (p.collections||[]).map((c,i)=>({ ...c, id: c.id || ('coll_'+i) }));
+  const list = document.getElementById('collectionsList');
+  if (!withIds.length){
+    list.innerHTML = `<div class="panel-empty" style="grid-column:1/-1"><i class="fas fa-folder"></i>No collections yet.</div>`;
+    return;
+  }
+  DroboardCollectionCard.setCollections(withIds);
 }
 
-function pcActions(post){
-  return `
-    <div class="pc-actions">
-      <div class="pc-action-group">
-        <button class="pc-action${post.liked?' liked':''}" data-pc-like>
-          <i class="fa-heart ${post.liked ? 'fas' : 'far'}"></i><span data-pc-like-ct>${fmtN(post.likes)}</span>
-        </button>
-        <button class="pc-action" data-pc-comment><i class="far fa-comment"></i><span>${fmtN(post.comments)}</span></button>
-        <button class="pc-action" data-pc-share><i class="fas fa-share-nodes"></i><span>Share</span></button>
-      </div>
-      <button class="pc-save" data-pc-save><i class="far fa-bookmark"></i></button>
-    </div>`;
+function renderFollowing(p){
+  document.getElementById('followingIntro').innerHTML = `Following <strong style="color:var(--tx-high)">${p.stats.following}</strong> writers &amp; readers`;
+  const el = document.getElementById('followingList');
+  if (!p.following || !p.following.length){ el.innerHTML = `<div class="panel-empty"><i class="fas fa-user-group"></i>Not following anyone yet.</div>`; return; }
+  el.innerHTML = p.following.map((f,i)=>`
+    <div class="follow-item">
+      <div class="follow-av"><img src="${f.av}" loading="lazy"/></div>
+      <div class="follow-info"><div class="follow-name">@${f.name}</div><div class="follow-meta">${f.meta}</div></div>
+      <button class="follow-btn${f.following?' ing':''}" data-i="${i}">${f.following?'✓ Following':'+ Follow'}</button>
+    </div>`).join('');
+  el.querySelectorAll('.follow-btn').forEach(btn => btn.addEventListener('click', () => toggleFollowRow(+btn.dataset.i, btn)));
+}
+async function toggleFollowRow(i, btn){
+  const row = PROFILE.following[i];
+  btn.disabled = true;
+  const call = row.following ? ProfileData.unfollowUser : ProfileData.followUser;
+  const result = await call(ME_HANDLE, row.name);
+  btn.disabled = false;
+  if (!result) { toast('Something went wrong — try again.'); return; }
+  row.following = !row.following;
+  btn.textContent = row.following ? '✓ Following' : '+ Follow';
+  btn.classList.toggle('ing', row.following);
+}
+function renderAbout(p){
+  document.getElementById('aboutIntro').textContent = p.isWriter
+    ? `A ${p.location.split(',')[0]}-based writer sharing stories on Droboard.`
+    : `A ${p.location.split(',')[0]}-based reader on Droboard.`;
+  document.getElementById('aboutLocation').textContent = p.location;
+  document.getElementById('aboutJoined').textContent = p.joinedLabel;
+  document.getElementById('aboutGenreDisplay').innerHTML = (p.about?.favoriteGenres||[]).map(id=>{
+    const g = GENRES_ALL.find(x=>x.id===id);
+    return g ? `<div class="genre-pill">${g.label}</div>` : '';
+  }).join('');
+  document.getElementById('aboutExtra').innerHTML = (p.about?.extra||[]).map(e=>`
+    <div class="about-item"><div class="about-icon"><i class="fas ${e.icon}" style="color:var(--acc)"></i></div>
+      <div><div class="about-label">${e.label}</div><div class="about-val">${esc(e.value)}</div></div></div>`).join('');
 }
 
-function typePillHTML(type){
-  switch(type){
-    case 'chapter-drop': return `<span class="type-pill tp-chapter"><i class="fas fa-book-open"></i>Chapter Drop</span>`;
-    case 'ama': return `<span class="type-pill tp-ama"><i class="fas fa-microphone"></i>Live AMA</span>`;
-    case 'quote': return `<span class="type-pill tp-quote"><i class="fas fa-quote-right"></i>Quote</span>`;
-    case 'repost': return `<span class="type-pill tp-repost"><i class="fas fa-retweet"></i>Recommendation</span>`;
-    case 'poll': return `<span class="type-pill tp-poll"><i class="fas fa-chart-bar"></i>Poll</span>`;
-    case 'debate': return `<span class="type-pill tp-debate"><i class="fas fa-gavel"></i>Debate</span>`;
-    default: return `<span class="type-pill tp-post"><i class="fas fa-pen"></i>Author Post</span>`;
-  }
-}
+/* ═══════════════════════════════════════════════════════
+   FEED — runs on shared components:
+     component/post-card.js     → card markup + click wiring
+     reaction-picker.js         → the like/react trigger inside each card
+     save-modal.js              → openSaveModal() on the bookmark tap
+     share-modal.js             → openShareModal() on Share
+     component/post-composer.js → the "+ New Post" sheet (from the drawer)
+   The "⋯" dots menu has no shared component in the library, so it's a
+   small page-local popover (openPostMenu, below) built directly on top
+   of ProfileData.pinPost / ProfileData.deletePost. Every mutation is
+   delegated to ProfileData, never held in local page state.
+═══════════════════════════════════════════════════════ */
+let FEED_HOOKED = false;
 
-function renderPostCard(post){
-  let body = '';
+function ensureFeedComponents(){
+  if (FEED_HOOKED) return;
+  FEED_HOOKED = true;
+  const feedList = document.getElementById('feedList');
 
-  if (post.type === 'ama') {
-    body += typePillHTML('ama');
-    body += `
-      <div class="pc-ama-card">
-        <div class="pc-ama-live-row">
-          <div class="pc-ama-live-dot"></div>
-          <div class="pc-ama-live-text">Live now</div>
-          <div class="pc-ama-viewers"><i class="far fa-eye"></i> ${fmtN(post.amaData.viewers)} watching</div>
-        </div>
-        <div class="pc-ama-title">${post.amaData.title}</div>
-        <div class="pc-ama-meta">${post.amaData.meta}</div>
-        <button class="pc-ama-join" data-pc-join><i class="fas fa-microphone"></i> Join AMA</button>
-      </div>`;
+  // Reaction picker runs in its own self-contained demo mode — wiring it
+  // to ProfileData.likePost/unlikePost would require implementing BOTH
+  // getState + onReact together (supplying only onReact breaks the
+  // picker's own visual refresh), so it's left as a standalone reaction
+  // surface here, same as everywhere else it's dropped in.
+  if (window.DroboardReactionPicker){
+    DroboardReactionPicker.attach(feedList, {});
   }
 
-  else if (post.type === 'chapter-drop') {
-    body += typePillHTML('chapter-drop');
-    if (post.text) body += `<div class="pc-text">${post.text}</div>`;
-    const c = post.chapterRef;
-    body += `
-      <div class="pc-chapter-card" data-pc-open-chapter>
-        <div class="pc-chapter-cover" style="background-image:url('${c.cover}')">
-          <div class="pc-chapter-scrim"></div>
-          <div class="pc-chapter-textwrap">
-            <div class="pc-chapter-eyebrow">${c.ch}</div>
-            <div class="pc-chapter-title">${c.title}</div>
-            <div class="pc-chapter-sub">${c.cat}</div>
-          </div>
-        </div>
-        <div class="pc-chapter-panel">
-          <div class="pc-chapter-desc">New chapter just dropped — tap to jump straight in.</div>
-          <button class="pc-read-btn"><i class="fas fa-book-open"></i> Read Now</button>
-        </div>
-      </div>`;
-  }
-
-  else if (post.type === 'quote') {
-    body += typePillHTML('quote');
-    body += `
-      <div class="pc-quote-card">
-        <div class="pc-quote-mark">&ldquo;</div>
-        <div class="pc-quote-text">${post.quote}</div>
-        <div class="pc-quote-caption">${post.caption}</div>
-      </div>`;
-  }
-
-  else if (post.type === 'repost') {
-    body += typePillHTML('repost');
-    if (post.note) body += `<div class="pc-text">${post.note}</div>`;
-    const s = post.storyRef;
-    body += `
-      <div class="pc-rec-card" data-pc-open-chapter>
-        <img class="pc-rec-thumb" src="${s.cover}" alt="">
-        <div>
-          <div class="pc-rec-title">${s.title}</div>
-          <div class="pc-rec-sub">${s.cat} · by @${s.writer}</div>
-        </div>
-        <span class="pc-rec-arrow"><i class="fas fa-chevron-right"></i></span>
-      </div>`;
-  }
-
-  else if (post.type === 'poll' && post.poll) {
-    body += typePillHTML('poll');
-    body += `<div class="pc-poll-q">${post.poll.question}</div>`;
-    const total = post.poll.total || post.poll.opts.reduce((a,o)=>a+o.v,0) || 1;
-    body += post.poll.opts.map((o,i) => {
-      const pct = Math.round((o.v/total)*100) || 0;
-      return `
-      <div class="pc-poll-row" data-pc-poll-opt="${i}">
-        <div class="pc-poll-label"><span>${o.label}${post.poll.voted===i?' <span class=\"pc-poll-voted\">· your vote</span>':''}</span><span>${pct}%</span></div>
-        <div class="pc-poll-track"><div class="pc-poll-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
-    body += `<div class="pc-poll-footer"><span>${post.poll.voted>=0?'Tap results to see more':'Tap an option to vote'}</span><span>${total} votes</span></div>`;
-  }
-
-  else if (post.type === 'debate' && post.debateData) {
-    body += typePillHTML('debate');
-    body += `<div class="pc-debate-q">${post.debateData.question}</div>`;
-    if (post.debateData.prompt) body += `<div class="pc-debate-prompt">${post.debateData.prompt}</div>`;
-    const voted = post.debateData.userVote;
-    body += `
-      <div class="pc-debate-opts">
-        <div class="pc-debate-opt for${voted==='for'?' picked':''}" data-pc-debate="for">
-          <div class="pc-debate-opt-text">${post.debateData.forText||'For'}</div>
-          <div class="pc-debate-icon"><i class="fas fa-thumbs-up"></i></div>
-        </div>
-        <div class="pc-debate-opt against${voted==='against'?' picked':''}" data-pc-debate="against">
-          <div class="pc-debate-opt-text">${post.debateData.againstText||'Against'}</div>
-          <div class="pc-debate-icon"><i class="fas fa-thumbs-down"></i></div>
-        </div>
-      </div>
-      <div class="pc-debate-footer"><span>${(post.debateData.forV||0)+(post.debateData.agV||0)} joined the discussion</span><span>View Discussion <i class="fas fa-chevron-right"></i></span></div>`;
-  }
-
-  else {
-    // plain author post
-    body += typePillHTML('post');
-    if (post.text) body += `<div class="pc-text">${post.text}</div>`;
-    if (post.image) body += `<img class="pc-image" src="${post.image}" alt="">`;
-  }
-
-  return `<div class="pc-post" data-pc-id="${post.id}">${pcHead(post)}${body}${pcActions(post)}</div>`;
-}
-
-function renderFeedPosts(){
-  document.getElementById('feedList').innerHTML = FEED_POSTS.map(renderPostCard).join('');
-}
-
-function findPost(id){ return FEED_POSTS.find(p => p.id === id); }
-
-function initFeedPosts(){
-  const list = document.getElementById('feedList');
-  list.addEventListener('click', (e) => {
-    const card = e.target.closest('.pc-post');
-    if (!card) return;
-    const post = findPost(card.dataset.pcId);
-    if (!post) return;
-
-    if (e.target.closest('[data-pc-like]')) {
-      post.liked = !post.liked;
-      post.likes += post.liked ? 1 : -1;
-      const btn = card.querySelector('[data-pc-like]');
-      btn.classList.toggle('liked', post.liked);
-      btn.querySelector('i').className = post.liked ? 'fa-heart fas' : 'fa-heart far';
-      card.querySelector('[data-pc-like-ct]').textContent = fmtN(post.likes);
-      return;
-    }
-    if (e.target.closest('[data-pc-save]')) {
-      const btn = card.querySelector('[data-pc-save]');
-      const on = btn.classList.toggle('on');
-      btn.querySelector('i').className = on ? 'fas fa-bookmark' : 'far fa-bookmark';
-      if (window.openSaveModal) {
-        window.openSaveModal({
-          title: post.chapterRef?.title || post.storyRef?.title || post.quote || 'Droboard Post',
-          sub: 'by @' + WRITER_NAME,
-          img: post.image || post.chapterRef?.cover || post.storyRef?.cover || '',
+  if (window.DroboardPostCard){
+    DroboardPostCard.attach(feedList, {
+      getReactionHTML: (post) => window.DroboardReactionPicker
+        ? DroboardReactionPicker.renderTrigger(post.id, { liked: post.liked, likeCount: post.likes })
+        : undefined,
+      onAvatarClick: () => toast('👀 Viewing profile…'),
+      onComment:     () => toast('💬 Opening comments…'),
+      onShare: (post) => {
+        if (!window.openShareModal) return;
+        openShareModal({
+          title: post.chapterRef?.title || post.storyRef?.title || PROFILE.name,
+          sub:   PROFILE.name,
+          img:   post.chapterRef?.cover || post.storyRef?.cover || PROFILE.avatar,
+          url:   'https://droboard.app/post/' + post.id,
+        });
+      },
+      onSave: (post) => {
+        if (!window.openSaveModal) return;
+        openSaveModal({
+          title:   post.chapterRef?.title || post.storyRef?.title || PROFILE.name,
+          sub:     PROFILE.name,
+          img:     post.chapterRef?.cover || post.storyRef?.cover || PROFILE.avatar,
           storyId: post.id,
         });
-      } else {
-        toast(on ? '🔖 Saved!' : 'Removed from saved');
-      }
-      return;
-    }
-    if (e.target.closest('[data-pc-comment]')) {
-      location.href = 'post.html?pid=' + post.id;
-      return;
-    }
-    if (e.target.closest('[data-pc-share]')) {
-      if (window.openShareModal) {
-        window.openShareModal({
-          title: post.chapterRef?.title || post.storyRef?.title || post.quote || post.text || ('Post by @'+WRITER_NAME),
-          sub: 'by @' + WRITER_NAME,
-          img: post.image || post.chapterRef?.cover || post.storyRef?.cover || '',
-          url: 'https://droboard.app/post/' + post.id,
-        });
-      } else {
-        toast('🔗 Link copied!');
-      }
-      return;
-    }
-    if (e.target.closest('[data-pc-dots]')) {
-      toast('More options…');
-      return;
-    }
-    if (e.target.closest('[data-pc-join]')) {
-      toast('🎙️ Joining AMA…');
-      return;
-    }
-    if (e.target.closest('[data-pc-open-chapter]')) {
-      const sid = SERIES_DATA.find(s => post.chapterRef && s.title === post.chapterRef.title)?.id
-                || SERIES_DATA.find(s => post.storyRef && s.title === post.storyRef.title)?.id;
-      location.href = sid ? ('series-reader.html?sid=' + sid) : 'series-reader.html';
-      return;
-    }
-    if (e.target.closest('[data-pc-avatar]')) {
-      const ws = (typeof WRITER_STATUSES !== 'undefined') ? WRITER_STATUSES.find(w => w.id === post.wid) : null;
-      if (ws && ws.statuses && ws.statuses.length && typeof window.openStatusViewer === 'function') {
-        window.openStatusViewer(WRITER_STATUSES, ws.id);
-      }
-      return;
-    }
-    const pollRow = e.target.closest('[data-pc-poll-opt]');
-    if (pollRow && post.poll) {
-      if (post.poll.voted >= 0) { toast('✅ Already voted!'); return; }
-      const i = +pollRow.dataset.pcPollOpt;
-      post.poll.opts[i].v++;
-      post.poll.voted = i;
-      post.poll.total = (post.poll.total || 0) + 1;
-      renderFeedPosts();
-      toast('✅ Vote cast!');
-      return;
-    }
-    const debateOpt = e.target.closest('[data-pc-debate]');
-    if (debateOpt && post.debateData) {
-      if (post.debateData.userVote) { toast('✅ Already voted!'); return; }
-      const side = debateOpt.dataset.pcDebate;
-      post.debateData.userVote = side;
-      if (side === 'for') post.debateData.forV = (post.debateData.forV||0)+1;
-      else post.debateData.agV = (post.debateData.agV||0)+1;
-      renderFeedPosts();
-      toast(side === 'for' ? '✅ Voted FOR!' : '❌ Voted AGAINST!');
-      return;
-    }
+      },
+      onDots:     (post, anchorEl) => openPostMenu(post, anchorEl),
+      onJoinAma:  () => toast('🎙️ Joining AMA…'),
+      onOpenLink: () => toast('📖 Opening story…'),
+    });
+  }
+
+  // save-modal.js fires this after any quick-save/collection toggle —
+  // forward it to the post-level saved flag ProfileData already tracks.
+  window.onDroboardSaveChange = (storyId, isSaved) => {
+    if (!storyId) return;
+    ProfileData.savePost(VIEW_HANDLE, storyId, isSaved);
+  };
+}
+
+/* profile-data.js's post shape is a near-exact match for post-card.js's
+   chapter-drop / ama / quote / default renderers (same field names).
+   'repost' is the one mismatch: profile-data's repost only carries a
+   lightweight storyRef {cover,cat,title,author} — exactly the shape
+   post-card.js's 'recommendation' renderer expects — while post-card's
+   own 'repost' renderer wants a full embedded original post this data
+   doesn't have. So repost → recommendation, everything else as-is. */
+function adaptPost(post){
+  return Object.assign({}, post, {
+    name:     PROFILE.name,
+    avatar:   PROFILE.avatar,
+    verified: PROFILE.verified,
+    type:     post.type === 'repost' ? 'recommendation' : post.type,
+    mine:     IS_OWNER,
   });
-  renderFeedPosts();
 }
 
-/* ══════════════════════════════
-   POST COMPOSER
-══════════════════════════════ */
-function openPostComposer(type) {
-  document.getElementById('postComposerOv').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  if(type) document.querySelectorAll('.ctype').forEach(t => t.classList.toggle('active', t.dataset.ct===type));
-}
-function closePostComposer() { document.getElementById('postComposerOv').classList.remove('open'); document.body.style.overflow=''; }
-document.querySelectorAll('.ctype').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.ctype').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-function submitPost() {
-  const text = document.getElementById('composerText').value.trim();
-  if (!text) { toast('✍️ Write something first!'); return; }
-  FEED_POSTS.unshift({
-    id: 'p_' + Date.now(), type:'post', name: WRITER_NAME, wid: WRITER_WID, avatar: WRITER_AV, avatarRing:'ring-live',
-    verified:true, badge:'writer', rank:'#1 This Week', time:'Just now', mine:true,
-    text, likes:0, liked:false, comments:0,
-  });
-  closePostComposer();
-  document.getElementById('composerText').value = '';
-  renderFeedPosts();
-  toast('✅ Post published!');
+function renderFeed(p){
+  ensureFeedComponents();
+  const posts = (p.posts||[]).map(adaptPost);
+  if (!window.DroboardPostCard){
+    document.getElementById('feedList').innerHTML = `<div class="panel-empty" style="padding:40px 16px"><i class="fas fa-triangle-exclamation"></i>Post component failed to load.</div>`;
+    return;
+  }
+  DroboardPostCard.setPosts(posts);
+  if (!posts.length){
+    document.getElementById('feedList').innerHTML = `<div class="panel-empty" style="padding:40px 16px"><i class="fas fa-inbox"></i>No posts yet.</div>`;
+  }
 }
 
-/* ══════════════════════════════
-   STATUS COMPOSER
-══════════════════════════════ */
-function openStatusComposer() { document.getElementById('statusComposerOv').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeStatusComposer() { document.getElementById('statusComposerOv').classList.remove('open'); document.body.style.overflow=''; }
-document.querySelectorAll('.scs-type').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.scs-type').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-/* ══════════════════════════════
-   RENDER: BOOKS (Books tab — cover left, title, view / chapters / rating)
-══════════════════════════════ */
-function renderBooks() {
-  document.getElementById('storiesCountTitle').textContent = SERIES_DATA.length + ' Books';
-  document.getElementById('booksTabBadge').textContent = SERIES_DATA.length;
-  document.getElementById('seriesList').innerHTML = SERIES_DATA.map(s => `
-    <div class="book-card" onclick="location.href='series-reader.html?sid=${s.id}'">
-      <div class="book-cover" style="background-image:url('${s.cover}')"></div>
-      <div class="book-info">
-        <div class="book-cat">${s.cat}</div>
-        <div class="book-title">${s.title}</div>
-        <div class="book-meta">
-          <span class="book-meta-item"><i class="far fa-eye"></i> ${s.reads}</span>
-          <span class="book-meta-item"><i class="fas fa-book"></i> ${s.chapters} ch</span>
-          <span class="book-meta-item rating"><i class="fas fa-star"></i> ${s.rating}</span>
-        </div>
-      </div>
-    </div>`).join('');
+/* ── Page-local post options popover ── */
+function closePostMenu(){
+  document.getElementById('pomMenu').classList.remove('open');
+  document.getElementById('pomOverlay').classList.remove('open');
 }
+function openPostMenu(post, anchorEl){
+  const menu = document.getElementById('pomMenu');
+  const overlay = document.getElementById('pomOverlay');
+  const mine = IS_OWNER && post.mine;
 
-/* ══════════════════════════════
-   COLLECTIONS — DroboardCollectionCard
-══════════════════════════════ */
-function initCollections() {
-  DroboardCollectionCard.attach(document.getElementById('collectionsGrid'), {
-    onOpen(coll) {
-      location.href = 'collection.html?cid=' + coll.id;
-    },
-    onShare(coll) {
-      window.openShareModal({
-        title: coll.name,
-        sub: (coll.count || 0) + ' stories · @' + WRITER_NAME,
-        img: (coll.covers && coll.covers[0]) || '',
-        url: 'https://droboard.app/collection/' + coll.id,
-      });
-    },
-    onCreateNew() {
-      openNewCollection();
-    },
-    createButtonEl: document.querySelector('.new-coll-btn'),
-  });
-  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
-}
+  let items = [];
+  if (mine){
+    items.push({ icon:'fa-thumbtack', label: post.pinned ? 'Unpin from profile' : 'Pin to profile', act:'pin' });
+    items.push({ icon:'fa-trash', label:'Delete post', act:'delete', danger:true });
+  } else {
+    items.push({ icon:'fa-flag', label:'Report post', act:'report' });
+    items.push({ icon:'fa-eye-slash', label:'Show less like this', act:'less' });
+  }
+  items.push({ icon:'fa-link', label:'Copy link', act:'copylink' });
 
-/* ══════════════════════════════
-   RENDER: ANALYTICS
-══════════════════════════════ */
-function switchAnalyticsPeriod(period, btn) {
-  currentAnalyticsPeriod = period;
-  document.querySelectorAll('.anlyt-period').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAnalytics();
-}
-
-function renderAnalytics() {
-  const data = ANALYTICS_DATA[currentAnalyticsPeriod] || ANALYTICS_DATA.week;
-  document.getElementById('analyticsGrid').innerHTML = data.map(a =>
-    `<div class="anlyt-card">
-      <div class="anlyt-label">${a.label}</div>
-      <div class="anlyt-num">${a.num}</div>
-      <div class="anlyt-sub">${a.sub}</div>
-      <div class="anlyt-bar"><div class="anlyt-bar-fill" style="width:${a.bar}%"></div></div>
-    </div>`).join('');
-
-  const ranks = ['#e0a300','#a0a0b0','#a07040','#8a8a8a','#8a8a8a'];
-  document.getElementById('topSeriesList').innerHTML = TOP_SERIES.map((s,i) =>
-    `<div class="top-series-item" onclick="location.href='series-reader.html?sid=${s.id}'">
-      <div class="top-series-rank" style="color:${ranks[i]||'#8a8a8a'}">${i+1}</div>
-      <div class="top-series-img" style="background-image:url('${s.cover}')"></div>
-      <div class="top-series-body">
-        <div class="top-series-title">${s.title}</div>
-        <div class="top-series-cat">${s.cat} · <span style="color:#0d9668;font-weight:700">${s.trend}</span></div>
-      </div>
-      <div class="top-series-reads"><strong>${s.reads}</strong><span>reads</span></div>
-    </div>`).join('');
-}
-
-/* ══════════════════════════════
-   RENDER: FOLLOWING
-══════════════════════════════ */
-function renderFollowing() {
-  document.getElementById('followingList').innerHTML = FOLLOWING_DATA.map((f,i) =>
-    `<div class="follow-item">
-      <div class="follow-av"><img src="${f.av}" loading="lazy"/></div>
-      <div class="follow-info">
-        <div class="follow-name">@${f.name}</div>
-        <div class="follow-meta">${f.meta}</div>
-      </div>
-      <button class="follow-btn${f.following?' ing':''}" onclick="toggleFollow(${i},this)">${f.following?'✓ Following':'+ Follow'}</button>
-    </div>`).join('');
-}
-
-function toggleFollow(i, btn) {
-  FOLLOWING_DATA[i].following = !FOLLOWING_DATA[i].following;
-  btn.textContent = FOLLOWING_DATA[i].following ? '✓ Following' : '+ Follow';
-  btn.classList.toggle('ing', FOLLOWING_DATA[i].following);
-  toast(FOLLOWING_DATA[i].following ? `✅ Following @${FOLLOWING_DATA[i].name}` : `Unfollowed @${FOLLOWING_DATA[i].name}`);
-}
-
-/* ══════════════════════════════
-   GENRE EDIT
-══════════════════════════════ */
-function openGenreEdit() {
-  document.getElementById('genreTogGrid').innerHTML = GENRES_ALL.map(g =>
-    `<div class="genre-tog${activeGenres.has(g.id)?' on':''}" data-gid="${g.id}" onclick="this.classList.toggle('on')">${g.label}</div>`
+  menu.innerHTML = items.map(it =>
+    `<div class="pom-item${it.danger?' danger':''}" data-act="${it.act}"><i class="fas ${it.icon}"></i> ${it.label}</div>`
   ).join('');
+
+  const rect = anchorEl.getBoundingClientRect();
+  let top = rect.bottom + 6, left = rect.right - 190;
+  if (left < 8) left = 8;
+  if (top + 160 > window.innerHeight) top = rect.top - 160;
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
+
+  menu.classList.add('open');
+  overlay.classList.add('open');
+
+  menu.querySelectorAll('.pom-item').forEach(el => {
+    el.addEventListener('click', () => handlePostMenuAction(el.dataset.act, post), { once: true });
+  });
+}
+async function handlePostMenuAction(act, post){
+  closePostMenu();
+  if (act === 'pin'){
+    const updated = await ProfileData.pinPost(VIEW_HANDLE, post.id, !post.pinned);
+    if (updated){ PROFILE = updated; renderFeed(PROFILE); toast(post.pinned ? '📌 Unpinned' : '📌 Pinned to profile'); }
+  } else if (act === 'delete'){
+    const updated = await ProfileData.deletePost(VIEW_HANDLE, post.id);
+    if (updated){ PROFILE = updated; renderFeed(PROFILE); toast('🗑️ Post deleted'); }
+  } else if (act === 'report'){
+    toast('🚩 Reported. Thanks for flagging.');
+  } else if (act === 'less'){
+    toast('Got it — showing less of this.');
+  } else if (act === 'copylink'){
+    navigator.clipboard?.writeText('https://droboard.app/post/' + post.id).catch(()=>{});
+    toast('🔗 Link copied');
+  }
+}
+document.getElementById('pomOverlay').addEventListener('click', closePostMenu);
+
+/* ── "+ New Post" — component/post-composer.js, wired to ProfileData.createPost ── */
+function openNewPostComposer(){
+  closeDrawer();
+  if (!window.DroboardPostComposer){ toast('Composer failed to load.'); return; }
+  DroboardPostComposer.open({
+    author: { name: PROFILE.name, avatar: PROFILE.avatar, verified: PROFILE.verified },
+    stories: (PROFILE.books || []).map(b => ({ id: b.id, title: b.title, cat: b.cat, cover: b.cover })),
+    defaultType: 'post',
+    onSubmit: async (post) => {
+      const updated = await ProfileData.createPost(VIEW_HANDLE, post);
+      if (!updated) { toast('Something went wrong — try again.'); return; }
+      PROFILE = updated;
+      renderFeed(PROFILE);
+      switchTab('feed');
+    },
+  });
+}
+
+/* ── GENRE EDIT — thin UI over ProfileData.updateGenres ── */
+function openGenreEdit(){
+  if (!IS_OWNER){ toast('You can only edit your own genres.'); return; }
+  const active = new Set(PROFILE.genres||[]);
+  const grid = document.getElementById('genreTogGrid');
+  grid.innerHTML = GENRES_ALL.map(g=>
+    `<div class="genre-tog${active.has(g.id)?' on':''}" data-gid="${g.id}">${g.label}</div>`
+  ).join('');
+  grid.querySelectorAll('.genre-tog').forEach(el => el.addEventListener('click', () => el.classList.toggle('on')));
   document.getElementById('genreEditOv').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-function closeGenreEdit() {
-  document.getElementById('genreEditOv').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function saveGenres() {
-  activeGenres = new Set([...document.querySelectorAll('#genreTogGrid .genre-tog.on')].map(el => el.dataset.gid));
-  const pillsEl = document.getElementById('genrePillsDisplay');
-  const shown = [...activeGenres].slice(0,6);
-  pillsEl.innerHTML = shown.map(id => {
-    const g = GENRES_ALL.find(x => x.id === id);
-    return g ? `<div class="genre-pill">${g.label}</div>` : '';
-  }).join('') + `<div class="genre-pill inactive" onclick="openGenreEdit()" style="cursor:pointer">+ Edit</div>`;
-  renderAboutGenres();
+function closeGenreEdit(){ document.getElementById('genreEditOv').classList.remove('open'); document.body.style.overflow=''; }
+async function saveGenres(){
+  const ids = [...document.querySelectorAll('#genreTogGrid .genre-tog.on')].map(el=>el.dataset.gid);
+  const updated = await ProfileData.updateGenres(VIEW_HANDLE, ids);
+  if (!updated){ toast('Something went wrong — try again.'); return; }
+  PROFILE = updated;
+  renderHeader(PROFILE);
+  if (RENDERED.about) renderAbout(PROFILE);
   closeGenreEdit();
   toast('✅ Genres saved!');
 }
 
-function renderAboutGenres() {
-  const el = document.getElementById('aboutGenreDisplay');
-  if (!el) return;
-  el.innerHTML = [...activeGenres].map(id => {
-    const g = GENRES_ALL.find(x => x.id === id);
-    return g ? `<div class="genre-pill">${g.label}</div>` : '';
-  }).join('');
+/* ── BECOME-A-WRITER WIZARD — thin UI over ProfileData.becomeWriter ── */
+function openUpgradeWizard(){
+  closeDrawer();
+  const grid = document.getElementById('uwGenreGrid');
+  grid.innerHTML = GENRES_ALL.slice(0,10).map((g,i)=>
+    `<div class="uw-genre${i===0?' on':''}" data-gid="${g.id}">${g.label}</div>`
+  ).join('');
+  grid.querySelectorAll('.uw-genre').forEach(el => el.addEventListener('click', () => {
+    grid.querySelectorAll('.uw-genre').forEach(x=>x.classList.remove('on'));
+    el.classList.add('on');
+  }));
+  document.getElementById('upgradeOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeUpgradeWizard(){ document.getElementById('upgradeOv').classList.remove('open'); document.body.style.overflow=''; }
+async function submitUpgrade(){
+  const title = document.getElementById('uwTitle').value.trim();
+  if (!title){ toast('✍️ Give your first book a title!'); return; }
+  const genre = document.querySelector('.uw-genre.on')?.dataset.gid;
+  const btn = document.getElementById('uwSubmitBtn');
+  btn.textContent = 'Publishing…'; btn.disabled = true;
+  const updated = await ProfileData.becomeWriter(PROFILE.handle, { firstBookTitle: title, genre });
+  btn.disabled = false; btn.textContent = 'Publish & Unlock Writer Tools ✓';
+  if (!updated){ toast('Something went wrong — try again.'); return; }
+  PROFILE = updated;
+  closeUpgradeWizard();
+  renderProfile(PROFILE);
+  toast('🎉 Writer tools unlocked!');
 }
 
-/* ══════════════════════════════
-   NEW COLLECTION
-══════════════════════════════ */
-function openNewCollection() { document.getElementById('newCollOv').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeNewColl() { document.getElementById('newCollOv').classList.remove('open'); document.body.style.overflow=''; }
-let _ncPrivacy = 'private';
-function setNcPrivacy(val, btn) {
-  _ncPrivacy = val;
-  document.querySelectorAll('.nc-privacy-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+/* ═══════════════════════════════════════════════════════
+   LEFT-SLIDING ACCOUNT DRAWER — navigation + entry points.
+   Sign-out calls AuthSession.logout().
+═══════════════════════════════════════════════════════ */
+function openDrawer(){
+  if (!PROFILE){ toast('Still loading your profile…'); return; }
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
-function createCollection() {
-  const name = document.getElementById('newCollName').value.trim();
-  if(!name){ toast('📂 Give your collection a name!'); return; }
-  COLLECTIONS_DATA.push({id:'c_'+Date.now(),name,covers:[],count:0,privacy:_ncPrivacy});
-  closeNewColl();
-  DroboardCollectionCard.setCollections(COLLECTIONS_DATA);
-  toast(`📂 "${name}" created!`);
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
 }
 
-/* ══════════════════════════════
-   INIT
-══════════════════════════════ */
-initAdBanner();
-initFeedPosts();
-renderBooks();
-initCollections();
-renderAnalytics();
-renderFollowing();
-renderAboutGenres();
+function renderDrawer(p){
+  document.getElementById('drawerAv').src = p.avatar;
+  document.getElementById('drawerName').textContent = p.name;
+  document.getElementById('drawerHandle').textContent = `@${p.handle} · ${fmtN(p.stats.followers)} followers`;
+  document.getElementById('drawerBadge').textContent = p.isWriter ? '✍️ Verified Writer' : '📖 Verified Reader';
+
+  let html = `<div class="drawer-section"><div class="drawer-section-title">Create</div>`;
+  html += `
+    <button class="drawer-item" id="drawerNewPost">
+      <div class="drawer-item-icon" style="background:rgba(255,0,80,.08);border:1px solid var(--bd-acc)"><i class="fas fa-pen" style="color:var(--acc)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">New Post</div><div class="drawer-item-sub">${p.isWriter?'Text, photo, chapter or AMA':'Quote, reaction or recommendation'}</div></div>
+    </button>`;
+  if (p.isWriter){
+    html += `
+    <button class="drawer-item" id="drawerNewBook">
+      <div class="drawer-item-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.12)"><i class="fas fa-book-open" style="color:var(--green)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">New Book</div><div class="drawer-item-sub">Start a new story</div></div>
+    </button>`;
+  }
+  html += `</div><div class="drawer-divider"></div><div class="drawer-section"><div class="drawer-section-title">My Content</div>`;
+
+  if (p.isWriter){
+    html += `
+    <button class="drawer-item" id="drawerBooksLink">
+      <div class="drawer-item-icon" style="background:rgba(255,0,80,.06);border:1px solid var(--bd-acc)"><i class="fas fa-book" style="color:var(--acc)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Books</div><div class="drawer-item-sub">${(p.books||[]).length} published</div></div>
+      <div class="drawer-item-right"><span class="drawer-badge-sm">${(p.books||[]).length}</span></div>
+    </button>`;
+    if (IS_OWNER){
+      html += `
+      <button class="drawer-item" onclick="location.href='author/author-center.html'">
+        <div class="drawer-item-icon" style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15)"><i class="fas fa-gauge" style="color:var(--purple)"></i></div>
+        <div style="flex:1"><div class="drawer-item-title">Author Center</div><div class="drawer-item-sub">Dashboard, analytics &amp; revenue</div></div>
+      </button>`;
+    }
+  } else {
+    html += `
+    <button class="drawer-item" id="drawerLibraryTab">
+      <div class="drawer-item-icon" style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.12)"><i class="fas fa-bookmark" style="color:var(--blue)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Library</div><div class="drawer-item-sub">${(p.library||[]).length} saved stories</div></div>
+    </button>`;
+  }
+  html += `
+    <button class="drawer-item" id="drawerCollectionsLink">
+      <div class="drawer-item-icon" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.12)"><i class="fas fa-folder" style="color:var(--green)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Collections</div><div class="drawer-item-sub">${(p.collections||[]).length} curated lists</div></div>
+    </button>
+    <button class="drawer-item" id="drawerFollowingLink">
+      <div class="drawer-item-icon" style="background:rgba(0,0,0,.04);border:1px solid var(--bd)"><i class="fas fa-user-group" style="color:var(--tx-muted)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Following</div><div class="drawer-item-sub">${p.stats.following} accounts</div></div>
+    </button>`;
+
+  if (IS_OWNER && !p.isWriter){
+    html += `
+    <button class="drawer-item" id="drawerBecomeWriter">
+      <div class="drawer-item-icon" style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.12)"><i class="fas fa-feather-pointed" style="color:var(--purple)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Become a Writer</div><div class="drawer-item-sub">Unlock books &amp; author tools</div></div>
+    </button>`;
+  }
+  html += `</div>`;
+
+  if (IS_OWNER){
+    html += `<div class="drawer-divider"></div><div class="drawer-section"><div class="drawer-section-title">Wallet</div>
+    <button class="drawer-item" onclick="location.href='wallet.html'">
+      <div class="drawer-item-icon" style="background:var(--gold-soft);border:1px solid rgba(240,168,0,.3)"><i class="fas fa-wallet" style="color:var(--gold)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title" style="color:var(--gold)">Wallet</div><div class="drawer-item-sub">Balance, earnings &amp; payouts</div></div>
+      <div class="drawer-item-right"><i class="fas fa-chevron-right" style="font-size:10px"></i></div>
+    </button>
+    </div>`;
+  }
+
+  html += `<div class="drawer-divider"></div><div class="drawer-section"><div class="drawer-section-title">Account</div>`;
+  if (IS_OWNER){
+    html += `
+    <button class="drawer-item" onclick="location.href='edit-profile.html'">
+      <div class="drawer-item-icon" style="background:rgba(0,0,0,.04);border:1px solid var(--bd)"><i class="fas fa-user-edit" style="color:var(--tx-muted)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Edit Profile</div><div class="drawer-item-sub">Name, bio, avatar, genres</div></div>
+    </button>
+    <button class="drawer-item" onclick="location.href='settings.html'">
+      <div class="drawer-item-icon" style="background:rgba(0,0,0,.04);border:1px solid var(--bd)"><i class="fas fa-gear" style="color:var(--tx-muted)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Settings</div><div class="drawer-item-sub">Privacy, notifications, payout</div></div>
+    </button>`;
+  }
+  html += `
+    <button class="drawer-item" id="drawerReferBtn">
+      <div class="drawer-item-icon" style="background:var(--gold-soft);border:1px solid rgba(240,168,0,.2)"><i class="fas fa-share-alt" style="color:var(--gold)"></i></div>
+      <div style="flex:1"><div class="drawer-item-title">Refer a Friend</div><div class="drawer-item-sub">Earn ₦500 per referral</div></div>
+    </button>
+    <button class="drawer-item" id="drawerSignOutBtn">
+      <div class="drawer-item-icon" style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15)"><i class="fas fa-sign-out-alt" style="color:#dc2626"></i></div>
+      <div style="flex:1"><div class="drawer-item-title" style="color:#dc2626">Sign Out</div></div>
+    </button>
+  </div>`;
+
+  document.getElementById('drawerBody').innerHTML = html;
+
+  const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  bind('drawerNewPost', openNewPostComposer);
+  bind('drawerNewBook', () => { toast('📖 Book creation isn\'t wired up yet'); closeDrawer(); });
+  bind('drawerBooksLink', () => { closeDrawer(); switchTab('books'); });
+  bind('drawerLibraryTab', () => { closeDrawer(); switchTab('library'); });
+  bind('drawerCollectionsLink', () => { closeDrawer(); switchTab('collections'); });
+  bind('drawerFollowingLink', () => { closeDrawer(); switchTab('following'); });
+  bind('drawerBecomeWriter', openUpgradeWizard);
+  bind('drawerReferBtn', () => { toast('🤝 Referral service isn\'t wired up yet'); closeDrawer(); });
+  bind('drawerSignOutBtn', async () => {
+    closeDrawer();
+    if (window.AuthSession) await AuthSession.logout();
+    toast('👋 Signed out!');
+    setTimeout(() => location.href = 'index.html', 600);
+  });
+}
+
+document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+document.getElementById('upgradeCloseBtn').addEventListener('click', closeUpgradeWizard);
+document.getElementById('upgradeOv').addEventListener('click', function(e){ if (e.target===this) closeUpgradeWizard(); });
+document.getElementById('uwSubmitBtn').addEventListener('click', submitUpgrade);
+document.getElementById('genreCloseBtn').addEventListener('click', closeGenreEdit);
+document.getElementById('genreEditOv').addEventListener('click', function(e){ if (e.target===this) closeGenreEdit(); });
+document.getElementById('genreSaveBtn').addEventListener('click', saveGenres);
+document.getElementById('aboutEditGenresBtn').addEventListener('click', openGenreEdit);
+document.getElementById('newBookBtn').addEventListener('click', () => toast('📚 Book creation isn\'t wired up yet'));
+
+/* ═══════════════════════════════════════════════════════
+   TOP-LEVEL RENDER + BOOT
+═══════════════════════════════════════════════════════ */
+function renderProfile(p){
+  IS_OWNER = (p.handle === ME_HANDLE);
+  renderHeader(p);
+  renderActionRow();
+  renderStats(p);
+  renderAchievements(p);
+  renderUpgradeStrip(p);
+  renderTabs(p);          // renders the tab bar + lazily renders the Feed tab only
+  renderDrawer(p);
+}
+
+/* Notification badge — demo-only placeholder count. */
+function showNotif(count){
+  const badge = document.getElementById('notifCount');
+  if (count>0){ badge.textContent = count>99?'99+':String(count); badge.style.display='flex'; }
+  else badge.style.display='none';
+}
+
+async function boot(){
+  showNotif(5);
+  if (window.DroboardNav) DroboardNav.configure({ active: 'profile' });
+
+  const params = new URLSearchParams(location.search);
+  ME_HANDLE = await ProfileData.getCurrentUserHandle();
+  VIEW_HANDLE = params.get('u') || ME_HANDLE;
+
+  const data = await ProfileData.getProfile(VIEW_HANDLE);
+  document.getElementById('loadingState').style.display = 'none';
+
+  if (!data){
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+
+  PROFILE = data;
+  document.getElementById('profileRoot').style.display = 'block';
+  renderProfile(PROFILE);
+
+  if (window.DroboardSearch){
+    DroboardSearch.configure({
+      onOpenStory: () => toast('📖 Opening story…'),
+      onOpenWriter: (w) => { location.href = 'profile.html?u=' + encodeURIComponent((w.handle||w.name||'').replace('@','')); },
+      onOpenDebate: () => toast('⚔️ Opening debate…'),
+    });
+  }
+}
+boot();
 </script>
 </body>
 </html>

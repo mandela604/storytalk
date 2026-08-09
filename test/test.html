@@ -1,1307 +1,744 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Droboard Search · Demo</title>
-  <!-- Fonts & Icons (same as Droboard pages) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- The search-overlay component (self-contained, drops right in) -->
-  <script src="https://gistcdn.githack.com/your-repo/search-overlay.js"></script>
-  <!-- In a real project you would use: <script src="component/search-overlay.js"></script> -->
-  <!-- For this demo we inject the component inline (see below) so it runs standalone -->
-  <style>
-    /* minimal demo chrome */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #0b0c10;
-      color: #e0e0e0;
-      font-family: 'DM Sans', system-ui, sans-serif;
-      padding: 20px 16px 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .demo-header {
-      max-width: 640px;
-      width: 100%;
-      margin-bottom: 28px;
-    }
-    .demo-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      font-size: 28px;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #ff0050, #ff7a9a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-    }
-    .demo-header p {
-      color: #71717a;
-      font-size: 14px;
-      margin-top: 6px;
-      font-weight: 400;
-    }
-    .demo-grid {
-      max-width: 640px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .demo-card {
-      background: #13141a;
-      border-radius: 20px;
-      padding: 18px 20px;
-      border: 1px solid rgba(255,255,255,0.06);
-      transition: border-color 0.2s;
-    }
-    .demo-card:hover {
-      border-color: rgba(255,0,80,0.15);
-    }
-    .demo-card h3 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #c0c0c0;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .demo-card h3 i {
-      color: #ff0050;
-      font-size: 15px;
-    }
-    .trigger-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #1a1b22;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 10px 18px;
-      border-radius: 40px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #d0d0d0;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .btn i {
-      font-size: 14px;
-      color: #ff7a9a;
-    }
-    .btn:hover {
-      background: #25262e;
-      border-color: rgba(255,0,80,0.25);
-      transform: translateY(-1px);
-    }
-    .btn:active {
-      transform: scale(0.96);
-    }
-    .btn-pink {
-      background: #ff0050;
-      border-color: #ff0050;
-      color: #fff;
-    }
-    .btn-pink i {
-      color: #fff;
-    }
-    .btn-pink:hover {
-      background: #e00048;
-      border-color: #e00048;
-    }
-    .badge-attribute {
-      background: #0e0f13;
-      border-radius: 30px;
-      padding: 5px 14px 5px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #a0a0a0;
-      border: 1px solid rgba(255,255,255,0.06);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'DM Sans', monospace;
-    }
-    .badge-attribute code {
-      color: #ff7a9a;
-      font-weight: 700;
-      background: rgba(255,0,80,0.06);
-      padding: 1px 6px;
-      border-radius: 12px;
-      font-size: 10px;
-    }
-    .demo-hint {
-      font-size: 12px;
-      color: #3f3f46;
-      margin-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-      padding-top: 12px;
-    }
-    .demo-hint kbd {
-      background: #1a1b22;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 600;
-      color: #b0b0b0;
-      border: 1px solid #2a2b33;
-    }
-    .separator {
-      width: 100%;
-      height: 1px;
-      background: rgba(255,255,255,0.04);
-      margin: 6px 0;
-    }
-    .flex-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-    }
-    .mock-nav {
-      display: flex;
-      justify-content: space-around;
-      background: #0e0f13;
-      border-radius: 40px;
-      padding: 6px 4px;
-      border: 1px solid rgba(255,255,255,0.06);
-      max-width: 400px;
-      width: 100%;
-      margin-top: 6px;
-    }
-    .mock-nav a {
-      color: #3f3f46;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s;
-    }
-    .mock-nav a i {
-      font-size: 14px;
-    }
-    .mock-nav a.active {
-      background: #ff0050;
-      color: #fff;
-    }
-    .mock-nav a:not(.active):hover {
-      color: #b0b0b0;
-      background: rgba(255,255,255,0.04);
-    }
-    .footnote {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #3f3f46;
-      text-align: center;
-      max-width: 500px;
-      line-height: 1.6;
-    }
-    .footnote a {
-      color: #ff7a9a;
-      text-decoration: none;
-    }
-    .footnote a:hover {
-      text-decoration: underline;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>JS Learn — JavaScript Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  :root{
+    --bg:#f4f6fb;
+    --surface:#ffffff;
+    --surface2:#f0f3f9;
+    --surface3:#e8edf5;
+    --border:#e2e8f0;
+    --border2:#cbd5e1;
+    --text:#0f172a;
+    --text2:#475569;
+    --text3:#94a3b8;
+    --primary:#2f6fed;
+    --primary-dim:rgba(47,111,237,0.10);
+    --primary-border:rgba(47,111,237,0.25);
+    --green:#16a34a; --green-bg:rgba(22,163,74,0.10);
+    --amber:#d97706; --amber-bg:rgba(217,119,6,0.10);
+    --shadow:0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    --shadow-lg:0 8px 24px rgba(15,23,42,0.08);
+  }
+
+  html, body{
+    background:#e8ecf4;
+    font-family:"Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    color:var(--text); font-size:14px; min-height:100vh;
+  }
+
+  .phone{
+    width:100%; max-width:430px; min-height:100vh; margin:0 auto;
+    background:var(--bg);
+    box-shadow:0 0 0 1px rgba(15,23,42,0.06), 0 12px 40px rgba(15,23,42,0.10);
+    display:flex; flex-direction:column;
+  }
+
+  /* Top bar */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .topbar-brand{ font-size:17px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .topbar-brand .logo{
+    width:28px; height:28px; border-radius:8px; background:var(--primary);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px;
+  }
+  .topbar-brand span{ color:var(--primary); }
+  .topbar-actions{ display:flex; gap:6px; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text2); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:14px; transition:all .15s;
+  }
+  .icon-btn:hover{ border-color:var(--primary-border); color:var(--primary); background:var(--primary-dim); }
+
+  .search-bar{ display:none; padding:10px 18px 12px; background:var(--surface); border-bottom:1px solid var(--border); }
+  .search-bar.open{ display:block; }
+  .search-box{
+    display:flex; align-items:center; gap:8px; background:var(--surface2);
+    border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+  }
+  .search-box:focus-within{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-dim); }
+  .search-box i{ color:var(--text3); font-size:13px; }
+  .search-box input{ background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:14px; width:100%; }
+  .search-box input::placeholder{ color:var(--text3); }
+
+  .chips{ padding:12px 18px; display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .chips::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0; padding:7px 14px; border-radius:20px; font-size:12px; font-weight:600;
+    border:1px solid var(--border); background:var(--surface); color:var(--text2);
+    cursor:pointer; transition:all .15s; white-space:nowrap; display:inline-flex; align-items:center; gap:5px;
+  }
+  .chip:hover{ border-color:var(--primary-border); color:var(--primary); }
+  .chip.on{ background:var(--primary); border-color:var(--primary); color:#fff; }
+
+  .content{ flex:1; padding:0 18px 8px; }
+
+  /* Featured */
+  .featured{
+    margin-bottom:18px; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden; box-shadow:var(--shadow); cursor:pointer; transition:box-shadow .2s;
+  }
+  .featured:hover{ box-shadow:var(--shadow-lg); }
+  .featured-cover{
+    height:170px; background:linear-gradient(145deg, #2f6fed 0%, #1e4bb8 55%, #0f2d6b 100%);
+    display:flex; align-items:flex-end; padding:16px; position:relative;
+  }
+  .featured-cover::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.55) 0%, transparent 55%); }
+  .featured-badge{
+    position:absolute; top:12px; left:12px; z-index:1;
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+    padding:4px 10px; border-radius:20px; background:rgba(255,255,255,0.2); color:#fff; backdrop-filter:blur(6px);
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .featured-title-on-cover{ position:relative; z-index:1; color:#fff; font-size:17px; font-weight:700; line-height:1.3; text-shadow:0 1px 4px rgba(0,0,0,0.3); }
+  .featured-body{ padding:14px 16px 16px; }
+  .featured-excerpt{ font-size:13px; color:var(--text2); line-height:1.55; margin-bottom:12px; }
+  .meta-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--text3); }
+  .meta-row .author{ display:inline-flex; align-items:center; gap:6px; color:var(--text2); font-weight:500; }
+  .av{
+    width:24px; height:24px; border-radius:50%; background:var(--primary-dim); color:var(--primary);
+    display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;
+  }
+
+  .section-label{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--text3); margin-bottom:12px; padding-left:2px; display:flex; align-items:center; gap:6px;
+  }
+
+  .post-list{ display:flex; flex-direction:column; gap:12px; }
+
+  .post-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); overflow:hidden; cursor:pointer;
+    display:flex; transition:box-shadow .2s, border-color .2s;
+  }
+  .post-card:hover{ box-shadow:var(--shadow-lg); border-color:var(--primary-border); }
+  .post-thumb{
+    width:96px; min-height:96px; flex-shrink:0;
+    background:linear-gradient(135deg, var(--primary-dim), var(--surface3));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .post-thumb i{ font-size:22px; color:var(--primary); opacity:.55; }
+  .post-body{ padding:12px 14px; display:flex; flex-direction:column; flex:1; min-width:0; }
+  .post-cat{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--primary); margin-bottom:4px; display:inline-flex; align-items:center; gap:4px; }
+  .post-title{ font-size:14px; font-weight:700; color:var(--text); line-height:1.35; margin-bottom:6px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .post-excerpt{ font-size:12px; color:var(--text2); line-height:1.45; margin-bottom:8px; flex:1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .post-footer{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .post-date{ font-size:11px; color:var(--text3); }
+  .post-stats{ display:flex; gap:10px; font-size:11px; color:var(--text3); }
+  .post-stats span{ display:inline-flex; align-items:center; gap:3px; }
+
+  /* Ad space */
+  .ad-slot{
+    background:var(--surface); border:1px dashed var(--border2); border-radius:12px;
+    padding:20px 16px; text-align:center; position:relative; overflow:hidden;
+  }
+  .ad-slot .ad-label{
+    position:absolute; top:8px; right:10px; font-size:9px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.6px; color:var(--text3);
+  }
+  .ad-slot .ad-icon{
+    width:44px; height:44px; border-radius:12px; background:var(--primary-dim); color:var(--primary);
+    display:inline-flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:10px;
+  }
+  .ad-slot h3{ font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .ad-slot p{ font-size:12px; color:var(--text2); line-height:1.45; margin-bottom:12px; }
+  .ad-slot .ad-cta{
+    display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px;
+    background:var(--primary); color:#fff; font-size:12px; font-weight:600; border:none;
+    cursor:pointer; font-family:inherit; transition:background .15s;
+  }
+  .ad-slot .ad-cta:hover{ background:#2563eb; }
+
+  .empty{ text-align:center; padding:48px 20px; color:var(--text3); background:var(--surface); border:1px solid var(--border); border-radius:12px; }
+  .empty i{ font-size:28px; margin-bottom:10px; display:block; color:var(--border2); }
+
+  .pagination{ display:flex; align-items:center; justify-content:center; gap:6px; margin-top:20px; }
+  .page-btn{
+    min-width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text2); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-family:inherit; transition:all .15s; padding:0 8px;
+  }
+  .page-btn:hover{ border-color:var(--primary-border); color:var(--primary); }
+  .page-btn.active{ background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600; }
+  .page-btn:disabled{ opacity:.35; cursor:default; pointer-events:none; }
+  .page-info{ font-size:12px; color:var(--text3); text-align:center; margin-top:8px; margin-bottom:4px; }
+
+  /* Newsletter */
+  .newsletter{
+    margin:24px 18px 0; background:linear-gradient(145deg, #2f6fed 0%, #1e4bb8 100%);
+    border-radius:14px; padding:22px 18px; color:#fff; text-align:center;
+  }
+  .newsletter .nl-icon{
+    width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.15);
+    display:inline-flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px;
+  }
+  .newsletter h3{ font-size:16px; font-weight:700; margin-bottom:6px; }
+  .newsletter p{ font-size:13px; opacity:.85; line-height:1.5; margin-bottom:14px; }
+  .nl-form{ display:flex; gap:8px; }
+  .nl-form input{
+    flex:1; padding:10px 12px; border-radius:8px; border:none; font-family:inherit; font-size:13px;
+    outline:none; min-width:0;
+  }
+  .nl-form button{
+    padding:10px 14px; border-radius:8px; border:none; background:#fff; color:var(--primary);
+    font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:5px; transition:opacity .15s;
+  }
+  .nl-form button:hover{ opacity:.9; }
+  .nl-note{ font-size:11px; opacity:.7; margin-top:10px; }
+
+  /* Topics / resources */
+  .resources{
+    margin:20px 18px 0; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:18px; box-shadow:var(--shadow);
+  }
+  .resources h3{
+    font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;
+    display:flex; align-items:center; gap:7px;
+  }
+  .resources h3 i{ color:var(--primary); }
+  .res-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .res-item{
+    display:flex; align-items:center; gap:10px; padding:10px 12px;
+    background:var(--surface2); border-radius:10px; border:1px solid var(--border);
+    cursor:pointer; transition:border-color .15s; text-decoration:none; color:inherit;
+  }
+  .res-item:hover{ border-color:var(--primary-border); }
+  .res-item .ri{
+    width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:14px; flex-shrink:0;
+  }
+  .res-item .ri.blue{ background:var(--primary-dim); color:var(--primary); }
+  .res-item .ri.green{ background:var(--green-bg); color:var(--green); }
+  .res-item .ri.amber{ background:var(--amber-bg); color:var(--amber); }
+  .res-item .ri.purple{ background:rgba(124,58,237,0.10); color:#7c3aed; }
+  .res-item span{ font-size:12px; font-weight:600; color:var(--text); line-height:1.3; }
+
+  /* Footer */
+  .footer{
+    margin-top:24px; padding:24px 18px 28px; background:var(--surface);
+    border-top:1px solid var(--border);
+  }
+  .footer-brand{ font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; display:flex; align-items:center; gap:7px; }
+  .footer-brand i{ color:var(--primary); }
+  .footer-tag{ font-size:12px; color:var(--text3); margin-bottom:16px; line-height:1.45; }
+  .footer-links{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:16px; }
+  .footer-links a{
+    font-size:12px; color:var(--text2); text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+  }
+  .footer-links a:hover{ color:var(--primary); }
+  .footer-social{ display:flex; gap:8px; margin-bottom:16px; }
+  .footer-social a{
+    width:34px; height:34px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text2); display:flex; align-items:center; justify-content:center;
+    font-size:14px; text-decoration:none; transition:all .15s;
+  }
+  .footer-social a:hover{ border-color:var(--primary-border); color:var(--primary); background:var(--primary-dim); }
+  .footer-copy{ font-size:11px; color:var(--text3); text-align:center; padding-top:12px; border-top:1px solid var(--border); }
+
+  /* Article view */
+  .article{ display:none; flex-direction:column; flex:1; }
+  .article.show{ display:flex; }
+  .list-view.hide{ display:none; }
+
+  .article-topbar{
+    position:sticky; top:0; z-index:50;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:12px 18px; display:flex; align-items:center; gap:12px;
+  }
+  .back-btn{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text2); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; transition:all .15s;
+  }
+  .back-btn:hover{ border-color:var(--primary-border); color:var(--primary); }
+  .article-topbar-title{ font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .article-cover{
+    height:180px; background:linear-gradient(145deg, #2f6fed 0%, #1e4bb8 55%, #0f2d6b 100%);
+    display:flex; align-items:flex-end; padding:20px 18px; position:relative;
+  }
+  .article-cover::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.5) 0%, transparent 50%); }
+  .article-cover-cat{
+    position:absolute; top:14px; left:18px; z-index:1;
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+    padding:4px 10px; border-radius:20px; background:rgba(255,255,255,0.2); color:#fff; backdrop-filter:blur(6px);
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .article-body{ padding:20px 18px 40px; }
+  .article-title{ font-size:22px; font-weight:700; color:var(--text); line-height:1.3; margin-bottom:14px; }
+  .article-meta{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size:13px; color:var(--text3); margin-bottom:20px;
+    padding-bottom:16px; border-bottom:1px solid var(--border);
+  }
+  .article-meta .author{ display:inline-flex; align-items:center; gap:8px; color:var(--text2); font-weight:500; }
+  .article-meta .av{ width:30px; height:30px; font-size:11px; }
+  .article-content{ font-size:15px; color:var(--text2); line-height:1.75; }
+  .article-content p{ margin-bottom:14px; }
+  .article-content code{
+    background:var(--surface2); border:1px solid var(--border); border-radius:4px;
+    padding:1px 5px; font-size:13px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color:var(--primary);
+  }
+  .article-content pre{
+    background:#0f172a; color:#e2e8f0; border-radius:10px; padding:14px 16px;
+    font-size:12.5px; line-height:1.6; overflow-x:auto; margin:0 0 14px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .article-stats{
+    display:flex; gap:16px; margin-top:24px; padding-top:16px; border-top:1px solid var(--border);
+    font-size:13px; color:var(--text3);
+  }
+  .article-stats span{ display:inline-flex; align-items:center; gap:5px; }
+
+  /* Toast */
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--text); color:#fff; padding:10px 18px; border-radius:10px;
+    font-size:13px; z-index:999; display:flex; align-items:center; gap:8px;
+    box-shadow:0 8px 24px rgba(15,23,42,0.2); animation:toastIn .25s ease;
+    max-width:calc(100vw - 40px);
+  }
+  @keyframes toastIn{ from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  ::-webkit-scrollbar{ width:4px; }
+  ::-webkit-scrollbar-thumb{ background:var(--border2); border-radius:4px; }
+</style>
 </head>
 <body>
+<div class="phone">
 
-<div class="demo-header">
-  <h1>🔍 Droboard Search</h1>
-  <p>Zero‑config overlay · works everywhere with <code>data-search-trigger</code></p>
-</div>
-
-<div class="demo-grid">
-
-  <!-- Card: triggers -->
-  <div class="demo-card">
-    <h3><i class="fas fa-bolt"></i> Launch the overlay</h3>
-    <div class="trigger-group">
-      <button class="btn btn-pink" onclick="DroboardSearch.open()">
-        <i class="fas fa-magnifying-glass"></i> Open search
-      </button>
-      <button class="btn" onclick="DroboardSearch.open('betrayal stories')">
-        <i class="fas fa-fire"></i> Pre‑fill “betrayal”
-      </button>
-      <button class="btn" onclick="DroboardSearch.open('Ada_Writes')">
-        <i class="fas fa-user"></i> Pre‑fill writer
-      </button>
-    </div>
-    <div class="demo-hint">
-      <kbd>Ctrl+K</kbd> or <kbd>/</kbd> to open (try it)
-    </div>
-  </div>
-
-  <!-- Card: data-search-trigger demo (no JS required) -->
-  <div class="demo-card">
-    <h3><i class="fas fa-hashtag"></i> Attribute‑based trigger</h3>
-    <div class="flex-row">
-      <div class="btn" data-search-trigger>
-        <i class="fas fa-search"></i> Click me (I have <code>data-search-trigger</code>)
+  <!-- LIST VIEW -->
+  <div class="list-view" id="listView">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="logo"><i class="fa-brands fa-js"></i></div>
+        JS <span>Learn</span>
       </div>
-      <span class="badge-attribute">
-        <i class="fas fa-code"></i> <code>data-search-trigger</code>
-      </span>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="searchToggle" title="Search" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="search-bar" id="searchBar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="fSearch" placeholder="Search lessons…" oninput="page=1;renderList()">
+      </div>
     </div>
-    <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px;">
-      <a href="search.html" class="btn" data-search-trigger style="background:transparent; border-color:rgba(255,255,255,0.06);">
-        <i class="fas fa-arrow-up-right-from-square"></i> Link with href + attribute
-      </a>
-      <span style="font-size:12px; color:#3f3f46; align-self:center;">
-        (href works as fallback, but overlay opens instead)
-      </span>
+
+    <div class="chips" id="catChips"></div>
+
+    <div class="content">
+      <div id="featuredSlot"></div>
+      <div class="section-label" id="listLabel"><i class="fa-solid fa-book-open"></i> Latest lessons</div>
+      <div class="post-list" id="postList"></div>
+      <div class="pagination" id="pageBtns"></div>
+      <div class="page-info" id="paginLabel"></div>
     </div>
-    <div class="demo-hint">
-      <i class="fas fa-check-circle" style="color:#34d399;"></i> Any element — button, link, div — just add the attribute.
+
+    <!-- Newsletter -->
+    <div class="newsletter">
+      <div class="nl-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <h3>Get weekly JS tips</h3>
+      <p>One practical JavaScript lesson in your inbox every week. No spam.</p>
+      <form class="nl-form" id="nlForm" onsubmit="return subscribeNewsletter(event)">
+        <input type="email" id="nlEmail" placeholder="you@email.com" required>
+        <button type="submit"><i class="fa-solid fa-paper-plane"></i> Join</button>
+      </form>
+      <div class="nl-note">Free · Unsubscribe anytime</div>
     </div>
+
+    <!-- Learning paths -->
+    <div class="resources">
+      <h3><i class="fa-solid fa-route"></i> Learning paths</h3>
+      <div class="res-grid">
+        <a class="res-item" href="#" onclick="filterCat('Basics');return false;">
+          <div class="ri blue"><i class="fa-solid fa-seedling"></i></div>
+          <span>JS Basics</span>
+        </a>
+        <a class="res-item" href="#" onclick="filterCat('DOM');return false;">
+          <div class="ri green"><i class="fa-solid fa-window-maximize"></i></div>
+          <span>DOM & Events</span>
+        </a>
+        <a class="res-item" href="#" onclick="filterCat('Async');return false;">
+          <div class="ri amber"><i class="fa-solid fa-bolt"></i></div>
+          <span>Async JS</span>
+        </a>
+        <a class="res-item" href="#" onclick="filterCat('Projects');return false;">
+          <div class="ri purple"><i class="fa-solid fa-code"></i></div>
+          <span>Mini Projects</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-brand"><i class="fa-brands fa-js"></i> JS Learn</div>
+      <div class="footer-tag">Practical JavaScript lessons for beginners and intermediate developers.</div>
+      <div class="footer-links">
+        <a href="#"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="#" onclick="filterCat('');return false;"><i class="fa-solid fa-book"></i> All lessons</a>
+        <a href="#"><i class="fa-solid fa-circle-question"></i> About</a>
+        <a href="#"><i class="fa-solid fa-shield-halved"></i> Privacy</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" title="GitHub" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="#" title="Twitter" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" title="YouTube" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#" title="Discord" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+      </div>
+      <div class="footer-copy">&copy; 2026 JS Learn. Built to teach JavaScript, one lesson at a time.</div>
+    </footer>
   </div>
 
-  <!-- Card: bottom navigation mock (shows real-world usage) -->
-  <div class="demo-card">
-    <h3><i class="fas fa-layer-group"></i> Bottom nav (as on every page)</h3>
-    <div class="mock-nav">
-      <a href="#"><i class="fas fa-house"></i> Home</a>
-      <a href="#"><i class="fas fa-compass"></i> Discover</a>
-      <a href="#" class="active" data-search-trigger><i class="fas fa-magnifying-glass"></i> Search</a>
-      <a href="#"><i class="fas fa-rss"></i> Feed</a>
-      <a href="#"><i class="fas fa-circle-user"></i> Profile</a>
-    </div>
-    <div class="demo-hint" style="border-top:none; padding-top:6px; margin-top:6px;">
-      <i class="fas fa-mouse-pointer" style="color:#ff7a9a;"></i> Click “Search” — it uses <code>data-search-trigger</code> (no extra wiring)
-    </div>
-  </div>
-
-  <!-- Card: programmatic API -->
-  <div class="demo-card">
-    <h3><i class="fas fa-sliders"></i> Programmatic API</h3>
-    <div style="display:flex; flex-wrap:wrap; gap:12px;">
-      <button class="btn" onclick="console.log('isOpen:', DroboardSearch.isOpen()); alert('Open: ' + DroboardSearch.isOpen())">
-        <i class="fas fa-info-circle"></i> isOpen()
+  <!-- ARTICLE VIEW -->
+  <div class="article" id="articleView">
+    <div class="article-topbar">
+      <button class="back-btn" onclick="closeArticle()" aria-label="Back">
+        <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <button class="btn" onclick="DroboardSearch.close()">
-        <i class="fas fa-xmark"></i> Close
-      </button>
-      <button class="btn" onclick="DroboardSearch.configure({ onOpenStory: (s) => alert('📖 Opening: ' + s.title) })">
-        <i class="fas fa-pen"></i> Configure (demo)
-      </button>
+      <div class="article-topbar-title" id="aTopTitle"></div>
     </div>
-    <div class="demo-hint">
-      <code>DroboardSearch.open()</code> · <code>.close()</code> · <code>.isOpen()</code> · <code>.configure({ ... })</code>
+    <div class="article-cover">
+      <span class="article-cover-cat" id="aCat"></span>
     </div>
-  </div>
-
-  <!-- Card: keyboard shortcut reminder -->
-  <div class="demo-card" style="border-color: rgba(255,0,80,0.08);">
-    <h3><i class="fas fa-keyboard"></i> Keyboard shortcut</h3>
-    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
-      <span style="font-size:13px; color:#a0a0a0;"><kbd>/</kbd> or <kbd>Ctrl+K</kbd> opens the overlay anywhere</span>
-      <span style="font-size:12px; color:#3f3f46;">(try it right now)</span>
+    <div class="article-body">
+      <h1 class="article-title" id="aTitle"></h1>
+      <div class="article-meta" id="aMeta"></div>
+      <div class="article-content" id="aContent"></div>
+      <div class="article-stats" id="aStats"></div>
     </div>
   </div>
 
 </div>
 
-<div class="footnote">
-  ⚡ The search component is self‑contained, uses <code>dso-</code> prefixes, and remembers recent searches.
-  <br>
-  Built for Droboard — drop it in, add <code>data-search-trigger</code>, and you're done.
-</div>
-
-<!--
-  ═══════════════════════════════════════════════════════════════════
-  In a real project you would load the component from a script tag.
-  For this demo we embed the exact code below (the same as the
-  search-overlay.js file) so it works standalone.
-  ═══════════════════════════════════════════════════════════════════
--->
 <script>
-  // ----- paste the component code here (the entire IIFE from search-overlay.js) -----
-  // (In production you'd use <script src="component/search-overlay.js"></script>)
-  // For clarity we embed it inline, but the code is identical.
-  // To keep this demo clean, we load it from a gist (or you can paste it).
-  // For maximum reliability, we inject it via a script tag.
-  (function(){
-    // We'll load the component from the same source — but since this is a
-    // standalone demo, we define it here. However, the code is long.
-    // Instead, we use an inline version with the exact same IIFE.
-    // For brevity, we reference the component from the same gist.
-    // But to make this demo fully self-contained, we embed the component
-    // code directly below (minified for readability, but full source).
-    // The component is ~15KB, so we load it from a CDN-style gist.
-    // In a real page you would use <script src="component/search-overlay.js"></script>
-    // We'll inject it via a dynamic script tag.
-    var script = document.createElement('script');
-    script.src = 'https://gistcdn.githack.com/your-repo/search-overlay.js'; // placeholder
-    // For this demo, we'll use a data URI or inline.
-    // Since we can't load external from gist in a raw demo, we paste the
-    // entire component code (the IIFE) inside this script.
-    // But to keep the demo readable, we'll use a compact approach:
-    // We'll embed the component as a string and eval it.
-    // (This is only for demo purposes; in production you'd use a script tag.)
+const CFG = {
+  API_BASE: '',
+  API_KEY:  '',
+  USE_DEMO: true,
+  PAGE_SIZE: 8,
+};
 
-    // The full component code is long, so we load it from a raw gist URL.
-    // For this demo, we use a reliable CDN link (the same as the source).
-    // We'll fetch it and execute it.
-    // But to avoid CORS issues, we'll use a simple approach:
-    // We'll include the component code in a <script> block below.
-    // Since the code is already provided in the prompt, we'll reuse it.
-    // We'll create a script element with the exact code from the prompt.
-    // That code is the entire IIFE. We'll inject it here.
+const DEMO_POSTS = [
+  { id:1,  title:'What is JavaScript?', category:'Basics', author:'Ada Okoro', initials:'AO', date:'2026-07-28', views:2140, likes:156, icon:'fa-solid fa-circle-question',
+    excerpt:'JavaScript is the language of the web. Learn what it is, where it runs, and why every frontend developer needs it.',
+    content:'JavaScript is a programming language that makes web pages interactive. Without it, sites would be static documents — no menus, no forms that validate, no live updates.\n\nIt runs in the browser (Chrome, Firefox, Safari) and also on the server with Node.js. That means one language for both frontend and backend.\n\nIn this blog you will learn JS from the ground up: variables, functions, the DOM, async code, and real mini projects. Each lesson is short, practical, and something you can try in the browser console right away.' },
+  { id:2,  title:'Variables: let, const, and var', category:'Basics', author:'Tunde Bello', initials:'TB', date:'2026-07-26', views:1890, likes:132, icon:'fa-solid fa-box',
+    excerpt:'Stop using var. Master let and const so your code is predictable and easier to debug.',
+    content:'In modern JavaScript you almost always use let and const. var is an older keyword with confusing scope rules — avoid it in new code.\n\nconst means the binding cannot be reassigned. Use it by default:\n\nconst name = "Ada";\n\nlet is for values that will change:\n\nlet count = 0;\ncount = count + 1;\n\nA good habit: start with const. Switch to let only when you need to reassign. This makes your intent clear and prevents accidental overwrites.' },
+  { id:3,  title:'Data Types You Must Know', category:'Basics', author:'Chioma Eze', initials:'CE', date:'2026-07-24', views:1650, likes:98, icon:'fa-solid fa-layer-group',
+    excerpt:'Strings, numbers, booleans, null, undefined, objects, and arrays — the building blocks of every JS program.',
+    content:'JavaScript has a small set of core types.\n\nPrimitives: string, number, boolean, null, undefined, symbol, bigint.\n\nEverything else is an object — including arrays and functions.\n\nCheck a type with typeof:\n\ntypeof "hello"  // "string"\ntypeof 42       // "number"\ntypeof true     // "boolean"\ntypeof {}       // "object"\ntypeof []       // "object" (arrays are objects)\n\nRemember: typeof null returns "object" — a famous historical bug. Use value === null to test for null.' },
+  { id:4,  title:'Functions: Declaration vs Expression', category:'Basics', author:'Ibrahim Musa', initials:'IM', date:'2026-07-22', views:1520, likes:110, icon:'fa-solid fa-function',
+    excerpt:'Functions are first-class values in JS. Learn the difference between declarations, expressions, and arrow functions.',
+    content:'A function declaration is hoisted — you can call it before it appears in the file:\n\nfunction greet(name) {\n  return "Hello, " + name;\n}\n\nA function expression is not hoisted:\n\nconst greet = function(name) {\n  return "Hello, " + name;\n};\n\nArrow functions are a shorter syntax, popular for callbacks:\n\nconst greet = (name) => "Hello, " + name;\n\nUse declarations for named utilities. Use arrows for short callbacks and when you need lexical this.' },
+  { id:5,  title:'Arrays: map, filter, and reduce', category:'Basics', author:'Ada Okoro', initials:'AO', date:'2026-07-20', views:2010, likes:178, icon:'fa-solid fa-list',
+    excerpt:'Transform lists without messy for-loops. map, filter, and reduce are the tools you will use every day.',
+    content:'map creates a new array by transforming each item:\n\nconst nums = [1, 2, 3];\nconst doubled = nums.map(n => n * 2);  // [2, 4, 6]\n\nfilter keeps items that pass a test:\n\nconst evens = nums.filter(n => n % 2 === 0);  // [2]\n\nreduce boils an array down to a single value:\n\nconst sum = nums.reduce((acc, n) => acc + n, 0);  // 6\n\nPrefer these over manual loops when you are transforming data. They are clearer and less error-prone.' },
+  { id:6,  title:'Objects and Destructuring', category:'Basics', author:'Chioma Eze', initials:'CE', date:'2026-07-18', views:1340, likes:87, icon:'fa-solid fa-cube',
+    excerpt:'Objects store related data. Destructuring pulls values out cleanly without repeating the object name.',
+    content:'An object holds key-value pairs:\n\nconst user = { name: "Ada", role: "dev", active: true };\n\nDestructuring extracts properties:\n\nconst { name, role } = user;\n// name === "Ada", role === "dev"\n\nYou can rename and set defaults:\n\nconst { name: userName, age = 0 } = user;\n\nDestructuring also works in function parameters — a very common pattern in real code:\n\nfunction printUser({ name, role }) {\n  console.log(name + " — " + role);\n}' },
+  { id:7,  title:'Selecting Elements in the DOM', category:'DOM', author:'Tunde Bello', initials:'TB', date:'2026-07-16', views:1780, likes:124, icon:'fa-solid fa-crosshairs',
+    excerpt:'querySelector and querySelectorAll are your main tools for finding elements on the page.',
+    content:'document.querySelector returns the first match:\n\nconst btn = document.querySelector("#saveBtn");\nconst title = document.querySelector("h1");\n\ndocument.querySelectorAll returns a NodeList of all matches:\n\nconst cards = document.querySelectorAll(".post-card");\ncards.forEach(card => card.classList.add("ready"));\n\nUse CSS selector syntax — the same language you already know from stylesheets. Prefer querySelector over older methods like getElementById when you want one consistent API.' },
+  { id:8,  title:'Events: click, input, and submit', category:'DOM', author:'Ibrahim Musa', initials:'IM', date:'2026-07-14', views:1620, likes:105, icon:'fa-solid fa-hand-pointer',
+    excerpt:'addEventListener is how your page reacts to the user. Master click, input, and form submit.',
+    content:'Attach a listener with addEventListener:\n\nconst btn = document.querySelector("#saveBtn");\nbtn.addEventListener("click", () => {\n  console.log("Saved!");\n});\n\nFor inputs, listen to "input" for live updates:\n\nconst search = document.querySelector("#fSearch");\nsearch.addEventListener("input", (e) => {\n  console.log(e.target.value);\n});\n\nFor forms, prevent the default page reload:\n\nform.addEventListener("submit", (e) => {\n  e.preventDefault();\n  // handle data\n});\n\nAlways prefer addEventListener over inline onclick attributes — it keeps behaviour in your script, not in HTML.' },
+  { id:9,  title:'Changing the Page with JS', category:'DOM', author:'Ada Okoro', initials:'AO', date:'2026-07-12', views:1450, likes:91, icon:'fa-solid fa-pen-to-square',
+    excerpt:'textContent, innerHTML, classList, and style — the four ways you update the UI from JavaScript.',
+    content:'Update text safely with textContent:\n\nel.textContent = "Hello";\n\ninnerHTML parses HTML — only use it with trusted content:\n\nel.innerHTML = "<strong>Bold</strong>";\n\nToggle classes with classList:\n\nel.classList.add("active");\nel.classList.remove("hidden");\nel.classList.toggle("open");\n\nInline styles when needed:\n\nel.style.color = "#2f6fed";\n\nPrefer classList over style for anything that belongs in CSS. It keeps design in stylesheets and logic in scripts.' },
+  { id:10, title:'Promises: then and catch', category:'Async', author:'Chioma Eze', initials:'CE', date:'2026-07-10', views:1920, likes:145, icon:'fa-solid fa-link',
+    excerpt:'A Promise represents a value that will arrive later. Learn then, catch, and why promises beat callbacks.',
+    content:'A Promise is either pending, fulfilled, or rejected.\n\nfetch("/api/posts")\n  .then(res => res.json())\n  .then(data => console.log(data))\n  .catch(err => console.error(err));\n\n.then runs when the promise succeeds. .catch runs when it fails.\n\nYou can chain thens — each one receives the return value of the previous step. This is cleaner than nested callbacks (callback hell).\n\nAlways handle errors with catch, or a rejected promise can become a silent failure.' },
+  { id:11, title:'async / await Explained', category:'Async', author:'Ibrahim Musa', initials:'IM', date:'2026-07-08', views:2100, likes:167, icon:'fa-solid fa-hourglass-half',
+    excerpt:'Write asynchronous code that looks synchronous. async and await make promises readable.',
+    content:'Mark a function async and you can await promises inside it:\n\nasync function loadPosts() {\n  try {\n    const res = await fetch("/api/posts");\n    const data = await res.json();\n    return data;\n  } catch (err) {\n    console.error("Failed to load", err);\n    return [];\n  }\n}\n\nawait pauses the function until the promise settles — without blocking the whole page.\n\nWrap await in try/catch for error handling. This pattern is the standard for modern JS apps.' },
+  { id:12, title:'Fetching Data from an API', category:'Async', author:'Tunde Bello', initials:'TB', date:'2026-07-06', views:1840, likes:128, icon:'fa-solid fa-cloud-arrow-down',
+    excerpt:'Use fetch to load JSON from a server. Handle loading, success, and error states properly.',
+    content:'fetch returns a promise. Always check res.ok:\n\nasync function getPosts() {\n  const res = await fetch("/api/posts");\n  if (!res.ok) throw new Error("HTTP " + res.status);\n  return res.json();\n}\n\nIn the UI, show a loading state, then render, or show an error:\n\ntry {\n  const posts = await getPosts();\n  render(posts);\n} catch (err) {\n  showError(err.message);\n}\n\nThis try/catch + fallback pattern is exactly how production frontends switch between live API and demo data.' },
+  { id:13, title:'Local Storage Basics', category:'DOM', author:'Ada Okoro', initials:'AO', date:'2026-07-04', views:1280, likes:76, icon:'fa-solid fa-database',
+    excerpt:'Save data in the browser with localStorage. Perfect for prefs, drafts, and offline demo state.',
+    content:'localStorage stores strings, keyed by name:\n\nlocalStorage.setItem("theme", "dark");\nconst theme = localStorage.getItem("theme");  // "dark"\nlocalStorage.removeItem("theme");\n\nFor objects, use JSON:\n\nlocalStorage.setItem("user", JSON.stringify({ name: "Ada" }));\nconst user = JSON.parse(localStorage.getItem("user"));\n\nData survives page reloads but is per-origin and can be cleared by the user. Never store secrets there.' },
+  { id:14, title:'Modules: import and export', category:'Basics', author:'Chioma Eze', initials:'CE', date:'2026-07-02', views:1160, likes:68, icon:'fa-solid fa-puzzle-piece',
+    excerpt:'Split your code into files. export what others need, import what you need.',
+    content:'In utils.js:\n\nexport function formatDate(iso) {\n  return new Date(iso).toLocaleDateString();\n}\nexport const PAGE_SIZE = 8;\n\nIn app.js:\n\nimport { formatDate, PAGE_SIZE } from "./utils.js";\n\nOr default export:\n\nexport default function render() { ... }\nimport render from "./render.js";\n\nModules keep files small and make dependencies explicit. Use type="module" on your script tag in the browser.' },
+  { id:15, title:'Error Handling Patterns', category:'Async', author:'Ibrahim Musa', initials:'IM', date:'2026-06-30', views:980, likes:54, icon:'fa-solid fa-triangle-exclamation',
+    excerpt:'try/catch, custom errors, and graceful fallbacks — write code that fails safely.',
+    content:'Wrap risky work in try/catch:\n\ntry {\n  const data = JSON.parse(raw);\n} catch (err) {\n  console.warn("Bad JSON", err.message);\n  return null;\n}\n\nThrow meaningful errors:\n\nif (!res.ok) throw new Error("HTTP " + res.status);\n\nIn UI code, never leave the user staring at a blank screen. Fall back to demo data, show a message, or disable the action — but always respond.' },
+  { id:16, title:'Build a Search Filter', category:'Projects', author:'Tunde Bello', initials:'TB', date:'2026-06-28', views:1560, likes:119, icon:'fa-solid fa-filter',
+    excerpt:'A mini project: filter a list of posts as the user types. Pure JS, no framework.',
+    content:'Keep the full list in memory. On every input event, filter and re-render:\n\nconst q = input.value.toLowerCase().trim();\nconst filtered = posts.filter(p =>\n  p.title.toLowerCase().includes(q) ||\n  p.excerpt.toLowerCase().includes(q)\n);\nrender(filtered);\n\nDebounce if the list is huge. For dozens of items, live filtering is fine and feels instant.\n\nThis is the same pattern used in the search bar on this blog.' },
+  { id:17, title:'Build a Pagination Component', category:'Projects', author:'Ada Okoro', initials:'AO', date:'2026-06-26', views:1420, likes:101, icon:'fa-solid fa-ellipsis',
+    excerpt:'Slice an array into pages. Render page buttons. Handle next and previous.',
+    content:'Given PAGE_SIZE and page number:\n\nconst start = (page - 1) * PAGE_SIZE;\nconst pageRows = rows.slice(start, start + PAGE_SIZE);\nconst totalPages = Math.ceil(rows.length / PAGE_SIZE);\n\nRender buttons for a window around the current page. Disable prev on page 1 and next on the last page.\n\nKeep page in state and re-run the render function when it changes. Simple, testable, no library required.' },
+  { id:18, title:'Template Literals and Rendering', category:'Projects', author:'Chioma Eze', initials:'CE', date:'2026-06-24', views:1190, likes:72, icon:'fa-solid fa-file-code',
+    excerpt:'Build HTML strings with backticks and ${}. The practical way to render lists without a framework.',
+    content:'Template literals let you embed expressions:\n\nconst html = posts.map(p => `\n  <article class="post-card">\n    <h2>${p.title}</h2>\n    <p>${p.excerpt}</p>\n  </article>\n`).join("");\n\nlist.innerHTML = html;\n\nEscape user-generated content before inserting, or use textContent for safety. For trusted lesson content, template literals are fast and readable.' },
+  { id:19, title:'Demo Data vs Live API', category:'Projects', author:'Ibrahim Musa', initials:'IM', date:'2026-06-22', views:1380, likes:94, icon:'fa-solid fa-server',
+    excerpt:'One data service, identical shapes, a USE_DEMO flag. Switch to production without rewriting the UI.',
+    content:'Put demo arrays and API calls behind one function:\n\nasync function getPosts() {\n  if (!CFG.USE_DEMO) {\n    try {\n      return await fetchFromAPI();\n    } catch (err) {\n      return DEMO_POSTS; // fallback\n    }\n  }\n  return DEMO_POSTS;\n}\n\nThe rest of the app only calls getPosts(). When the backend is ready, set USE_DEMO to false. Same data shape — zero UI changes.\n\nThis is the pattern this blog uses.' },
+  { id:20, title:'Your First Complete Mini App', category:'Projects', author:'Ada Okoro', initials:'AO', date:'2026-06-20', views:2450, likes:201, icon:'fa-solid fa-rocket',
+    excerpt:'Put it all together: data, filter, pagination, detail view, and a config switch. You have built a real app.',
+    content:'You now know variables, functions, arrays, the DOM, events, promises, and async/await.\n\nA complete mini app needs:\n1. A data source (demo or API)\n2. Filter and search\n3. Pagination\n4. A list view and a detail view\n5. Clear empty and error states\n\nThat is exactly the structure of this JavaScript learning blog. Read the source, change PAGE_SIZE, add a lesson, break things, fix them — that is how you learn.\n\nNext: pick a project idea and ship it.' },
+];
 
-    // For demo purposes, we'll just use the code that is already in the
-    // global scope (it was defined above). But we need to make sure it's
-    // not already defined. We'll check if DroboardSearch exists.
-    if (window.DroboardSearch) return; // already loaded
+const CAT_ICONS = {
+  'Basics': 'fa-solid fa-seedling',
+  'DOM': 'fa-solid fa-window-maximize',
+  'Async': 'fa-solid fa-bolt',
+  'Projects': 'fa-solid fa-code',
+};
 
-    // We'll use the same code as the prompt — we'll define it inline.
-    // To avoid duplication, we'll assume the component is loaded separately.
-    // In this demo, we'll load it from a script tag with a fallback.
-    // Let's just use the embedded version.
-    // The prompt includes the entire component. We'll copy it here.
-    // For brevity, we'll use a simple eval of the code.
-    // But eval is not ideal. Instead, we'll use a function constructor.
-    // However, the simplest is to just include the code in a script tag.
-    // We'll do that now.
+async function fetchFromAPI(){
+  if (!CFG.API_BASE) throw new Error('No API_BASE configured');
+  const opts = { headers: { 'Content-Type': 'application/json' } };
+  if (CFG.API_KEY) opts.headers['Authorization'] = `Bearer ${CFG.API_KEY}`;
+  const res = await fetch(CFG.API_BASE + '/api/blog/posts', opts);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.posts || []);
+}
 
-    // We'll create a new script element and set its textContent to the
-    // component code. This is the same as the search-overlay.js file.
-    var componentCode = `
-      (function () {
-        'use strict';
+async function getPosts(){
+  if (!CFG.USE_DEMO) {
+    try { return await fetchFromAPI(); }
+    catch (err) { console.warn('[API] Falling back to demo:', err.message); return DEMO_POSTS; }
+  }
+  return DEMO_POSTS;
+}
 
-        if (window.__droboardSearchOverlay) return;
-        window.__droboardSearchOverlay = true;
+let posts = [];
+let page = 1;
+let catFilter = '';
 
-        // ══════════════════════════════════════════════════════════════════
-        // CSS (dso- prefixed, self-contained, injected once)
-        // ══════════════════════════════════════════════════════════════════
-        const CSS = \`
-          .dso-root{position:fixed;inset:0;z-index:5000;background:#000;color:#c0c0c0;
-            font-family:'DM Sans',system-ui,sans-serif;display:none;flex-direction:column;
-            overflow:hidden;}
-          .dso-root.open{display:flex}
-          .dso-root *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-          .dso-root ::-webkit-scrollbar{width:2px}
-          .dso-root ::-webkit-scrollbar-thumb{background:rgba(255,0,80,.2);border-radius:2px}
-          .dso-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-            padding-bottom:24px;}
+function fmtDate(iso){
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
 
-          .dso-topbar{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.97);
-            backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);
-            padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 9px;flex-shrink:0}
-          .dso-toprow{display:flex;align-items:center;gap:10px;margin-bottom:2px}
-          .dso-back{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);
-            border:none;color:#e0e0e0;display:flex;align-items:center;justify-content:center;
-            font-size:13px;cursor:pointer;flex-shrink:0;transition:.15s}
-          .dso-back:active{transform:scale(.9);background:rgba(255,0,80,.15);color:#ff0050}
-          .dso-toplabel{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;
-            color:#e0e0e0;flex:1}
-          .dso-search-wrap{display:flex;align-items:center;gap:9px;background:#08090c;
-            border:1.5px solid rgba(255,255,255,.07);border-radius:24px;padding:9px 14px;
-            margin-top:9px;transition:border-color .2s}
-          .dso-search-wrap:focus-within{border-color:rgba(255,0,80,.3);
-            box-shadow:0 0 0 3px rgba(255,0,80,.12)}
-          .dso-search-wrap i.dso-search-icon{color:#3f3f46;font-size:13px;flex-shrink:0}
-          .dso-search-inp{flex:1;background:none;border:none;outline:none;color:#e0e0e0;
-            font-family:'DM Sans',sans-serif;font-size:14px;caret-color:#ff0050}
-          .dso-search-inp::placeholder{color:#3f3f46}
-          .dso-search-clear{width:22px;height:22px;border-radius:50%;background:#1a1b22;
-            display:none;align-items:center;justify-content:center;font-size:9px;
-            color:#71717a;cursor:pointer;flex-shrink:0}
-          .dso-search-clear.show{display:flex}
-          .dso-search-clear:active{transform:scale(.88)}
+function filterCat(cat){
+  catFilter = cat;
+  page = 1;
+  document.getElementById('listView').classList.remove('hide');
+  document.getElementById('articleView').classList.remove('show');
+  renderList();
+  window.scrollTo(0, 0);
+}
 
-          .dso-filter-bar{display:none;gap:6px;padding:10px 14px 0;overflow-x:auto;
-            scrollbar-width:none}
-          .dso-filter-bar::-webkit-scrollbar{display:none}
-          .dso-filter-bar.show{display:flex}
-          .dso-fpill{flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:10px;
-            font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.07);
-            color:#3f3f46;background:transparent;transition:all .18s;white-space:nowrap;
-            font-family:'DM Sans',sans-serif}
-          .dso-fpill.on{background:#ff0050;color:#fff;border-color:#ff0050;
-            box-shadow:0 2px 10px rgba(255,0,80,.12)}
-          .dso-fpill:active{transform:scale(.95)}
+function getFiltered(){
+  const q = (document.getElementById('fSearch').value || '').toLowerCase().trim();
+  let rows = posts.filter(p => {
+    const mq = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q) ||
+               p.author.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+    const mc = !catFilter || p.category === catFilter;
+    return mq && mc;
+  });
+  rows.sort((a,b) => b.date.localeCompare(a.date));
+  return rows;
+}
 
-          .dso-sh{display:flex;align-items:center;justify-content:space-between;
-            padding:18px 14px 10px}
-          .dso-sh-title{font-size:11px;font-weight:800;color:#71717a;text-transform:uppercase;
-            letter-spacing:.1em;display:flex;align-items:center;gap:6px}
-          .dso-sh-more{font-size:10px;font-weight:700;color:#ff7a9a;cursor:pointer;
-            padding:3px 9px;border-radius:10px;background:rgba(255,0,80,.06);
-            border:1px solid rgba(255,0,80,.2);text-decoration:none}
+function renderChips(){
+  const cats = [...new Set(posts.map(p => p.category))];
+  const order = ['Basics','DOM','Async','Projects'];
+  cats.sort((a,b) => (order.indexOf(a)+99) - (order.indexOf(b)+99));
+  const el = document.getElementById('catChips');
+  el.innerHTML = `<button class="chip${!catFilter?' on':''}" data-cat=""><i class="fa-solid fa-border-all"></i> All</button>` +
+    cats.map(c => `<button class="chip${catFilter===c?' on':''}" data-cat="${c}"><i class="${CAT_ICONS[c]||'fa-solid fa-tag'}"></i> ${c}</button>`).join('');
+  el.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => { catFilter = btn.dataset.cat; page = 1; renderList(); });
+  });
+}
 
-          .dso-trending-list,.dso-recent-list,.dso-cat-grid{padding:0 14px}
-          .dso-trend-item{display:flex;align-items:center;gap:12px;padding:11px 0;
-            border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:.15s}
-          .dso-trend-item:last-child{border-bottom:none}
-          .dso-trend-item:active{opacity:.7}
-          .dso-trend-rank{font-family:'Playfair Display',serif;font-size:13px;font-weight:900;
-            width:24px;text-align:center;flex-shrink:0}
-          .dso-trend-rank.t1{color:#fbbf24}.dso-trend-rank.t2{color:#a0aec0}
-          .dso-trend-rank.t3{color:#c0956a}.dso-trend-rank.td{color:#3f3f46}
-          .dso-trend-body{flex:1;min-width:0}
-          .dso-trend-query{font-size:13px;font-weight:700;color:#e0e0e0}
-          .dso-trend-meta{font-size:10px;color:#71717a;margin-top:1px}
-          .dso-trend-arrow{font-size:11px;color:#3f3f46}
-          .dso-trend-fire{font-size:13px;flex-shrink:0}
+function adHTML(){
+  return `<div class="ad-slot">
+    <span class="ad-label">Sponsored</span>
+    <div class="ad-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+    <h3>Free JS cheat sheet</h3>
+    <p>Variables, arrays, DOM, async — one printable page. Perfect for your desk.</p>
+    <button class="ad-cta" onclick="event.stopPropagation();showToast('Cheat sheet link coming soon!')">
+      <i class="fa-solid fa-download"></i> Get the PDF
+    </button>
+  </div>`;
+}
 
-          .dso-recent-item{display:flex;align-items:center;gap:10px;padding:10px 0;
-            border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
-          .dso-recent-item:last-child{border-bottom:none}
-          .dso-recent-icon{width:32px;height:32px;border-radius:9px;background:#0e0f13;
-            border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;
-            justify-content:center;font-size:12px;color:#71717a;flex-shrink:0}
-          .dso-recent-text{flex:1;font-size:13px;font-weight:600;color:#c0c0c0}
-          .dso-recent-del{width:26px;height:26px;border-radius:50%;background:transparent;
-            border:none;display:flex;align-items:center;justify-content:center;font-size:11px;
-            color:#3f3f46;cursor:pointer;flex-shrink:0;transition:.15s}
-          .dso-recent-del:active{color:#ff0050}
-          .dso-recent-empty{padding:10px 0;font-size:12px;color:#3f3f46}
+function renderList(){
+  renderChips();
+  const rows = getFiltered();
+  const showFeatured = !catFilter && !(document.getElementById('fSearch').value || '').trim() && page === 1;
+  const featured = showFeatured ? rows[0] : null;
+  const listRows = featured ? rows.slice(1) : rows;
 
-          .dso-story-card{display:flex;gap:11px;background:#08090c;
-            border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:10px;
-            cursor:pointer;transition:border-color .2s;margin-bottom:8px;position:relative}
-          .dso-story-card:active{border-color:rgba(255,0,80,.2)}
-          .dso-sc-img{width:72px;height:86px;border-radius:8px;background-size:cover;
-            background-position:center;flex-shrink:0}
-          .dso-sc-body{flex:1;min-width:0;display:flex;flex-direction:column;
-            justify-content:space-between}
-          .dso-sc-cat{font-size:8px;font-weight:800;color:#ff0050;text-transform:uppercase;
-            letter-spacing:.05em;margin-bottom:3px}
-          .dso-sc-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;
-            line-height:1.35;color:#e0e0e0;display:-webkit-box;-webkit-line-clamp:2;
-            -webkit-box-orient:vertical;overflow:hidden;margin-bottom:5px}
-          .dso-sc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-          .dso-sc-av{width:14px;height:14px;border-radius:50%;object-fit:cover;
-            border:1px solid rgba(255,255,255,.07)}
-          .dso-sc-author{font-size:9px;color:#71717a;font-weight:600}
-          .dso-sc-stat{font-size:9px;color:#3f3f46;display:flex;align-items:center;gap:2px;
-            font-weight:600}
-          .dso-sc-badge{position:absolute;top:8px;right:8px;font-size:7px;font-weight:800;
-            padding:2px 7px;border-radius:6px;letter-spacing:.03em}
-          .dso-badge-hot{background:#ff0050;color:#fff}
-          .dso-badge-new{background:rgba(52,211,153,.1);color:#34d399;
-            border:1px solid rgba(52,211,153,.2)}
-          .dso-badge-free{background:rgba(56,189,248,.08);color:#38bdf8;
-            border:1px solid rgba(56,189,248,.2)}
+  const fSlot = document.getElementById('featuredSlot');
+  if (featured) {
+    fSlot.innerHTML = `<article class="featured" onclick="openArticle(${featured.id})">
+      <div class="featured-cover">
+        <span class="featured-badge"><i class="${CAT_ICONS[featured.category]||'fa-solid fa-tag'}"></i> ${featured.category}</span>
+        <div class="featured-title-on-cover">${featured.title}</div>
+      </div>
+      <div class="featured-body">
+        <p class="featured-excerpt">${featured.excerpt}</p>
+        <div class="meta-row">
+          <span class="author"><span class="av">${featured.initials}</span> ${featured.author}</span>
+          <span><i class="fa-regular fa-calendar"></i> ${fmtDate(featured.date)}</span>
+          <span><i class="fa-solid fa-eye"></i> ${featured.views.toLocaleString()}</span>
+        </div>
+      </div>
+    </article>`;
+  } else {
+    fSlot.innerHTML = '';
+  }
 
-          .dso-writer-card{display:flex;align-items:center;gap:10px;padding:10px 0;
-            border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
-          .dso-writer-card:last-child{border-bottom:none}
-          .dso-wc-av-wrap{position:relative;flex-shrink:0}
-          .dso-wc-av-ring{width:44px;height:44px;border-radius:50%;padding:2.5px;
-            background:linear-gradient(135deg,#ff0050,#ff4d7a)}
-          .dso-wc-av-ring.blue-ring{background:linear-gradient(135deg,#38bdf8,#0ea5e9)}
-          .dso-wc-av-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;
-            background:#000}
-          .dso-wc-av-inner img{width:100%;height:100%;object-fit:cover;display:block}
-          .dso-wc-verified{position:absolute;bottom:-1px;right:-1px;width:16px;height:16px;
-            border-radius:50%;background:#38bdf8;border:2px solid #000;display:flex;
-            align-items:center;justify-content:center;font-size:6px;color:#fff}
-          .dso-wc-body{flex:1;min-width:0}
-          .dso-wc-name{font-size:13px;font-weight:700;color:#e0e0e0}
-          .dso-wc-handle{font-size:10px;color:#71717a;margin-top:1px}
-          .dso-wc-genre{display:inline-flex;align-items:center;gap:3px;font-size:8px;
-            font-weight:700;padding:2px 7px;border-radius:6px;background:rgba(255,0,80,.07);
-            border:1px solid rgba(255,0,80,.2);color:#ff7a9a;margin-top:4px}
-          .dso-wc-follow-btn{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;
-            cursor:pointer;border:1.5px solid rgba(255,255,255,.07);
-            background:rgba(255,255,255,.05);color:#ccc;white-space:nowrap;flex-shrink:0;
-            transition:.2s;font-family:'DM Sans',sans-serif}
-          .dso-wc-follow-btn.ing{background:#ff0050;border-color:#ff0050;color:#fff}
-          .dso-wc-follow-btn:active{transform:scale(.96)}
+  const total = listRows.length;
+  const totalPages = Math.max(1, Math.ceil(total / CFG.PAGE_SIZE));
+  if (page > totalPages) page = totalPages;
+  const start = (page - 1) * CFG.PAGE_SIZE;
+  const pageRows = listRows.slice(start, start + CFG.PAGE_SIZE);
 
-          .dso-h-scroll{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;
-            padding:0 14px}
-          .dso-h-scroll::-webkit-scrollbar{display:none}
-          .dso-h-card{flex-shrink:0;width:130px;cursor:pointer;display:flex;
-            flex-direction:column}
-          .dso-h-card:active{opacity:.8}
-          .dso-h-cover{position:relative;width:100%;height:160px;border-radius:10px;
-            overflow:hidden;background:#08090c;box-shadow:0 4px 14px rgba(0,0,0,.5)}
-          .dso-h-cover img{width:100%;height:100%;object-fit:cover;display:block}
-          .dso-h-scrim{position:absolute;bottom:0;left:0;right:0;height:60%;
-            background:linear-gradient(0deg,rgba(0,0,0,.94),transparent)}
-          .dso-h-badge{position:absolute;top:5px;left:0;font-size:7px;font-weight:800;
-            padding:2px 6px 2px 4px;border-radius:0 6px 6px 0;text-transform:uppercase;z-index:2}
-          .dso-h-views{position:absolute;bottom:5px;left:7px;font-size:8px;font-weight:700;
-            color:rgba(255,255,255,.8);display:flex;align-items:center;gap:2px}
-          .dso-h-title{font-size:10.5px;font-weight:700;line-height:1.35;color:#e0e0e0;
-            margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-            overflow:hidden}
-          .dso-h-author{font-size:9px;color:#71717a;margin-top:3px;font-weight:600}
+  document.getElementById('listLabel').innerHTML = catFilter
+    ? `<i class="${CAT_ICONS[catFilter]||'fa-solid fa-tag'}"></i> ${catFilter}`
+    : (featured ? '<i class="fa-solid fa-book-open"></i> More lessons' : '<i class="fa-solid fa-book-open"></i> Latest lessons');
 
-          .dso-cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-          .dso-cat-tile{position:relative;border-radius:12px;overflow:hidden;height:72px;
-            cursor:pointer;transition:.15s}
-          .dso-cat-tile:active{transform:scale(.97)}
-          .dso-cat-tile-bg{position:absolute;inset:0;background-size:cover;
-            background-position:center}
-          .dso-cat-tile-ov{position:absolute;inset:0;display:flex;align-items:center;
-            padding:0 12px}
-          .dso-cat-tile-label{font-family:'Playfair Display',serif;font-size:13px;
-            font-weight:900;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7)}
-          .dso-cat-tile-count{font-size:9px;color:rgba(255,255,255,.65);margin-top:2px;
-            font-weight:600}
-
-          .dso-results-count{font-size:11px;color:#71717a;font-weight:600;margin-bottom:12px;
-            padding:12px 14px 0}
-          .dso-results-count strong{color:#e0e0e0}
-          .dso-results-inner{padding:0 14px}
-
-          .dso-empty-state{padding:52px 24px;text-align:center;display:flex;
-            flex-direction:column;align-items:center;gap:12px}
-          .dso-empty-icon{font-size:46px;animation:dsoFloat 3s ease-in-out infinite}
-          @keyframes dsoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-          .dso-empty-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;
-            color:#e0e0e0}
-          .dso-empty-body{font-size:12px;color:#71717a;line-height:1.6;max-width:240px}
-          .dso-empty-try{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;
-            margin-top:4px}
-          .dso-empty-try-pill{font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;
-            cursor:pointer;background:rgba(255,0,80,.07);border:1px solid rgba(255,0,80,.2);
-            color:#ff7a9a}
-
-          .dso-debate-card{background:#08090c;border:1px solid rgba(255,255,255,.07);
-            border-radius:13px;overflow:hidden;margin-bottom:8px;cursor:pointer;
-            transition:border-color .2s}
-          .dso-debate-card:active{border-color:rgba(255,0,80,.2)}
-          .dso-dc-header{display:flex;gap:9px;padding:11px 12px 9px}
-          .dso-dc-thumb{width:44px;height:52px;border-radius:7px;background-size:cover;
-            background-position:center;flex-shrink:0}
-          .dso-dc-body{flex:1;min-width:0}
-          .dso-dc-badge{font-size:7.5px;font-weight:800;padding:2px 7px;border-radius:6px;
-            background:rgba(255,0,80,.1);color:#ff0050;border:1px solid rgba(255,0,80,.18);
-            display:inline-flex;align-items:center;gap:3px;margin-bottom:4px}
-          .dso-dc-live-dot{width:4px;height:4px;border-radius:50%;background:#ff0050;
-            animation:dsoLive 1.3s ease-in-out infinite}
-          @keyframes dsoLive{0%,100%{opacity:1}50%{opacity:.3}}
-          .dso-dc-motion{font-size:11px;font-weight:700;color:#e0e0e0;line-height:1.35;
-            display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-          .dso-dc-bars{display:flex;gap:5px;padding:0 12px 10px}
-          .dso-dc-side{flex:1;border-radius:8px;padding:6px 8px;position:relative;overflow:hidden}
-          .dso-dc-side.for{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15)}
-          .dso-dc-side.ag{background:rgba(255,0,80,.05);border:1px solid rgba(255,0,80,.2)}
-          .dso-dc-side-bar{position:absolute;left:0;top:0;bottom:0;z-index:0;border-radius:8px}
-          .dso-dc-side.for .dso-dc-side-bar{background:rgba(52,211,153,.12)}
-          .dso-dc-side.ag .dso-dc-side-bar{background:rgba(255,0,80,.09)}
-          .dso-dc-side-inner{position:relative;z-index:1;display:flex;justify-content:space-between;
-            align-items:center}
-          .dso-dc-side-lbl{font-size:8px;font-weight:800}
-          .dso-dc-side.for .dso-dc-side-lbl{color:#34d399}
-          .dso-dc-side.ag .dso-dc-side-lbl{color:#ff7a9a}
-          .dso-dc-side-pct{font-size:11px;font-weight:900}
-          .dso-dc-side.for .dso-dc-side-pct{color:#34d399}
-          .dso-dc-side.ag .dso-dc-side-pct{color:#ff7a9a}
-          .dso-dc-total{font-size:9px;color:#3f3f46;padding:0 12px 10px;font-weight:600}
-
-          .dso-bottom-nav{position:sticky;bottom:0;z-index:20;background:rgba(0,0,0,.97);
-            backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);
-            display:flex;justify-content:space-around;padding:8px 0 calc(env(safe-area-inset-bottom,0px) + 8px);
-            flex-shrink:0}
-          .dso-bn-item{text-align:center;font-size:9px;font-weight:600;color:#3f3f46;
-            cursor:pointer;transition:.2s;padding:2px 8px;text-decoration:none;
-            display:flex;flex-direction:column;align-items:center;gap:2px}
-          .dso-bn-item i{font-size:20px;display:block}
-          .dso-bn-item.active{color:#ff0050}
-
-          .dso-sdiv{height:1px;background:rgba(255,255,255,.04);margin:6px 0}
-
-          .dso-ad-banner{margin:0 14px 14px;background:#08090c;
-            border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:11px 13px;
-            display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;
-            cursor:pointer}
-          .dso-ad-banner::after{content:'AD';position:absolute;top:6px;right:8px;
-            font-size:7px;font-weight:800;color:#3f3f46;letter-spacing:.08em}
-          .dso-ad-logo{width:36px;height:36px;border-radius:9px;object-fit:cover;
-            flex-shrink:0;border:1px solid rgba(255,255,255,.07)}
-          .dso-ad-body{flex:1;min-width:0}
-          .dso-ad-brand{font-size:9px;font-weight:800;color:#38bdf8;margin-bottom:2px}
-          .dso-ad-headline{font-size:11px;font-weight:700;color:#e0e0e0;margin-bottom:1px;
-            white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-          .dso-ad-sub{font-size:9px;color:#3f3f46}
-          .dso-ad-cta{background:#ff0050;color:#fff;border:none;padding:5px 11px;
-            border-radius:10px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap;
-            flex-shrink:0;font-family:'DM Sans',sans-serif}
-
-          .dso-toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);
-            left:50%;transform:translateX(-50%) translateY(16px);background:#13141a;
-            border:1px solid rgba(255,255,255,.07);color:#c0c0c0;padding:8px 18px;
-            border-radius:28px;font-size:12px;font-weight:600;z-index:5900;opacity:0;
-            transition:.28s;pointer-events:none;white-space:nowrap;max-width:92vw;
-            text-align:center;font-family:'DM Sans',sans-serif}
-          .dso-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-          @keyframes dsoFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-          .dso-fu{animation:dsoFadeUp .22s ease both}
-          .dso-d1{animation-delay:.03s}.dso-d2{animation-delay:.06s}.dso-d3{animation-delay:.09s}
-          .dso-d4{animation-delay:.12s}.dso-d5{animation-delay:.15s}.dso-d6{animation-delay:.18s}
-
-          .dso-view{display:none}
-          .dso-view.show{display:block}
-        \`;
-
-        let _stylesInjected = false;
-        function _injectStyles() {
-          if (_stylesInjected) return;
-          _stylesInjected = true;
-          const el = document.createElement('style');
-          el.id = 'dso-styles';
-          el.textContent = CSS;
-          document.head.appendChild(el);
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Utils
-        // ══════════════════════════════════════════════════════════════════
-        function _fmtN(n) { if (typeof n === 'string') return n; n = +n || 0; return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n); }
-        function _esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-        function _toast(msg, d) {
-          if (typeof window.toast === 'function') { window.toast(msg); return; }
-          let el = document.getElementById('dsoToast');
-          if (!el) {
-            el = document.createElement('div');
-            el.id = 'dsoToast';
-            el.className = 'dso-toast';
-            document.body.appendChild(el);
-          }
-          el.textContent = msg;
-          el.classList.add('show');
-          clearTimeout(el._t);
-          el._t = setTimeout(() => el.classList.remove('show'), d || 2400);
-        }
-
-        const RECENT_KEY = 'dro_recent_v1';
-        function _getRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; } }
-        function _saveRecent(r) { try { localStorage.setItem(RECENT_KEY, JSON.stringify(r)); } catch (e) {} }
-        function _addRecent(q) { let r = _getRecent().filter(x => x !== q); r.unshift(q); r = r.slice(0, 8); _saveRecent(r); }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Default demo data — identical content to the original search.html.
-        // Overridable wholesale (or per-key) via DroboardSearch.configure({data:...})
-        // ══════════════════════════════════════════════════════════════════
-        const DEFAULT_DATA = {
-          trending: [
-            { q: 'Ada_Writes', meta: '12.4k searches · Writer', fire: true },
-            { q: 'betrayal stories', meta: '9.1k searches this week', fire: true },
-            { q: 'The Runaway Bride', meta: '8.7k searches', fire: false },
-            { q: 'campus romance 2025', meta: '7.2k searches', fire: false },
-            { q: 'Chiamaka_N', meta: '6.8k searches · Writer', fire: false },
-            { q: 'family drama series', meta: '5.9k searches', fire: false },
-            { q: 'revenge arc', meta: '5.3k searches', fire: false },
-            { q: 'best elegy stories', meta: '4.1k searches', fire: false },
-          ],
-          categories: [
-            { label: '💔 Betrayal', count: '1.2k stories', bg: 'https://i.postimg.cc/MXBR6bfY/wolf3.jpg' },
-            { label: '🎓 Campus', count: '890 stories', bg: 'https://i.postimg.cc/RqtfSQJJ/wife3.jpg' },
-            { label: '👑 Family', count: '740 stories', bg: 'https://i.postimg.cc/xqmHfyNR/wolf2.jpg' },
-            { label: '🔥 Revenge', count: '620 stories', bg: 'https://i.postimg.cc/fkdXzjS8/wolf.jpg' },
-            { label: '✨ Twist', count: '580 stories', bg: 'https://i.postimg.cc/tY7KnJyr/images.jpg' },
-            { label: '🌙 Elegy', count: '310 stories', bg: 'https://i.postimg.cc/N9jY0w4m/5.jpg' },
-            { label: '💍 Romance', count: '950 stories', bg: 'https://i.postimg.cc/WF1j4Pnh/6.jpg' },
-            { label: '😂 Comedy', count: '420 stories', bg: 'https://i.postimg.cc/cgLZJNmC/8.jpg' },
-          ],
-          featured: [
-            { img: 'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', cat: '💔 Betrayal', title: 'I came home early and caught my husband kissing her photograph', author: 'Ada_Writes', av: 'https://i.pravatar.cc/100?img=32', views: '171k', badge: 'hot' },
-            { img: 'https://i.postimg.cc/tY7KnJyr/images.jpg', cat: '✨ Twist', title: 'The runaway bride in her socked feet', author: 'Ifeanyi_Story', av: 'https://i.pravatar.cc/100?img=53', views: '312k', badge: 'hot' },
-            { img: 'https://i.postimg.cc/xqmHfyNR/wolf2.jpg', cat: '👑 Family', title: "My grandmother's will revealed I wasn't her blood", author: 'Chiamaka_N', av: 'https://i.pravatar.cc/100?img=47', views: '204k', badge: 'free' },
-            { img: 'https://i.postimg.cc/N9jY0w4m/5.jpg', cat: '🌙 Elegy', title: 'The letter he never sent', author: 'Efe_O', av: 'https://i.pravatar.cc/100?img=22', views: '218k', badge: '' },
-            { img: 'https://i.postimg.cc/fkdXzjS8/wolf.jpg', cat: '🔥 Revenge', title: 'I became his boss before telling him who I was', author: 'Zara_M', av: 'https://i.pravatar.cc/100?img=16', views: '192k', badge: 'new' },
-            { img: 'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', cat: '🎓 Campus', title: 'The richest boy started sitting beside me every morning', author: 'CampusQueen', av: 'https://i.pravatar.cc/100?img=12', views: '134k', badge: 'new' },
-          ],
-          writers: [
-            { name: 'Ada_Writes', handle: '@ada_writes', genre: '💔 Betrayal', av: 'https://i.pravatar.cc/100?img=32', followers: '12.4k', verified: true, following: false },
-            { name: 'Ifeanyi_Story', handle: '@ifeanyi_story', genre: '✨ Twist', av: 'https://i.pravatar.cc/100?img=53', followers: '31.7k', verified: true, following: false },
-            { name: 'Chiamaka_N', handle: '@chiamaka_n', genre: '👑 Family', av: 'https://i.pravatar.cc/100?img=47', followers: '19.2k', verified: false, following: false },
-            { name: 'Efe_O', handle: '@efe_o', genre: '🌙 Elegy', av: 'https://i.pravatar.cc/100?img=22', followers: '22.3k', verified: true, following: false },
-            { name: 'Zara_M', handle: '@zara_m', genre: '🔥 Revenge', av: 'https://i.pravatar.cc/100?img=16', followers: '14.8k', verified: false, following: false },
-          ],
-          debates: [
-            { thumb: 'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', motion: 'Ada should stay and fight for her marriage, not leave.', forV: 2341, agV: 3819, live: true },
-            { thumb: 'https://i.postimg.cc/tY7KnJyr/images.jpg', motion: 'Walking out publicly at the altar was brave, not dramatic.', forV: 9800, agV: 2100, live: true },
-            { thumb: 'https://i.postimg.cc/fkdXzjS8/wolf.jpg', motion: 'Legal action was the only appropriate response to theft.', forV: 5800, agV: 900, live: false },
-          ],
-          poolStories: [
-            { type: 'story', img: 'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', cat: '💔 Betrayal', title: "I came home early and caught my husband kissing my late sister's photograph", author: 'Ada_Writes', av: 'https://i.pravatar.cc/100?img=32', views: '171k', likes: '24.3k', badge: 'hot', keywords: ['betrayal', 'husband', 'sister', 'photograph', 'ada'] },
-            { type: 'story', img: 'https://i.postimg.cc/tY7KnJyr/images.jpg', cat: '✨ Twist', title: 'The runaway bride — I left at the altar in my socked feet', author: 'Ifeanyi_Story', av: 'https://i.pravatar.cc/100?img=53', views: '312k', likes: '45k', badge: 'hot', keywords: ['twist', 'bride', 'altar', 'runaway', 'ifeanyi'] },
-            { type: 'story', img: 'https://i.postimg.cc/xqmHfyNR/wolf2.jpg', cat: '👑 Family', title: "My grandmother's will revealed I wasn't her blood", author: 'Chiamaka_N', av: 'https://i.pravatar.cc/100?img=47', views: '204k', likes: '31k', badge: 'free', keywords: ['family', 'grandmother', 'will', 'blood', 'chiamaka'] },
-            { type: 'story', img: 'https://i.postimg.cc/N9jY0w4m/5.jpg', cat: '🌙 Elegy', title: 'The letter folded inside his jacket pocket — he died before sending it', author: 'Efe_O', av: 'https://i.pravatar.cc/100?img=22', views: '218k', likes: '36.5k', badge: '', keywords: ['elegy', 'letter', 'death', 'grief', 'efe'] },
-            { type: 'story', img: 'https://i.postimg.cc/fkdXzjS8/wolf.jpg', cat: '🔥 Revenge', title: 'My stepmother stole my university fund — so I uncovered her entire secret life', author: 'Zara_M', av: 'https://i.pravatar.cc/100?img=16', views: '192k', likes: '28k', badge: 'hot', keywords: ['revenge', 'stepmother', 'fund', 'zara'] },
-            { type: 'story', img: 'https://i.postimg.cc/RqtfSQJJ/wife3.jpg', cat: '🎓 Campus', title: 'The richest boy in school suddenly started sitting beside me every morning', author: 'CampusQueen', av: 'https://i.pravatar.cc/100?img=12', views: '134k', likes: '18.1k', badge: 'new', keywords: ['campus', 'rich', 'school', 'romance'] },
-            { type: 'story', img: 'https://i.postimg.cc/vDn9YLx5/wife2.jpg', cat: '💔 Heartbreak', title: "He proposed with my best friend's ring — she giggled before he even knelt", author: 'Kemi_A', av: 'https://i.pravatar.cc/100?img=28', views: '96k', likes: '19.2k', badge: 'new', keywords: ['heartbreak', 'proposal', 'ring', 'kemi'] },
-            { type: 'story', img: 'https://i.postimg.cc/fkdXzjSj/wife.jpg', cat: '🏙️ Urban Love', title: "She rejected me 3 times. Now we share a mortgage and a dog named 'Finally'", author: 'Dami_Cole', av: 'https://i.pravatar.cc/100?img=64', views: '22.4k', likes: '22.4k', badge: '', keywords: ['romance', 'urban', 'love', 'dog', 'dami'] },
-          ],
-          poolWriters: [
-            { type: 'writer', name: 'Ada_Writes', handle: '@ada_writes', genre: '💔 Betrayal', av: 'https://i.pravatar.cc/100?img=32', followers: '12.4k', verified: true, following: false, keywords: ['ada', 'ada_writes', 'betrayal', 'writer'] },
-            { type: 'writer', name: 'Ifeanyi_Story', handle: '@ifeanyi_story', genre: '✨ Twist', av: 'https://i.pravatar.cc/100?img=53', followers: '31.7k', verified: true, following: false, keywords: ['ifeanyi', 'twist', 'writer'] },
-            { type: 'writer', name: 'Chiamaka_N', handle: '@chiamaka_n', genre: '👑 Family', av: 'https://i.pravatar.cc/100?img=47', followers: '19.2k', verified: false, following: false, keywords: ['chiamaka', 'family', 'writer'] },
-            { type: 'writer', name: 'Efe_O', handle: '@efe_o', genre: '🌙 Elegy', av: 'https://i.pravatar.cc/100?img=22', followers: '22.3k', verified: true, following: false, keywords: ['efe', 'elegy', 'writer'] },
-            { type: 'writer', name: 'Zara_M', handle: '@zara_m', genre: '🔥 Revenge', av: 'https://i.pravatar.cc/100?img=16', followers: '14.8k', verified: false, following: false, keywords: ['zara', 'revenge', 'writer'] },
-            { type: 'writer', name: 'CampusQueen', handle: '@campusqueen', genre: '🎓 Campus', av: 'https://i.pravatar.cc/100?img=12', followers: '8.1k', verified: false, following: false, keywords: ['campus', 'queen', 'writer'] },
-            { type: 'writer', name: 'Kemi_A', handle: '@kemi_a', genre: '💔 Heartbreak', av: 'https://i.pravatar.cc/100?img=28', followers: '6.5k', verified: false, following: false, keywords: ['kemi', 'heartbreak', 'writer'] },
-            { type: 'writer', name: 'Dami_Cole', handle: '@dami_cole', genre: '🏙️ Urban Love', av: 'https://i.pravatar.cc/100?img=64', followers: '9.4k', verified: false, following: false, keywords: ['dami', 'urban', 'love', 'writer'] },
-          ],
-          poolDebates: [
-            { type: 'debate', thumb: 'https://i.postimg.cc/MXBR6bfY/wolf3.jpg', motion: 'Ada should stay and fight for her marriage, not leave.', forV: 2341, agV: 3819, live: true, keywords: ['debate', 'ada', 'marriage', 'stay', 'leave', 'betrayal'] },
-            { type: 'debate', thumb: 'https://i.postimg.cc/tY7KnJyr/images.jpg', motion: 'Walking out publicly at the altar was brave, not dramatic.', forV: 9800, agV: 2100, live: true, keywords: ['debate', 'bride', 'altar', 'brave', 'dramatic', 'twist'] },
-            { type: 'debate', thumb: 'https://i.postimg.cc/fkdXzjS8/wolf.jpg', motion: 'Legal action was the only appropriate response to theft.', forV: 5800, agV: 900, live: false, keywords: ['debate', 'legal', 'theft', 'revenge', 'stepmother'] },
-          ],
-          ad: { logo: 'https://i.pravatar.cc/100?img=23', brand: 'PiggyVest', headline: 'Save smarter, build your future.', sub: '4M+ Nigerians already saving.', cta: 'Start' },
-        };
-
-        // ══════════════════════════════════════════════════════════════════
-        // Module state
-        // ══════════════════════════════════════════════════════════════════
-        let _data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-        let _hooks = {
-          onOpenStory: () => { location.href = 'bridge.html'; },
-          onOpenWriter: () => { location.href = 'profile.html'; },
-          onOpenDebate: () => { _toast('⚔️ Opening debate…'); },
-          onFollowToggle: null,
-          onAdClick: (ad) => { _toast('Opening ' + (ad.brand || 'ad') + '…'); },
-        };
-        let _built = false;
-        let _root, _scrollEl, _searchInp, _clearBtn, _filterBar;
-        let _defaultView, _resultsView, _emptyView;
-        let _currentFilter = 'all';
-        let _debounceTimer = null;
-        let _isOpen = false;
-
-        function configure(options) {
-          options = options || {};
-          if (options.data) {
-            Object.keys(options.data).forEach(k => { _data[k] = options.data[k]; });
-          }
-          ['onOpenStory', 'onOpenWriter', 'onOpenDebate', 'onFollowToggle', 'onAdClick'].forEach(k => {
-            if (typeof options[k] === 'function') _hooks[k] = options[k];
-          });
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Build (once, lazily on first open)
-        // ══════════════════════════════════════════════════════════════════
-        function build() {
-          if (_built) return;
-          _built = true;
-          _injectStyles();
-
-          _root = document.createElement('div');
-          _root.className = 'dso-root';
-          _root.innerHTML = \`
-            <div class="dso-topbar">
-              <div class="dso-toprow">
-                <button class="dso-back" data-dso-close aria-label="Close search"><i class="fas fa-arrow-left"></i></button>
-                <span class="dso-toplabel">Search</span>
-                <div style="width:32px"></div>
-              </div>
-              <div class="dso-search-wrap">
-                <i class="fas fa-magnifying-glass dso-search-icon"></i>
-                <input class="dso-search-inp" type="search" placeholder="Stories, writers, genres, keywords…"
-                       autocomplete="off" autocorrect="off" spellcheck="false"/>
-                <div class="dso-search-clear"><i class="fas fa-xmark"></i></div>
-              </div>
-              <div class="dso-filter-bar">
-                <div class="dso-fpill on" data-f="all">🔥 All</div>
-                <div class="dso-fpill" data-f="stories">📖 Stories</div>
-                <div class="dso-fpill" data-f="writers">✍️ Writers</div>
-                <div class="dso-fpill" data-f="debates">⚔️ Debates</div>
-                <div class="dso-fpill" data-f="tags"># Tags</div>
-              </div>
+  const list = document.getElementById('postList');
+  if (pageRows.length === 0 && !featured) {
+    list.innerHTML = `<div class="empty"><i class="fa-solid fa-inbox"></i>No lessons found</div>`;
+  } else {
+    let html = '';
+    pageRows.forEach((p, i) => {
+      if (i === 4) html += adHTML(); // ad after first 4 posts
+      html += `<article class="post-card" onclick="openArticle(${p.id})">
+        <div class="post-thumb"><i class="${p.icon||'fa-solid fa-code'}"></i></div>
+        <div class="post-body">
+          <div class="post-cat"><i class="${CAT_ICONS[p.category]||'fa-solid fa-tag'}"></i> ${p.category}</div>
+          <h2 class="post-title">${p.title}</h2>
+          <p class="post-excerpt">${p.excerpt}</p>
+          <div class="post-footer">
+            <span class="post-date"><i class="fa-regular fa-calendar"></i> ${fmtDate(p.date)}</span>
+            <div class="post-stats">
+              <span><i class="fa-solid fa-eye"></i> ${p.views.toLocaleString()}</span>
+              <span><i class="fa-solid fa-heart"></i> ${p.likes}</span>
             </div>
-
-            <div class="dso-scroll">
-              <div class="dso-view show" data-view="default">
-                <div class="dso-sh dso-fu dso-d1">
-                  <div class="dso-sh-title"><i class="fas fa-clock-rotate-left" style="font-size:10px"></i> Recent</div>
-                  <div class="dso-sh-more" data-dso-clearrecent>Clear all</div>
-                </div>
-                <div class="dso-recent-list" data-dso-recentlist></div>
-
-                <div class="dso-sdiv" style="margin:14px 0 0"></div>
-
-                <div class="dso-sh dso-fu dso-d2">
-                  <div class="dso-sh-title"><i class="fas fa-fire" style="font-size:10px;color:#ff0050"></i> Trending Searches</div>
-                </div>
-                <div class="dso-trending-list dso-fu dso-d2" data-dso-trendinglist></div>
-
-                <div class="dso-sdiv" style="margin:14px 0 0"></div>
-
-                <div class="dso-sh dso-fu dso-d3">
-                  <div class="dso-sh-title"><i class="fas fa-compass" style="font-size:10px"></i> Browse by Genre</div>
-                  <a class="dso-sh-more" href="discover.html">See all</a>
-                </div>
-                <div class="dso-cat-grid dso-fu dso-d3" data-dso-catgrid></div>
-
-                <div style="height:8px"></div>
-
-                <div class="dso-sh dso-fu dso-d4">
-                  <div class="dso-sh-title"><i class="fas fa-star" style="font-size:10px;color:#fbbf24"></i> Featured This Week</div>
-                  <a class="dso-sh-more" href="browse.html">Browse all</a>
-                </div>
-                <div class="dso-h-scroll dso-fu dso-d4" data-dso-featuredscroll style="padding-bottom:10px"></div>
-
-                <div class="dso-sdiv" style="margin:4px 0 0"></div>
-
-                <div class="dso-sh dso-fu dso-d5">
-                  <div class="dso-sh-title"><i class="fas fa-pen-nib" style="font-size:10px"></i> Writers to Follow</div>
-                </div>
-                <div style="padding:0 14px" class="dso-fu dso-d5" data-dso-writerslist></div>
-
-                <div class="dso-sdiv" style="margin:14px 0 0"></div>
-
-                <div class="dso-sh dso-fu dso-d6">
-                  <div class="dso-sh-title"><i class="fas fa-gavel" style="font-size:10px;color:#ff0050"></i> Hot Debates</div>
-                  <a class="dso-sh-more" href="debate.html">All debates</a>
-                </div>
-                <div style="padding:0 14px" class="dso-fu dso-d6" data-dso-debateslist></div>
-
-                <div class="dso-ad-banner dso-fu dso-d6" data-dso-ad></div>
-              </div>
-
-              <div class="dso-view" data-view="results">
-                <div data-dso-resultswrap></div>
-              </div>
-
-              <div class="dso-view" data-view="empty">
-                <div class="dso-empty-state">
-                  <div class="dso-empty-icon">🔍</div>
-                  <div class="dso-empty-title" data-dso-emptytitle>No results</div>
-                  <div class="dso-empty-body">Try a different keyword, writer name, or genre.</div>
-                  <div class="dso-empty-try" data-dso-emptytry></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="dso-bottom-nav">
-              <a class="dso-bn-item" href="index.html"><i class="fas fa-house"></i>Home</a>
-              <a class="dso-bn-item" href="discover.html"><i class="fas fa-compass"></i>Discover</a>
-              <a class="dso-bn-item active" href="search.html"><i class="fas fa-magnifying-glass"></i>Search</a>
-              <a class="dso-bn-item" href="feed.html"><i class="fas fa-rss"></i>Feed</a>
-              <a class="dso-bn-item" href="profile.html"><i class="fas fa-circle-user"></i>Profile</a>
-            </div>
-          \`;
-          document.body.appendChild(_root);
-
-          _scrollEl = _root.querySelector('.dso-scroll');
-          _searchInp = _root.querySelector('.dso-search-inp');
-          _clearBtn = _root.querySelector('.dso-search-clear');
-          _filterBar = _root.querySelector('.dso-filter-bar');
-          _defaultView = _root.querySelector('[data-view="default"]');
-          _resultsView = _root.querySelector('[data-view="results"]');
-          _emptyView = _root.querySelector('[data-view="empty"]');
-
-          bindStaticEvents();
-          renderRecent();
-          renderTrending();
-          renderCategories();
-          renderFeatured();
-          renderWriters();
-          renderDebates();
-          renderAd();
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Render: static/browse sections
-        // ══════════════════════════════════════════════════════════════════
-        function renderRecent() {
-          const r = _getRecent();
-          const el = _root.querySelector('[data-dso-recentlist]');
-          if (!r.length) { el.innerHTML = \`<div class="dso-recent-empty">No recent searches yet.</div>\`; return; }
-          el.innerHTML = r.map(q => \`
-            <div class="dso-recent-item" data-dso-recentrun="\${_esc(q)}">
-              <div class="dso-recent-icon"><i class="fas fa-clock-rotate-left"></i></div>
-              <div class="dso-recent-text">\${_esc(q)}</div>
-              <button class="dso-recent-del" data-dso-recentdel="\${_esc(q)}"><i class="fas fa-xmark"></i></button>
-            </div>\`).join('');
-        }
-
-        function renderTrending() {
-          _root.querySelector('[data-dso-trendinglist]').innerHTML = (_data.trending || []).map((t, i) => \`
-            <div class="dso-trend-item" data-dso-run="\${_esc(t.q)}">
-              <div class="dso-trend-rank \${i === 0 ? 't1' : i === 1 ? 't2' : i === 2 ? 't3' : 'td'}">\${i + 1}</div>
-              <div class="dso-trend-body">
-                <div class="dso-trend-query">\${_esc(t.q)}</div>
-                <div class="dso-trend-meta">\${_esc(t.meta)}</div>
-              </div>
-              \${t.fire ? '<div class="dso-trend-fire">🔥</div>' : ''}
-              <div class="dso-trend-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>\`).join('');
-        }
-
-        function renderCategories() {
-          _root.querySelector('[data-dso-catgrid]').innerHTML = (_data.categories || []).map(c => \`
-            <div class="dso-cat-tile" data-dso-run="\${_esc((c.label || '').replace(/[^a-zA-Z ]/g, '').trim())}">
-              <div class="dso-cat-tile-bg" style="background-image:url('\${c.bg}')"></div>
-              <div class="dso-cat-tile-ov" style="background:linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.3))">
-                <div>
-                  <div class="dso-cat-tile-label">\${c.label}</div>
-                  <div class="dso-cat-tile-count">\${c.count}</div>
-                </div>
-              </div>
-            </div>\`).join('');
-        }
-
-        function renderFeatured() {
-          _root.querySelector('[data-dso-featuredscroll]').innerHTML = (_data.featured || []).map(s => {
-            const bc = s.badge === 'hot' ? 'dso-badge-hot' : s.badge === 'new' ? 'dso-badge-new' : s.badge === 'free' ? 'dso-badge-free' : '';
-            return \`<div class="dso-h-card" data-dso-openstory='\${_esc(JSON.stringify(s))}'>
-              <div class="dso-h-cover">
-                <img src="\${s.img}" loading="lazy" alt=""/>
-                <div class="dso-h-scrim"></div>
-                \${s.badge ? \`<div class="dso-h-badge \${bc}">\${s.badge.toUpperCase()}</div>\` : ''}
-                <div class="dso-h-views"><i class="fas fa-eye" style="font-size:6px"></i> \${s.views}</div>
-              </div>
-              <div class="dso-h-title">\${_esc(s.title)}</div>
-              <div class="dso-h-author">@\${_esc(s.author)}</div>
-            </div>\`;
-          }).join('');
-        }
-
-        function renderWriters() {
-          _root.querySelector('[data-dso-writerslist]').innerHTML = (_data.writers || []).map((w, i) => \`
-            <div class="dso-writer-card" data-dso-openwriter='\${_esc(JSON.stringify(w))}'>
-              <div class="dso-wc-av-wrap">
-                <div class="dso-wc-av-ring\${i % 2 === 0 ? '' : ' blue-ring'}">
-                  <div class="dso-wc-av-inner"><img src="\${w.av}" loading="lazy" alt=""/></div>
-                </div>
-                \${w.verified ? \`<div class="dso-wc-verified"><i class="fas fa-check" style="font-size:5px"></i></div>\` : ''}
-              </div>
-              <div class="dso-wc-body">
-                <div class="dso-wc-name">\${_esc(w.name)}</div>
-                <div class="dso-wc-handle">\${_esc(w.handle)} · \${_esc(w.followers)} followers</div>
-                <div class="dso-wc-genre">\${w.genre}</div>
-              </div>
-              <button class="dso-wc-follow-btn\${w.following ? ' ing' : ''}" data-dso-follow="\${i}">\${w.following ? '✓ Following' : '+ Follow'}</button>
-            </div>\`).join('');
-        }
-
-        function renderDebates() {
-          const list = (_data.debates || []).map(d => debateCardHtml(d));
-          _root.querySelector('[data-dso-debateslist]').innerHTML = list.join('');
-        }
-
-        function debateCardHtml(d) {
-          const tot = (d.forV + d.agV) || 1;
-          const fp = Math.round(d.forV / tot * 100), ap = 100 - fp;
-          return \`<div class="dso-debate-card" data-dso-opendebate='\${_esc(JSON.stringify(d))}'>
-            <div class="dso-dc-header">
-              <div class="dso-dc-thumb" style="background-image:url('\${d.thumb}')"></div>
-              <div class="dso-dc-body">
-                <div class="dso-dc-badge">\${d.live ? \`<span class="dso-dc-live-dot"></span>LIVE\` : 'Debate'}</div>
-                <div class="dso-dc-motion">"\${_esc(d.motion)}"</div>
-              </div>
-            </div>
-            <div class="dso-dc-bars">
-              <div class="dso-dc-side for"><div class="dso-dc-side-bar" style="width:\${fp}%"></div><div class="dso-dc-side-inner"><span class="dso-dc-side-lbl">✅ FOR</span><span class="dso-dc-side-pct">\${fp}%</span></div></div>
-              <div class="dso-dc-side ag"><div class="dso-dc-side-bar" style="width:\${ap}%"></div><div class="dso-dc-side-inner"><span class="dso-dc-side-lbl">❌ AGAINST</span><span class="dso-dc-side-pct">\${ap}%</span></div></div>
-            </div>
-            <div class="dso-dc-total">\${_fmtN(d.forV + d.agV)} voices</div>
-          </div>\`;
-        }
-
-        function renderAd() {
-          const ad = _data.ad;
-          if (!ad) { _root.querySelector('[data-dso-ad]').style.display = 'none'; return; }
-          _root.querySelector('[data-dso-ad]').innerHTML = \`
-            <img class="dso-ad-logo" src="\${ad.logo}" loading="lazy" alt="\${_esc(ad.brand)}"/>
-            <div class="dso-ad-body">
-              <div class="dso-ad-brand">\${_esc(ad.brand)}</div>
-              <div class="dso-ad-headline">\${_esc(ad.headline)}</div>
-              <div class="dso-ad-sub">\${_esc(ad.sub)}</div>
-            </div>
-            <button class="dso-ad-cta">\${_esc(ad.cta)}</button>\`;
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Search logic
-        // ══════════════════════════════════════════════════════════════════
-        function switchView(name) {
-          [_defaultView, _resultsView, _emptyView].forEach(v => v.classList.remove('show'));
-          if (name === 'default') _defaultView.classList.add('show');
-          if (name === 'results') _resultsView.classList.add('show');
-          if (name === 'empty') _emptyView.classList.add('show');
-        }
-
-        function clearSearchUI() {
-          _searchInp.value = '';
-          _clearBtn.classList.remove('show');
-          _filterBar.classList.remove('show');
-          switchView('default');
-        }
-
-        function runSearch(q) {
-          _searchInp.value = q;
-          _searchInp.dispatchEvent(new Event('input'));
-          _searchInp.blur();
-        }
-
-        function doSearch(q) {
-          q = (q || '').trim();
-          if (!q) { clearSearchUI(); return; }
-          _clearBtn.classList.add('show');
-          _filterBar.classList.add('show');
-          _addRecent(q);
-          renderRecent();
-          displayResults(q);
-        }
-
-        function allPool() {
-          return [].concat(_data.poolStories || [], _data.poolWriters || [], _data.poolDebates || []);
-        }
-
-        function displayResults(q) {
-          const qLow = q.toLowerCase();
-          let hits = allPool().filter(item => {
-            const inKw = (item.keywords || []).some(k => k.includes(qLow) || qLow.includes(k));
-            const inTitle = (item.title || item.motion || item.name || '').toLowerCase().includes(qLow);
-            const inAuthor = (item.author || item.handle || '').toLowerCase().includes(qLow);
-            return inKw || inTitle || inAuthor;
-          });
-
-          if (_currentFilter === 'stories') hits = hits.filter(h => h.type === 'story');
-          else if (_currentFilter === 'writers') hits = hits.filter(h => h.type === 'writer');
-          else if (_currentFilter === 'debates') hits = hits.filter(h => h.type === 'debate');
-          else if (_currentFilter === 'tags') hits = hits.filter(h => h.type === 'story');
-
-          if (!hits.length) {
-            switchView('empty');
-            _root.querySelector('[data-dso-emptytitle]').textContent = \`Nothing for "\${q}"\`;
-            _root.querySelector('[data-dso-emptytry]').innerHTML =
-              ['betrayal', 'campus', 'Ada_Writes', 'elegy', 'romance'].map(s =>
-                \`<div class="dso-empty-try-pill" data-dso-run="\${_esc(s)}">\${s}</div>\`).join('');
-            return;
-          }
-
-          switchView('results');
-
-          const storiesHits = hits.filter(h => h.type === 'story');
-          const writersHits = hits.filter(h => h.type === 'writer');
-          const debatesHits = hits.filter(h => h.type === 'debate');
-
-          let html = \`<div class="dso-results-count"><strong>\${hits.length}</strong> result\${hits.length !== 1 ? 's' : ''} for "<strong>\${_esc(q)}</strong>"</div><div class="dso-results-inner">\`;
-
-          if (writersHits.length && (_currentFilter === 'all' || _currentFilter === 'writers')) {
-            html += \`<div class="dso-sh" style="padding:4px 0 10px"><div class="dso-sh-title"><i class="fas fa-pen-nib" style="font-size:10px"></i> Writers</div></div>\`;
-            html += writersHits.map(w => \`
-              <div class="dso-writer-card" style="margin-bottom:4px" data-dso-openwriter='\${_esc(JSON.stringify(w))}'>
-                <div class="dso-wc-av-wrap">
-                  <div class="dso-wc-av-ring"><div class="dso-wc-av-inner"><img src="\${w.av}" loading="lazy" alt=""/></div></div>
-                  \${w.verified ? \`<div class="dso-wc-verified"><i class="fas fa-check" style="font-size:5px"></i></div>\` : ''}
-                </div>
-                <div class="dso-wc-body">
-                  <div class="dso-wc-name">\${_esc(w.name)}</div>
-                  <div class="dso-wc-handle">\${_esc(w.handle)} · \${_esc(w.followers)} followers</div>
-                  <div class="dso-wc-genre">\${w.genre}</div>
-                </div>
-                <button class="dso-wc-follow-btn" data-dso-followresult='\${_esc(JSON.stringify(w))}'>\${w.following ? '✓ Following' : '+ Follow'}</button>
-              </div>\`).join('');
-            if (storiesHits.length || debatesHits.length) html += \`<div class="dso-sdiv" style="margin:8px 0 0"></div>\`;
-          }
-
-          if (storiesHits.length && (_currentFilter === 'all' || _currentFilter === 'stories' || _currentFilter === 'tags')) {
-            html += \`<div class="dso-sh" style="padding:\${writersHits.length ? '12px' : '4px'} 0 10px"><div class="dso-sh-title"><i class="fas fa-book-open" style="font-size:10px"></i> Stories</div></div>\`;
-            html += storiesHits.map(s => {
-              const bc = s.badge === 'hot' ? 'dso-badge-hot' : s.badge === 'new' ? 'dso-badge-new' : s.badge === 'free' ? 'dso-badge-free' : '';
-              return \`<div class="dso-story-card" data-dso-openstory='\${_esc(JSON.stringify(s))}'>
-                <div class="dso-sc-img" style="background-image:url('\${s.img}')"></div>
-                <div class="dso-sc-body">
-                  <div class="dso-sc-cat">\${s.cat}</div>
-                  <div class="dso-sc-title">\${_esc(s.title)}</div>
-                  <div class="dso-sc-meta">
-                    <img class="dso-sc-av" src="\${s.av}" loading="lazy" alt=""/>
-                    <span class="dso-sc-author">@\${_esc(s.author)}</span>
-                    <span class="dso-sc-stat"><i class="fas fa-eye" style="font-size:7px"></i>\${s.views}</span>
-                    <span class="dso-sc-stat"><i class="fas fa-heart" style="font-size:7px;color:#ff0050"></i>\${s.likes}</span>
-                  </div>
-                </div>
-                \${s.badge ? \`<span class="dso-sc-badge \${bc}">\${s.badge.toUpperCase()}</span>\` : ''}
-              </div>\`;
-            }).join('');
-            if (debatesHits.length) html += \`<div class="dso-sdiv" style="margin:4px 0 0"></div>\`;
-          }
-
-          if (debatesHits.length && (_currentFilter === 'all' || _currentFilter === 'debates')) {
-            html += \`<div class="dso-sh" style="padding:12px 0 10px"><div class="dso-sh-title"><i class="fas fa-gavel" style="font-size:10px;color:#ff0050"></i> Debates</div></div>\`;
-            html += debatesHits.map(d => debateCardHtml(d)).join('');
-          }
-
-          html += \`<div style="height:8px"></div></div>\`;
-          _root.querySelector('[data-dso-resultswrap]').innerHTML = html;
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Events (delegated — bound once, at build time)
-        // ══════════════════════════════════════════════════════════════════
-        function bindStaticEvents() {
-          _root.querySelector('[data-dso-close]').addEventListener('click', close);
-
-          _searchInp.addEventListener('input', e => {
-            const q = e.target.value;
-            _clearBtn.classList.toggle('show', q.length > 0);
-            clearTimeout(_debounceTimer);
-            if (!q.trim()) { clearSearchUI(); return; }
-            _debounceTimer = setTimeout(() => doSearch(q), 280);
-          });
-          _searchInp.addEventListener('keydown', e => {
-            if (e.key === 'Enter') { e.preventDefault(); doSearch(_searchInp.value); }
-          });
-          _clearBtn.addEventListener('click', clearSearchUI);
-
-          _filterBar.querySelectorAll('.dso-fpill').forEach(p => {
-            p.addEventListener('click', () => {
-              _currentFilter = p.dataset.f;
-              _filterBar.querySelectorAll('.dso-fpill').forEach(x => x.classList.toggle('on', x === p));
-              const q = _searchInp.value.trim();
-              if (q) displayResults(q);
-            });
-          });
-
-          _root.querySelector('[data-dso-clearrecent]').addEventListener('click', () => {
-            _saveRecent([]); renderRecent(); _toast('🗑️ Recent searches cleared');
-          });
-
-          // One big delegated handler covers: recent run/delete, trending run,
-          // category run, empty-state suggestion pills, story/writer/debate
-          // opens (both in the browse sections and inside live results), and
-          // follow toggles (both sections use the same data attributes).
-          _root.addEventListener('click', e => {
-            const runEl = e.target.closest('[data-dso-run],[data-dso-recentrun]');
-            if (runEl) { runSearch(runEl.dataset.dsoRun || runEl.dataset.dsoRecentrun); return; }
-
-            const delEl = e.target.closest('[data-dso-recentdel]');
-            if (delEl) {
-              e.stopPropagation();
-              _saveRecent(_getRecent().filter(x => x !== delEl.dataset.dsoRecentdel));
-              renderRecent();
-              return;
-            }
-
-            const followBtn = e.target.closest('[data-dso-follow]');
-            if (followBtn) {
-              e.stopPropagation();
-              const i = +followBtn.dataset.dsoFollow;
-              const w = _data.writers[i];
-              if (!w) return;
-              w.following = !w.following;
-              followBtn.textContent = w.following ? '✓ Following' : '+ Follow';
-              followBtn.classList.toggle('ing', w.following);
-              _toast(w.following ? \`✅ Following @\${w.name}\` : \`Unfollowed @\${w.name}\`);
-              if (_hooks.onFollowToggle) _hooks.onFollowToggle(w, w.following);
-              return;
-            }
-            const followResultBtn = e.target.closest('[data-dso-followresult]');
-            if (followResultBtn) {
-              e.stopPropagation();
-              const w = JSON.parse(followResultBtn.dataset.dsoFollowresult);
-              w.following = !w.following;
-              followResultBtn.textContent = w.following ? '✓ Following' : '+ Follow';
-              followResultBtn.classList.toggle('ing', w.following);
-              _toast(w.following ? \`✅ Following @\${w.name}\` : \`Unfollowed @\${w.name}\`);
-              if (_hooks.onFollowToggle) _hooks.onFollowToggle(w, w.following);
-              return;
-            }
-
-            const storyEl = e.target.closest('[data-dso-openstory]');
-            if (storyEl) { _hooks.onOpenStory(JSON.parse(storyEl.dataset.dsoOpenstory)); return; }
-
-            const writerEl = e.target.closest('[data-dso-openwriter]');
-            if (writerEl && !e.target.closest('[data-dso-follow],[data-dso-followresult]')) {
-              _hooks.onOpenWriter(JSON.parse(writerEl.dataset.dsoOpenwriter)); return;
-            }
-
-            const debateEl = e.target.closest('[data-dso-opendebate]');
-            if (debateEl) { _hooks.onOpenDebate(JSON.parse(debateEl.dataset.dsoOpendebate)); return; }
-
-            const adEl = e.target.closest('[data-dso-ad]');
-            if (adEl) { _hooks.onAdClick(_data.ad); return; }
-          });
-        }
-
-        // ══════════════════════════════════════════════════════════════════
-        // Public API
-        // ══════════════════════════════════════════════════════════════════
-        function open(prefillQuery) {
-          build();
-          _root.classList.add('open');
-          document.body.style.overflow = 'hidden';
-          _isOpen = true;
-          if (prefillQuery) {
-            runSearch(prefillQuery);
-          } else if (!_searchInp.value) {
-            clearSearchUI();
-          }
-          setTimeout(() => _searchInp && _searchInp.focus(), 60);
-        }
-
-        function close() {
-          if (!_built) return;
-          _root.classList.remove('open');
-          document.body.style.overflow = '';
-          _isOpen = false;
-        }
-
-        function isOpen() { return _isOpen; }
-
-        window.DroboardSearch = { open, close, isOpen, configure };
-
-        // ══════════════════════════════════════════════════════════════════
-        // Auto-bind: any element anywhere with data-search-trigger opens this
-        // overlay. Works for elements that don't exist yet at script-load time
-        // too, since it's one delegated listener on the document.
-        // ══════════════════════════════════════════════════════════════════
-        document.addEventListener('click', e => {
-          const trigger = e.target.closest('[data-search-trigger]');
-          if (!trigger) return;
-          e.preventDefault();
-          open();
-        });
-
-      })();
-    `;
-
-    // Execute the component code
-    var scriptTag = document.createElement('script');
-    scriptTag.textContent = componentCode;
-    document.head.appendChild(scriptTag);
-
-    // Also add keyboard shortcut
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey && e.key === 'k') || e.key === '/' && !e.ctrlKey && !e.metaKey) {
-        var tag = e.target.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
-        e.preventDefault();
-        if (window.DroboardSearch) {
-          if (window.DroboardSearch.isOpen()) {
-            window.DroboardSearch.close();
-          } else {
-            window.DroboardSearch.open();
-          }
-        }
-      }
+          </div>
+        </div>
+      </article>`;
     });
+    list.innerHTML = html;
+  }
 
-  })();
+  const btns = document.getElementById('pageBtns');
+  btns.innerHTML = '';
+  if (totalPages > 1) {
+    const prev = document.createElement('button');
+    prev.className = 'page-btn'; prev.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+    prev.disabled = page === 1;
+    prev.onclick = () => { page--; renderList(); window.scrollTo(0,0); };
+    btns.appendChild(prev);
 
+    let s = Math.max(1, page - 2), e = Math.min(totalPages, s + 4);
+    s = Math.max(1, e - 4);
+    for (let i = s; i <= e; i++) {
+      const b = document.createElement('button');
+      b.className = 'page-btn' + (i === page ? ' active' : '');
+      b.textContent = i;
+      b.onclick = ((p) => () => { page = p; renderList(); window.scrollTo(0,0); })(i);
+      btns.appendChild(b);
+    }
+
+    const next = document.createElement('button');
+    next.className = 'page-btn'; next.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+    next.disabled = page >= totalPages;
+    next.onclick = () => { page++; renderList(); window.scrollTo(0,0); };
+    btns.appendChild(next);
+  }
+
+  const from = total === 0 ? 0 : start + 1;
+  const to = Math.min(start + CFG.PAGE_SIZE, total);
+  const extra = featured ? 1 : 0;
+  document.getElementById('paginLabel').textContent =
+    total + extra === 0 ? '' : `${from + extra}–${to + extra} of ${total + extra} lessons`;
+}
+
+function openArticle(id){
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('aTopTitle').textContent = p.title;
+  document.getElementById('aCat').innerHTML = `<i class="${CAT_ICONS[p.category]||'fa-solid fa-tag'}"></i> ${p.category}`;
+  document.getElementById('aTitle').textContent = p.title;
+  document.getElementById('aMeta').innerHTML = `
+    <span class="author"><span class="av">${p.initials}</span> ${p.author}</span>
+    <span><i class="fa-regular fa-calendar"></i> ${fmtDate(p.date)}</span>
+  `;
+  // Simple markdown-ish: paragraphs + inline code-ish lines that look like code
+  const raw = p.content || p.excerpt;
+  const blocks = raw.split(/\n\n+/).map(para => {
+    const t = para.trim();
+    // If paragraph looks like code (indented or starts with const/function/etc)
+    if (/^(const |let |function |async |fetch\(|typeof |localStorage)/.test(t) || t.includes('\n  ')) {
+      return `<pre>${t.replace(/</g,'&lt;')}</pre>`;
+    }
+    // Inline code: backtick-free simple highlight for short code words is skipped;
+    // escape and wrap plain paragraphs
+    return `<p>${t.replace(/</g,'&lt;')}</p>`;
+  }).join('');
+  document.getElementById('aContent').innerHTML = blocks;
+  document.getElementById('aStats').innerHTML = `
+    <span><i class="fa-solid fa-eye"></i> ${p.views.toLocaleString()} views</span>
+    <span><i class="fa-solid fa-heart"></i> ${p.likes} likes</span>
+  `;
+  document.getElementById('listView').classList.add('hide');
+  document.getElementById('articleView').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function closeArticle(){
+  document.getElementById('articleView').classList.remove('show');
+  document.getElementById('listView').classList.remove('hide');
+}
+
+function subscribeNewsletter(e){
+  e.preventDefault();
+  const email = document.getElementById('nlEmail').value.trim();
+  if (!email) return false;
+  document.getElementById('nlEmail').value = '';
+  showToast('You\'re in! Check your inbox soon.');
+  return false;
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+document.getElementById('searchToggle').addEventListener('click', () => {
+  const bar = document.getElementById('searchBar');
+  bar.classList.toggle('open');
+  if (bar.classList.contains('open')) document.getElementById('fSearch').focus();
+  else { document.getElementById('fSearch').value = ''; page = 1; renderList(); }
+});
+
+async function init(){
+  try { posts = await getPosts(); }
+  catch (err) { posts = DEMO_POSTS; }
+  renderList();
+}
+init();
 </script>
-
 </body>
 </html>
