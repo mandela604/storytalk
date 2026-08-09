@@ -164,7 +164,7 @@
         { type: 'warning', severity: 'warning', text: 'Multiple failed login attempts on account USR-005 (Marcus Ihejirika)', time: '1d ago' },
         { type: 'blocked', severity: 'warning', text: 'Suspicious API request pattern detected and blocked', time: '2d ago' },
       ],
-    //  apiKey: 'sk_live_7f3a9b2c1e8d4f6a5b0c3e7d9f1a2b4c',
+
     },
 
     systemLogs: [
